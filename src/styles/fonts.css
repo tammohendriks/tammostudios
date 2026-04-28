@@ -1,0 +1,21 @@
+/* Lokal gehostete Schriften für Wordmark + spätere Brand-Anwendungen.
+   Bewusst minimal: Body-Text nutzt aktuell weiterhin Inter als Fallback,
+   bis weitere Neue-Montreal-Gewichte gebraucht werden. */
+
+@font-face {
+  font-family: 'Neue Montreal';
+  src:
+    url('/fonts/montreal/NeueMontreal-Bold.woff2') format('woff2'),
+    url('/fonts/montreal/NeueMontreal-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Aileron';
+  src: url('/fonts/aileron/Aileron-BoldItalic.otf') format('opentype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
