@@ -23,9 +23,9 @@ const year = new Date().getFullYear();
       <section class="mt-10 space-y-2 leading-relaxed text-ts-fg/90">
         <h2 class="text-[12px] uppercase tracking-[0.3em] text-ts-muted">Anbieter</h2>
         <p>Tammo Hendriks</p>
-        <p>[Straße und Hausnummer — Platzhalter]</p>
-        <p>[PLZ Ort — Platzhalter]</p>
-        <p>{SITE.location}, Deutschland</p>
+        <p>{SITE.address.street}</p>
+        <p>{SITE.address.zip} {SITE.address.city}</p>
+        <p>{SITE.address.country}</p>
       </section>
 
       <section class="mt-8 space-y-2 leading-relaxed text-ts-fg/90">
@@ -35,25 +35,23 @@ const year = new Date().getFullYear();
 
       <section class="mt-8 space-y-2 leading-relaxed text-ts-fg/90">
         <h2 class="text-[12px] uppercase tracking-[0.3em] text-ts-muted">
-          Umsatzsteuer / Steuernummer
+          Umsatzsteuer-Identifikationsnummer (gem. §27a UStG)
         </h2>
-        <p>USt-IdNr.: [Platzhalter]</p>
-        <p>Steuernummer: [Platzhalter]</p>
+        <p>{SITE.legal.vatId}</p>
       </section>
 
       <section class="mt-8 space-y-2 leading-relaxed text-ts-fg/90">
         <h2 class="text-[12px] uppercase tracking-[0.3em] text-ts-muted">
-          Verantwortlich i.S.d. §18 Abs. 2 MStV
+          Steuernummer
         </h2>
-        <p>Tammo Hendriks</p>
-        <p>Anschrift wie oben.</p>
+        <p>{SITE.legal.taxId}</p>
       </section>
 
-      <section class="mt-12 border-t border-white/5 pt-6 text-[13px] text-ts-muted">
-        <p>
-          Hinweis: Diese Angaben werden vor dem offiziellen Launch durch die
-          finalen, vollständigen Daten ersetzt.
-        </p>
+      <section class="mt-8 space-y-2 leading-relaxed text-ts-fg/90">
+        <h2 class="text-[12px] uppercase tracking-[0.3em] text-ts-muted">
+          Verantwortlich für den Inhalt nach §18 Abs. 2 MStV
+        </h2>
+        <p>Tammo Hendriks (Anschrift wie oben)</p>
       </section>
     </article>
 

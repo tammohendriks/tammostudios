@@ -3,9 +3,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE } from '../lib/constants';
 
 const year = new Date().getFullYear();
-
-const emailUser = SITE.email.split('@')[0];
-const emailDomain = SITE.email.split('@')[1];
 ---
 
 <BaseLayout
@@ -13,7 +10,10 @@ const emailDomain = SITE.email.split('@')[1];
   description={`${SITE.name} — ${SITE.tagline}`}
 >
   <main class="relative flex min-h-dvh flex-col overflow-hidden">
-    <div class="grid-bg" aria-hidden="true"></div>
+    <div class="grid-mask" aria-hidden="true">
+      <div class="grid-drift"></div>
+    </div>
+    <div class="ambient-glow" aria-hidden="true"></div>
     <div class="vignette" aria-hidden="true"></div>
 
     <section class="relative flex flex-1 flex-col items-center justify-center px-6">
@@ -39,11 +39,10 @@ const emailDomain = SITE.email.split('@')[1];
         <a href="/impressum" class="hover:text-ts-fg">Impressum</a>
         <a href="/datenschutz" class="hover:text-ts-fg">Datenschutz</a>
         <a
-          id="contact-link"
-          href="#"
+          href={SITE.instagram}
           class="hover:text-ts-fg"
-          data-u={emailUser}
-          data-d={emailDomain}
+          target="_blank"
+          rel="noopener noreferrer"
         >
           Anfragen
         </a>
@@ -53,13 +52,10 @@ const emailDomain = SITE.email.split('@')[1];
 </BaseLayout>
 
 <style>
-  .grid-bg {
+  .grid-mask {
     position: absolute;
     inset: 0;
-    background-image:
-      linear-gradient(to right, var(--color-ts-grid) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--color-ts-grid) 1px, transparent 1px);
-    background-size: 56px 56px;
+    overflow: hidden;
     -webkit-mask-image: linear-gradient(
       to bottom,
       transparent 0%,
@@ -77,28 +73,51 @@ const emailDomain = SITE.email.split('@')[1];
     pointer-events: none;
   }
 
+  .grid-drift {
+    --cell: 56px;
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background-image:
+      linear-gradient(to right, var(--color-ts-grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--color-ts-grid) 1px, transparent 1px);
+    background-size: var(--cell) var(--cell);
+    animation: grid-drift 60s linear infinite;
+    will-change: transform;
+  }
+
   @media (min-width: 768px) {
-    .grid-bg {
-      background-size: 80px 80px;
+    .grid-drift {
+      --cell: 80px;
     }
+  }
+
+  .ambient-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse 60% 50% at 50% 50%,
+      rgba(245, 158, 11, 0.08) 0%,
+      rgba(245, 158, 11, 0.03) 35%,
+      transparent 70%
+    );
+    filter: blur(40px);
+    transform-origin: center;
+    animation: ambient-pulse 8s ease-in-out infinite;
+    will-change: opacity, transform;
+    pointer-events: none;
   }
 
   .vignette {
     position: absolute;
     inset: 0;
-    background:
-      radial-gradient(
-        ellipse 60% 50% at 50% 50%,
-        rgba(245, 158, 11, 0.08) 0%,
-        rgba(245, 158, 11, 0.03) 35%,
-        transparent 70%
-      ),
-      radial-gradient(
-        ellipse 100% 100% at 50% 50%,
-        transparent 30%,
-        var(--color-ts-bg-deep) 100%
-      );
-    filter: blur(40px);
+    background: radial-gradient(
+      ellipse 100% 100% at 50% 50%,
+      transparent 30%,
+      var(--color-ts-bg-deep) 100%
+    );
     pointer-events: none;
   }
 
@@ -141,21 +160,22 @@ const emailDomain = SITE.email.split('@')[1];
     }
   }
 
+  @keyframes grid-drift {
+    0%   { transform: translate(0, 0); }
+    100% { transform: translate(var(--cell), calc(var(--cell) * -1)); }
+  }
+
+  @keyframes ambient-pulse {
+    0%, 100% { opacity: 0.55; transform: scale(1); }
+    50%      { opacity: 1;    transform: scale(1.08); }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .hero-stack,
-    .logo {
+    .logo,
+    .grid-drift,
+    .ambient-glow {
       animation: none;
     }
   }
 </style>
-
-<script is:inline>
-  (function () {
-    const el = document.getElementById('contact-link');
-    if (!el) return;
-    const u = el.dataset.u;
-    const d = el.dataset.d;
-    if (!u || !d) return;
-    el.setAttribute('href', 'mailto:' + u + '@' + d);
-  })();
-</script>

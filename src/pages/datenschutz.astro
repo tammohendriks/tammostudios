@@ -34,8 +34,9 @@ const year = new Date().getFullYear();
         </p>
         <p>
           Tammo Hendriks<br />
-          [Straße und Hausnummer — Platzhalter]<br />
-          [PLZ Ort — Platzhalter]<br />
+          {SITE.address.street}<br />
+          {SITE.address.zip} {SITE.address.city}<br />
+          {SITE.address.country}<br />
           E-Mail:
           <a class="underline-offset-4 hover:underline" href={`mailto:${SITE.email}`}>{SITE.email}</a>
         </p>

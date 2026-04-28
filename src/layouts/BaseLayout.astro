@@ -23,8 +23,8 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalURL} />
     {!allowIndexing && <meta name="robots" content="noindex,nofollow" />}
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" href="/logos/logo-websiteicon.png" />
+    <link rel="apple-touch-icon" href="/logos/logo-websiteicon.png" />
     <meta name="generator" content={Astro.generator} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />

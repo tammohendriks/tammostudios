@@ -5,4 +5,17 @@ export const SITE = {
   email: 'tammo@tammostudios.de',
   location: 'Bremen',
   tagline: 'Webentwicklung mit Charakter.',
+  instagram: 'https://www.instagram.com/tammostudios/',
+
+  address: {
+    street: 'Eckernförder Straße 6',
+    zip: '28219',
+    city: 'Bremen',
+    country: 'Deutschland',
+  },
+
+  legal: {
+    vatId: 'beantragt',
+    taxId: 'beantragt',
+  },
 } as const;
