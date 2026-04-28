@@ -13,20 +13,24 @@ const year = new Date().getFullYear();
     <div class="grid-mask" aria-hidden="true">
       <div class="grid-drift"></div>
     </div>
-    <div class="ambient-glow" aria-hidden="true"></div>
     <div class="vignette" aria-hidden="true"></div>
 
     <section class="relative flex flex-1 flex-col items-center justify-center px-6">
       <div class="hero-stack flex flex-col items-center">
-        <img
-          src="/logos/logo-full.png"
-          alt={SITE.name}
-          width="960"
-          height="540"
-          class="logo block h-auto w-[75vw] max-w-[480px] select-none"
-          draggable="false"
-          fetchpriority="high"
-        />
+        <div class="logo-wrapper relative">
+          <div class="ambient-anchor" aria-hidden="true">
+            <div class="ambient-glow"></div>
+          </div>
+          <img
+            src="/logos/logo-full.png"
+            alt={SITE.name}
+            width="960"
+            height="540"
+            class="logo relative block h-auto w-[75vw] max-w-[480px] select-none"
+            draggable="false"
+            fetchpriority="high"
+          />
+        </div>
         <p class="subline mt-10 text-[12px] uppercase text-ts-muted">
           Bald verfügbar
         </p>
@@ -94,16 +98,31 @@ const year = new Date().getFullYear();
     }
   }
 
+  .logo-wrapper {
+    isolation: isolate;
+  }
+
+  .ambient-anchor {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 140vmax;
+    height: 140vmax;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: -1;
+  }
+
   .ambient-glow {
     position: absolute;
     inset: 0;
     background: radial-gradient(
-      ellipse 60% 50% at 50% 50%,
-      rgba(245, 158, 11, 0.08) 0%,
-      rgba(245, 158, 11, 0.03) 35%,
-      transparent 70%
+      circle at center,
+      rgba(245, 158, 11, 0.20) 0%,
+      rgba(245, 158, 11, 0.12) 12%,
+      rgba(245, 158, 11, 0.05) 28%,
+      rgba(245, 158, 11, 0) 50%
     );
-    filter: blur(40px);
     transform-origin: center;
     animation: ambient-pulse 8s ease-in-out infinite;
     will-change: opacity, transform;
