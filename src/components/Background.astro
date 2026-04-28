@@ -1,0 +1,246 @@
+---
+// Background — drei Layer:
+// A: statisches, langsam driftendes Grid (CSS)
+// B: pulsierende Knoten an Grid-Intersections (Canvas 2D, JS-erzeugt)
+// C: warmer Spotlight, der dem Cursor folgt (CSS, --mouse-x/--mouse-y)
+---
+
+<div class="background" aria-hidden="true">
+  <div class="grid-mask">
+    <div class="grid-drift"></div>
+  </div>
+  <div class="spotlight"></div>
+</div>
+
+<style is:global>
+  /* Canvas wird zur Laufzeit angelegt → Style muss global sein. */
+  canvas.node-canvas {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      black 14%,
+      black 86%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      black 14%,
+      black 86%,
+      transparent 100%
+    );
+  }
+</style>
+
+<style>
+  .background {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .grid-mask {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      black 14%,
+      black 86%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      black 14%,
+      black 86%,
+      transparent 100%
+    );
+  }
+
+  .grid-drift {
+    --cell: 56px;
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: var(--cell) var(--cell);
+    animation: grid-drift 60s linear infinite;
+    will-change: transform;
+  }
+
+  @media (min-width: 768px) {
+    .grid-drift {
+      --cell: 80px;
+    }
+  }
+
+  .spotlight {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: radial-gradient(
+      600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      rgba(245, 158, 11, 0.10) 0%,
+      rgba(245, 158, 11, 0.04) 30%,
+      transparent 60%
+    );
+    transition: background 80ms linear;
+    pointer-events: none;
+  }
+
+  @keyframes grid-drift {
+    0%   { transform: translate(0, 0); }
+    100% { transform: translate(var(--cell), calc(var(--cell) * -1)); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .grid-drift {
+      animation: none;
+    }
+    .spotlight {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isCoarse = window.matchMedia('(pointer: coarse)').matches;
+
+  // === Layer B: Canvas mit pulsierenden Knoten ===
+  const bgEl = document.querySelector('.background');
+  if (bgEl) {
+    const canvas = document.createElement('canvas');
+    canvas.classList.add('node-canvas');
+    bgEl.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let nodes = [];
+    let cellSize = 80;
+    let nodeRadius = 2;
+
+    function rebuildNodes() {
+      cellSize = window.innerWidth < 768 ? 56 : 80;
+      nodeRadius = window.innerWidth < 768 ? 1.5 : 2;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      canvas.style.width = window.innerWidth + 'px';
+      canvas.style.height = window.innerHeight + 'px';
+      // canvas.width-Set resettet die Context-Transformation auf identity.
+      ctx.scale(dpr, dpr);
+
+      nodes = [];
+      for (let x = 0; x <= window.innerWidth; x += cellSize) {
+        for (let y = 0; y <= window.innerHeight; y += cellSize) {
+          nodes.push({
+            x,
+            y,
+            phase: Math.random() * Math.PI * 2,
+            amplitude: 0.05 + Math.random() * 0.35,
+          });
+        }
+      }
+    }
+
+    function drawFrame(t) {
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      for (const n of nodes) {
+        const brightness = reduceMotion
+          ? 0.15
+          : 0.05 + n.amplitude * (Math.sin(t * 0.6 + n.phase) * 0.5 + 0.5);
+        ctx.fillStyle = 'rgba(245, 158, 11, ' + brightness + ')';
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, nodeRadius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    rebuildNodes();
+
+    let raf = 0;
+    let running = !reduceMotion;
+
+    function tick() {
+      raf = requestAnimationFrame(tick);
+      drawFrame(performance.now() / 1000);
+    }
+
+    if (running) {
+      tick();
+    } else {
+      drawFrame(0);
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (reduceMotion) return;
+      if (document.visibilityState === 'visible') {
+        if (!running) {
+          running = true;
+          tick();
+        }
+      } else {
+        running = false;
+        if (raf) cancelAnimationFrame(raf);
+      }
+    });
+
+    let resizeRaf = 0;
+    window.addEventListener('resize', () => {
+      if (resizeRaf) cancelAnimationFrame(resizeRaf);
+      resizeRaf = requestAnimationFrame(() => {
+        rebuildNodes();
+        if (reduceMotion) drawFrame(0);
+      });
+    });
+
+    document.addEventListener('astro:before-preparation', () => {
+      running = false;
+      if (raf) cancelAnimationFrame(raf);
+      canvas.remove();
+    });
+  }
+
+  // === Layer C: Spotlight mouse tracking ===
+  const root = document.documentElement;
+  const setPos = (x, y) => {
+    root.style.setProperty('--mouse-x', x + 'px');
+    root.style.setProperty('--mouse-y', y + 'px');
+  };
+
+  if (!reduceMotion && !isCoarse) {
+    let lastX = window.innerWidth / 2;
+    let lastY = window.innerHeight / 2;
+    let pending = false;
+    const flush = () => {
+      pending = false;
+      setPos(lastX, lastY);
+    };
+    window.addEventListener(
+      'mousemove',
+      (e) => {
+        lastX = e.clientX;
+        lastY = e.clientY;
+        if (!pending) {
+          pending = true;
+          requestAnimationFrame(flush);
+        }
+      },
+      { passive: true },
+    );
+  }
+  // Touch / reduced-motion → Spotlight bleibt zentral (Default 50%/50%)
+</script>

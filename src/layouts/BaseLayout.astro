@@ -7,7 +7,7 @@ interface Props {
   description?: string;
 }
 
-const { pageTitle, description = SITE.tagline } = Astro.props;
+const { pageTitle, description = `${SITE.name} — Webentwicklung aus ${SITE.location}.` } = Astro.props;
 
 const fullTitle = `${pageTitle} — ${SITE.name}`;
 const allowIndexing = import.meta.env.PUBLIC_ALLOW_INDEXING === 'true';
