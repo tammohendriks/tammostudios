@@ -1,0 +1,134 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../lib/constants';
+
+const year = new Date().getFullYear();
+---
+
+<BaseLayout
+  pageTitle="Datenschutz"
+  description={`Datenschutzerklärung von ${SITE.name}.`}
+>
+  <main class="relative mx-auto flex min-h-dvh max-w-2xl flex-col px-6 py-16 sm:py-24">
+    <a href="/" class="text-[12px] uppercase tracking-[0.3em] text-ts-muted hover:text-ts-fg">
+      ← Zurück
+    </a>
+
+    <article class="mt-12 flex-1">
+      <h1 class="text-2xl font-medium text-ts-fg sm:text-3xl">Datenschutzerklärung</h1>
+      <p class="mt-2 text-[12px] uppercase tracking-[0.3em] text-ts-muted">
+        Stand: Platzhalter-Version
+      </p>
+
+      <div class="mt-6 rounded border border-white/5 bg-white/[0.02] p-4 text-[13px] leading-relaxed text-ts-muted">
+        Diese Datenschutzerklärung ist Platzhalter und wird vor offiziellem
+        Launch durch eine geprüfte Version ersetzt.
+      </div>
+
+      <section class="mt-10 space-y-3 leading-relaxed text-ts-fg/90">
+        <h2 class="text-[12px] uppercase tracking-[0.3em] text-ts-muted">
+          1. Verantwortlicher
+        </h2>
+        <p>
+          Verantwortlich für die Datenverarbeitung auf dieser Website ist:
+        </p>
+        <p>
+          Tammo Hendriks<br />
+          [Straße und Hausnummer — Platzhalter]<br />
+          [PLZ Ort — Platzhalter]<br />
+          E-Mail:
+          <a class="underline-offset-4 hover:underline" href={`mailto:${SITE.email}`}>{SITE.email}</a>
+        </p>
+      </section>
+
+      <section class="mt-8 space-y-3 leading-relaxed text-ts-fg/90">
+        <h2 class="text-[12px] uppercase tracking-[0.3em] text-ts-muted">
+          2. Hosting
+        </h2>
+        <p>
+          Diese Website wird bei Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA
+          91789, USA, gehostet. Beim Aufruf der Website werden technisch
+          notwendige Daten an Vercel übertragen. Da Vercel Server in den USA
+          betreibt, kann eine Übermittlung in ein Drittland stattfinden. Als
+          rechtliche Grundlage dafür dienen die EU-Standardvertragsklauseln.
+          Weitere Informationen finden sich in der Datenschutzerklärung von
+          Vercel.
+        </p>
+      </section>
+
+      <section class="mt-8 space-y-3 leading-relaxed text-ts-fg/90">
+        <h2 class="text-[12px] uppercase tracking-[0.3em] text-ts-muted">
+          3. Server-Logfiles
+        </h2>
+        <p>
+          Bei jedem Aufruf werden durch den Hosting-Provider technische
+          Informationen in sogenannten Server-Logfiles gespeichert, die der
+          Browser automatisch übermittelt. Dazu gehören insbesondere:
+        </p>
+        <ul class="list-inside list-disc space-y-1 pl-2">
+          <li>IP-Adresse des zugreifenden Geräts</li>
+          <li>Datum und Uhrzeit des Zugriffs</li>
+          <li>Aufgerufene URL</li>
+          <li>Referrer-URL</li>
+          <li>Verwendeter Browser und Betriebssystem</li>
+        </ul>
+        <p>
+          Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse
+          an der technischen Bereitstellung und Sicherheit der Website).
+        </p>
+      </section>
+
+      <section class="mt-8 space-y-3 leading-relaxed text-ts-fg/90">
+        <h2 class="text-[12px] uppercase tracking-[0.3em] text-ts-muted">
+          4. Cookies, Analytics, externe Schriften
+        </h2>
+        <p>
+          Diese Website setzt keine Cookies, verwendet keine
+          Analyse-Werkzeuge und lädt keine externen Schriftarten von
+          Drittanbietern. Schriftarten werden lokal vom eigenen Server
+          ausgeliefert.
+        </p>
+      </section>
+
+      <section class="mt-8 space-y-3 leading-relaxed text-ts-fg/90">
+        <h2 class="text-[12px] uppercase tracking-[0.3em] text-ts-muted">
+          5. Kontaktaufnahme
+        </h2>
+        <p>
+          Bei Kontaktaufnahme per E-Mail werden die übermittelten Daten zur
+          Bearbeitung der Anfrage verarbeitet (Art. 6 Abs. 1 lit. b bzw. f
+          DSGVO). Die Daten werden gelöscht, sobald sie für den Zweck nicht
+          mehr erforderlich sind und keine gesetzlichen Aufbewahrungspflichten
+          entgegenstehen.
+        </p>
+      </section>
+
+      <section class="mt-8 space-y-3 leading-relaxed text-ts-fg/90">
+        <h2 class="text-[12px] uppercase tracking-[0.3em] text-ts-muted">
+          6. Rechte der betroffenen Person
+        </h2>
+        <p>Betroffene Personen haben gegenüber dem Verantwortlichen folgende Rechte:</p>
+        <ul class="list-inside list-disc space-y-1 pl-2">
+          <li>Recht auf Auskunft (Art. 15 DSGVO)</li>
+          <li>Recht auf Berichtigung (Art. 16 DSGVO)</li>
+          <li>Recht auf Löschung (Art. 17 DSGVO)</li>
+          <li>Recht auf Einschränkung der Verarbeitung (Art. 18 DSGVO)</li>
+          <li>Recht auf Datenübertragbarkeit (Art. 20 DSGVO)</li>
+          <li>Recht auf Widerspruch (Art. 21 DSGVO)</li>
+          <li>
+            Recht auf Beschwerde bei einer Datenschutz-Aufsichtsbehörde
+            (Art. 77 DSGVO)
+          </li>
+        </ul>
+      </section>
+    </article>
+
+    <footer class="mt-16 flex flex-col items-center gap-3 text-center text-[12px] text-ts-muted sm:flex-row sm:justify-between sm:text-left">
+      <span>© {year} {SITE.name}</span>
+      <nav class="flex items-center gap-5">
+        <a href="/impressum" class="hover:text-ts-fg">Impressum</a>
+        <a href="/datenschutz" class="hover:text-ts-fg">Datenschutz</a>
+      </nav>
+    </footer>
+  </main>
+</BaseLayout>

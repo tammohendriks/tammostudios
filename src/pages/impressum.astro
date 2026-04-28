@@ -1,0 +1,68 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../lib/constants';
+
+const year = new Date().getFullYear();
+---
+
+<BaseLayout
+  pageTitle="Impressum"
+  description={`Impressum von ${SITE.name}.`}
+>
+  <main class="relative mx-auto flex min-h-dvh max-w-2xl flex-col px-6 py-16 sm:py-24">
+    <a href="/" class="text-[12px] uppercase tracking-[0.3em] text-ts-muted hover:text-ts-fg">
+      ← Zurück
+    </a>
+
+    <article class="mt-12 flex-1">
+      <h1 class="text-2xl font-medium text-ts-fg sm:text-3xl">Impressum</h1>
+      <p class="mt-2 text-[12px] uppercase tracking-[0.3em] text-ts-muted">
+        Angaben gemäß §5 TMG
+      </p>
+
+      <section class="mt-10 space-y-2 leading-relaxed text-ts-fg/90">
+        <h2 class="text-[12px] uppercase tracking-[0.3em] text-ts-muted">Anbieter</h2>
+        <p>Tammo Hendriks</p>
+        <p>[Straße und Hausnummer — Platzhalter]</p>
+        <p>[PLZ Ort — Platzhalter]</p>
+        <p>{SITE.location}, Deutschland</p>
+      </section>
+
+      <section class="mt-8 space-y-2 leading-relaxed text-ts-fg/90">
+        <h2 class="text-[12px] uppercase tracking-[0.3em] text-ts-muted">Kontakt</h2>
+        <p>E-Mail: <a class="underline-offset-4 hover:underline" href={`mailto:${SITE.email}`}>{SITE.email}</a></p>
+      </section>
+
+      <section class="mt-8 space-y-2 leading-relaxed text-ts-fg/90">
+        <h2 class="text-[12px] uppercase tracking-[0.3em] text-ts-muted">
+          Umsatzsteuer / Steuernummer
+        </h2>
+        <p>USt-IdNr.: [Platzhalter]</p>
+        <p>Steuernummer: [Platzhalter]</p>
+      </section>
+
+      <section class="mt-8 space-y-2 leading-relaxed text-ts-fg/90">
+        <h2 class="text-[12px] uppercase tracking-[0.3em] text-ts-muted">
+          Verantwortlich i.S.d. §18 Abs. 2 MStV
+        </h2>
+        <p>Tammo Hendriks</p>
+        <p>Anschrift wie oben.</p>
+      </section>
+
+      <section class="mt-12 border-t border-white/5 pt-6 text-[13px] text-ts-muted">
+        <p>
+          Hinweis: Diese Angaben werden vor dem offiziellen Launch durch die
+          finalen, vollständigen Daten ersetzt.
+        </p>
+      </section>
+    </article>
+
+    <footer class="mt-16 flex flex-col items-center gap-3 text-center text-[12px] text-ts-muted sm:flex-row sm:justify-between sm:text-left">
+      <span>© {year} {SITE.name}</span>
+      <nav class="flex items-center gap-5">
+        <a href="/impressum" class="hover:text-ts-fg">Impressum</a>
+        <a href="/datenschutz" class="hover:text-ts-fg">Datenschutz</a>
+      </nav>
+    </footer>
+  </main>
+</BaseLayout>

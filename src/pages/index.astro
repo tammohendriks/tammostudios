@@ -1,17 +1,161 @@
 ---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../lib/constants';
 
+const year = new Date().getFullYear();
+
+const emailUser = SITE.email.split('@')[0];
+const emailDomain = SITE.email.split('@')[1];
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout
+  pageTitle="Bald verfügbar"
+  description={`${SITE.name} — ${SITE.tagline}`}
+>
+  <main class="relative flex min-h-dvh flex-col overflow-hidden">
+    <div class="grid-bg" aria-hidden="true"></div>
+    <div class="vignette" aria-hidden="true"></div>
+
+    <section class="relative flex flex-1 flex-col items-center justify-center px-6">
+      <div class="hero-stack flex flex-col items-center">
+        <img
+          src="/logos/logo-full.png"
+          alt={SITE.name}
+          width="960"
+          height="540"
+          class="logo block h-auto w-[75vw] max-w-[480px] select-none"
+          draggable="false"
+          fetchpriority="high"
+        />
+        <p class="subline mt-10 text-[12px] uppercase text-ts-muted">
+          Bald verfügbar
+        </p>
+      </div>
+    </section>
+
+    <footer class="relative mx-auto flex w-full max-w-3xl flex-col items-center gap-3 px-6 pb-8 text-center text-[12px] text-ts-muted sm:flex-row sm:justify-between sm:text-left">
+      <span>© {year} {SITE.name}</span>
+      <nav class="flex items-center gap-5">
+        <a href="/impressum" class="hover:text-ts-fg">Impressum</a>
+        <a href="/datenschutz" class="hover:text-ts-fg">Datenschutz</a>
+        <a
+          id="contact-link"
+          href="#"
+          class="hover:text-ts-fg"
+          data-u={emailUser}
+          data-d={emailDomain}
+        >
+          Anfragen
+        </a>
+      </nav>
+    </footer>
+  </main>
+</BaseLayout>
+
+<style>
+  .grid-bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, var(--color-ts-grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--color-ts-grid) 1px, transparent 1px);
+    background-size: 56px 56px;
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      black 18%,
+      black 82%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      black 18%,
+      black 82%,
+      transparent 100%
+    );
+    pointer-events: none;
+  }
+
+  @media (min-width: 768px) {
+    .grid-bg {
+      background-size: 80px 80px;
+    }
+  }
+
+  .vignette {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(
+        ellipse 60% 50% at 50% 50%,
+        rgba(245, 158, 11, 0.08) 0%,
+        rgba(245, 158, 11, 0.03) 35%,
+        transparent 70%
+      ),
+      radial-gradient(
+        ellipse 100% 100% at 50% 50%,
+        transparent 30%,
+        var(--color-ts-bg-deep) 100%
+      );
+    filter: blur(40px);
+    pointer-events: none;
+  }
+
+  .hero-stack {
+    animation: enter 800ms ease-out both;
+  }
+
+  .logo {
+    filter:
+      drop-shadow(0 0 32px rgba(245, 158, 11, 0.18))
+      drop-shadow(0 0 80px rgba(245, 158, 11, 0.10));
+    animation: pulse 6s ease-in-out infinite;
+  }
+
+  .subline {
+    letter-spacing: 0.3em;
+  }
+
+  @keyframes enter {
+    from {
+      opacity: 0;
+      transform: scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      filter:
+        drop-shadow(0 0 32px rgba(245, 158, 11, 0.18))
+        drop-shadow(0 0 80px rgba(245, 158, 11, 0.10));
+    }
+    50% {
+      filter:
+        drop-shadow(0 0 48px rgba(245, 158, 11, 0.28))
+        drop-shadow(0 0 110px rgba(245, 158, 11, 0.16));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-stack,
+    .logo {
+      animation: none;
+    }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const el = document.getElementById('contact-link');
+    if (!el) return;
+    const u = el.dataset.u;
+    const d = el.dataset.d;
+    if (!u || !d) return;
+    el.setAttribute('href', 'mailto:' + u + '@' + d);
+  })();
+</script>
