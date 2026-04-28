@@ -89,6 +89,7 @@ import { SITE_LABELS, NAV_ITEMS, CTA } from '../lib/constants';
     padding: 28px 28px 36px;
     gap: 16px;
     pointer-events: none;
+    overflow: visible;
   }
 
   .topbar > * {
@@ -141,6 +142,7 @@ import { SITE_LABELS, NAV_ITEMS, CTA } from '../lib/constants';
     display: inline-flex;
     align-items: center;
     gap: 12px;
+    overflow: visible;
   }
 
   .cta-pill {
@@ -175,6 +177,10 @@ import { SITE_LABELS, NAV_ITEMS, CTA } from '../lib/constants';
     left: -100%;
     width: 60%;
     height: 100%;
+    /* Belt-and-Suspenders: eigenes border-radius, damit der Shimmer
+       auch dann an der Pill-Form bleibt, wenn das Parent-Clipping in
+       Kombination mit transform-Pseudo-Elementen mal zickt. */
+    border-radius: inherit;
     background: linear-gradient(
       90deg,
       transparent 0%,
