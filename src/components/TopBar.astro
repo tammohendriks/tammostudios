@@ -226,31 +226,22 @@ import { SITE_LABELS, NAV_ITEMS, CTA } from '../lib/constants';
     outline-offset: 4px;
   }
 
-  /* Pulse: ambient layer bleibt konstant, nur die "Welle" (5. Layer) animiert. */
+  /* Pulse: warme Halo-Layer atmen, kein expandierender Outline-Ring mehr.
+     (Der hatte 0-Blur und las sich als harte amber Linie unter dem Button.) */
   @keyframes cta-pulse {
-    0% {
+    0%, 100% {
       box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.25),
         0 2px 8px rgba(0, 0, 0, 0.25),
         0 0 32px rgba(245, 158, 11, 0.45),
-        0 0 80px rgba(245, 158, 11, 0.20),
-        0 0 0 0 rgba(245, 158, 11, 0.35);
+        0 0 80px rgba(245, 158, 11, 0.20);
     }
-    70% {
+    50% {
       box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.25),
         0 2px 8px rgba(0, 0, 0, 0.25),
-        0 0 32px rgba(245, 158, 11, 0.45),
-        0 0 80px rgba(245, 158, 11, 0.20),
-        0 0 0 18px rgba(245, 158, 11, 0);
-    }
-    100% {
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.25),
-        0 2px 8px rgba(0, 0, 0, 0.25),
-        0 0 32px rgba(245, 158, 11, 0.45),
-        0 0 80px rgba(245, 158, 11, 0.20),
-        0 0 0 0 rgba(245, 158, 11, 0);
+        0 0 40px rgba(245, 158, 11, 0.58),
+        0 0 100px rgba(245, 158, 11, 0.28);
     }
   }
 
