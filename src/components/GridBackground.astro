@@ -1,0 +1,170 @@
+---
+---
+
+<div class="grid-bg" aria-hidden="true">
+  <div class="grid-mask">
+    <div class="grid-drift grid-base"></div>
+  </div>
+  <div class="spotlight-glow"></div>
+  <div class="grid-mask">
+    <div class="grid-spot-mask">
+      <div class="grid-drift grid-amber"></div>
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  :root {
+    --mouse-x: 50%;
+    --mouse-y: 50%;
+  }
+</style>
+
+<style>
+  .grid-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .grid-mask {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      black 14%,
+      black 86%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      black 14%,
+      black 86%,
+      transparent 100%
+    );
+    pointer-events: none;
+  }
+
+  .grid-drift {
+    --cell: 56px;
+    --grid-color: rgba(255, 255, 255, 0.04);
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background-image:
+      linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+    background-size: var(--cell) var(--cell);
+    animation: grid-drift 60s linear infinite;
+    will-change: transform;
+  }
+
+  .grid-amber {
+    --grid-color: rgba(245, 158, 11, 0.18);
+  }
+
+  @media (min-width: 768px) {
+    .grid-drift {
+      --cell: 80px;
+    }
+  }
+
+  .spotlight-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      rgba(245, 158, 11, 0.10) 0%,
+      rgba(245, 158, 11, 0.04) 30%,
+      transparent 60%
+    );
+    transition: background 80ms linear;
+    pointer-events: none;
+  }
+
+  .grid-spot-mask {
+    position: absolute;
+    inset: 0;
+    -webkit-mask-image: radial-gradient(
+      600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      black 0%,
+      transparent 60%
+    );
+    mask-image: radial-gradient(
+      600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      black 0%,
+      transparent 60%
+    );
+    pointer-events: none;
+  }
+
+  @keyframes grid-drift {
+    0%   { transform: translate(0, 0); }
+    100% { transform: translate(var(--cell), calc(var(--cell) * -1)); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .grid-drift {
+      animation: none;
+    }
+    .spotlight-glow {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const root = document.documentElement;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isCoarse = window.matchMedia('(pointer: coarse)').matches;
+
+  const setPos = (x, y) => {
+    root.style.setProperty('--mouse-x', x + 'px');
+    root.style.setProperty('--mouse-y', y + 'px');
+  };
+
+  if (reduceMotion) {
+    // Spotlight bleibt zentriert (50%/50% Default)
+  } else if (isCoarse) {
+    // Touch / kein Cursor: weite Lissajous-Bewegung, ~30s Grundperiode
+    const start = performance.now();
+    const tick = (now) => {
+      const t = (now - start) / 1000;
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const x = w * (0.5 + 0.35 * Math.sin(t * 0.21));
+      const y = h * (0.5 + 0.30 * Math.sin(t * 0.14 + Math.PI / 3));
+      setPos(x, y);
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  } else {
+    // Maus: rAF-throttled
+    let lastX = window.innerWidth / 2;
+    let lastY = window.innerHeight / 2;
+    let pending = false;
+    const flush = () => {
+      pending = false;
+      setPos(lastX, lastY);
+    };
+    window.addEventListener(
+      'mousemove',
+      (e) => {
+        lastX = e.clientX;
+        lastY = e.clientY;
+        if (!pending) {
+          pending = true;
+          requestAnimationFrame(flush);
+        }
+      },
+      { passive: true },
+    );
+  }
+</script>

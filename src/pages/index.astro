@@ -1,202 +1,38 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import GridBackground from '../components/GridBackground.astro';
+import Nav from '../components/Nav.astro';
+import Hero from '../components/Hero.astro';
 import { SITE } from '../lib/constants';
 
 const year = new Date().getFullYear();
 ---
 
 <BaseLayout
-  pageTitle="Bald verfügbar"
-  description={`${SITE.name} — ${SITE.tagline}`}
+  pageTitle="Webentwicklung mit Charakter"
+  description={`${SITE.name} — Webentwicklung aus ${SITE.location}. Ein moderner Stack, sauber gebaut.`}
 >
-  <main class="relative flex min-h-dvh flex-col overflow-hidden">
-    <div class="grid-mask" aria-hidden="true">
-      <div class="grid-drift"></div>
-    </div>
-    <div class="vignette" aria-hidden="true"></div>
+  <GridBackground />
 
-    <section class="relative flex flex-1 flex-col items-center justify-center px-6">
-      <div class="hero-stack flex flex-col items-center">
-        <div class="logo-wrapper relative">
-          <div class="ambient-anchor" aria-hidden="true">
-            <div class="ambient-glow"></div>
-          </div>
-          <img
-            src="/logos/logo-full.png"
-            alt={SITE.name}
-            width="960"
-            height="540"
-            class="logo relative block h-auto w-[75vw] max-w-[480px] select-none"
-            draggable="false"
-            fetchpriority="high"
-          />
-        </div>
-        <p class="subline mt-10 text-[12px] uppercase text-ts-muted">
-          Bald verfügbar
-        </p>
-      </div>
-    </section>
+  <Nav />
 
-    <footer class="relative mx-auto flex w-full max-w-3xl flex-col items-center gap-3 px-6 pb-8 text-center text-[12px] text-ts-muted sm:flex-row sm:justify-between sm:text-left">
-      <span>© {year} {SITE.name}</span>
-      <nav class="flex items-center gap-5">
-        <a href="/impressum" class="hover:text-ts-fg">Impressum</a>
-        <a href="/datenschutz" class="hover:text-ts-fg">Datenschutz</a>
-        <a
-          href={SITE.instagram}
-          class="hover:text-ts-fg"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Anfragen
-        </a>
-      </nav>
-    </footer>
+  <main class="relative z-10">
+    <Hero />
   </main>
+
+  <footer class="relative z-10 mx-auto flex w-full max-w-3xl flex-col items-center gap-3 px-6 pb-8 pt-12 text-center text-[12px] text-ts-muted sm:flex-row sm:justify-between sm:text-left">
+    <span>© {year} {SITE.name}</span>
+    <nav class="flex items-center gap-5">
+      <a href="/impressum" class="hover:text-ts-fg">Impressum</a>
+      <a href="/datenschutz" class="hover:text-ts-fg">Datenschutz</a>
+      <a
+        href={SITE.instagram}
+        class="hover:text-ts-fg"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Anfragen
+      </a>
+    </nav>
+  </footer>
 </BaseLayout>
-
-<style>
-  .grid-mask {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-    -webkit-mask-image: linear-gradient(
-      to bottom,
-      transparent 0%,
-      black 18%,
-      black 82%,
-      transparent 100%
-    );
-    mask-image: linear-gradient(
-      to bottom,
-      transparent 0%,
-      black 18%,
-      black 82%,
-      transparent 100%
-    );
-    pointer-events: none;
-  }
-
-  .grid-drift {
-    --cell: 56px;
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background-image:
-      linear-gradient(to right, var(--color-ts-grid) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--color-ts-grid) 1px, transparent 1px);
-    background-size: var(--cell) var(--cell);
-    animation: grid-drift 60s linear infinite;
-    will-change: transform;
-  }
-
-  @media (min-width: 768px) {
-    .grid-drift {
-      --cell: 80px;
-    }
-  }
-
-  .logo-wrapper {
-    isolation: isolate;
-  }
-
-  .ambient-anchor {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 140vmax;
-    height: 140vmax;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    z-index: -1;
-  }
-
-  .ambient-glow {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(
-      circle at center,
-      rgba(245, 158, 11, 0.20) 0%,
-      rgba(245, 158, 11, 0.10) 8%,
-      rgba(245, 158, 11, 0.04) 18%,
-      rgba(245, 158, 11, 0.015) 35%,
-      rgba(245, 158, 11, 0.005) 60%,
-      rgba(245, 158, 11, 0) 100%
-    );
-    transform-origin: center;
-    animation: ambient-pulse 8s ease-in-out infinite;
-    will-change: opacity, transform;
-    pointer-events: none;
-  }
-
-  .vignette {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(
-      ellipse 100% 100% at 50% 50%,
-      transparent 30%,
-      var(--color-ts-bg-deep) 100%
-    );
-    pointer-events: none;
-  }
-
-  .hero-stack {
-    animation: enter 800ms ease-out both;
-  }
-
-  .logo {
-    filter:
-      drop-shadow(0 0 32px rgba(245, 158, 11, 0.18))
-      drop-shadow(0 0 80px rgba(245, 158, 11, 0.10));
-    animation: pulse 6s ease-in-out infinite;
-  }
-
-  .subline {
-    letter-spacing: 0.3em;
-  }
-
-  @keyframes enter {
-    from {
-      opacity: 0;
-      transform: scale(0.98);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-
-  @keyframes pulse {
-    0%, 100% {
-      filter:
-        drop-shadow(0 0 32px rgba(245, 158, 11, 0.18))
-        drop-shadow(0 0 80px rgba(245, 158, 11, 0.10));
-    }
-    50% {
-      filter:
-        drop-shadow(0 0 48px rgba(245, 158, 11, 0.28))
-        drop-shadow(0 0 110px rgba(245, 158, 11, 0.16));
-    }
-  }
-
-  @keyframes grid-drift {
-    0%   { transform: translate(0, 0); }
-    100% { transform: translate(var(--cell), calc(var(--cell) * -1)); }
-  }
-
-  @keyframes ambient-pulse {
-    0%, 100% { opacity: 0.55; transform: scale(1); }
-    50%      { opacity: 1;    transform: scale(1.08); }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .hero-stack,
-    .logo,
-    .grid-drift,
-    .ambient-glow {
-      animation: none;
-    }
-  }
-</style>

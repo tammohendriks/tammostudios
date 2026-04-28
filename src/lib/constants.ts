@@ -19,3 +19,14 @@ export const SITE = {
     taxId: 'beantragt',
   },
 } as const;
+
+export const NAV_ITEMS = [
+  { label: 'Über', href: '/ueber' },
+  { label: 'Referenzen', href: '/referenzen' },
+  { label: 'Preise', href: '/preise' },
+] as const;
+
+export const CTA = {
+  label: 'Kontakt',
+  href: '/kontakt',
+} as const;
