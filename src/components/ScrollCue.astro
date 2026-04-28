@@ -11,7 +11,9 @@ import { SITE_LABELS } from '../lib/constants';
 
 <style>
   .scroll-cue {
-    position: fixed;
+    /* Section-scoped: anker im jeweiligen <section position: relative>,
+       scrollt mit der Section weg, statt am Viewport zu kleben. */
+    position: absolute;
     bottom: 28px;
     left: 50%;
     transform: translateX(-50%);

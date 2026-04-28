@@ -38,7 +38,9 @@
 
 <style>
   .background {
-    position: fixed;
+    /* Section-scoped: Parent (Section1) ist position: relative, Background
+       deckt nur diese Section ab. */
+    position: absolute;
     inset: 0;
     z-index: 0;
     pointer-events: none;

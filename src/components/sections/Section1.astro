@@ -1,89 +1,86 @@
 ---
-import { SITE, SITE_LABELS } from '../lib/constants';
-import Background from './Background.astro';
-import TopBar from './TopBar.astro';
-import ScrollCue from './ScrollCue.astro';
+import { SITE, SITE_LABELS } from '../../lib/constants';
+import Background from '../Background.astro';
+import ScrollCue from '../ScrollCue.astro';
 ---
 
-<script is:inline>
-  // Frühe Entscheidung VOR Body-Paint: returning visitor oder reduced-motion?
-  // Setzt html.splash-skip → CSS macht alles ab erstem Frame voll sichtbar.
-  try {
-    if (
-      window.sessionStorage.getItem('ts-splash-seen') === '1' ||
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    ) {
-      document.documentElement.classList.add('splash-skip');
-    }
-  } catch (e) {}
-</script>
-
-<div id="splash-root" data-state="splash">
+<section class="section-1">
   <Background />
-  <TopBar />
 
-  <main class="hero">
-    <h1 class="logo-wrap">
-      <img
-        src="/logos/logo-full.png"
-        alt={SITE.name}
-        class="logo-img"
-        draggable="false"
-        fetchpriority="high"
-      />
-    </h1>
-    <p class="intro">{SITE_LABELS.introText}</p>
-  </main>
+  <h1 class="logo-wrap">
+    <img
+      src="/logos/logo-full.png"
+      alt={SITE.name}
+      class="logo-img"
+      draggable="false"
+      fetchpriority="high"
+    />
+  </h1>
+  <p class="intro">{SITE_LABELS.introText}</p>
 
   <ScrollCue />
-</div>
+</section>
 
 <style is:global>
-  /* State-Cascade: global, weil .top-left, .nav, .cta, .scroll-cue
-     in Sub-Components leben (eigene Astro-Scopes). */
+  /* State-Cascade auf <html>: erreicht TopBar (außerhalb Section1) und
+     Section1-Inhalte gleichzeitig. */
 
-  #splash-root .background {
-    opacity: 0;
+  html[data-splash="splash"] .background,
+  html[data-splash="reveal"] .background,
+  html[data-splash="ready"]  .background {
     transition: opacity 0.8s ease-out;
   }
 
-  #splash-root[data-state="reveal"] .background,
-  #splash-root[data-state="ready"]  .background {
+  html[data-splash="splash"] .background {
+    opacity: 0;
+  }
+
+  html[data-splash="reveal"] .background,
+  html[data-splash="ready"] .background {
     opacity: 1;
   }
 
-  #splash-root .top-left,
-  #splash-root .nav,
-  #splash-root .cta,
-  #splash-root .intro,
-  #splash-root .scroll-cue {
+  html[data-splash="splash"] .top-left,
+  html[data-splash="splash"] .nav,
+  html[data-splash="splash"] .cta,
+  html[data-splash="splash"] .intro,
+  html[data-splash="splash"] .scroll-cue,
+  html[data-splash="reveal"] .top-left,
+  html[data-splash="reveal"] .nav,
+  html[data-splash="reveal"] .cta,
+  html[data-splash="reveal"] .intro,
+  html[data-splash="reveal"] .scroll-cue {
     opacity: 0;
     transform: translateY(8px);
     transition: opacity 500ms ease-out, transform 500ms ease-out;
   }
 
-  #splash-root[data-state="ready"] .top-left,
-  #splash-root[data-state="ready"] .nav,
-  #splash-root[data-state="ready"] .cta,
-  #splash-root[data-state="ready"] .intro,
-  #splash-root[data-state="ready"] .scroll-cue {
+  html[data-splash="ready"] .top-left,
+  html[data-splash="ready"] .nav,
+  html[data-splash="ready"] .cta,
+  html[data-splash="ready"] .intro,
+  html[data-splash="ready"] .scroll-cue {
     opacity: 1;
     transform: translateY(0);
+    transition: opacity 500ms ease-out, transform 500ms ease-out;
   }
 
-  #splash-root[data-state="ready"] .top-left   { transition-delay: 0ms;   }
-  #splash-root[data-state="ready"] .nav        { transition-delay: 80ms;  }
-  #splash-root[data-state="ready"] .cta        { transition-delay: 160ms; }
-  #splash-root[data-state="ready"] .intro      { transition-delay: 240ms; }
-  #splash-root[data-state="ready"] .scroll-cue { transition-delay: 320ms; }
+  html[data-splash="ready"] .top-left   { transition-delay: 0ms;   }
+  html[data-splash="ready"] .nav        { transition-delay: 80ms;  }
+  html[data-splash="ready"] .cta        { transition-delay: 160ms; }
+  html[data-splash="ready"] .intro      { transition-delay: 240ms; }
+  html[data-splash="ready"] .scroll-cue { transition-delay: 320ms; }
 
-  /* Returning visitor / reduced-motion → alles sofort, ohne Transition */
-  html.splash-skip #splash-root .background,
-  html.splash-skip #splash-root .top-left,
-  html.splash-skip #splash-root .nav,
-  html.splash-skip #splash-root .cta,
-  html.splash-skip #splash-root .intro,
-  html.splash-skip #splash-root .scroll-cue {
+  /* Returning visitor / reduced-motion: keine data-splash-Attribute,
+     Default-Styles greifen → alles sofort sichtbar. Diese expliziten
+     Regeln stellen sicher, dass auch bei Race-Conditions kein Halt-State
+     hängen bleibt. */
+  html.splash-skip .background,
+  html.splash-skip .top-left,
+  html.splash-skip .nav,
+  html.splash-skip .cta,
+  html.splash-skip .intro,
+  html.splash-skip .scroll-cue {
     opacity: 1;
     transform: none;
     transition: none;
@@ -91,9 +88,9 @@ import ScrollCue from './ScrollCue.astro';
 </style>
 
 <style>
-  .hero {
+  .section-1 {
     position: relative;
-    z-index: 5;
+    overflow: hidden;
     min-height: 100dvh;
     display: flex;
     flex-direction: column;
@@ -104,6 +101,8 @@ import ScrollCue from './ScrollCue.astro';
   }
 
   .logo-wrap {
+    position: relative;
+    z-index: 5;
     margin: 0;
     padding: 0;
     pointer-events: none;
@@ -140,6 +139,8 @@ import ScrollCue from './ScrollCue.astro';
   }
 
   .intro {
+    position: relative;
+    z-index: 5;
     margin: 28px 0 0 0;
     max-width: 520px;
     color: rgba(245, 245, 244, 0.7);
@@ -162,15 +163,13 @@ import ScrollCue from './ScrollCue.astro';
 </style>
 
 <script>
-  // Splash-State-Maschine. Inline-Script oben hat ggf. html.splash-skip gesetzt.
-  const wrapper = document.getElementById('splash-root');
-  if (wrapper) {
-    if (document.documentElement.classList.contains('splash-skip')) {
-      wrapper.dataset.state = 'ready';
-    } else {
-      try { sessionStorage.setItem('ts-splash-seen', '1'); } catch (e) {}
-      window.setTimeout(() => { wrapper.dataset.state = 'reveal'; }, 1200);
-      window.setTimeout(() => { wrapper.dataset.state = 'ready'; }, 2000);
-    }
+  // Splash-State-Maschine. Das Inline-Script in BaseLayout hat ggf. schon
+  // html.splash-skip gesetzt (returning visitor / reduced-motion) — dann
+  // bleibt data-splash leer und CSS-Defaults greifen sofort.
+  const html = document.documentElement;
+  if (!html.classList.contains('splash-skip')) {
+    try { sessionStorage.setItem('ts-splash-seen', '1'); } catch (e) {}
+    window.setTimeout(() => { html.setAttribute('data-splash', 'reveal'); }, 1200);
+    window.setTimeout(() => { html.setAttribute('data-splash', 'ready'); }, 2000);
   }
 </script>

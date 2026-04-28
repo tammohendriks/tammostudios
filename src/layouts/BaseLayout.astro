@@ -32,6 +32,25 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={SITE.name} />
     <meta name="theme-color" content="#0a0a0c" />
+    <script is:inline>
+      // Splash-State VOR dem ersten Paint setzen, damit TopBar (außerhalb
+      // Section1) und Section1-Inhalte gleichzeitig korrekt rendern:
+      //   - Returning visitor / reduced-motion → html.splash-skip → CSS
+      //     macht alles sofort sichtbar
+      //   - Sonst → html[data-splash="splash"] → CSS hält .top-left, .nav,
+      //     .cta, .intro, .scroll-cue und .background unsichtbar, bis das
+      //     Section1-Modul-Script die Phasen weiterschaltet.
+      try {
+        if (
+          window.sessionStorage.getItem('ts-splash-seen') === '1' ||
+          window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        ) {
+          document.documentElement.classList.add('splash-skip');
+        } else {
+          document.documentElement.setAttribute('data-splash', 'splash');
+        }
+      } catch (e) {}
+    </script>
   </head>
   <body class="min-h-dvh bg-ts-bg text-ts-fg">
     <slot />
