@@ -1,0 +1,179 @@
+---
+// "tammo — STUDIOS." als animierte Wordmark.
+// tammo + dash → Neue Montreal Bold, STUDIOS. → Aileron Bold Italic.
+// IntersectionObserver triggert die Letter-Fly-In Stagger; nach dem letzten
+// Char-animationend lebt Section2 weiter mit Boom-Headline.
+---
+
+<h2 class="wordmark" aria-label="Tammo Studios">
+  <span class="wm-block wm-tammo">
+    <span class="char" style="--i: 0;">t</span>
+    <span class="char" style="--i: 1;">a</span>
+    <span class="char" style="--i: 2;">m</span>
+    <span class="char" style="--i: 3;">m</span>
+    <span class="char" style="--i: 4;">o</span>
+  </span>
+  <span class="wm-block wm-dash">
+    <span class="char" style="--i: 5;">—</span>
+  </span>
+  <span class="wm-block wm-studios">
+    <span class="char" style="--i: 6;">S</span>
+    <span class="char" style="--i: 7;">T</span>
+    <span class="char" style="--i: 8;">U</span>
+    <span class="char" style="--i: 9;">D</span>
+    <span class="char" style="--i: 10;">I</span>
+    <span class="char" style="--i: 11;">O</span>
+    <span class="char" style="--i: 12;">S</span>
+    <span class="char" style="--i: 13;">.</span>
+  </span>
+</h2>
+
+<style>
+  .wordmark {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.15em;
+    font-size: clamp(3rem, 9vw, 7rem);
+    color: #f5f5f4;
+    line-height: 1;
+    white-space: nowrap;
+    margin: 0;
+  }
+
+  .wm-block {
+    display: inline-flex;
+  }
+
+  .wm-tammo,
+  .wm-dash {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+  }
+
+  .wm-studios {
+    font-family: 'Aileron', 'Inter', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    letter-spacing: -0.02em;
+  }
+
+  .wm-dash {
+    margin: 0 0.1em;
+  }
+
+  /* Initial state: jeder Char unsichtbar, von unten, weichgezeichnet. */
+  .char {
+    display: inline-block;
+    transform: translateY(100%);
+    opacity: 0;
+    filter: blur(6px);
+    will-change: transform, opacity, filter;
+  }
+
+  /* Aktivierte Wordmark: Chars fliegen einzeln rein. */
+  .wordmark-active .char {
+    animation: letter-fly-in 600ms cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+  }
+
+  /* Stagger via Block — innerhalb tammo/studios linear über --i, dazwischen
+     extra Pausen für Atemzug vor und nach dem Dash. */
+  .wordmark-active .wm-tammo .char {
+    animation-delay: calc(var(--i) * 80ms);
+  }
+
+  .wordmark-active .wm-dash .char {
+    animation-delay: 440ms;
+  }
+
+  .wordmark-active .wm-studios .char {
+    animation-delay: calc((var(--i) - 6) * 80ms + 600ms);
+  }
+
+  @keyframes letter-fly-in {
+    0% {
+      transform: translateY(100%);
+      opacity: 0;
+      filter: blur(6px);
+    }
+    60% {
+      transform: translateY(-8%);
+      opacity: 1;
+      filter: blur(0);
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+      filter: blur(0);
+    }
+  }
+
+  /* Permanenter dezenter Glow, sobald die ganze Wordmark steht. */
+  .wordmark-complete {
+    text-shadow:
+      0 0 20px rgba(245, 158, 11, 0.18),
+      0 0 60px rgba(245, 158, 11, 0.10);
+    transition: text-shadow 800ms ease-out;
+  }
+
+  @media (max-width: 380px) {
+    .wordmark {
+      font-size: 2.5rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .char {
+      transform: none;
+      opacity: 1;
+      filter: none;
+    }
+    .wordmark-active .char {
+      animation-duration: 0ms;
+      animation-delay: 0ms;
+    }
+    .wordmark-complete {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const wordmark = document.querySelector('.wordmark');
+  const headline = document.querySelector('.boom-headline');
+  if (wordmark) {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const triggerBoom = () => {
+      wordmark.classList.add('wordmark-complete');
+      window.setTimeout(() => {
+        if (headline) headline.classList.add('boom-visible');
+      }, 200);
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          wordmark.classList.add('wordmark-active');
+          observer.unobserve(wordmark);
+
+          if (reduceMotion) {
+            triggerBoom();
+          } else {
+            const lastChar = wordmark.querySelector('.char[style*="--i: 13"]');
+            if (lastChar) {
+              lastChar.addEventListener('animationend', triggerBoom, { once: true });
+            } else {
+              // Defensive Fallback falls Selector mal nicht greift
+              window.setTimeout(triggerBoom, 1800);
+            }
+          }
+        }
+      },
+      { threshold: 0.35 },
+    );
+    observer.observe(wordmark);
+  }
+</script>

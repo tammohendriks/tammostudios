@@ -28,6 +28,10 @@ export const SITE_LABELS = {
   scrollCue: 'SCROLLEN',
 } as const;
 
+export const SECTION2 = {
+  boomHeadline: 'Präzision bis ins letzte Pixel.',
+} as const;
+
 export const NAV_ITEMS = [
   { label: 'Über', href: '/ueber' },
   { label: 'Referenzen', href: '/referenzen' },
