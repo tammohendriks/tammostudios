@@ -30,3 +30,9 @@ export const CTA = {
   label: 'Kontakt',
   href: '/kontakt',
 } as const;
+
+export const SITE_LABELS = {
+  establishedLine: 'EST. 2026 · BREMEN',
+  introText: 'Individuelle Websites für Geschäfte aller Art.',
+  scrollCue: 'SCROLLEN',
+} as const;

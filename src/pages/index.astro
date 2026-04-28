@@ -1,38 +1,12 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import GridBackground from '../components/GridBackground.astro';
-import Nav from '../components/Nav.astro';
-import Hero from '../components/Hero.astro';
+import Splash from '../components/Splash.astro';
 import { SITE } from '../lib/constants';
-
-const year = new Date().getFullYear();
 ---
 
 <BaseLayout
-  pageTitle="Webentwicklung mit Charakter"
-  description={`${SITE.name} — Webentwicklung aus ${SITE.location}. Ein moderner Stack, sauber gebaut.`}
+  pageTitle={SITE.tagline.replace(/\.$/, '')}
+  description={`${SITE.name} — Webentwicklung aus ${SITE.location}.`}
 >
-  <GridBackground />
-
-  <Nav />
-
-  <main class="relative z-10">
-    <Hero />
-  </main>
-
-  <footer class="relative z-10 mx-auto flex w-full max-w-3xl flex-col items-center gap-3 px-6 pb-8 pt-12 text-center text-[12px] text-ts-muted sm:flex-row sm:justify-between sm:text-left">
-    <span>© {year} {SITE.name}</span>
-    <nav class="flex items-center gap-5">
-      <a href="/impressum" class="hover:text-ts-fg">Impressum</a>
-      <a href="/datenschutz" class="hover:text-ts-fg">Datenschutz</a>
-      <a
-        href={SITE.instagram}
-        class="hover:text-ts-fg"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Anfragen
-      </a>
-    </nav>
-  </footer>
+  <Splash />
 </BaseLayout>

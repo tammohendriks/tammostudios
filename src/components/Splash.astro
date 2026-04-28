@@ -1,0 +1,265 @@
+---
+import { SITE, NAV_ITEMS, SITE_LABELS } from '../lib/constants';
+import CornerLabel from './CornerLabel.astro';
+import ParticleField from './ParticleField.astro';
+---
+
+<script is:inline>
+  // Frühe Entscheidung VOR Body-Paint: returning visitor oder reduced-motion?
+  // Setzt html.splash-skip → CSS macht alles ab erstem Frame voll sichtbar.
+  try {
+    if (
+      window.sessionStorage.getItem('ts-splash-seen') === '1' ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      document.documentElement.classList.add('splash-skip');
+    }
+  } catch (e) {}
+</script>
+
+<ParticleField />
+
+<div id="splash-root" data-state="splash">
+  <h1 class="logo-wrap">
+    <img
+      src="/logos/logo-full.png"
+      alt={SITE.name}
+      class="logo-img"
+      draggable="false"
+      fetchpriority="high"
+    />
+  </h1>
+
+  <CornerLabel position="top-left">
+    <span class="label-tracked">{SITE_LABELS.establishedLine}</span>
+  </CornerLabel>
+
+  <CornerLabel position="top-right">
+    <nav class="nav-inline" aria-label="Hauptnavigation">
+      {NAV_ITEMS.map((item, i) => (
+        <span class="nav-item">
+          {i > 0 ? <span class="dot" aria-hidden="true"> · </span> : null}
+          <a href={item.href} class="nav-link">{item.label}</a>
+        </span>
+      ))}
+    </nav>
+  </CornerLabel>
+
+  <CornerLabel position="bottom-left">
+    <a href={`mailto:${SITE.email}`} class="mail-link">{SITE.email}</a>
+  </CornerLabel>
+
+  <CornerLabel position="bottom-center">
+    <p class="intro">{SITE_LABELS.introText}</p>
+  </CornerLabel>
+
+  <CornerLabel position="bottom-right">
+    <button class="scroll-cue" type="button" aria-label="Nach unten scrollen">
+      <span class="label-tracked">{SITE_LABELS.scrollCue}</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 5v14M5 12l7 7 7-7" />
+      </svg>
+    </button>
+  </CornerLabel>
+</div>
+
+<style is:global>
+  /* Splash-State-Cascade — global, weil Canvas (Sibling von #splash-root) und
+     CornerLabel-Children (eigener Astro-Scope) erreicht werden müssen. */
+
+  #splash-root [data-corner] {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 600ms ease-out, transform 600ms ease-out;
+  }
+
+  #splash-root[data-state="ready"] [data-corner] {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  #splash-root[data-state="ready"] [data-corner="top-left"]      { transition-delay: 0ms; }
+  #splash-root[data-state="ready"] [data-corner="top-right"]     { transition-delay: 100ms; }
+  #splash-root[data-state="ready"] [data-corner="bottom-left"]   { transition-delay: 200ms; }
+  #splash-root[data-state="ready"] [data-corner="bottom-center"] { transition-delay: 300ms; }
+  #splash-root[data-state="ready"] [data-corner="bottom-right"]  { transition-delay: 400ms; }
+
+  canvas.particle-field {
+    opacity: 0;
+    transition: opacity 1.2s ease-out;
+  }
+
+  #splash-root[data-state="reveal"] ~ canvas.particle-field,
+  #splash-root[data-state="ready"]  ~ canvas.particle-field {
+    opacity: 1;
+  }
+
+  /* Returning visitor / reduced motion → alles sofort, ohne Transition */
+  html.splash-skip canvas.particle-field {
+    opacity: 1;
+    transition: none;
+  }
+
+  html.splash-skip #splash-root [data-corner] {
+    opacity: 1;
+    transform: translateY(0);
+    transition: none;
+  }
+</style>
+
+<style>
+  .logo-wrap {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    margin: 0;
+    padding: 0;
+    pointer-events: none;
+  }
+
+  .logo-img {
+    display: block;
+    height: 30vh;
+    width: auto;
+    max-width: 80vw;
+    filter:
+      drop-shadow(0 0 30px rgba(245, 158, 11, 0.20))
+      drop-shadow(0 0 60px rgba(245, 158, 11, 0.10));
+    animation: logo-glow 6s ease-in-out infinite;
+  }
+
+  @media (max-width: 767px) {
+    .logo-img {
+      height: 22vh;
+    }
+  }
+
+  @keyframes logo-glow {
+    0%, 100% {
+      filter:
+        drop-shadow(0 0 30px rgba(245, 158, 11, 0.20))
+        drop-shadow(0 0 60px rgba(245, 158, 11, 0.10));
+    }
+    50% {
+      filter:
+        drop-shadow(0 0 45px rgba(245, 158, 11, 0.30))
+        drop-shadow(0 0 90px rgba(245, 158, 11, 0.16));
+    }
+  }
+
+  .label-tracked {
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-weight: 500;
+  }
+
+  .nav-inline {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: nowrap;
+  }
+
+  .nav-item {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .nav-link {
+    color: rgba(245, 245, 244, 0.6);
+    transition: color 200ms ease;
+    padding: 2px 0;
+  }
+
+  .nav-link:hover,
+  .nav-link:focus-visible {
+    color: rgba(245, 245, 244, 1);
+  }
+
+  .dot {
+    color: rgba(245, 245, 244, 0.3);
+    padding: 0 4px;
+  }
+
+  .mail-link {
+    color: rgba(245, 245, 244, 0.6);
+    transition: color 200ms ease;
+  }
+
+  .mail-link:hover,
+  .mail-link:focus-visible {
+    color: var(--color-ts-accent);
+  }
+
+  .intro {
+    margin: 0;
+    max-width: 360px;
+    color: rgba(245, 245, 244, 0.6);
+    font-size: 14px;
+    font-weight: 400;
+  }
+
+  .scroll-cue {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    color: rgba(245, 245, 244, 0.6);
+    cursor: pointer;
+    transition: color 200ms ease;
+  }
+
+  .scroll-cue:hover,
+  .scroll-cue:focus-visible {
+    color: rgba(245, 245, 244, 1);
+  }
+
+  .scroll-cue svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    animation: scroll-bob 2.4s ease-in-out infinite;
+  }
+
+  @keyframes scroll-bob {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(2px); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .logo-img,
+    .scroll-cue svg {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  // Splash-State-Maschine. Inline-Script oben hat ggf. html.splash-skip gesetzt.
+  const wrapper = document.getElementById('splash-root');
+  if (wrapper) {
+    if (document.documentElement.classList.contains('splash-skip')) {
+      wrapper.dataset.state = 'ready';
+    } else {
+      try { sessionStorage.setItem('ts-splash-seen', '1'); } catch (e) {}
+      window.setTimeout(() => { wrapper.dataset.state = 'reveal'; }, 1800);
+      window.setTimeout(() => { wrapper.dataset.state = 'ready'; }, 3000);
+    }
+  }
+
+  // Scroll-Cue: scrollt eine Viewport-Höhe (no-op falls noch kein Folge-Inhalt)
+  const cue = document.querySelector('.scroll-cue');
+  if (cue) {
+    cue.addEventListener('click', () => {
+      window.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
+    });
+  }
+</script>

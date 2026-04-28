@@ -1,0 +1,150 @@
+---
+// ParticleField — Three.js Galaxie als Hintergrund.
+// Performance-Schwellwert beachten: Bundle-Size three.js core ist ~50KB gzip.
+// Falls Mobile-Performance dafür schlecht wird, hier Canvas-2D-Fallback prüfen.
+---
+
+<style is:global>
+  /* Canvas wird zur Laufzeit von Three.js angelegt — Style daher global. */
+  canvas.particle-field {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    display: block;
+  }
+</style>
+
+<script>
+  import {
+    BufferAttribute,
+    BufferGeometry,
+    Group,
+    PerspectiveCamera,
+    Points,
+    PointsMaterial,
+    Scene,
+    WebGLRenderer,
+  } from 'three';
+
+  const isMobile = window.innerWidth < 768;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isCoarse = window.matchMedia('(pointer: coarse)').matches;
+
+  const COUNT_WHITE = isMobile ? 1500 : 3000;
+  const COUNT_ACCENT = isMobile ? 25 : 50;
+
+  const scene = new Scene();
+  const camera = new PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    2000,
+  );
+  camera.position.z = 400;
+
+  const renderer = new WebGLRenderer({ antialias: false, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor(0x000000, 0);
+  renderer.domElement.classList.add('particle-field');
+  document.body.appendChild(renderer.domElement);
+
+  const group = new Group();
+  scene.add(group);
+
+  function makePoints(count, color, opacity) {
+    const geom = new BufferGeometry();
+    const positions = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      positions[3 * i + 0] = (Math.random() - 0.5) * 1000;
+      positions[3 * i + 1] = (Math.random() - 0.5) * 1000;
+      positions[3 * i + 2] = (Math.random() - 0.5) * 1000;
+    }
+    geom.setAttribute('position', new BufferAttribute(positions, 3));
+    const mat = new PointsMaterial({
+      color,
+      size: 1.5,
+      sizeAttenuation: true,
+      transparent: true,
+      opacity,
+      depthWrite: false,
+    });
+    return new Points(geom, mat);
+  }
+
+  const whitePoints = makePoints(COUNT_WHITE, 0xffffff, 0.85);
+  const accentPoints = makePoints(COUNT_ACCENT, 0xf59e0b, 0.95);
+  group.add(whitePoints);
+  group.add(accentPoints);
+
+  let targetCamX = 0;
+  let targetCamY = 0;
+
+  if (!reduceMotion && !isCoarse) {
+    window.addEventListener(
+      'mousemove',
+      (e) => {
+        const nx = (e.clientX / window.innerWidth) * 2 - 1;
+        const ny = (e.clientY / window.innerHeight) * 2 - 1;
+        targetCamX = nx * 30;
+        targetCamY = -ny * 30;
+      },
+      { passive: true },
+    );
+  }
+
+  let resizeRaf = 0;
+  window.addEventListener('resize', () => {
+    if (resizeRaf) cancelAnimationFrame(resizeRaf);
+    resizeRaf = requestAnimationFrame(() => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  });
+
+  let raf = 0;
+  let running = !reduceMotion;
+
+  function tick() {
+    raf = requestAnimationFrame(tick);
+    camera.position.x += (targetCamX - camera.position.x) * 0.05;
+    camera.position.y += (targetCamY - camera.position.y) * 0.05;
+    camera.lookAt(0, 0, 0);
+    group.rotation.y += 0.0003;
+    renderer.render(scene, camera);
+  }
+
+  if (running) {
+    tick();
+  } else {
+    // Reduced motion: ein einzelnes statisches Frame
+    renderer.render(scene, camera);
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (reduceMotion) return;
+    if (document.visibilityState === 'visible') {
+      if (!running) {
+        running = true;
+        tick();
+      }
+    } else {
+      running = false;
+      if (raf) cancelAnimationFrame(raf);
+    }
+  });
+
+  // Cleanup für spätere View-Transitions
+  document.addEventListener('astro:before-preparation', () => {
+    running = false;
+    if (raf) cancelAnimationFrame(raf);
+    whitePoints.geometry.dispose();
+    accentPoints.geometry.dispose();
+    whitePoints.material.dispose();
+    accentPoints.material.dispose();
+    renderer.dispose();
+    renderer.domElement.remove();
+  });
+</script>
