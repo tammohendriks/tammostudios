@@ -120,6 +120,14 @@
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isCoarse = window.matchMedia('(pointer: coarse)').matches;
 
+  // Geteilte Mausposition für Spotlight (Layer C) und Knoten-Proximity (Layer B).
+  // Auf Touch / vor erstem mousemove bleibt sie in der Viewport-Mitte.
+  let mouseX = window.innerWidth / 2;
+  let mouseY = window.innerHeight / 2;
+
+  const PROX_RADIUS = 280;
+  const PROX_RADIUS_SQ = PROX_RADIUS * PROX_RADIUS;
+
   // === Layer B: Canvas mit pulsierenden Knoten ===
   const bgEl = document.querySelector('.background');
   if (bgEl) {
@@ -159,12 +167,26 @@
     function drawFrame(t) {
       ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
       for (const n of nodes) {
-        const brightness = reduceMotion
-          ? 0.15
-          : 0.05 + n.amplitude * (Math.sin(t * 0.6 + n.phase) * 0.5 + 0.5);
+        const dx = n.x - mouseX;
+        const dy = n.y - mouseY;
+        const distSq = dx * dx + dy * dy;
+        let proximity = 0;
+        if (distSq < PROX_RADIUS_SQ) {
+          proximity = 1 - Math.sqrt(distSq) / PROX_RADIUS;
+        }
+
+        // Pulse-Phase friert bei reduced-motion ein, Proximity bleibt aktiv
+        // (interaktiv, nicht decorative).
+        const phaseValue = reduceMotion
+          ? 0.5
+          : Math.sin(t * 0.6 + n.phase) * 0.5 + 0.5;
+        const baseBrightness = 0.05 + n.amplitude * phaseValue;
+        const brightness = Math.min(0.9, baseBrightness + proximity * 0.5);
+        const radius = nodeRadius + proximity * 1.5;
+
         ctx.fillStyle = 'rgba(245, 158, 11, ' + brightness + ')';
         ctx.beginPath();
-        ctx.arc(n.x, n.y, nodeRadius, 0, Math.PI * 2);
+        ctx.arc(n.x, n.y, radius, 0, Math.PI * 2);
         ctx.fill();
       }
     }
@@ -172,21 +194,16 @@
     rebuildNodes();
 
     let raf = 0;
-    let running = !reduceMotion;
+    let running = true;
 
     function tick() {
       raf = requestAnimationFrame(tick);
       drawFrame(performance.now() / 1000);
     }
 
-    if (running) {
-      tick();
-    } else {
-      drawFrame(0);
-    }
+    tick();
 
     document.addEventListener('visibilitychange', () => {
-      if (reduceMotion) return;
       if (document.visibilityState === 'visible') {
         if (!running) {
           running = true;
@@ -203,7 +220,11 @@
       if (resizeRaf) cancelAnimationFrame(resizeRaf);
       resizeRaf = requestAnimationFrame(() => {
         rebuildNodes();
-        if (reduceMotion) drawFrame(0);
+        if (isCoarse) {
+          // Touch ohne realen Cursor: Mitte nachziehen
+          mouseX = window.innerWidth / 2;
+          mouseY = window.innerHeight / 2;
+        }
       });
     });
 
@@ -214,26 +235,26 @@
     });
   }
 
-  // === Layer C: Spotlight mouse tracking ===
+  // === Layer C: Spotlight + geteilte Mausposition ===
   const root = document.documentElement;
   const setPos = (x, y) => {
     root.style.setProperty('--mouse-x', x + 'px');
     root.style.setProperty('--mouse-y', y + 'px');
   };
 
-  if (!reduceMotion && !isCoarse) {
-    let lastX = window.innerWidth / 2;
-    let lastY = window.innerHeight / 2;
+  if (!isCoarse) {
+    // Mauslistener läuft auch bei reduced-motion: die Knoten-Proximity ist
+    // nutzergetrieben, nicht decorative.
     let pending = false;
     const flush = () => {
       pending = false;
-      setPos(lastX, lastY);
+      setPos(mouseX, mouseY);
     };
     window.addEventListener(
       'mousemove',
       (e) => {
-        lastX = e.clientX;
-        lastY = e.clientY;
+        mouseX = e.clientX;
+        mouseY = e.clientY;
         if (!pending) {
           pending = true;
           requestAnimationFrame(flush);
@@ -242,5 +263,5 @@
       { passive: true },
     );
   }
-  // Touch / reduced-motion → Spotlight bleibt zentral (Default 50%/50%)
+  // Touch → mouseX/mouseY bleibt zentral; Spotlight CSS nutzt Default 50%/50%.
 </script>

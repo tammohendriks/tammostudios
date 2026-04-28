@@ -111,27 +111,78 @@ import { SITE_LABELS, NAV_ITEMS, CTA } from '../lib/constants';
   }
 
   .cta-pill {
+    position: relative;
     display: inline-block;
-    padding: 10px 24px;
+    overflow: hidden;
+    padding: 11px 26px;
     border-radius: 9999px;
-    background: var(--color-ts-accent);
-    color: var(--color-ts-bg);
+    background: linear-gradient(to bottom, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #1a1a1a;
     font-size: 14px;
     font-weight: 600;
-    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5);
-    animation: pulse-cta 2.4s ease-out infinite;
-    transition: transform 180ms ease, filter 180ms ease;
+    box-shadow:
+      0 0 0 0 rgba(245, 158, 11, 0.5),
+      0 4px 24px rgba(245, 158, 11, 0.35),
+      0 0 60px rgba(245, 158, 11, 0.15);
+    animation: cta-pulse 2.4s ease-out infinite;
+    transition: transform 200ms ease, box-shadow 200ms ease;
+  }
+
+  .cta-pill::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.25) 50%,
+      transparent 100%
+    );
+    transform: skewX(-20deg);
+    animation: cta-shimmer 5s ease-in-out infinite;
+    pointer-events: none;
   }
 
   .cta-pill:hover {
-    transform: translateY(-1px);
-    filter: brightness(1.05);
+    transform: scale(1.03);
+    box-shadow:
+      0 0 0 0 rgba(245, 158, 11, 0),
+      0 6px 32px rgba(245, 158, 11, 0.55),
+      0 0 100px rgba(245, 158, 11, 0.3);
   }
 
-  @keyframes pulse-cta {
-    0%   { box-shadow: 0 0 0 0    rgba(245, 158, 11, 0.5); }
-    70%  { box-shadow: 0 0 0 14px rgba(245, 158, 11, 0);   }
-    100% { box-shadow: 0 0 0 0    rgba(245, 158, 11, 0);   }
+  .cta-pill:hover::before {
+    animation-duration: 1.5s;
+  }
+
+  @keyframes cta-pulse {
+    0% {
+      box-shadow:
+        0 0 0 0 rgba(245, 158, 11, 0.5),
+        0 4px 24px rgba(245, 158, 11, 0.35),
+        0 0 60px rgba(245, 158, 11, 0.15);
+    }
+    70% {
+      box-shadow:
+        0 0 0 16px rgba(245, 158, 11, 0),
+        0 4px 28px rgba(245, 158, 11, 0.45),
+        0 0 80px rgba(245, 158, 11, 0.2);
+    }
+    100% {
+      box-shadow:
+        0 0 0 0 rgba(245, 158, 11, 0),
+        0 4px 24px rgba(245, 158, 11, 0.35),
+        0 0 60px rgba(245, 158, 11, 0.15);
+    }
+  }
+
+  @keyframes cta-shimmer {
+    0%, 70% { left: -100%; }
+    100%    { left: 200%; }
   }
 
   /* Hamburger */
@@ -225,7 +276,17 @@ import { SITE_LABELS, NAV_ITEMS, CTA } from '../lib/constants';
   @media (prefers-reduced-motion: reduce) {
     .cta-pill {
       animation: none;
-      box-shadow: none;
+      box-shadow:
+        0 0 0 0 rgba(245, 158, 11, 0),
+        0 4px 24px rgba(245, 158, 11, 0.35),
+        0 0 60px rgba(245, 158, 11, 0.15);
+    }
+    .cta-pill::before {
+      animation: none;
+      display: none;
+    }
+    .cta-pill:hover {
+      transform: none;
     }
     .mobile-menu {
       animation: none;

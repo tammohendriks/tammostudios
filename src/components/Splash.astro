@@ -44,7 +44,7 @@ import ScrollCue from './ScrollCue.astro';
 
   #splash-root .background {
     opacity: 0;
-    transition: opacity 1.2s ease-out;
+    transition: opacity 0.8s ease-out;
   }
 
   #splash-root[data-state="reveal"] .background,
@@ -59,7 +59,7 @@ import ScrollCue from './ScrollCue.astro';
   #splash-root .scroll-cue {
     opacity: 0;
     transform: translateY(8px);
-    transition: opacity 600ms ease-out, transform 600ms ease-out;
+    transition: opacity 500ms ease-out, transform 500ms ease-out;
   }
 
   #splash-root[data-state="ready"] .top-left,
@@ -72,10 +72,10 @@ import ScrollCue from './ScrollCue.astro';
   }
 
   #splash-root[data-state="ready"] .top-left   { transition-delay: 0ms;   }
-  #splash-root[data-state="ready"] .nav        { transition-delay: 100ms; }
-  #splash-root[data-state="ready"] .cta        { transition-delay: 200ms; }
-  #splash-root[data-state="ready"] .intro      { transition-delay: 300ms; }
-  #splash-root[data-state="ready"] .scroll-cue { transition-delay: 400ms; }
+  #splash-root[data-state="ready"] .nav        { transition-delay: 80ms;  }
+  #splash-root[data-state="ready"] .cta        { transition-delay: 160ms; }
+  #splash-root[data-state="ready"] .intro      { transition-delay: 240ms; }
+  #splash-root[data-state="ready"] .scroll-cue { transition-delay: 320ms; }
 
   /* Returning visitor / reduced-motion → alles sofort, ohne Transition */
   html.splash-skip #splash-root .background,
@@ -111,31 +111,31 @@ import ScrollCue from './ScrollCue.astro';
 
   .logo-img {
     display: block;
-    height: 30vh;
+    height: 38vh;
     width: auto;
     max-width: 80vw;
     filter:
-      drop-shadow(0 0 30px rgba(245, 158, 11, 0.20))
-      drop-shadow(0 0 60px rgba(245, 158, 11, 0.10));
+      drop-shadow(0 0 40px rgba(245, 158, 11, 0.25))
+      drop-shadow(0 0 90px rgba(245, 158, 11, 0.12));
     animation: logo-glow 6s ease-in-out infinite;
   }
 
   @media (max-width: 767px) {
     .logo-img {
-      height: 22vh;
+      height: 25vh;
     }
   }
 
   @keyframes logo-glow {
     0%, 100% {
       filter:
-        drop-shadow(0 0 30px rgba(245, 158, 11, 0.20))
-        drop-shadow(0 0 60px rgba(245, 158, 11, 0.10));
+        drop-shadow(0 0 40px rgba(245, 158, 11, 0.25))
+        drop-shadow(0 0 90px rgba(245, 158, 11, 0.12));
     }
     50% {
       filter:
-        drop-shadow(0 0 45px rgba(245, 158, 11, 0.30))
-        drop-shadow(0 0 90px rgba(245, 158, 11, 0.16));
+        drop-shadow(0 0 60px rgba(245, 158, 11, 0.36))
+        drop-shadow(0 0 130px rgba(245, 158, 11, 0.20));
     }
   }
 
@@ -169,8 +169,8 @@ import ScrollCue from './ScrollCue.astro';
       wrapper.dataset.state = 'ready';
     } else {
       try { sessionStorage.setItem('ts-splash-seen', '1'); } catch (e) {}
-      window.setTimeout(() => { wrapper.dataset.state = 'reveal'; }, 1800);
-      window.setTimeout(() => { wrapper.dataset.state = 'ready'; }, 3000);
+      window.setTimeout(() => { wrapper.dataset.state = 'reveal'; }, 1200);
+      window.setTimeout(() => { wrapper.dataset.state = 'ready'; }, 2000);
     }
   }
 </script>
