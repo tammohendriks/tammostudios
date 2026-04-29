@@ -174,18 +174,22 @@ import ScrollCue from '../ScrollCue.astro';
     pointer-events: none;
     z-index: 0;
     --aurora-intensity: 0;
+    contain: layout style paint;
   }
 
   .aurora-layer {
     position: absolute;
     border-radius: 50%;
-    /* 35px blur: weiter runter (war 45 / vorher 60). Visuell kaum
-       unterscheidbar, halbiert die Composite-Kosten gegenüber 60.
-       Hilft Section2-Lag auf Desktop. */
-    filter: blur(35px);
+    /* 30px blur: weiter runter (war 35 / vorher 45 / ursprünglich 60).
+       Visuell minimal anders, GPU-Kosten weiter unten — hilft Mobile
+       deutlich. */
+    filter: blur(30px);
     mix-blend-mode: screen;
     transition: opacity 200ms linear;
     will-change: transform, opacity;
+    /* Layout/style/paint containment: isoliert die Aurora-Layer
+       gegen Reflows / Repaints anderswo auf der Seite. */
+    contain: layout style paint;
   }
 
   .aurora-1 {
@@ -246,7 +250,7 @@ import ScrollCue from '../ScrollCue.astro';
 
   /* Mobile Performance: nur Layer 1 ist sichtbar, Layer 2 und 3
      entfallen — spart 2× blur-Operationen pro Frame. Layer 1 wird
-     großzügiger skaliert + leicht hellere Multiplier um den
+     auf 110vmax skaliert + leicht hellere Multiplier um den
      Verlust optisch zu kompensieren. */
   @media (max-width: 768px) {
     .aurora-2,
@@ -254,8 +258,8 @@ import ScrollCue from '../ScrollCue.astro';
       display: none;
     }
     .aurora-1 {
-      width: 100vw;
-      height: 100vh;
+      width: 110vmax;
+      height: 110vmax;
       opacity: calc(var(--aurora-intensity) * 0.7);
     }
   }
@@ -291,12 +295,14 @@ import ScrollCue from '../ScrollCue.astro';
       rgba(120, 53,  15, 0.04) 70%,
       rgba(0,   0,   0,   0)   88%
     );
-    /* 35px blur — siehe Begründung an .aurora-layer. */
+    /* 35px blur — bleibt etwas höher als bei Aurora, weil das
+       Spotlight die fokussierte Lichtquelle ist. */
     filter: blur(35px);
     /* KEINE transition auf transform — sonst lag durch Smoothing über
        jeden Scroll-Tick. Nur opacity bekommt den weichen On/Off. */
     transition: opacity 200ms linear;
     will-change: transform, opacity;
+    contain: layout style paint;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -327,13 +333,12 @@ import ScrollCue from '../ScrollCue.astro';
   const headline = section ? section.querySelector('.boom-headline') : null;
   const ellipse = section ? section.querySelector('.headline-circle ellipse') : null;
   const aurora = section ? section.querySelector('.ambient-aurora') : null;
-  const wordmark = section ? section.querySelector('.wordmark') : null;
   const spotlight = section ? section.querySelector('.wordmark-spotlight') : null;
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   if (
     section && stickyChars.length && headline && ellipse &&
-    aurora && wordmark && spotlight
+    aurora && spotlight
   ) {
     const stepsForChars = stickyChars.length;
     const headlineStartStep = stepsForChars + 2;
@@ -343,10 +348,9 @@ import ScrollCue from '../ScrollCue.astro';
     const totalSteps = circleEndStep;
 
     // Animation belegt nur die ersten 75% des Section-Scrolls. Die letzten
-    // 25% sind Settled-State: Spotlight stabil, Wordmark-Glow voll, Aurora
-    // weiter dezent driftend.
+    // 25% sind Settled-State: Spotlight stabil, Aurora weiter dezent
+    // driftend.
     const ANIMATION_RANGE = 0.75;
-    const SETTLE_START = ANIMATION_RANGE;
     // Spotlight erreicht seine Endposition leicht nach Animationsende,
     // damit er beim Übergang in den Settled-State sauber "ankommt".
     // Vh-Offsets RELATIV zur sticky-Mitte (50% top): +30vh = 80% des
@@ -379,7 +383,6 @@ import ScrollCue from '../ScrollCue.astro';
         headline.classList.add('headline-on');
         ellipse.style.strokeDashoffset = '0';
         aurora.style.setProperty('--aurora-intensity', '0.5');
-        wordmark.style.setProperty('--settle-progress', '1');
         spotlight.style.setProperty('--spotlight-offset', '-22vh');
         spotlight.style.setProperty('--spotlight-intensity', '1');
         return;
@@ -408,13 +411,6 @@ import ScrollCue from '../ScrollCue.astro';
 
       aurora.style.setProperty('--aurora-intensity', String(progress));
 
-      // Settled-State Glow auf der Wordmark, scroll-driven von 0 → 1
-      // zwischen 75% und 100% rawProgress.
-      const settleProgress = clamp01(
-        (rawProgress - SETTLE_START) / (1 - SETTLE_START),
-      );
-      wordmark.style.setProperty('--settle-progress', String(settleProgress));
-
       // Rising Spotlight: steigt im Viewport von +30vh (unten) auf
       // -22vh (oberhalb Wordmark) relativ zur sticky-Mitte, Intensität
       // 0 → 1. Position über transform — kein Layout-Trigger pro Tick.
@@ -426,14 +422,17 @@ import ScrollCue from '../ScrollCue.astro';
       spotlight.style.setProperty('--spotlight-intensity', String(spotlightProgress));
     }
 
-    // Scroll: rAF + 60fps-Cap. Auf 120Hz-Mobile verhindert das Cap
-    // doppelt-getriggerte Updates pro Frame.
+    // Scroll: rAF + dynamischer Cap. Desktop 60fps (16ms), Mobile
+    // 30fps (33ms) — die GPU-schweren blurred Layer machen 60fps
+    // auf dem Phone unnötig teuer, 30fps fühlt sich gleich smooth an.
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    const scrollMinInterval = isMobile ? 33 : 16;
     let ticking = false;
     let lastScrollTime = 0;
     function onScroll() {
       if (ticking) return;
       const now = performance.now();
-      if (now - lastScrollTime < 16) return;
+      if (now - lastScrollTime < scrollMinInterval) return;
       lastScrollTime = now;
       ticking = true;
       window.requestAnimationFrame(() => {

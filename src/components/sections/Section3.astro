@@ -84,7 +84,9 @@ import ScrollCue from '../ScrollCue.astro';
 
   @media (max-width: 768px) {
     .section-3-sticky {
-      padding: 60px 24px;
+      /* 120px top: TopBar + Spielraum für Eyebrow.
+         100px bottom: Platz für ScrollCue ohne Box-Overlap. */
+      padding: 120px 20px 100px;
     }
   }
 
@@ -99,7 +101,7 @@ import ScrollCue from '../ScrollCue.astro';
 
   @media (max-width: 768px) {
     .section-3-content {
-      gap: 40px;
+      gap: 32px;
     }
   }
 
@@ -137,7 +139,7 @@ import ScrollCue from '../ScrollCue.astro';
 
   @media (max-width: 768px) {
     .differentiators {
-      gap: 36px;
+      gap: 32px;
     }
   }
 
@@ -152,6 +154,12 @@ import ScrollCue from '../ScrollCue.astro';
     opacity: var(--item-progress);
     transform: translateY(calc((1 - var(--item-progress)) * 40px));
     will-change: transform, opacity;
+  }
+
+  @media (max-width: 768px) {
+    .diff-item {
+      gap: 12px;
+    }
   }
 
   .diff-number {
@@ -173,6 +181,12 @@ import ScrollCue from '../ScrollCue.astro';
     }
   }
 
+  @media (max-width: 768px) {
+    .diff-number {
+      font-size: 3rem;
+    }
+  }
+
   .diff-title {
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-weight: 700;
@@ -181,6 +195,12 @@ import ScrollCue from '../ScrollCue.astro';
     letter-spacing: -0.01em;
     margin: 0;
     line-height: 1.25;
+  }
+
+  @media (max-width: 768px) {
+    .diff-title {
+      font-size: 1.05rem;
+    }
   }
 
   .diff-body {
@@ -196,6 +216,12 @@ import ScrollCue from '../ScrollCue.astro';
   @media (max-width: 1024px) {
     .diff-body {
       max-width: 100%;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .diff-body {
+      font-size: 0.9rem;
     }
   }
 
@@ -222,6 +248,12 @@ import ScrollCue from '../ScrollCue.astro';
     transition: opacity 400ms ease-out;
   }
 
+  @media (max-width: 768px) {
+    .section-3 .scroll-cue-label {
+      font-size: 0.65rem;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .section-3 .scroll-cue-anchor {
       --cue-visibility: 1 !important;
@@ -243,19 +275,20 @@ import ScrollCue from '../ScrollCue.astro';
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   if (section && items.length === 3 && eyebrow && cueAnchor) {
-    // Cascade läuft wie Section 2: kontinuierlich über den ersten
-    // Großteil des Scrolls (0 → 75%), Items überlappen sich leicht.
-    // Ab 75% Settled-Tail mit ½ Viewport Lesezeit (50vh of scroll
-    // bei 300vh Section / 100vh Sticky).
+    // Mit 300vh Runway gehen wir auf langsame, dramatische Cascade:
+    // jeder Übergang hat Atemzug, Box 3 ist erst bei 85% voll. Kurzer
+    // Settled-Tail danach, ScrollCue signalisiert das Ende.
     const ranges = [
-      { start: 0.00, end: 0.30 },
-      { start: 0.20, end: 0.50 },
-      { start: 0.45, end: 0.75 },
+      { start: 0.00, end: 0.40 },
+      { start: 0.25, end: 0.60 },
+      { start: 0.50, end: 0.85 },
     ];
-    const EYEBROW_END = 0.10;
-    // Cue erscheint zu Beginn des Settled-Tails
-    const CUE_START = 0.78;
-    const CUE_END = 0.88;
+    const EYEBROW_END = 0.12;
+    // Cue erscheint später — auf Mobile noch später, weil weniger Platz
+    // nach unten und Box 3 sonst überlagert würde.
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    const CUE_START = isMobile ? 0.85 : 0.78;
+    const CUE_END = CUE_START + 0.10;
 
     function clamp01(v) {
       return v < 0 ? 0 : v > 1 ? 1 : v;
