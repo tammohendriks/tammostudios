@@ -82,10 +82,10 @@ export const SECTION4 = {
       label: 'PHASE 03',
       title: 'Ich baue sie',
       body:
-        'Aus dem Entwurf wird die echte Website — mit deinen Texten, ' +
-        'deinen Bildern. Dazu bekommst du einen eigenen Bereich, in dem ' +
-        'du Öffnungszeiten, Bilder oder Texte später selbst ändern ' +
-        'kannst. Wie ausführlich der wird, entscheidest du.',
+        'Aus dem Entwurf wird die echte Website — mit deinen Texten ' +
+        'und Bildern. Plus ein eigener Bereich, in dem du ' +
+        'Öffnungszeiten, Bilder oder Texte später selbst änderst — ' +
+        'so ausführlich wie du willst.',
       link: { label: 'Was kostet was?', href: '/preise' },
     },
     {
