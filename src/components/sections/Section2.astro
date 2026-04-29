@@ -179,9 +179,10 @@ import ScrollCue from '../ScrollCue.astro';
   .aurora-layer {
     position: absolute;
     border-radius: 50%;
-    /* 45px blur statt 60px: visuell kaum unterscheidbar, GPU-Kosten
-       beim Resize/Composite deutlich niedriger. */
-    filter: blur(45px);
+    /* 35px blur: weiter runter (war 45 / vorher 60). Visuell kaum
+       unterscheidbar, halbiert die Composite-Kosten gegenüber 60.
+       Hilft Section2-Lag auf Desktop. */
+    filter: blur(35px);
     mix-blend-mode: screen;
     transition: opacity 200ms linear;
     will-change: transform, opacity;
@@ -287,8 +288,8 @@ import ScrollCue from '../ScrollCue.astro';
       rgba(120, 53,  15, 0.04) 70%,
       rgba(0,   0,   0,   0)   88%
     );
-    /* 45px blur — siehe Begründung an .aurora-layer. */
-    filter: blur(45px);
+    /* 35px blur — siehe Begründung an .aurora-layer. */
+    filter: blur(35px);
     transition: top 200ms linear, opacity 200ms linear;
     will-change: transform, opacity;
   }

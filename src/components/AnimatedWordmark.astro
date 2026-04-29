@@ -51,6 +51,9 @@
     color: #f5f5f4;
     line-height: 0.95;
     margin: 0;
+    /* Settle-Filter (brightness + drop-shadow) wird scroll-driven
+       gewechselt — eigene Compositing-Layer beschleunigt das Update. */
+    will-change: filter;
     /* Settled-State: scroll-driven brightness + drop-shadow Atmen.
        --settle-progress 0 = identity, 1 = voller Glow. */
     filter:

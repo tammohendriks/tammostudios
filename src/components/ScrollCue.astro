@@ -2,31 +2,45 @@
 import { SITE_LABELS } from '../lib/constants';
 ---
 
-<button class="scroll-cue" type="button" aria-label="Nach unten scrollen">
-  <span class="scroll-cue-label">{SITE_LABELS.scrollCue}</span>
-  <svg class="scroll-cue-icon" viewBox="0 0 24 24" aria-hidden="true">
-    <path d="M6 9l6 6 6-6" />
-  </svg>
-</button>
+<div class="scroll-cue-anchor">
+  <button class="scroll-cue" type="button" aria-label="Nach unten scrollen">
+    <span class="scroll-cue-label">{SITE_LABELS.scrollCue}</span>
+    <svg class="scroll-cue-arrow" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M6 9l6 6 6-6" />
+    </svg>
+  </button>
+</div>
 
 <style>
-  .scroll-cue {
-    /* Section-scoped: anker im jeweiligen <section position: relative>,
-       scrollt mit der Section weg, statt am Viewport zu kleben.
-       width: max-content + margin: 0 absichern, dass der Button auf
-       seinen Inhalt schrumpft — nur dann klebt translateX(-50%) sauber
-       auf der echten Mitte des Elements. */
+  /* Voller Section-Breiten-Anchor mit flex centering. Kein
+     transform: translateX(-50%), kein left: 50% — der Anchor IST
+     die Section-Breite, justify-content: center pinnt den Cue
+     darin garantiert mittig. Bulletproof gegen Tailwind-Resets,
+     UA-Defaults oder verschobene Containing-Blocks. */
+  .scroll-cue-anchor {
     position: absolute;
-    bottom: 28px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 30;
-    width: max-content;
-    margin: 0;
-    display: inline-flex;
+    left: 0;
+    right: 0;
+    bottom: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+    z-index: 20;
+  }
+
+  @media (max-width: 768px) {
+    .scroll-cue-anchor {
+      bottom: 24px;
+    }
+  }
+
+  .scroll-cue {
+    pointer-events: auto;
+    display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     background: transparent;
     border: 0;
     padding: 4px 8px;
@@ -36,25 +50,20 @@ import { SITE_LABELS } from '../lib/constants';
     transition: color 200ms ease;
   }
 
-  @media (max-width: 768px) {
-    .scroll-cue {
-      bottom: 24px;
-    }
-  }
-
   .scroll-cue:hover,
   .scroll-cue:focus-visible {
     color: rgba(245, 245, 244, 0.9);
   }
 
   .scroll-cue-label {
-    font-size: 11px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-    letter-spacing: 0.18em;
     font-weight: 500;
   }
 
-  .scroll-cue-icon {
+  .scroll-cue-arrow {
     width: 16px;
     height: 16px;
     stroke: currentColor;
@@ -62,16 +71,16 @@ import { SITE_LABELS } from '../lib/constants';
     fill: none;
     stroke-linecap: round;
     stroke-linejoin: round;
-    animation: scroll-cue-bob 1.8s ease-in-out infinite;
+    animation: scroll-cue-bounce 1.8s ease-in-out infinite;
   }
 
-  @keyframes scroll-cue-bob {
-    0%, 100% { transform: translateY(0);   opacity: 0.5; }
-    50%      { transform: translateY(6px); opacity: 1;   }
+  @keyframes scroll-cue-bounce {
+    0%, 100% { transform: translateY(0); opacity: 0.5; }
+    50%      { transform: translateY(6px); opacity: 1; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .scroll-cue-icon {
+    .scroll-cue-arrow {
       animation: none;
       opacity: 0.7;
     }
@@ -79,10 +88,11 @@ import { SITE_LABELS } from '../lib/constants';
 </style>
 
 <script>
-  const cue = document.querySelector('.scroll-cue');
-  if (cue) {
+  // Click auf jeden Cue scrollt eine Viewport-Höhe nach unten.
+  // querySelectorAll, weil Section1 und Section2 jeweils einen Cue haben.
+  document.querySelectorAll('.scroll-cue').forEach((cue) => {
     cue.addEventListener('click', () => {
       window.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
     });
-  }
+  });
 </script>

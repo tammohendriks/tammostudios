@@ -19,9 +19,6 @@
     inset: 0;
     z-index: 1;
     pointer-events: none;
-    /* Touch-Flicker-Effekt schaltet eine .flicker-dim Klasse —
-       Transition glättet das Ein-/Ausblenden beim Scrollen. */
-    transition: opacity 200ms ease-out;
     -webkit-mask-image: linear-gradient(
       to bottom,
       transparent 0%,
@@ -36,10 +33,6 @@
       black 86%,
       transparent 100%
     );
-  }
-
-  canvas.node-canvas.flicker-dim {
-    opacity: 0.3;
   }
 </style>
 
@@ -137,9 +130,11 @@
 
 <script>
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  // (hover: hover) ist zuverlässiger als (pointer: coarse) — manche
-  // Hybrid-Devices melden coarse + fine, hover ist klarer differenziert.
-  const isHoverCapable = window.matchMedia('(hover: hover)').matches;
+  // Strenger gefasst: (hover: hover) UND (pointer: fine). Erfasst echte
+  // Maus-Devices verlässlich, vermeidet Hybrid-Reports und sorgt dafür,
+  // dass auf Mobile garantiert keine dynamischen Mouse/Spotlight-Pfade
+  // laufen.
+  const isHoverCapable = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
   // Geteilte Mausposition für Spotlight (Layer C) und Knoten-Proximity (Layer B).
   // Auf Touch / vor erstem mousemove bleibt sie in der Viewport-Mitte.
@@ -254,30 +249,10 @@
       });
     });
 
-    // Touch-only: Scroll-getriggerter Knoten-Flicker. Ersetzt visuell
-    // den Mouse-Spotlight, den's ohne Cursor nicht gibt — die Nodes
-    // dimmen kurz via .flicker-dim Klasse, kommen dann wieder hoch.
-    // Subtil, aber spürbar reaktiv.
-    if (!isHoverCapable && !reduceMotion) {
-      let flickerPending = false;
-      let flickerReset = 0;
-      window.addEventListener(
-        'scroll',
-        () => {
-          if (flickerPending) return;
-          flickerPending = true;
-          requestAnimationFrame(() => {
-            flickerPending = false;
-            canvas.classList.add('flicker-dim');
-            if (flickerReset) clearTimeout(flickerReset);
-            flickerReset = window.setTimeout(() => {
-              canvas.classList.remove('flicker-dim');
-            }, 250);
-          });
-        },
-        { passive: true },
-      );
-    }
+    // Auf Touch: KEINE dynamischen Effekte. Kein Mouse-Listener, kein
+    // Scroll-Flicker, keine Proximity-Berechnung. Das natürliche
+    // Knoten-Pulsen via drawFrame läuft weiter — das war's.
+    // Stabilität > clevere Mobile-Spielereien.
 
     document.addEventListener('astro:before-preparation', () => {
       running = false;
