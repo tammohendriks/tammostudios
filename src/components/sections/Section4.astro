@@ -52,6 +52,7 @@ import ScrollCue from '../ScrollCue.astro';
       <div class="phase-dot phase-dot-3" data-phase="2"></div>
       <div class="phase-dot phase-dot-4" data-phase="3"></div>
       <div class="phase-dot phase-dot-5" data-phase="4"></div>
+      <div class="phase-dot phase-dot-6" data-phase="5"></div>
 
       <div class="phases-container">
         {SECTION4.phases.map((phase, i) => (
@@ -247,10 +248,11 @@ import ScrollCue from '../ScrollCue.astro';
   }
 
   .phase-dot-1 { top: 18%; }
-  .phase-dot-2 { top: 34%; }
-  .phase-dot-3 { top: 50%; }
-  .phase-dot-4 { top: 66%; }
-  .phase-dot-5 { top: 82%; }
+  .phase-dot-2 { top: 30.8%; }
+  .phase-dot-3 { top: 43.6%; }
+  .phase-dot-4 { top: 56.4%; }
+  .phase-dot-5 { top: 69.2%; }
+  .phase-dot-6 { top: 82%; }
 
   /* Lit-State: Dot leuchtet ab phase.fadeIn[0] und bleibt lit für
      den Rest der Section. Kein passed/active Unterschied — die
@@ -435,9 +437,9 @@ import ScrollCue from '../ScrollCue.astro';
     }
   }
 
-  /* Reduced-motion: Settled-State zeigen — Phase 4 + Phase 5 (das
+  /* Reduced-motion: Settled-State zeigen — Phase 5 + Phase 6 (das
      finale Two-at-a-time Paar) sichtbar, alle Dots lit, Linie voll
-     bis Dot 5 (90%). Andere Phasen bleiben unsichtbar (kein Stacken
+     bis Dot 6 (100%). Andere Phasen bleiben unsichtbar (kein Stacken
      unleserlicher Übereinanderlagen). */
   @media (prefers-reduced-motion: reduce) {
     .section-4-header {
@@ -449,11 +451,12 @@ import ScrollCue from '../ScrollCue.astro';
     }
     .phase.phase-1,
     .phase.phase-2,
-    .phase.phase-3 {
+    .phase.phase-3,
+    .phase.phase-4 {
       opacity: 0 !important;
     }
-    .phase.phase-4,
-    .phase.phase-5 {
+    .phase.phase-5,
+    .phase.phase-6 {
       opacity: 1 !important;
     }
     .phase-dot {
@@ -495,33 +498,35 @@ import ScrollCue from '../ScrollCue.astro';
   }
 
   if (
-    section && header && phases.length === 5 && dots.length === 5 &&
+    section && header && phases.length === 6 && dots.length === 6 &&
     lineProgress && cueWrap
   ) {
     // Two-at-a-Time Sequence — pro Phase eigener Lifecycle:
     //   fadeIn  [start,end] — opacity 0 → 1
     //   fadeOut [start,end] — opacity 1 → 0  (null = bleibt sichtbar)
     // Same-Side Sequencing: Phase X fadeOut.end <= Phase X+2 fadeIn.start,
-    // damit auf der gleichen Seite NIE zwei Phasen gleichzeitig sichtbar
-    // sind. Cross-Side (Phase X ↔ X+1) darf parallel laufen — die Phasen
-    // sitzen auf verschiedenen Seiten, kein Overlap.
+    // damit auf gleicher Seite NIE zwei Phasen gleichzeitig sichtbar
+    // sind. Cross-Side (Phase X ↔ X+1) darf parallel laufen — andere
+    // Seite, kein Overlap. Stable-Window pro Phase ~15% Progress
+    // (genug Lesezeit ohne hetzen).
     const phasesConfig = [
-      { fadeIn: [0.10, 0.16], fadeOut: [0.24, 0.30] },
-      { fadeIn: [0.20, 0.26], fadeOut: [0.39, 0.45] },
-      { fadeIn: [0.30, 0.36], fadeOut: [0.49, 0.55] },
-      { fadeIn: [0.45, 0.52], fadeOut: null },
-      { fadeIn: [0.55, 0.62], fadeOut: null },
+      { fadeIn: [0.05, 0.10], fadeOut: [0.25, 0.30] },
+      { fadeIn: [0.15, 0.20], fadeOut: [0.35, 0.40] },
+      { fadeIn: [0.30, 0.35], fadeOut: [0.50, 0.55] },
+      { fadeIn: [0.40, 0.45], fadeOut: [0.60, 0.65] },
+      { fadeIn: [0.55, 0.60], fadeOut: null },
+      { fadeIn: [0.65, 0.70], fadeOut: null },
     ];
     // Linien-Position pro Dot (0..100, line-relativ). Linie spannt
-    // jetzt 18%-82% des Wraps; Dot 1 = Linien-Start (0), Dot 5 =
-    // Linien-Ende (100). dashoffset = 100 - linePos.
-    const linePositions = [0, 25, 50, 75, 100];
-    // Mobile-Slices: 5 gleich große Phasen-Slots nach dem Lead-In
-    // (0.10), letzte Phase bleibt im Settled-Tail.
-    const mobileBoundaries = [0.10, 0.27, 0.44, 0.61, 0.78];
-    const HEADER_END = 0.06;
-    const SETTLED_AT = 0.92;
-    const CUE_RANGE = 0.06;
+    // 18%-82% des Wraps; Dot 1 = Linien-Start (0), Dot 6 = Ende (100).
+    // 6 Dots → äquidistant in 20er-Schritten. dashoffset = 100 - linePos.
+    const linePositions = [0, 20, 40, 60, 80, 100];
+    // Mobile-Slices: 6 gleich-ish große Phasen-Slots nach dem Lead-In.
+    // Letzte Phase bleibt im Settled-Tail.
+    const mobileBoundaries = [0.05, 0.20, 0.35, 0.50, 0.65, 0.80];
+    const HEADER_END = 0.04;
+    const SETTLED_AT = 0.85;
+    const CUE_RANGE = 0.10;
     const desktopMQ = window.matchMedia('(min-width: 1024px)');
 
     function clamp01(v) {
@@ -561,15 +566,15 @@ import ScrollCue from '../ScrollCue.astro';
       if (reduceMotion) {
         header.style.setProperty('--header-progress', '1');
         for (let i = 0; i < phases.length; i++) {
-          // Settled: Phase 4 + 5 sichtbar (finales Two-at-a-time Paar)
+          // Settled: Phase 5 + 6 sichtbar (finales Two-at-a-time Paar)
           phases[i].style.setProperty(
             '--phase-opacity',
-            i === 3 || i === 4 ? '1' : '0'
+            i === 4 || i === 5 ? '1' : '0'
           );
-          phases[i].style.pointerEvents = i === 3 || i === 4 ? 'auto' : 'none';
+          phases[i].style.pointerEvents = i === 4 || i === 5 ? 'auto' : 'none';
           dots[i].classList.add('dot-lit');
         }
-        lineProgress.style.strokeDashoffset = String(100 - linePositions[4]);
+        lineProgress.style.strokeDashoffset = String(100 - linePositions[5]);
         cueWrap.style.setProperty('--cue-progress', '1');
         return;
       }

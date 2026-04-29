@@ -103,6 +103,15 @@ export const SECTION4 = {
         'wie du selbst weiterarbeiten kannst — ohne mich jedes Mal ' +
         'anrufen zu müssen.',
     },
+    {
+      label: 'PHASE 06',
+      title: 'Und jetzt du',
+      body:
+        'Du kennst den Weg. Wenn er sich richtig anfühlt: schreib ' +
+        'mir. Dann nehmen wir uns 30 Minuten Zeit für dein ' +
+        'Projekt — kostenlos und ohne Verpflichtung.',
+      link: { label: 'Erstgespräch anfragen', href: '/kontakt' },
+    },
   ],
 } as const;
 
