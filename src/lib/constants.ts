@@ -33,6 +33,33 @@ export const SECTION2 = {
   boomHeadline: 'Präzision bis ins letzte Pixel.',
 } as const;
 
+export const SECTION3 = {
+  eyebrow: 'WARUM TAMMO STUDIOS',
+  items: [
+    {
+      number: '01',
+      title: 'Eine Person, ein Ansprechpartner',
+      body:
+        'Direkt mit mir. Kein Account-Manager, kein wechselnder Kontakt — ' +
+        'vom Briefing bis zum Launch immer derselbe Mensch.',
+    },
+    {
+      number: '02',
+      title: 'Modernes Design, kein Template',
+      body:
+        'Jede Website ist ein Original. Keine Themes, keine kopierten ' +
+        'Layouts — Visuals, die nur zu dir passen.',
+    },
+    {
+      number: '03',
+      title: 'Zwei Wochen, eine Website',
+      body:
+        'Vom Erstgespräch bis zur Live-Schaltung in maximal 14 Tagen. ' +
+        'Klare Deadlines, klare Ergebnisse.',
+    },
+  ],
+} as const;
+
 export const NAV_ITEMS = [
   { label: 'Über', href: '/ueber' },
   { label: 'Referenzen', href: '/referenzen' },
