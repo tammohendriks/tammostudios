@@ -12,12 +12,17 @@ import { SITE_LABELS } from '../lib/constants';
 <style>
   .scroll-cue {
     /* Section-scoped: anker im jeweiligen <section position: relative>,
-       scrollt mit der Section weg, statt am Viewport zu kleben. */
+       scrollt mit der Section weg, statt am Viewport zu kleben.
+       width: max-content + margin: 0 absichern, dass der Button auf
+       seinen Inhalt schrumpft — nur dann klebt translateX(-50%) sauber
+       auf der echten Mitte des Elements. */
     position: absolute;
     bottom: 28px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 30;
+    width: max-content;
+    margin: 0;
     display: inline-flex;
     flex-direction: column;
     align-items: center;
@@ -29,6 +34,12 @@ import { SITE_LABELS } from '../lib/constants';
     cursor: pointer;
     font: inherit;
     transition: color 200ms ease;
+  }
+
+  @media (max-width: 768px) {
+    .scroll-cue {
+      bottom: 24px;
+    }
   }
 
   .scroll-cue:hover,

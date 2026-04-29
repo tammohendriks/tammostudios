@@ -19,8 +19,8 @@
     inset: 0;
     z-index: 1;
     pointer-events: none;
-    /* Touch-Flicker-Effekt setzt die opacity per JS — Transition
-       sorgt für den weichen Ein-/Ausblendrhythmus beim Scrollen. */
+    /* Touch-Flicker-Effekt schaltet eine .flicker-dim Klasse —
+       Transition glättet das Ein-/Ausblenden beim Scrollen. */
     transition: opacity 200ms ease-out;
     -webkit-mask-image: linear-gradient(
       to bottom,
@@ -36,6 +36,10 @@
       black 86%,
       transparent 100%
     );
+  }
+
+  canvas.node-canvas.flicker-dim {
+    opacity: 0.3;
   }
 </style>
 
@@ -121,18 +125,21 @@
   }
 
   /* Touch-Devices: Spotlight ergibt ohne Cursor keinen Sinn —
-     komplett ausblenden. Stattdessen springt der Scroll-Flicker
-     im Script die Knoten kurz dimmen. */
-  @media (pointer: coarse) {
+     komplett ausblenden. (hover: none) ist zuverlässiger als
+     (pointer: coarse) für Touch-Detection. !important, damit kein
+     anderer Selector den Spotlight wieder einblenden kann. */
+  @media (hover: none) {
     .spotlight {
-      display: none;
+      display: none !important;
     }
   }
 </style>
 
 <script>
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const isCoarse = window.matchMedia('(pointer: coarse)').matches;
+  // (hover: hover) ist zuverlässiger als (pointer: coarse) — manche
+  // Hybrid-Devices melden coarse + fine, hover ist klarer differenziert.
+  const isHoverCapable = window.matchMedia('(hover: hover)').matches;
 
   // Geteilte Mausposition für Spotlight (Layer C) und Knoten-Proximity (Layer B).
   // Auf Touch / vor erstem mousemove bleibt sie in der Viewport-Mitte.
@@ -181,12 +188,17 @@
     function drawFrame(t) {
       ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
       for (const n of nodes) {
-        const dx = n.x - mouseX;
-        const dy = n.y - mouseY;
-        const distSq = dx * dx + dy * dy;
+        // Proximity nur auf Hover-fähigen Devices — auf Touch wird mouseX/Y
+        // nie aktualisiert, da würde der Boost an einem statischen Punkt
+        // hängen bleiben. Auf Touch übernimmt der Scroll-Flicker.
         let proximity = 0;
-        if (distSq < PROX_RADIUS_SQ) {
-          proximity = 1 - Math.sqrt(distSq) / PROX_RADIUS;
+        if (isHoverCapable) {
+          const dx = n.x - mouseX;
+          const dy = n.y - mouseY;
+          const distSq = dx * dx + dy * dy;
+          if (distSq < PROX_RADIUS_SQ) {
+            proximity = 1 - Math.sqrt(distSq) / PROX_RADIUS;
+          }
         }
 
         // Pulse-Phase friert bei reduced-motion ein, Proximity bleibt aktiv
@@ -234,7 +246,7 @@
       if (resizeRaf) cancelAnimationFrame(resizeRaf);
       resizeRaf = requestAnimationFrame(() => {
         rebuildNodes();
-        if (isCoarse) {
+        if (!isHoverCapable) {
           // Touch ohne realen Cursor: Mitte nachziehen
           mouseX = window.innerWidth / 2;
           mouseY = window.innerHeight / 2;
@@ -243,10 +255,10 @@
     });
 
     // Touch-only: Scroll-getriggerter Knoten-Flicker. Ersetzt visuell
-     // den Mouse-Spotlight, den's ohne Cursor nicht gibt — die Nodes
-     // dimmen kurz, kommen dann wieder hoch. Subtil, aber spürbar
-     // reaktiv.
-    if (isCoarse && !reduceMotion) {
+    // den Mouse-Spotlight, den's ohne Cursor nicht gibt — die Nodes
+    // dimmen kurz via .flicker-dim Klasse, kommen dann wieder hoch.
+    // Subtil, aber spürbar reaktiv.
+    if (!isHoverCapable && !reduceMotion) {
       let flickerPending = false;
       let flickerReset = 0;
       window.addEventListener(
@@ -256,10 +268,10 @@
           flickerPending = true;
           requestAnimationFrame(() => {
             flickerPending = false;
-            canvas.style.opacity = '0.25';
+            canvas.classList.add('flicker-dim');
             if (flickerReset) clearTimeout(flickerReset);
             flickerReset = window.setTimeout(() => {
-              canvas.style.opacity = '1';
+              canvas.classList.remove('flicker-dim');
             }, 250);
           });
         },
@@ -281,7 +293,7 @@
     root.style.setProperty('--mouse-y', y + 'px');
   };
 
-  if (!isCoarse) {
+  if (isHoverCapable) {
     // Mauslistener läuft auch bei reduced-motion: die Knoten-Proximity ist
     // nutzergetrieben, nicht decorative.
     let pending = false;
@@ -302,5 +314,6 @@
       { passive: true },
     );
   }
-  // Touch → mouseX/mouseY bleibt zentral; Spotlight CSS nutzt Default 50%/50%.
+  // Touch → mouseX/mouseY bleibt zentral; Spotlight ist via CSS auf
+  // (hover: none) ausgeblendet, kein Flicker durch verwaiste --mouse-x/y.
 </script>
