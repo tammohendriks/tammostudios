@@ -23,41 +23,35 @@ import ScrollCue from '../ScrollCue.astro';
 </section>
 
 <style is:global>
-  /* State-Cascade auf <html>: erreicht TopBar (außerhalb Section1) und
-     Section1-Inhalte gleichzeitig. */
+  /* Anti-FOUC: alle animierten Hero-Elemente sind PER DEFAULT versteckt,
+     komplett unabhängig vom data-splash-Attribut. Falls das Inline-Script
+     in BaseLayout aus irgendeinem Grund nicht greift (sessionStorage in
+     Private Mode wirft, JS deaktiviert für einen Moment, etc.), sehen
+     wir trotzdem nichts aufblitzen. Sichtbar wird's nur durch
+     html[data-splash="ready"] oder html.splash-skip. */
 
-  html[data-splash="splash"] .background,
-  html[data-splash="reveal"] .background,
-  html[data-splash="ready"]  .background {
+  .background {
+    opacity: 0;
     transition: opacity 0.8s ease-out;
   }
 
-  html[data-splash="splash"] .background {
+  .top-left,
+  .nav,
+  .cta,
+  .hero-service,
+  .intro,
+  .scroll-cue {
     opacity: 0;
+    transform: translateY(8px);
   }
 
+  /* Reveal-Phase: Background fadet ein, Hero-Texte bleiben noch hidden. */
   html[data-splash="reveal"] .background,
-  html[data-splash="ready"] .background {
+  html[data-splash="ready"]  .background {
     opacity: 1;
   }
 
-  html[data-splash="splash"] .top-left,
-  html[data-splash="splash"] .nav,
-  html[data-splash="splash"] .cta,
-  html[data-splash="splash"] .hero-service,
-  html[data-splash="splash"] .intro,
-  html[data-splash="splash"] .scroll-cue,
-  html[data-splash="reveal"] .top-left,
-  html[data-splash="reveal"] .nav,
-  html[data-splash="reveal"] .cta,
-  html[data-splash="reveal"] .hero-service,
-  html[data-splash="reveal"] .intro,
-  html[data-splash="reveal"] .scroll-cue {
-    opacity: 0;
-    transform: translateY(8px);
-    transition: opacity 500ms ease-out, transform 500ms ease-out;
-  }
-
+  /* Ready-Phase: alle Hero-Elemente faden gestaffelt ein. */
   html[data-splash="ready"] .top-left,
   html[data-splash="ready"] .nav,
   html[data-splash="ready"] .cta,
@@ -76,10 +70,8 @@ import ScrollCue from '../ScrollCue.astro';
   html[data-splash="ready"] .intro         { transition-delay: 280ms; }
   html[data-splash="ready"] .scroll-cue    { transition-delay: 360ms; }
 
-  /* Returning visitor / reduced-motion: keine data-splash-Attribute,
-     Default-Styles greifen → alles sofort sichtbar. Diese expliziten
-     Regeln stellen sicher, dass auch bei Race-Conditions kein Halt-State
-     hängen bleibt. */
+  /* Returning visitor / reduced-motion: alles sofort sichtbar, keine
+     Transitions. Höhere Specifity als die Default-Hidden-Regeln. */
   html.splash-skip .background,
   html.splash-skip .top-left,
   html.splash-skip .nav,
