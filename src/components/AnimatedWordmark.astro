@@ -59,7 +59,7 @@
     align-items: baseline;
   }
 
-  /* Optisch angepasst zum Match des Logo-PNG: tammo dominiert die obere
+  /* Optisch kalibriert zum Match des Logo-PNG: tammo dominiert die obere
      Zeile, Bar + STUDIOS sitzen kompakter mit leichtem Overlap nach oben.
      justify-content: flex-start sichert, dass die Bar wirklich am linken
      Rand klebt — egal wie schmal der Wordmark-Block durch das kleinere
@@ -67,8 +67,8 @@
   .wm-line-bottom {
     align-items: center;
     justify-content: flex-start;
-    margin-top: -0.1em;
-    gap: 0.15em;
+    margin-top: -0.08em;
+    gap: 0.10em;
   }
 
   .wm-block {
@@ -88,14 +88,14 @@
 
   /* Im Logo-PNG ist STUDIOS deutlich kleiner als tammo. font-size relativ
      zum Wordmark-em, damit clamp() weiterhin die Skalierung steuert.
-     0.48em ist optisch kalibriert: damit endet der "." von STUDIOS bündig
+     0.42em ist optisch kalibriert: damit endet der "." von STUDIOS bündig
      mit dem "o" von tammo. */
   .wm-studios {
     font-family: 'Aileron', 'Inter', sans-serif;
     font-weight: 900;
     font-style: italic;
     letter-spacing: -0.02em;
-    font-size: 0.48em;
+    font-size: 0.42em;
   }
 
   /* Per-Char Progress 0..1 wird vom Section2-Script gesetzt.
