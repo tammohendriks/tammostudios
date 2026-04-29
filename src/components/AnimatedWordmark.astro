@@ -60,11 +60,15 @@
   }
 
   /* Optisch angepasst zum Match des Logo-PNG: tammo dominiert die obere
-     Zeile, Bar + STUDIOS sitzen kompakter mit leichtem Overlap nach oben. */
+     Zeile, Bar + STUDIOS sitzen kompakter mit leichtem Overlap nach oben.
+     justify-content: flex-start sichert, dass die Bar wirklich am linken
+     Rand klebt — egal wie schmal der Wordmark-Block durch das kleinere
+     STUDIOS wird. */
   .wm-line-bottom {
     align-items: center;
+    justify-content: flex-start;
     margin-top: -0.1em;
-    gap: 0.2em;
+    gap: 0.15em;
   }
 
   .wm-block {
@@ -73,6 +77,7 @@
 
   .wm-block.wm-dash {
     align-items: center;
+    margin-left: 0;
   }
 
   .wm-tammo {
@@ -82,13 +87,15 @@
   }
 
   /* Im Logo-PNG ist STUDIOS deutlich kleiner als tammo. font-size relativ
-     zum Wordmark-em, damit clamp() weiterhin die Skalierung steuert. */
+     zum Wordmark-em, damit clamp() weiterhin die Skalierung steuert.
+     0.48em ist optisch kalibriert: damit endet der "." von STUDIOS bündig
+     mit dem "o" von tammo. */
   .wm-studios {
     font-family: 'Aileron', 'Inter', sans-serif;
     font-weight: 900;
     font-style: italic;
     letter-spacing: -0.02em;
-    font-size: 0.55em;
+    font-size: 0.48em;
   }
 
   /* Per-Char Progress 0..1 wird vom Section2-Script gesetzt.
@@ -112,12 +119,13 @@
     will-change: transform, opacity, filter;
   }
 
-  /* Custom Bar als Dash — kürzer & dicker, näher am Logo-PNG. Eigene
-     translateY-Distanz von 1em, weil 100% von 0.1em-Höhe quasi nichts
-     wäre und der Bar dann nur "blink-on" statt einfliegen würde. */
+  /* Custom Bar als Dash — länger & dicker, näher am Logo-PNG.
+     Translation-Distanz 1em, weil 100% von der Mini-Höhe quasi nichts
+     wäre und der Bar sonst nur "blink-on" statt einfliegen würde.
+     Optisch kalibriert zum Match des Logo-PNG. */
   .char.wm-bar {
-    width: 0.55em;
-    height: 0.1em;
+    width: 0.85em;
+    height: 0.13em;
     background: currentColor;
     margin: 0;
     align-self: center;
