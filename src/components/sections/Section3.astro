@@ -28,18 +28,21 @@ import ScrollCue from '../ScrollCue.astro';
 <style>
   .section-3 {
     position: relative;
-    /* 200vh statt 250vh: kompakteres Runway. Kombiniert mit dem
-       schnelleren Cascade-Schedule (Animation fertig bei progress
-       0.5) bekommt der Settled-State eine ganze halbe Viewport-Höhe
-       Lesezeit. */
-    min-height: 200vh;
+    /* 300vh wie Section2: Sticky-Duration = 200vh, Animation läuft
+       die ersten 75% (= 150vh of scroll), Settled-Tail die letzten
+       25% (= 50vh of scroll). So fühlt sich jede Scroll-Bewegung
+       kontrolliert an und es bleibt halbe Viewport-Höhe Lesezeit
+       am Ende. Mobile proportional kürzer. */
+    min-height: 300vh;
     background: linear-gradient(to bottom, #050507 0%, #0a0a0c 100%);
-    overflow: hidden;
+    /* overflow: clip statt hidden — moderner Property der das
+       Bg-Pattern clippt, ohne Sticky-Children zu brechen. */
+    overflow: clip;
   }
 
   @media (max-width: 768px) {
     .section-3 {
-      min-height: 180vh;
+      min-height: 220vh;
     }
   }
 
@@ -240,19 +243,19 @@ import ScrollCue from '../ScrollCue.astro';
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   if (section && items.length === 3 && eyebrow && cueAnchor) {
-    // Cascade füllt fast den gesamten Scroll aus (wie Section 2):
-    // jeder Pixel Scroll = sichtbarer Fortschritt. Items überlappen
-    // sich leicht in den Übergängen, ab 90% nur noch kurzer Settled-
-    // Tail. So scrollt nichts ins Leere.
+    // Cascade läuft wie Section 2: kontinuierlich über den ersten
+    // Großteil des Scrolls (0 → 75%), Items überlappen sich leicht.
+    // Ab 75% Settled-Tail mit ½ Viewport Lesezeit (50vh of scroll
+    // bei 300vh Section / 100vh Sticky).
     const ranges = [
-      { start: 0.00, end: 0.40 },
-      { start: 0.30, end: 0.65 },
-      { start: 0.55, end: 0.90 },
+      { start: 0.00, end: 0.30 },
+      { start: 0.20, end: 0.50 },
+      { start: 0.45, end: 0.75 },
     ];
     const EYEBROW_END = 0.10;
-    // Cue kommt schnell sichtbar nach 90% — Signal "alles gelesen"
-    const CUE_START = 0.90;
-    const CUE_END = 0.95;
+    // Cue erscheint zu Beginn des Settled-Tails
+    const CUE_START = 0.78;
+    const CUE_END = 0.88;
 
     function clamp01(v) {
       return v < 0 ? 0 : v > 1 ? 1 : v;
