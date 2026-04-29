@@ -261,13 +261,17 @@ import ScrollCue from '../ScrollCue.astro';
   }
 
   /* === Wordmark Spotlight ===
-     Sitzt INSIDE des sticky Containers, damit `top` in % an 100dvh
-     hängt → Wert 80% / 35% bedeutet 80vh / 35vh des sichtbaren
-     Viewports während die Sektion gepinnt ist. */
+     Sitzt INSIDE des sticky Containers. Vorher animierte top: var(...)
+     pro Scroll-Tick die Vertikalposition — das hat einen Layout-Pass
+     getriggert und CLS auf 0.74 hochgetrieben. Jetzt: top/left statisch
+     auf 50%, die ganze Vertikalbewegung läuft via transform mit einer
+     --spotlight-offset Variable in vh. translate wird im Compositor
+     gerechnet, kein Reflow → CLS = 0. */
   .wordmark-spotlight {
-    --spotlight-y: 80%;
+    --spotlight-offset: 30vh;
     --spotlight-intensity: 0;
     position: absolute;
+    top: 50%;
     left: 50%;
     width: 90vw;
     max-width: 1200px;
@@ -275,8 +279,7 @@ import ScrollCue from '../ScrollCue.astro';
     pointer-events: none;
     mix-blend-mode: screen;
     z-index: 1;
-    top: var(--spotlight-y);
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, calc(-50% + var(--spotlight-offset)));
     opacity: var(--spotlight-intensity);
     /* Zentrum bewusst gedimmt: rahmt den Wordmark warm ein, ohne ihn
        auszubleichen. Letterforms bleiben definiert gegen den Glow. */
@@ -290,7 +293,9 @@ import ScrollCue from '../ScrollCue.astro';
     );
     /* 35px blur — siehe Begründung an .aurora-layer. */
     filter: blur(35px);
-    transition: top 200ms linear, opacity 200ms linear;
+    /* KEINE transition auf transform — sonst lag durch Smoothing über
+       jeden Scroll-Tick. Nur opacity bekommt den weichen On/Off. */
+    transition: opacity 200ms linear;
     will-change: transform, opacity;
   }
 
@@ -309,7 +314,7 @@ import ScrollCue from '../ScrollCue.astro';
       --aurora-intensity: 0.5 !important;
     }
     .wordmark-spotlight {
-      --spotlight-y: 28% !important;
+      --spotlight-offset: -22vh !important;
       --spotlight-intensity: 1 !important;
       transition: none !important;
     }
@@ -344,9 +349,11 @@ import ScrollCue from '../ScrollCue.astro';
     const SETTLE_START = ANIMATION_RANGE;
     // Spotlight erreicht seine Endposition leicht nach Animationsende,
     // damit er beim Übergang in den Settled-State sauber "ankommt".
+    // Vh-Offsets RELATIV zur sticky-Mitte (50% top): +30vh = 80% des
+    // Viewports (unter dem Wordmark), -22vh = 28% (über dem Wordmark).
     const SPOTLIGHT_END = 0.85;
-    const SPOTLIGHT_FROM_Y = 80;
-    const SPOTLIGHT_TO_Y = 28;
+    const SPOTLIGHT_FROM_OFFSET_VH = 30;
+    const SPOTLIGHT_TO_OFFSET_VH = -22;
 
     function clamp01(v) {
       return v < 0 ? 0 : v > 1 ? 1 : v;
@@ -373,7 +380,7 @@ import ScrollCue from '../ScrollCue.astro';
         ellipse.style.strokeDashoffset = '0';
         aurora.style.setProperty('--aurora-intensity', '0.5');
         wordmark.style.setProperty('--settle-progress', '1');
-        spotlight.style.setProperty('--spotlight-y', '28%');
+        spotlight.style.setProperty('--spotlight-offset', '-22vh');
         spotlight.style.setProperty('--spotlight-intensity', '1');
         return;
       }
@@ -408,12 +415,14 @@ import ScrollCue from '../ScrollCue.astro';
       );
       wordmark.style.setProperty('--settle-progress', String(settleProgress));
 
-      // Rising Spotlight: steigt im Viewport von 80% (unten) auf 35%
-      // (oberhalb Wordmark), Intensität 0 → 1.
+      // Rising Spotlight: steigt im Viewport von +30vh (unten) auf
+      // -22vh (oberhalb Wordmark) relativ zur sticky-Mitte, Intensität
+      // 0 → 1. Position über transform — kein Layout-Trigger pro Tick.
       const spotlightProgress = Math.min(1, rawProgress / SPOTLIGHT_END);
-      const spotlightY =
-        SPOTLIGHT_FROM_Y - spotlightProgress * (SPOTLIGHT_FROM_Y - SPOTLIGHT_TO_Y);
-      spotlight.style.setProperty('--spotlight-y', `${spotlightY}%`);
+      const spotlightOffsetVh =
+        SPOTLIGHT_FROM_OFFSET_VH -
+        spotlightProgress * (SPOTLIGHT_FROM_OFFSET_VH - SPOTLIGHT_TO_OFFSET_VH);
+      spotlight.style.setProperty('--spotlight-offset', `${spotlightOffsetVh}vh`);
       spotlight.style.setProperty('--spotlight-intensity', String(spotlightProgress));
     }
 
