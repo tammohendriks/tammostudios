@@ -1,0 +1,604 @@
+---
+import { SECTION4 } from '../../lib/constants';
+import ScrollCue from '../ScrollCue.astro';
+---
+
+<section class="section-4">
+  <div class="section-4-video-wrap" aria-hidden="true">
+    <video
+      class="section-4-video"
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="auto"
+    >
+      <source
+        media="(min-width: 768px)"
+        src="/videos/desktop.mp4"
+        type="video/mp4"
+      />
+      <source src="/videos/mobile.mp4" type="video/mp4" />
+    </video>
+    <div class="section-4-scrim"></div>
+  </div>
+
+  <div class="section-4-sticky">
+    <header class="section-4-header">
+      <p class="section-4-eyebrow">{SECTION4.eyebrow}</p>
+      <h2 class="section-4-title">{SECTION4.title}</h2>
+    </header>
+
+    <div class="section-4-timeline-wrap">
+      <svg
+        class="timeline-line"
+        viewBox="0 0 4 1000"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        <line x1="2" y1="0" x2="2" y2="1000" class="line-track" />
+        <line
+          x1="2"
+          y1="0"
+          x2="2"
+          y2="1000"
+          class="line-progress"
+          pathLength="100"
+        />
+      </svg>
+
+      <div class="phase-dot phase-dot-1" data-phase="0"></div>
+      <div class="phase-dot phase-dot-2" data-phase="1"></div>
+      <div class="phase-dot phase-dot-3" data-phase="2"></div>
+      <div class="phase-dot phase-dot-4" data-phase="3"></div>
+      <div class="phase-dot phase-dot-5" data-phase="4"></div>
+
+      <div class="phases-container">
+        {SECTION4.phases.map((phase, i) => (
+          <article class={`phase phase-${i + 1}`} data-phase={i}>
+            <span class="phase-label">{phase.label}</span>
+            <div class="phase-content">
+              <h3 class="phase-title">{phase.title}</h3>
+              <p class="phase-body">
+                {phase.body}
+                {phase.link && (
+                  <>
+                    {' '}
+                    <a href={phase.link.href}>{phase.link.label}</a>
+                  </>
+                )}
+              </p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+
+    <div class="section-4-scrollcue-wrap">
+      <ScrollCue />
+    </div>
+  </div>
+</section>
+
+<style>
+  .section-4 {
+    position: relative;
+    min-height: 350vh;
+    overflow: clip;
+    background: #050507;
+  }
+
+  @media (max-width: 768px) {
+    .section-4 {
+      min-height: 280vh;
+    }
+  }
+
+  /* === Galaxy Video Background ===
+     Sticky-pinned: bleibt während des gesamten Section-Scrolls am
+     Viewport-Top kleben, statt mit der Section mitzuscrollen. */
+  .section-4-video-wrap {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  .section-4-video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: translate(-50%, -50%);
+    filter: brightness(0.85) contrast(1.1) saturate(1.15);
+  }
+
+  .section-4-scrim {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.55) 90%),
+      linear-gradient(
+        180deg,
+        rgba(5, 5, 7, 0.55) 0%,
+        rgba(5, 5, 7, 0.4) 50%,
+        rgba(5, 5, 7, 0.65) 100%
+      );
+    pointer-events: none;
+  }
+
+  /* === Sticky Container — 3-Row Grid: header / timeline / cue ===
+     110px Top sichert Distanz zur fixed TopBar; gap 32px gibt
+     Header / Timeline / Cue klaren Atemzug. */
+  .section-4-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100dvh;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    padding: 110px 40px 60px;
+    gap: 32px;
+    z-index: 2;
+  }
+
+  @media (max-width: 768px) {
+    .section-4-sticky {
+      padding: 90px 20px 40px;
+      gap: 20px;
+    }
+  }
+
+  /* === Header (oben fix, fadet einmal ein) ===
+     Margin-Bottom raus — der Sticky-Grid macht das Spacing via gap. */
+  .section-4-header {
+    --header-progress: 0;
+    text-align: center;
+    opacity: var(--header-progress);
+    transform: translateY(calc((1 - var(--header-progress)) * 12px));
+    will-change: transform, opacity;
+  }
+
+  .section-4-eyebrow {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.3em;
+    color: rgba(245, 158, 11, 0.85);
+    text-transform: uppercase;
+    margin: 0 0 6px;
+  }
+
+  .section-4-title {
+    font-family: 'Aileron', 'Inter', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: clamp(1.3rem, 2.5vw, 1.85rem);
+    color: #f5f5f4;
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+
+  /* === Timeline-Wrap: Bühne für Line + Dots + Phasen-Slideshow === */
+  .section-4-timeline-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    height: 100%;
+  }
+
+  /* Linie nimmt 70% des Wrap-Heights ein (8% bis 78%). Lässt unten
+     ~22% Pufferzone bevor die ScrollCue im nächsten Grid-Row sitzt
+     — kein Overlap zwischen Linien-Ende und ScrollCue. */
+  .timeline-line {
+    position: absolute;
+    top: 8%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 70%;
+    pointer-events: none;
+    overflow: visible;
+    z-index: 1;
+  }
+
+  .line-track {
+    stroke: rgba(255, 255, 255, 0.08);
+    stroke-width: 2;
+  }
+
+  .line-progress {
+    stroke: rgba(245, 158, 11, 0.85);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.6));
+  }
+
+  /* Dots an den festen Y-Positionen, alle absolute */
+  .phase-dot {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.10);
+    border: 2px solid rgba(245, 158, 11, 0.30);
+    transition:
+      background-color 300ms ease,
+      border-color 300ms ease,
+      box-shadow 300ms ease,
+      transform 300ms ease;
+    z-index: 2;
+  }
+
+  .phase-dot-1 { top: 8%; }
+  .phase-dot-2 { top: 25.5%; }
+  .phase-dot-3 { top: 43%; }
+  .phase-dot-4 { top: 60.5%; }
+  .phase-dot-5 { top: 78%; }
+
+  .phase-dot.dot-passed {
+    background: rgba(245, 158, 11, 0.85);
+    border-color: rgba(245, 158, 11, 0.85);
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+  }
+
+  .phase-dot.dot-active {
+    background: rgba(245, 158, 11, 1);
+    border-color: rgba(245, 158, 11, 1);
+    box-shadow:
+      0 0 12px rgba(245, 158, 11, 0.8),
+      0 0 24px rgba(245, 158, 11, 0.4);
+    transform: translateX(-50%) scale(1.3);
+  }
+
+  /* === Phasen — alle absolute übereinander gestapelt, eine
+     gleichzeitig sichtbar via .phase-active === */
+  .phases-container {
+    position: relative;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .phase {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: 1fr 80px 1fr;
+    align-items: center;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 500ms ease-out, transform 500ms ease-out;
+    will-change: transform, opacity;
+  }
+
+  .phase.phase-active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  /* Alternation Desktop only — ungerade Phasen: Label links, Content rechts */
+  @media (min-width: 1024px) {
+    .phase:nth-child(odd) .phase-label {
+      grid-column: 1;
+      text-align: right;
+      padding-right: 32px;
+      justify-self: end;
+    }
+    .phase:nth-child(odd) .phase-content {
+      grid-column: 3;
+      text-align: left;
+      padding-left: 32px;
+    }
+    .phase:nth-child(even) .phase-label {
+      grid-column: 3;
+      text-align: left;
+      padding-left: 32px;
+      justify-self: start;
+    }
+    .phase:nth-child(even) .phase-content {
+      grid-column: 1;
+      text-align: right;
+      padding-right: 32px;
+    }
+  }
+
+  /* PHASE_XX Decoration — Brand-Amber, kein Yellow-Drift mehr.
+     Active-State hebt sich über höhere Sättigung + stärkeren Glow ab,
+     nicht durch Hue-Shift. */
+  .phase-label {
+    font-family: 'Aileron', 'Inter', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    color: rgba(245, 158, 11, 0.85);
+    letter-spacing: -0.03em;
+    line-height: 1;
+    text-shadow:
+      0 0 20px rgba(245, 158, 11, 0.5),
+      0 0 50px rgba(245, 158, 11, 0.3),
+      0 0 100px rgba(245, 158, 11, 0.15);
+    transition: color 400ms ease, text-shadow 400ms ease;
+  }
+
+  .phase.phase-active .phase-label {
+    color: rgba(245, 158, 11, 1);
+    text-shadow:
+      0 0 24px rgba(245, 158, 11, 0.8),
+      0 0 60px rgba(245, 158, 11, 0.5),
+      0 0 120px rgba(245, 158, 11, 0.25);
+  }
+
+  /* Content (Title + Body) */
+  .phase-content {
+    max-width: 380px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .phase-title {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+    color: #f5f5f4;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+
+  .phase-body {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: clamp(0.85rem, 1.05vw, 0.95rem);
+    color: rgba(245, 245, 244, 0.75);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .phase-body a {
+    color: rgba(245, 158, 11, 0.95);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.4);
+    padding-bottom: 1px;
+    transition: border-color 200ms ease;
+  }
+
+  .phase-body a:hover,
+  .phase-body a:focus-visible {
+    border-color: rgba(245, 158, 11, 1);
+  }
+
+  /* === ScrollCue — eigene Visibility, getrieben vom Settled-Progress.
+     padding-top schafft zusätzliche Distanz zum Linien-Ende oben. */
+  .section-4-scrollcue-wrap {
+    --cue-progress: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 16px;
+    opacity: var(--cue-progress);
+    transform: translateY(calc((1 - var(--cue-progress)) * 8px));
+    transition: opacity 300ms ease, transform 300ms ease;
+  }
+
+  /* Override Anchor-Defaults von ScrollCue: in Section 4 fließt der
+     Cue im Grid-Row, nicht absolute am Section-Bottom. */
+  .section-4 .scroll-cue-anchor {
+    position: static;
+    bottom: auto;
+  }
+
+  /* === Mobile (< 1024px): einseitiges Layout, Linie links === */
+  @media (max-width: 1024px) {
+    .timeline-line {
+      left: 16px;
+      transform: none;
+    }
+
+    .phase-dot {
+      left: 16px;
+      width: 10px;
+      height: 10px;
+    }
+
+    .phase-dot.dot-active {
+      transform: translateX(-50%) scale(1.3);
+    }
+
+    .phase {
+      grid-template-columns: 32px 1fr;
+    }
+
+    .phase-label,
+    .phase:nth-child(odd) .phase-label,
+    .phase:nth-child(even) .phase-label {
+      grid-column: 2;
+      text-align: left;
+      padding: 0 0 0 24px;
+      justify-self: start;
+      font-size: clamp(1.5rem, 8vw, 2.5rem);
+      margin-bottom: 8px;
+    }
+
+    .phase-content,
+    .phase:nth-child(odd) .phase-content,
+    .phase:nth-child(even) .phase-content {
+      grid-column: 2;
+      text-align: left;
+      padding: 0 0 0 24px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .section-4-header {
+      --header-progress: 1 !important;
+      transform: none !important;
+    }
+    .phase {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+    }
+    .phase-dot {
+      background: rgba(245, 158, 11, 1) !important;
+      border-color: rgba(245, 158, 11, 1) !important;
+      box-shadow: 0 0 8px rgba(245, 158, 11, 0.5) !important;
+      transition: none !important;
+    }
+    .line-progress {
+      stroke-dashoffset: 0 !important;
+    }
+    .section-4-scrollcue-wrap {
+      --cue-progress: 1 !important;
+      transform: none !important;
+    }
+  }
+</style>
+
+<script>
+  const section = document.querySelector('.section-4');
+  const header = section ? section.querySelector('.section-4-header') : null;
+  const phases = section
+    ? Array.from(section.querySelectorAll('.phase'))
+    : [];
+  const dots = section
+    ? Array.from(section.querySelectorAll('.phase-dot'))
+    : [];
+  const lineProgress = section
+    ? section.querySelector('.line-progress')
+    : null;
+  const cueWrap = section
+    ? section.querySelector('.section-4-scrollcue-wrap')
+    : null;
+  const video = section ? section.querySelector('.section-4-video') : null;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (reduceMotion && video) {
+    try { video.pause(); } catch (e) {}
+  }
+
+  if (
+    section && header && phases.length === 5 && dots.length === 5 &&
+    lineProgress && cueWrap
+  ) {
+    // Phase-Distribution: Phase 1 ist von Anfang an active (start: 0),
+    // damit beim ersten Scroll-Frame schon Content da ist und keine
+    // leere Lücke entsteht. Header läuft parallel über die ersten 5%.
+    const phaseRanges = [
+      { start: 0.00, end: 0.18 },
+      { start: 0.18, end: 0.36 },
+      { start: 0.36, end: 0.54 },
+      { start: 0.54, end: 0.72 },
+      { start: 0.72, end: 0.92 },
+    ];
+    const HEADER_END = 0.05;
+    const SETTLED_AT = 0.92;
+    const CUE_RANGE = 0.06;
+    // Linie läuft kontinuierlich von Phase-1-Start bis Phase-5-Ende
+    const LINE_START = 0.00;
+    const LINE_END = 0.92;
+
+    function clamp01(v) {
+      return v < 0 ? 0 : v > 1 ? 1 : v;
+    }
+
+    function getScrollProgress() {
+      const rect = section.getBoundingClientRect();
+      const total = section.offsetHeight - window.innerHeight;
+      if (total <= 0) return 0;
+      return clamp01(-rect.top / total);
+    }
+
+    function determineActivePhase(progress) {
+      // Settled: Phase 5 bleibt active
+      if (progress >= SETTLED_AT) return 4;
+      for (let i = 0; i < phaseRanges.length; i++) {
+        const r = phaseRanges[i];
+        if (progress >= r.start && progress < r.end) return i;
+      }
+      // Vor allen Ranges (sollte nicht passieren, weil Phase 1 bei 0
+      // startet — aber als Defensive: Phase 1 als Default-Active).
+      return 0;
+    }
+
+    function update() {
+      if (reduceMotion) {
+        header.style.setProperty('--header-progress', '1');
+        for (let i = 0; i < phases.length; i++) {
+          phases[i].classList.toggle('phase-active', i === 4);
+          dots[i].classList.add('dot-passed');
+          dots[i].classList.remove('dot-active');
+        }
+        dots[4].classList.add('dot-active');
+        dots[4].classList.remove('dot-passed');
+        lineProgress.style.strokeDashoffset = '0';
+        cueWrap.style.setProperty('--cue-progress', '1');
+        return;
+      }
+
+      const progress = getScrollProgress();
+
+      // Header
+      const headerP = clamp01(progress / HEADER_END);
+      header.style.setProperty('--header-progress', String(headerP));
+
+      // Active Phase
+      const activeIdx = determineActivePhase(progress);
+
+      for (let i = 0; i < phases.length; i++) {
+        phases[i].classList.toggle('phase-active', i === activeIdx);
+      }
+
+      // Dots: passed (i < activeIdx), active (i === activeIdx), inactive sonst
+      for (let i = 0; i < dots.length; i++) {
+        dots[i].classList.remove('dot-active', 'dot-passed');
+        if (i < activeIdx) {
+          dots[i].classList.add('dot-passed');
+        } else if (i === activeIdx) {
+          dots[i].classList.add('dot-active');
+        }
+      }
+
+      // Linie: kontinuierlich von 0% bei progress=LINE_START bis 100%
+      // bei progress=LINE_END. Geht weich durch alle Dots durch.
+      const lineP = clamp01((progress - LINE_START) / (LINE_END - LINE_START));
+      lineProgress.style.strokeDashoffset = String(100 * (1 - lineP));
+
+      // ScrollCue: kommt im Settled-Tail
+      const cueP = clamp01((progress - SETTLED_AT) / CUE_RANGE);
+      cueWrap.style.setProperty('--cue-progress', String(cueP));
+    }
+
+    let ticking = false;
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        update();
+        ticking = false;
+      });
+    }
+
+    let resizeTimer = 0;
+    function onResize() {
+      if (resizeTimer) clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(update, 120);
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onResize, { passive: true });
+    update();
+  }
+</script>

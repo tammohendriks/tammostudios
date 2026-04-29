@@ -60,6 +60,52 @@ export const SECTION3 = {
   ],
 } as const;
 
+export const SECTION4 = {
+  eyebrow: 'DER FAHRPLAN',
+  title: 'So entsteht deine Website',
+  phases: [
+    {
+      label: 'PHASE 01',
+      title: 'Wir sprechen miteinander',
+      body:
+        'Kostenloses Erstgespräch. Du erzählst was du brauchst, ich höre ' +
+        'zu. Am Ende weißt du was es kostet und wie\'s weitergeht.',
+    },
+    {
+      label: 'PHASE 02',
+      title: 'Ich entwerfe deine Website',
+      body:
+        'Erste Entwürfe: Aufbau, Farben, Stil. Wir drehen so lange bis ' +
+        'es deine Marke trifft.',
+    },
+    {
+      label: 'PHASE 03',
+      title: 'Ich baue sie',
+      body:
+        'Aus dem Entwurf wird die echte Website — mit deinen Texten, ' +
+        'deinen Bildern. Dazu bekommst du einen eigenen Bereich, in dem ' +
+        'du Öffnungszeiten, Bilder oder Texte später selbst ändern ' +
+        'kannst. Wie ausführlich der wird, entscheidest du.',
+      link: { label: 'Was kostet was?', href: '/preise' },
+    },
+    {
+      label: 'PHASE 04',
+      title: 'Wir prüfen alles gemeinsam',
+      body:
+        'Du gehst durch die Seite, wir korrigieren letzte Details. Tests ' +
+        'auf Handy und Computer. Damit am Launch nichts wackelt.',
+    },
+    {
+      label: 'PHASE 05',
+      title: 'Deine Website geht online',
+      body:
+        'Live-Schaltung auf deine Domain. Plus 30 Minuten Einweisung, ' +
+        'wie du selbst weiterarbeiten kannst — ohne mich jedes Mal ' +
+        'anrufen zu müssen.',
+    },
+  ],
+} as const;
+
 export const NAV_ITEMS = [
   { label: 'Über', href: '/ueber' },
   { label: 'Referenzen', href: '/referenzen' },
