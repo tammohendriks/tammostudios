@@ -1,68 +1,94 @@
 ---
 // "tammo — STUDIOS." als animierte Wordmark.
-// tammo + Bar (custom Dash) → Neue Montreal Bold,
-// STUDIOS. → Aileron Bold Italic.
-// Steuerung: ausschließlich über --char-progress (0 → 1), gesetzt
-// von Section2's Scroll-Listener. Diese Komponente ist passiv,
-// kein eigenes Script, kein Trigger.
+// 2-Zeilen-Layout wie das Logo-PNG:
+//   Zeile 1: tammo (Neue Montreal Bold)
+//   Zeile 2: Bar + STUDIOS. (Aileron Black Italic)
+// Steuerung: ausschließlich über CSS-Variablen (--char-progress pro
+// Char, --settle-progress auf der ganzen Wordmark), gesetzt vom
+// Section2-Scroll-Listener. Komponente ist passiv.
 ---
 
 <h2 class="wordmark" aria-label="Tammo Studios">
-  <span class="wm-block wm-tammo">
-    <span class="char" style="--i: 0;">t</span>
-    <span class="char" style="--i: 1;">a</span>
-    <span class="char" style="--i: 2;">m</span>
-    <span class="char" style="--i: 3;">m</span>
-    <span class="char" style="--i: 4;">o</span>
+  <span class="wm-line wm-line-top">
+    <span class="wm-block wm-tammo">
+      <span class="char" style="--i: 0;">t</span>
+      <span class="char" style="--i: 1;">a</span>
+      <span class="char" style="--i: 2;">m</span>
+      <span class="char" style="--i: 3;">m</span>
+      <span class="char" style="--i: 4;">o</span>
+    </span>
   </span>
-  <span class="wm-block wm-dash">
-    <span class="char wm-bar" style="--i: 5;" aria-hidden="true"></span>
-  </span>
-  <span class="wm-block wm-studios">
-    <span class="char" style="--i: 6;">S</span>
-    <span class="char" style="--i: 7;">T</span>
-    <span class="char" style="--i: 8;">U</span>
-    <span class="char" style="--i: 9;">D</span>
-    <span class="char" style="--i: 10;">I</span>
-    <span class="char" style="--i: 11;">O</span>
-    <span class="char" style="--i: 12;">S</span>
-    <span class="char" style="--i: 13;">.</span>
+  <span class="wm-line wm-line-bottom">
+    <span class="wm-block wm-dash">
+      <span class="char wm-bar" style="--i: 5;" aria-hidden="true"></span>
+    </span>
+    <span class="wm-block wm-studios">
+      <span class="char" style="--i: 6;">S</span>
+      <span class="char" style="--i: 7;">T</span>
+      <span class="char" style="--i: 8;">U</span>
+      <span class="char" style="--i: 9;">D</span>
+      <span class="char" style="--i: 10;">I</span>
+      <span class="char" style="--i: 11;">O</span>
+      <span class="char" style="--i: 12;">S</span>
+      <span class="char" style="--i: 13;">.</span>
+    </span>
   </span>
 </h2>
 
 <style>
   .wordmark {
-    display: flex;
-    align-items: baseline;
-    justify-content: center;
-    gap: 0.15em;
+    --settle-progress: 0;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
     font-size: clamp(3rem, 9vw, 7rem);
     color: #f5f5f4;
-    line-height: 1;
-    white-space: nowrap;
+    line-height: 0.95;
     margin: 0;
+    /* Settled-State: scroll-driven brightness + drop-shadow Atmen.
+       --settle-progress 0 = identity, 1 = voller Glow. */
+    filter:
+      brightness(calc(1 + var(--settle-progress) * 0.1))
+      drop-shadow(0 0
+                  calc(var(--settle-progress) * 30px)
+                  rgba(245, 158, 11, calc(var(--settle-progress) * 0.5)));
+  }
+
+  .wm-line {
+    display: flex;
+    align-items: baseline;
+  }
+
+  /* Optisch angepasst zum Match des Logo-PNG: tammo dominiert die obere
+     Zeile, Bar + STUDIOS sitzen kompakter mit leichtem Overlap nach oben. */
+  .wm-line-bottom {
+    align-items: center;
+    margin-top: -0.1em;
+    gap: 0.2em;
   }
 
   .wm-block {
     display: inline-flex;
   }
 
-  .wm-tammo,
-  .wm-dash {
+  .wm-block.wm-dash {
+    align-items: center;
+  }
+
+  .wm-tammo {
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-weight: 700;
     letter-spacing: -0.04em;
   }
 
+  /* Im Logo-PNG ist STUDIOS deutlich kleiner als tammo. font-size relativ
+     zum Wordmark-em, damit clamp() weiterhin die Skalierung steuert. */
   .wm-studios {
     font-family: 'Aileron', 'Inter', sans-serif;
     font-weight: 900;
     font-style: italic;
-    letter-spacing: -0.025em;
-  }
-
-  .wm-dash {
-    margin: 0 0.1em;
+    letter-spacing: -0.02em;
+    font-size: 0.55em;
   }
 
   /* Per-Char Progress 0..1 wird vom Section2-Script gesetzt.
@@ -86,37 +112,23 @@
     will-change: transform, opacity, filter;
   }
 
-  /* Custom Bar als Dash — proportional zum Logo-PNG. Override für
-     transform: kombiniert Fly-In-Bewegung mit dem Rest-Y-Offset. */
+  /* Custom Bar als Dash — kürzer & dicker, näher am Logo-PNG. Eigene
+     translateY-Distanz von 1em, weil 100% von 0.1em-Höhe quasi nichts
+     wäre und der Bar dann nur "blink-on" statt einfliegen würde. */
   .char.wm-bar {
     width: 0.55em;
-    height: 0.13em;
+    height: 0.1em;
     background: currentColor;
-    vertical-align: middle;
-    margin: 0 0.04em;
-    transform: translateY(calc((1 - var(--char-progress)) * 100% - 0.15em));
+    margin: 0;
+    align-self: center;
+    transform: translateY(calc((1 - var(--char-progress)) * 1em));
     /* text-shadow rendert nichts auf einem Bar ohne Inhalt → eigener
-       box-shadow Glow, parallel zum Char-Glow hochgezogen. */
+       box-shadow Glow, parallel zum Char-Glow. */
     box-shadow:
-      0 0 calc(var(--char-progress) * 32px)
-        rgba(245, 158, 11, calc(var(--char-progress) * 0.7)),
-      0 0 calc(var(--char-progress) * 80px)
-        rgba(245, 158, 11, calc(var(--char-progress) * 0.4));
-  }
-
-  /* Settled-State: dezenter, dauerhafter Atem-Pulse auf der ganzen
-     Wordmark. Aktiviert vom Section2-Script ab rawProgress >= 0.75. */
-  .wordmark.wordmark-breathing {
-    animation: wordmark-breath 6s ease-in-out infinite;
-  }
-
-  @keyframes wordmark-breath {
-    0%, 100% {
-      filter: brightness(1) drop-shadow(0 0 0 transparent);
-    }
-    50% {
-      filter: brightness(1.1) drop-shadow(0 0 20px rgba(245, 158, 11, 0.4));
-    }
+      0 0 calc(var(--char-progress) * 24px)
+        rgba(245, 158, 11, calc(var(--char-progress) * 0.6)),
+      0 0 calc(var(--char-progress) * 60px)
+        rgba(245, 158, 11, calc(var(--char-progress) * 0.35));
   }
 
   @media (max-width: 380px) {
@@ -129,8 +141,8 @@
     .char {
       --char-progress: 1 !important;
     }
-    .wordmark.wordmark-breathing {
-      animation: none !important;
+    .wordmark {
+      --settle-progress: 1 !important;
     }
   }
 </style>
