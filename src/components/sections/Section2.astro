@@ -119,6 +119,10 @@ import ScrollCue from '../ScrollCue.astro';
       drop-shadow(0 0 32px rgba(245, 158, 11, 0.3));
   }
 
+  /* Harter Hidden-Default: visibility:hidden + opacity:0 + keine Filter
+     stellen sicher, dass beim Section-Eintritt keine Render-Spuren von
+     blur oder text-shadow durchschlagen. Erst wenn JS die Aktiv-Klasse
+     `.headline-on` setzt, greifen die var-getriebenen Effekte. */
   .boom-headline {
     --headline-progress: 0;
     position: relative;
@@ -130,6 +134,15 @@ import ScrollCue from '../ScrollCue.astro';
     text-align: center;
     margin: 0;
 
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.92);
+    filter: none;
+    text-shadow: none;
+  }
+
+  .boom-headline.headline-on {
+    visibility: visible;
     opacity: var(--headline-progress);
     transform: scale(calc(0.92 + var(--headline-progress) * 0.08));
     filter: blur(calc((1 - var(--headline-progress)) * 4px));
@@ -346,6 +359,7 @@ import ScrollCue from '../ScrollCue.astro';
       if (reduceMotion) {
         for (const char of stickyChars) char.style.setProperty('--char-progress', '1');
         headline.style.setProperty('--headline-progress', '1');
+        headline.classList.add('headline-on');
         ellipse.style.strokeDashoffset = '0';
         aurora.style.setProperty('--aurora-intensity', '0.5');
         wordmark.style.setProperty('--settle-progress', '1');
@@ -364,6 +378,13 @@ import ScrollCue from '../ScrollCue.astro';
 
       const hp = rangeProgress(progress, headlineStartStep, headlineEndStep);
       headline.style.setProperty('--headline-progress', String(hp));
+      // Aktiv-Klasse erst ab progress > 0 → vor der Headline-Phase keine
+      // var-getriebenen Filter/Shadows, kein Render-Spuk durch den Browser.
+      if (hp > 0) {
+        headline.classList.add('headline-on');
+      } else {
+        headline.classList.remove('headline-on');
+      }
 
       const ep = rangeProgress(progress, circleStartStep, circleEndStep);
       ellipse.style.strokeDashoffset = String(100 * (1 - ep));

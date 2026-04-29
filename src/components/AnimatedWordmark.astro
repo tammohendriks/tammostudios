@@ -40,7 +40,10 @@
     --settle-progress: 0;
     display: inline-flex;
     flex-direction: column;
-    align-items: flex-start;
+    /* stretch statt flex-start: beide Zeilen nehmen die Breite der
+       breitesten Zeile (= tammo) an. Die Bottom-Line nutzt das, um Bar
+       links und STUDIOS rechts auf die Außenkanten zu pinnen. */
+    align-items: stretch;
     font-size: clamp(3rem, 9vw, 7rem);
     color: #f5f5f4;
     line-height: 0.95;
@@ -60,15 +63,12 @@
   }
 
   /* Optisch kalibriert zum Match des Logo-PNG: tammo dominiert die obere
-     Zeile, Bar + STUDIOS sitzen kompakter mit leichtem Overlap nach oben.
-     justify-content: flex-start sichert, dass die Bar wirklich am linken
-     Rand klebt — egal wie schmal der Wordmark-Block durch das kleinere
-     STUDIOS wird. */
+     Zeile, Bottom-Line stretched auf tammo-Breite. space-between pinnt
+     Bar links und STUDIOS rechts an die Wordmark-Außenkanten. */
   .wm-line-bottom {
     align-items: center;
-    justify-content: flex-start;
+    justify-content: space-between;
     margin-top: -0.08em;
-    gap: 0.10em;
   }
 
   .wm-block {
@@ -88,14 +88,15 @@
 
   /* Im Logo-PNG ist STUDIOS deutlich kleiner als tammo. font-size relativ
      zum Wordmark-em, damit clamp() weiterhin die Skalierung steuert.
-     0.42em ist optisch kalibriert: damit endet der "." von STUDIOS bündig
-     mit dem "o" von tammo. */
+     flex-shrink: 0 sichert, dass STUDIOS auf engen Viewports nicht
+     gestaucht wird — die Außenkante bleibt verlässlich rechts unter "o". */
   .wm-studios {
     font-family: 'Aileron', 'Inter', sans-serif;
     font-weight: 900;
     font-style: italic;
     letter-spacing: -0.02em;
     font-size: 0.42em;
+    flex-shrink: 0;
   }
 
   /* Per-Char Progress 0..1 wird vom Section2-Script gesetzt.
@@ -122,13 +123,15 @@
   /* Custom Bar als Dash — länger & dicker, näher am Logo-PNG.
      Translation-Distanz 1em, weil 100% von der Mini-Höhe quasi nichts
      wäre und der Bar sonst nur "blink-on" statt einfliegen würde.
-     Optisch kalibriert zum Match des Logo-PNG. */
+     flex-shrink: 0 sichert die Breite auch wenn die Bottom-Line
+     gestreckt wird — Bar bleibt links und behält Logo-Proportion. */
   .char.wm-bar {
-    width: 0.85em;
+    width: 0.95em;
     height: 0.13em;
     background: currentColor;
     margin: 0;
     align-self: center;
+    flex-shrink: 0;
     transform: translateY(calc((1 - var(--char-progress)) * 1em));
     /* text-shadow rendert nichts auf einem Bar ohne Inhalt → eigener
        box-shadow Glow, parallel zum Char-Glow. */
