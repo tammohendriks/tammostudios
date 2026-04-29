@@ -22,6 +22,7 @@ export const SITE = {
 
 export const SITE_LABELS = {
   establishedLine: 'EST. 2026 · BREMEN',
+  serviceLine: 'Individuelle Websites, handgemacht in Bremen.',
   introText:
     'Eine Person, eine Handschrift, komplett individuell gebaut. ' +
     'Für Unternehmen, die online ankommen wollen — dort, wo ihre Kunden suchen.',

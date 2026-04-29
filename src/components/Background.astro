@@ -19,6 +19,9 @@
     inset: 0;
     z-index: 1;
     pointer-events: none;
+    /* Touch-Flicker-Effekt setzt die opacity per JS — Transition
+       sorgt für den weichen Ein-/Ausblendrhythmus beim Scrollen. */
+    transition: opacity 200ms ease-out;
     -webkit-mask-image: linear-gradient(
       to bottom,
       transparent 0%,
@@ -114,6 +117,15 @@
     }
     .spotlight {
       transition: none;
+    }
+  }
+
+  /* Touch-Devices: Spotlight ergibt ohne Cursor keinen Sinn —
+     komplett ausblenden. Stattdessen springt der Scroll-Flicker
+     im Script die Knoten kurz dimmen. */
+  @media (pointer: coarse) {
+    .spotlight {
+      display: none;
     }
   }
 </style>
@@ -229,6 +241,31 @@
         }
       });
     });
+
+    // Touch-only: Scroll-getriggerter Knoten-Flicker. Ersetzt visuell
+     // den Mouse-Spotlight, den's ohne Cursor nicht gibt — die Nodes
+     // dimmen kurz, kommen dann wieder hoch. Subtil, aber spürbar
+     // reaktiv.
+    if (isCoarse && !reduceMotion) {
+      let flickerPending = false;
+      let flickerReset = 0;
+      window.addEventListener(
+        'scroll',
+        () => {
+          if (flickerPending) return;
+          flickerPending = true;
+          requestAnimationFrame(() => {
+            flickerPending = false;
+            canvas.style.opacity = '0.25';
+            if (flickerReset) clearTimeout(flickerReset);
+            flickerReset = window.setTimeout(() => {
+              canvas.style.opacity = '1';
+            }, 250);
+          });
+        },
+        { passive: true },
+      );
+    }
 
     document.addEventListener('astro:before-preparation', () => {
       running = false;

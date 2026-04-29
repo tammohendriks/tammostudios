@@ -16,6 +16,7 @@ import ScrollCue from '../ScrollCue.astro';
       fetchpriority="high"
     />
   </h1>
+  <p class="hero-service">{SITE_LABELS.serviceLine}</p>
   <p class="intro">{SITE_LABELS.introText}</p>
 
   <ScrollCue />
@@ -43,11 +44,13 @@ import ScrollCue from '../ScrollCue.astro';
   html[data-splash="splash"] .top-left,
   html[data-splash="splash"] .nav,
   html[data-splash="splash"] .cta,
+  html[data-splash="splash"] .hero-service,
   html[data-splash="splash"] .intro,
   html[data-splash="splash"] .scroll-cue,
   html[data-splash="reveal"] .top-left,
   html[data-splash="reveal"] .nav,
   html[data-splash="reveal"] .cta,
+  html[data-splash="reveal"] .hero-service,
   html[data-splash="reveal"] .intro,
   html[data-splash="reveal"] .scroll-cue {
     opacity: 0;
@@ -58,6 +61,7 @@ import ScrollCue from '../ScrollCue.astro';
   html[data-splash="ready"] .top-left,
   html[data-splash="ready"] .nav,
   html[data-splash="ready"] .cta,
+  html[data-splash="ready"] .hero-service,
   html[data-splash="ready"] .intro,
   html[data-splash="ready"] .scroll-cue {
     opacity: 1;
@@ -65,11 +69,12 @@ import ScrollCue from '../ScrollCue.astro';
     transition: opacity 500ms ease-out, transform 500ms ease-out;
   }
 
-  html[data-splash="ready"] .top-left   { transition-delay: 0ms;   }
-  html[data-splash="ready"] .nav        { transition-delay: 80ms;  }
-  html[data-splash="ready"] .cta        { transition-delay: 160ms; }
-  html[data-splash="ready"] .intro      { transition-delay: 240ms; }
-  html[data-splash="ready"] .scroll-cue { transition-delay: 320ms; }
+  html[data-splash="ready"] .top-left      { transition-delay: 0ms;   }
+  html[data-splash="ready"] .nav           { transition-delay: 80ms;  }
+  html[data-splash="ready"] .cta           { transition-delay: 160ms; }
+  html[data-splash="ready"] .hero-service  { transition-delay: 220ms; }
+  html[data-splash="ready"] .intro         { transition-delay: 280ms; }
+  html[data-splash="ready"] .scroll-cue    { transition-delay: 360ms; }
 
   /* Returning visitor / reduced-motion: keine data-splash-Attribute,
      Default-Styles greifen → alles sofort sichtbar. Diese expliziten
@@ -79,6 +84,7 @@ import ScrollCue from '../ScrollCue.astro';
   html.splash-skip .top-left,
   html.splash-skip .nav,
   html.splash-skip .cta,
+  html.splash-skip .hero-service,
   html.splash-skip .intro,
   html.splash-skip .scroll-cue {
     opacity: 1;
@@ -138,10 +144,25 @@ import ScrollCue from '../ScrollCue.astro';
     }
   }
 
+  /* Service-Zeile: zwischen Logo und Intro, deutlich präsenter als
+     der Subtext darunter. Hierarchie Logo > Service > Intro. */
+  .hero-service {
+    position: relative;
+    z-index: 5;
+    margin: 28px 0 14px;
+    max-width: 640px;
+    color: #f5f5f4;
+    font-family: 'Neue Montreal', 'Inter', system-ui, sans-serif;
+    font-weight: 500;
+    font-size: clamp(1.15rem, 2.2vw, 1.5rem);
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+
   .intro {
     position: relative;
     z-index: 5;
-    margin: 28px 0 0 0;
+    margin: 0;
     max-width: 520px;
     color: rgba(245, 245, 244, 0.7);
     font-size: 14px;
@@ -149,6 +170,9 @@ import ScrollCue from '../ScrollCue.astro';
   }
 
   @media (max-width: 767px) {
+    .hero-service {
+      max-width: 480px;
+    }
     .intro {
       font-size: 13px;
       max-width: 360px;

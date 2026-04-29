@@ -21,6 +21,14 @@
     -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
+html {
+  /* Reserviert dauerhaft Platz für die Scrollbar — der visuelle
+     Mittelpunkt des Viewports bleibt konstant, egal ob die Seite
+     gerade scrollbar ist oder nicht. ScrollCues bleiben damit
+     pixelgenau zentriert. */
+  scrollbar-gutter: stable;
+}
+
 html,
 body {
   background-color: var(--color-ts-bg);
