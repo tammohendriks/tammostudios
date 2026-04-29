@@ -56,9 +56,9 @@
 
   .wm-studios {
     font-family: 'Aileron', 'Inter', sans-serif;
-    font-weight: 700;
+    font-weight: 900;
     font-style: italic;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
   }
 
   .wm-dash {
@@ -66,7 +66,8 @@
   }
 
   /* Per-Char Progress 0..1 wird vom Section2-Script gesetzt.
-     Position, Sichtbarkeit, Schärfe und Glow leiten sich linear ab. */
+     Position, Sichtbarkeit, Schärfe und Glow leiten sich linear ab.
+     Vier-Layer-Glow inkl. heller Goldton (#fcd34d) für äußere Tiefe. */
   .char {
     --char-progress: 0;
     display: inline-block;
@@ -74,12 +75,14 @@
     opacity: var(--char-progress);
     filter: blur(calc((1 - var(--char-progress)) * 6px));
     text-shadow:
-      0 0 calc(var(--char-progress) * 24px)
-        rgba(245, 158, 11, calc(var(--char-progress) * 0.5)),
-      0 0 calc(var(--char-progress) * 60px)
-        rgba(245, 158, 11, calc(var(--char-progress) * 0.3)),
+      0 0 calc(var(--char-progress) * 40px)
+        rgba(245, 158, 11, calc(var(--char-progress) * 0.7)),
       0 0 calc(var(--char-progress) * 100px)
-        rgba(245, 158, 11, calc(var(--char-progress) * 0.15));
+        rgba(245, 158, 11, calc(var(--char-progress) * 0.5)),
+      0 0 calc(var(--char-progress) * 200px)
+        rgba(245, 158, 11, calc(var(--char-progress) * 0.25)),
+      0 0 calc(var(--char-progress) * 300px)
+        rgba(252, 211, 77, calc(var(--char-progress) * 0.10));
     will-change: transform, opacity, filter;
   }
 
@@ -91,14 +94,29 @@
     background: currentColor;
     vertical-align: middle;
     margin: 0 0.04em;
-    transform: translateY(calc((1 - var(--char-progress)) * 100% + -0.15em));
+    transform: translateY(calc((1 - var(--char-progress)) * 100% - 0.15em));
     /* text-shadow rendert nichts auf einem Bar ohne Inhalt → eigener
-       box-shadow Glow, gleiche Helligkeitsabhängigkeit wie die Chars. */
+       box-shadow Glow, parallel zum Char-Glow hochgezogen. */
     box-shadow:
-      0 0 calc(var(--char-progress) * 24px)
-        rgba(245, 158, 11, calc(var(--char-progress) * 0.5)),
-      0 0 calc(var(--char-progress) * 60px)
-        rgba(245, 158, 11, calc(var(--char-progress) * 0.3));
+      0 0 calc(var(--char-progress) * 32px)
+        rgba(245, 158, 11, calc(var(--char-progress) * 0.7)),
+      0 0 calc(var(--char-progress) * 80px)
+        rgba(245, 158, 11, calc(var(--char-progress) * 0.4));
+  }
+
+  /* Settled-State: dezenter, dauerhafter Atem-Pulse auf der ganzen
+     Wordmark. Aktiviert vom Section2-Script ab rawProgress >= 0.75. */
+  .wordmark.wordmark-breathing {
+    animation: wordmark-breath 6s ease-in-out infinite;
+  }
+
+  @keyframes wordmark-breath {
+    0%, 100% {
+      filter: brightness(1) drop-shadow(0 0 0 transparent);
+    }
+    50% {
+      filter: brightness(1.1) drop-shadow(0 0 20px rgba(245, 158, 11, 0.4));
+    }
   }
 
   @media (max-width: 380px) {
@@ -110,6 +128,9 @@
   @media (prefers-reduced-motion: reduce) {
     .char {
       --char-progress: 1 !important;
+    }
+    .wordmark.wordmark-breathing {
+      animation: none !important;
     }
   }
 </style>

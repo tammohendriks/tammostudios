@@ -5,7 +5,15 @@ import ScrollCue from '../ScrollCue.astro';
 ---
 
 <section class="section-2">
+  <div class="ambient-aurora" aria-hidden="true">
+    <div class="aurora-layer aurora-1"></div>
+    <div class="aurora-layer aurora-2"></div>
+    <div class="aurora-layer aurora-3"></div>
+  </div>
+
   <div class="section-2-sticky">
+    <div class="completion-burst" aria-hidden="true"></div>
+
     <div class="content">
       <AnimatedWordmark />
 
@@ -40,17 +48,14 @@ import ScrollCue from '../ScrollCue.astro';
 <style>
   .section-2 {
     position: relative;
-    min-height: 200vh;
+    min-height: 300vh;
     background: linear-gradient(to bottom, #000 0%, #0a0a0c 100%);
-    /* KEIN overflow: hidden — das bricht position: sticky des inneren
-       .section-2-sticky in den meisten Browsern. Der Halo-Drop-Shadow
-       der Ellipse darf ruhig leicht über die Section-Grenzen ragen. */
+    /* KEIN overflow: hidden — bricht position: sticky des inneren Containers. */
   }
 
-  @media (max-width: 767px) {
+  @media (max-width: 768px) {
     .section-2 {
-      /* iOS Safari sticky-Quirk: kürzere Runway, sonst springt sticky */
-      min-height: 150vh;
+      min-height: 220vh;
     }
   }
 
@@ -58,8 +63,10 @@ import ScrollCue from '../ScrollCue.astro';
     position: sticky;
     top: 0;
     height: 100vh;
-    /* Fallback für ältere iOS Safari, die 100vh durch URL-Bar verfälschen */
     height: 100dvh;
+    /* eigenes Stacking-Context, damit z-Indexes von completion-burst und
+       Content sauber innerhalb der Sticky-Box sortieren. */
+    z-index: 5;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -68,6 +75,8 @@ import ScrollCue from '../ScrollCue.astro';
   }
 
   .content {
+    position: relative;
+    z-index: 5;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -105,9 +114,11 @@ import ScrollCue from '../ScrollCue.astro';
   }
 
   .headline-circle ellipse {
-    /* JS schreibt stroke-dashoffset direkt; transition glättet die rAF-Updates. */
     transition: stroke-dashoffset 80ms linear;
-    filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.5));
+    /* doppelter drop-shadow für Tiefe, deutlich wärmer als vorher. */
+    filter:
+      drop-shadow(0 0 16px rgba(245, 158, 11, 0.6))
+      drop-shadow(0 0 32px rgba(245, 158, 11, 0.3));
   }
 
   .boom-headline {
@@ -126,9 +137,131 @@ import ScrollCue from '../ScrollCue.astro';
     filter: blur(calc((1 - var(--headline-progress)) * 4px));
     text-shadow:
       0 0 calc(var(--headline-progress) * 30px)
-        rgba(245, 158, 11, calc(var(--headline-progress) * 0.5)),
+        rgba(245, 158, 11, calc(var(--headline-progress) * 0.7)),
       0 0 calc(var(--headline-progress) * 80px)
-        rgba(245, 158, 11, calc(var(--headline-progress) * 0.25));
+        rgba(245, 158, 11, calc(var(--headline-progress) * 0.4)),
+      0 0 calc(var(--headline-progress) * 160px)
+        rgba(245, 158, 11, calc(var(--headline-progress) * 0.2));
+  }
+
+  /* === Ambient Aurora === */
+  .ambient-aurora {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+    --aurora-intensity: 0;
+  }
+
+  .aurora-layer {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: var(--aurora-intensity);
+    mix-blend-mode: screen;
+    transition: opacity 200ms linear;
+    will-change: transform, opacity;
+  }
+
+  .aurora-1 {
+    width: 70vw;
+    height: 70vw;
+    top: 20%;
+    left: 15%;
+    background: radial-gradient(circle,
+      rgba(245, 158, 11, 0.55) 0%,
+      rgba(245, 158, 11, 0.25) 30%,
+      rgba(245, 158, 11, 0)    65%);
+    animation: aurora-drift-1 22s ease-in-out infinite;
+  }
+
+  .aurora-2 {
+    width: 55vw;
+    height: 55vw;
+    top: 30%;
+    right: 10%;
+    background: radial-gradient(circle,
+      rgba(252, 211, 77, 0.45) 0%,
+      rgba(252, 211, 77, 0.18) 35%,
+      rgba(252, 211, 77, 0)    70%);
+    animation: aurora-drift-2 28s ease-in-out infinite;
+  }
+
+  .aurora-3 {
+    width: 60vw;
+    height: 60vw;
+    bottom: 10%;
+    left: 35%;
+    background: radial-gradient(circle,
+      rgba(217, 119, 6, 0.40) 0%,
+      rgba(217, 119, 6, 0.15) 40%,
+      rgba(217, 119, 6, 0)    75%);
+    animation: aurora-drift-3 34s ease-in-out infinite;
+  }
+
+  @keyframes aurora-drift-1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33%      { transform: translate(8vw, -5vh) scale(1.15); }
+    66%      { transform: translate(-6vw, 8vh) scale(0.9); }
+  }
+
+  @keyframes aurora-drift-2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50%      { transform: translate(-10vw, 6vh) scale(1.2); }
+  }
+
+  @keyframes aurora-drift-3 {
+    0%, 100% { transform: translate(0, 0) scale(0.95); }
+    25%      { transform: translate(5vw, -8vh) scale(1.1); }
+    75%      { transform: translate(-7vw, -4vh) scale(1.05); }
+  }
+
+  /* === Completion Burst === */
+  .completion-burst {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background: radial-gradient(
+      circle at 50% 50%,
+      rgba(245, 158, 11, 0) 0%,
+      rgba(245, 158, 11, 0) 100%
+    );
+    opacity: 0;
+  }
+
+  .completion-burst.fired {
+    animation: completion-burst-anim 1.6s ease-out forwards;
+  }
+
+  @keyframes completion-burst-anim {
+    0% {
+      opacity: 0;
+      background: radial-gradient(
+        circle at 50% 50%,
+        rgba(245, 158, 11, 0.7) 0%,
+        rgba(245, 158, 11, 0.3) 25%,
+        rgba(245, 158, 11, 0)   55%
+      );
+    }
+    20% {
+      opacity: 1;
+      background: radial-gradient(
+        circle at 50% 50%,
+        rgba(245, 158, 11, 0.85) 0%,
+        rgba(245, 158, 11, 0.4)  30%,
+        rgba(245, 158, 11, 0)    70%
+      );
+    }
+    100% {
+      opacity: 0;
+      background: radial-gradient(
+        circle at 50% 50%,
+        rgba(245, 158, 11, 0) 0%,
+        rgba(245, 158, 11, 0) 100%
+      );
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -139,6 +272,17 @@ import ScrollCue from '../ScrollCue.astro';
       stroke-dashoffset: 0 !important;
       transition: none;
     }
+    .aurora-layer {
+      animation: none !important;
+    }
+    .ambient-aurora {
+      --aurora-intensity: 0.6 !important;
+    }
+    .completion-burst,
+    .completion-burst.fired {
+      animation: none !important;
+      opacity: 0 !important;
+    }
   }
 </style>
 
@@ -147,21 +291,24 @@ import ScrollCue from '../ScrollCue.astro';
   const stickyChars = section ? Array.from(section.querySelectorAll('.char')) : [];
   const headline = section ? section.querySelector('.boom-headline') : null;
   const ellipse = section ? section.querySelector('.headline-circle ellipse') : null;
+  const aurora = section ? section.querySelector('.ambient-aurora') : null;
+  const burst = section ? section.querySelector('.completion-burst') : null;
+  const wordmark = section ? section.querySelector('.wordmark') : null;
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  if (section && stickyChars.length && headline && ellipse) {
-    // 14 Chars + 2 Halt-Steps + Headline-Fade (2 Steps) + Circle-Draw (4 Steps)
-    // Reihenfolge:
-    //   0..13   → chars
-    //   14..15  → kurze Pause
-    //   16..17  → headline progressive in
-    //   18..21  → ellipse zeichnet sich
+  if (section && stickyChars.length && headline && ellipse && aurora && burst && wordmark) {
     const stepsForChars = stickyChars.length;
     const headlineStartStep = stepsForChars + 2;
     const headlineEndStep = headlineStartStep + 2;
     const circleStartStep = headlineEndStep;
     const circleEndStep = circleStartStep + 4;
     const totalSteps = circleEndStep;
+
+    // Animation belegt nur die ersten 75% des Section-Scrolls. Die letzten
+    // 25% sind Settled-State: Aurora auf 1, Wordmark atmet, Burst feuert.
+    const ANIMATION_RANGE = 0.75;
+
+    let burstFired = false;
 
     function clamp01(v) {
       return v < 0 ? 0 : v > 1 ? 1 : v;
@@ -180,28 +327,48 @@ import ScrollCue from '../ScrollCue.astro';
       return clamp01(-rect.top / totalScrollDistance);
     }
 
+    function handleSettledState(isSettled) {
+      if (reduceMotion) return;
+      if (isSettled && !burstFired) {
+        burst.classList.add('fired');
+        wordmark.classList.add('wordmark-breathing');
+        burstFired = true;
+      } else if (!isSettled && burstFired) {
+        burst.classList.remove('fired');
+        wordmark.classList.remove('wordmark-breathing');
+        burstFired = false;
+      }
+    }
+
     function update() {
       if (reduceMotion) {
-        // CSS !important hat Vorrang — JS-Werte sind hier zwar gesetzt, aber
-        // nicht visuell wirksam. Trotzdem konsistent halten.
         for (const char of stickyChars) char.style.setProperty('--char-progress', '1');
         headline.style.setProperty('--headline-progress', '1');
         ellipse.style.strokeDashoffset = '0';
+        // Aurora-Intensität wird per CSS !important auf 0.6 geclampt;
+        // den JS-Wert trotzdem konsistent setzen.
+        aurora.style.setProperty('--aurora-intensity', '0.6');
         return;
       }
 
-      const progress = getScrollProgress();
+      const rawProgress = getScrollProgress();
+      const progress = Math.min(1, rawProgress / ANIMATION_RANGE);
 
       for (let i = 0; i < stickyChars.length; i++) {
-        const charProgress = rangeProgress(progress, i, i + 1);
-        stickyChars[i].style.setProperty('--char-progress', String(charProgress));
+        const cp = rangeProgress(progress, i, i + 1);
+        stickyChars[i].style.setProperty('--char-progress', String(cp));
       }
 
-      const headlineProgress = rangeProgress(progress, headlineStartStep, headlineEndStep);
-      headline.style.setProperty('--headline-progress', String(headlineProgress));
+      const hp = rangeProgress(progress, headlineStartStep, headlineEndStep);
+      headline.style.setProperty('--headline-progress', String(hp));
 
-      const circleProgress = rangeProgress(progress, circleStartStep, circleEndStep);
-      ellipse.style.strokeDashoffset = String(100 * (1 - circleProgress));
+      const ep = rangeProgress(progress, circleStartStep, circleEndStep);
+      ellipse.style.strokeDashoffset = String(100 * (1 - ep));
+
+      // Aurora-Intensität skaliert mit dem 0..1 progress (über die 75%-Range).
+      aurora.style.setProperty('--aurora-intensity', String(progress));
+
+      handleSettledState(rawProgress >= ANIMATION_RANGE);
     }
 
     let ticking = false;
