@@ -4,26 +4,26 @@ import ScrollCue from '../ScrollCue.astro';
 ---
 
 <section class="section-4">
-  <div class="section-4-video-wrap" aria-hidden="true">
-    <video
-      class="section-4-video"
-      autoplay
-      muted
-      loop
-      playsinline
-      preload="auto"
-    >
-      <source
-        media="(min-width: 768px)"
-        src="/videos/desktop.mp4"
-        type="video/mp4"
-      />
-      <source src="/videos/mobile.mp4" type="video/mp4" />
-    </video>
-    <div class="section-4-scrim"></div>
-  </div>
-
   <div class="section-4-sticky">
+    <div class="section-4-video-wrap" aria-hidden="true">
+      <video
+        class="section-4-video"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="auto"
+      >
+        <source
+          media="(min-width: 768px)"
+          src="/videos/desktop.mp4"
+          type="video/mp4"
+        />
+        <source src="/videos/mobile.mp4" type="video/mp4" />
+      </video>
+      <div class="section-4-scrim"></div>
+    </div>
+
     <header class="section-4-header">
       <p class="section-4-eyebrow">{SECTION4.eyebrow}</p>
       <h2 class="section-4-title">{SECTION4.title}</h2>
@@ -95,17 +95,16 @@ import ScrollCue from '../ScrollCue.astro';
   }
 
   /* === Galaxy Video Background ===
-     Sticky-pinned: bleibt während des gesamten Section-Scrolls am
-     Viewport-Top kleben, statt mit der Section mitzuscrollen. */
+     Liegt INSIDE des einen Sticky-Containers als absoluter Layer
+     hinter dem Content. Single-sticky-Pattern verhindert das
+     Engagement-Problem, das zwei sticky-Geschwister auslösen
+     (zweite würde erst nach 100vh Flow-Offset pinnen). */
   .section-4-video-wrap {
-    position: sticky;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    height: 100dvh;
+    position: absolute;
+    inset: 0;
     overflow: hidden;
     z-index: 0;
+    pointer-events: none;
   }
 
   .section-4-video {
@@ -134,8 +133,9 @@ import ScrollCue from '../ScrollCue.astro';
   }
 
   /* === Sticky Container — 3-Row Grid: header / timeline / cue ===
-     110px Top sichert Distanz zur fixed TopBar; gap 32px gibt
-     Header / Timeline / Cue klaren Atemzug. */
+     Single sticky element (jetzt FIRST child von section-4) → pinnt
+     ab Section-Eintritt. 100px Top sichert Distanz zur fixed TopBar.
+     Video lebt darin als position: absolute background. */
   .section-4-sticky {
     position: sticky;
     top: 0;
@@ -143,22 +143,22 @@ import ScrollCue from '../ScrollCue.astro';
     height: 100dvh;
     display: grid;
     grid-template-rows: auto 1fr auto;
-    padding: 110px 40px 60px;
-    gap: 32px;
+    padding: 100px 40px 40px;
     z-index: 2;
   }
 
   @media (max-width: 768px) {
     .section-4-sticky {
-      padding: 90px 20px 40px;
-      gap: 20px;
+      padding: 80px 20px 32px;
     }
   }
 
-  /* === Header (oben fix, fadet einmal ein) ===
-     Margin-Bottom raus — der Sticky-Grid macht das Spacing via gap. */
+  /* === Header (grid-row 1, oben fix, fadet einmal ein) === */
   .section-4-header {
     --header-progress: 0;
+    grid-row: 1;
+    position: relative;
+    z-index: 2;
     text-align: center;
     opacity: var(--header-progress);
     transform: translateY(calc((1 - var(--header-progress)) * 12px));
@@ -185,9 +185,12 @@ import ScrollCue from '../ScrollCue.astro';
     margin: 0;
   }
 
-  /* === Timeline-Wrap: Bühne für Line + Dots + Phasen-Slideshow === */
+  /* === Timeline-Wrap (grid-row 2, vertikal zentriert in der 1fr Zelle) === */
   .section-4-timeline-wrap {
+    grid-row: 2;
+    align-self: center;
     position: relative;
+    z-index: 2;
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
@@ -262,17 +265,22 @@ import ScrollCue from '../ScrollCue.astro';
     transform: translateX(-50%) scale(1.3);
   }
 
-  /* === Phasen — alle absolute übereinander gestapelt, eine
-     gleichzeitig sichtbar via .phase-active === */
+  /* === Phasen — Grid-Layering: alle Phasen teilen sich grid-row 1
+     in der phases-container Grid-Cell. Eine ist gleichzeitig sichtbar
+     via .phase-active. min-height stabilisiert die Cell, sodass ein
+     Phase-Wechsel keine Höhenänderung des Wraps auslöst. === */
   .phases-container {
     position: relative;
-    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 80px 1fr;
+    align-items: center;
+    min-height: 50vh;
     pointer-events: none;
   }
 
   .phase {
-    position: absolute;
-    inset: 0;
+    grid-column: 1 / -1;
+    grid-row: 1;
     display: grid;
     grid-template-columns: 1fr 80px 1fr;
     align-items: center;
@@ -380,10 +388,13 @@ import ScrollCue from '../ScrollCue.astro';
     border-color: rgba(245, 158, 11, 1);
   }
 
-  /* === ScrollCue — eigene Visibility, getrieben vom Settled-Progress.
-     padding-top schafft zusätzliche Distanz zum Linien-Ende oben. */
+  /* === ScrollCue (grid-row 3, am unteren Rand) — eigene Visibility,
+     getrieben vom Settled-Progress. */
   .section-4-scrollcue-wrap {
     --cue-progress: 0;
+    grid-row: 3;
+    position: relative;
+    z-index: 2;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -493,21 +504,23 @@ import ScrollCue from '../ScrollCue.astro';
     section && header && phases.length === 5 && dots.length === 5 &&
     lineProgress && cueWrap
   ) {
-    // Phase-Distribution: Phase 1 ist von Anfang an active (start: 0),
-    // damit beim ersten Scroll-Frame schon Content da ist und keine
-    // leere Lücke entsteht. Header läuft parallel über die ersten 5%.
+    // Phase-Distribution mit Lead-In-Buffer (0.00–0.10): erst nach 10%
+    // Section-Scroll wird Phase 1 active, sodass der Sticky garantiert
+    // engaged ist und der Header oben pinnt, bevor Content erscheint.
+    // Header fadet während der ersten 6% ein.
     const phaseRanges = [
-      { start: 0.00, end: 0.18 },
-      { start: 0.18, end: 0.36 },
-      { start: 0.36, end: 0.54 },
-      { start: 0.54, end: 0.72 },
-      { start: 0.72, end: 0.92 },
+      { start: 0.10, end: 0.26 },
+      { start: 0.26, end: 0.42 },
+      { start: 0.42, end: 0.58 },
+      { start: 0.58, end: 0.74 },
+      { start: 0.74, end: 0.92 },
     ];
-    const HEADER_END = 0.05;
+    const HEADER_END = 0.06;
     const SETTLED_AT = 0.92;
     const CUE_RANGE = 0.06;
-    // Linie läuft kontinuierlich von Phase-1-Start bis Phase-5-Ende
-    const LINE_START = 0.00;
+    // Linie startet bei Phase-1-Start (nach Lead-In) und läuft bis
+    // Phase-5-Ende.
+    const LINE_START = 0.10;
     const LINE_END = 0.92;
 
     function clamp01(v) {
@@ -522,15 +535,15 @@ import ScrollCue from '../ScrollCue.astro';
     }
 
     function determineActivePhase(progress) {
+      // Lead-In-Buffer: keine Phase active bis Sticky engaged ist
+      if (progress < 0.10) return -1;
       // Settled: Phase 5 bleibt active
       if (progress >= SETTLED_AT) return 4;
       for (let i = 0; i < phaseRanges.length; i++) {
         const r = phaseRanges[i];
         if (progress >= r.start && progress < r.end) return i;
       }
-      // Vor allen Ranges (sollte nicht passieren, weil Phase 1 bei 0
-      // startet — aber als Defensive: Phase 1 als Default-Active).
-      return 0;
+      return -1;
     }
 
     function update() {
