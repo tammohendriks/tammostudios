@@ -1,5 +1,6 @@
 ---
 import { SECTION3 } from '../../lib/constants';
+import ScrollCue from '../ScrollCue.astro';
 ---
 
 <section class="section-3">
@@ -19,13 +20,19 @@ import { SECTION3 } from '../../lib/constants';
         ))}
       </div>
     </div>
+
+    <ScrollCue />
   </div>
 </section>
 
 <style>
   .section-3 {
     position: relative;
-    min-height: 250vh;
+    /* 200vh statt 250vh: kompakteres Runway. Kombiniert mit dem
+       schnelleren Cascade-Schedule (Animation fertig bei progress
+       0.5) bekommt der Settled-State eine ganze halbe Viewport-Höhe
+       Lesezeit. */
+    min-height: 200vh;
     background: linear-gradient(to bottom, #050507 0%, #0a0a0c 100%);
     overflow: hidden;
   }
@@ -200,6 +207,25 @@ import { SECTION3 } from '../../lib/constants';
   }
 </style>
 
+<style is:global>
+  /* Section3-spezifische Steuerung des ScrollCue-Anchors. Liegt in
+     einem global-Block, weil .scroll-cue-anchor in der ScrollCue-
+     Komponente lebt (eigener Astro-Scope). Cue erscheint erst im
+     Settled-State (progress > 0.55), damit der User nicht in die
+     letzte Box reinscrollt während er noch denkt, da kommt was. */
+  .section-3 .scroll-cue-anchor {
+    --cue-visibility: 0;
+    opacity: var(--cue-visibility);
+    transition: opacity 400ms ease-out;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .section-3 .scroll-cue-anchor {
+      --cue-visibility: 1 !important;
+    }
+  }
+</style>
+
 <script>
   const section = document.querySelector('.section-3');
   const items = section
@@ -208,18 +234,25 @@ import { SECTION3 } from '../../lib/constants';
   const eyebrow = section
     ? section.querySelector('.section-3-eyebrow')
     : null;
+  const cueAnchor = section
+    ? section.querySelector('.scroll-cue-anchor')
+    : null;
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  if (section && items.length === 3 && eyebrow) {
-    // Pro Item leicht überlappende Progress-Range über die Section-
-    // Runway. Eyebrow erscheint zuerst (0–15%), Items kaskadieren
-    // nacheinander mit Overlap, ab 70% ist alles im Settled-State.
+  if (section && items.length === 3 && eyebrow && cueAnchor) {
+    // Cascade füllt fast den gesamten Scroll aus (wie Section 2):
+    // jeder Pixel Scroll = sichtbarer Fortschritt. Items überlappen
+    // sich leicht in den Übergängen, ab 90% nur noch kurzer Settled-
+    // Tail. So scrollt nichts ins Leere.
     const ranges = [
-      { start: 0.00, end: 0.30 },
-      { start: 0.20, end: 0.50 },
-      { start: 0.40, end: 0.70 },
+      { start: 0.00, end: 0.40 },
+      { start: 0.30, end: 0.65 },
+      { start: 0.55, end: 0.90 },
     ];
-    const EYEBROW_END = 0.15;
+    const EYEBROW_END = 0.10;
+    // Cue kommt schnell sichtbar nach 90% — Signal "alles gelesen"
+    const CUE_START = 0.90;
+    const CUE_END = 0.95;
 
     function clamp01(v) {
       return v < 0 ? 0 : v > 1 ? 1 : v;
@@ -239,6 +272,7 @@ import { SECTION3 } from '../../lib/constants';
         for (const item of items) {
           item.style.setProperty('--item-progress', '1');
         }
+        cueAnchor.style.setProperty('--cue-visibility', '1');
         return;
       }
 
@@ -253,6 +287,9 @@ import { SECTION3 } from '../../lib/constants';
         const ip = clamp01((progress - start) / (end - start));
         items[i].style.setProperty('--item-progress', String(ip));
       }
+
+      const cueP = clamp01((progress - CUE_START) / (CUE_END - CUE_START));
+      cueAnchor.style.setProperty('--cue-visibility', String(cueP));
     }
 
     let ticking = false;
