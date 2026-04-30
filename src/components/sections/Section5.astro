@@ -73,13 +73,13 @@ const { eyebrow, headline, subtext, primaryCta, secondaryEmail, footer } = SECTI
     display: flex;
     flex-direction: column;
     background: #050507;
-    padding: 100px 40px 32px;
+    padding: 160px 40px 32px;
     overflow: hidden;
   }
 
   @media (max-width: 768px) {
     .section-5 {
-      padding: 80px 20px 24px;
+      padding: 120px 20px 24px;
     }
   }
 
@@ -121,9 +121,14 @@ const { eyebrow, headline, subtext, primaryCta, secondaryEmail, footer } = SECTI
     margin: 0;
   }
 
-  /* Runder Logo-Frame mit warmem Glow + sanftem Atmen.
-     Mehrlagiger box-shadow für Tiefe; inset-Highlight zeichnet
-     einen feinen inneren Rand. */
+  /* Runder Logo-Frame als organisch lebendiges Lichtspiel.
+     Drei überlagerte Animations-Layer mit nicht-synchronen Tempi
+     (4s / 14s / 5.5s) — das Auge nimmt's als "lebendig" wahr,
+     weil sich nichts exakt wiederholt.
+
+     Layer 1: stärkerer Breath-Pulse via box-shadow (4s).
+     Layer 2: ::before — rotierender Conic-Gradient (Leuchtturm, 14s).
+     Layer 3: ::after — innerer Highlight-Reflex (Glas-Shimmer, 5.5s). */
   .logo-frame {
     position: relative;
     width: 280px;
@@ -134,12 +139,55 @@ const { eyebrow, headline, subtext, primaryCta, secondaryEmail, footer } = SECTI
     display: flex;
     align-items: center;
     justify-content: center;
+    isolation: isolate;
     box-shadow:
-      0 0 40px rgba(245, 158, 11, 0.3),
-      0 0 80px rgba(245, 158, 11, 0.15),
-      0 0 140px rgba(245, 158, 11, 0.08),
-      inset 0 0 30px rgba(245, 158, 11, 0.1);
-    animation: logo-frame-breath 6s ease-in-out infinite;
+      0 0 30px rgba(245, 158, 11, 0.25),
+      0 0 70px rgba(245, 158, 11, 0.12),
+      0 0 120px rgba(245, 158, 11, 0.06),
+      inset 0 0 25px rgba(245, 158, 11, 0.08);
+    animation: logo-frame-breath 4s ease-in-out infinite;
+  }
+
+  /* Leuchtturm-Schein: rotiert hinter dem Frame und blitzt nur
+     dort raus, wo er über die Frame-Kante hinaussteht. */
+  .logo-frame::before {
+    content: '';
+    position: absolute;
+    inset: -30px;
+    border-radius: 50%;
+    background: conic-gradient(
+      from 0deg,
+      rgba(245, 158, 11, 0)    0%,
+      rgba(245, 158, 11, 0.5) 20%,
+      rgba(245, 158, 11, 0)   40%,
+      rgba(245, 158, 11, 0)   60%,
+      rgba(245, 158, 11, 0.5) 80%,
+      rgba(245, 158, 11, 0)  100%
+    );
+    filter: blur(30px);
+    z-index: -1;
+    pointer-events: none;
+    animation: frame-orbit 14s linear infinite;
+  }
+
+  /* Glas-Reflex: kleiner heller Punkt links-oben pulsiert. */
+  .logo-frame::after {
+    content: '';
+    position: absolute;
+    top: 8%;
+    left: 20%;
+    width: 30%;
+    height: 30%;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      rgba(255, 220, 130, 0.35) 0%,
+      rgba(255, 220, 130, 0) 70%
+    );
+    filter: blur(8px);
+    z-index: 1;
+    pointer-events: none;
+    animation: highlight-pulse 5.5s ease-in-out infinite;
   }
 
   .logo-frame img {
@@ -151,18 +199,28 @@ const { eyebrow, headline, subtext, primaryCta, secondaryEmail, footer } = SECTI
   @keyframes logo-frame-breath {
     0%, 100% {
       box-shadow:
-        0 0 40px rgba(245, 158, 11, 0.3),
-        0 0 80px rgba(245, 158, 11, 0.15),
-        0 0 140px rgba(245, 158, 11, 0.08),
-        inset 0 0 30px rgba(245, 158, 11, 0.1);
+        0 0 30px rgba(245, 158, 11, 0.25),
+        0 0 70px rgba(245, 158, 11, 0.12),
+        0 0 120px rgba(245, 158, 11, 0.06),
+        inset 0 0 25px rgba(245, 158, 11, 0.08);
     }
     50% {
       box-shadow:
-        0 0 60px rgba(245, 158, 11, 0.45),
-        0 0 120px rgba(245, 158, 11, 0.25),
-        0 0 200px rgba(245, 158, 11, 0.12),
-        inset 0 0 40px rgba(245, 158, 11, 0.15);
+        0 0 70px rgba(245, 158, 11, 0.6),
+        0 0 140px rgba(245, 158, 11, 0.35),
+        0 0 220px rgba(245, 158, 11, 0.18),
+        inset 0 0 50px rgba(245, 158, 11, 0.2);
     }
+  }
+
+  @keyframes frame-orbit {
+    0%   { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  @keyframes highlight-pulse {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50%      { opacity: 0.9; transform: scale(1.1); }
   }
 
   @media (max-width: 768px) {
@@ -387,8 +445,16 @@ const { eyebrow, headline, subtext, primaryCta, secondaryEmail, footer } = SECTI
       transform: none !important;
       transition: none !important;
     }
-    .logo-frame {
+    .logo-frame,
+    .logo-frame::before,
+    .logo-frame::after {
       animation: none !important;
+    }
+    .logo-frame::before {
+      opacity: 0.3;
+    }
+    .logo-frame::after {
+      opacity: 0.4;
     }
     .closing-cta {
       animation: none !important;
