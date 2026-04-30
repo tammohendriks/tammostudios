@@ -94,6 +94,38 @@ import { SITE_LABELS, NAV_ITEMS, CTA } from '../lib/constants';
     pointer-events: auto;
   }
 
+  /* Splash-Coupling: TopBar-Items sind während Splash + Reveal
+     unsichtbar und faden bei "ready" mit den Section-1-Heroes ein.
+     Returning visitors mit .splash-skip sehen alles sofort.
+     Default-Hidden ist KRITISCH gegen Mobile-FOUC: ohne diese Regel
+     blitzt die TopBar im ersten Frame auf, bevor das Splash-Script
+     greift. */
+  .label-tracked,
+  .nav,
+  .cta-orbital,
+  .hamburger {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 600ms ease-out;
+  }
+
+  :global(html[data-splash="ready"]) .label-tracked,
+  :global(html[data-splash="ready"]) .nav,
+  :global(html[data-splash="ready"]) .cta-orbital,
+  :global(html[data-splash="ready"]) .hamburger,
+  :global(html.splash-skip) .label-tracked,
+  :global(html.splash-skip) .nav,
+  :global(html.splash-skip) .cta-orbital,
+  :global(html.splash-skip) .hamburger {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  :global(html[data-splash="ready"]) .label-tracked { transition-delay: 0ms;   }
+  :global(html[data-splash="ready"]) .nav           { transition-delay: 80ms;  }
+  :global(html[data-splash="ready"]) .cta-orbital   { transition-delay: 160ms; }
+  :global(html[data-splash="ready"]) .hamburger     { transition-delay: 80ms;  }
+
   @media (max-width: 767px) {
     .topbar {
       padding: 20px 20px 28px;

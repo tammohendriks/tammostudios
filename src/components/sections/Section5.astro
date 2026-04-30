@@ -77,9 +77,46 @@ const { eyebrow, headline, subtext, primaryCta, secondaryEmail, footer } = SECTI
     overflow: hidden;
   }
 
+  /* Mobile: Section ist EXAKT 100vh — Closing oben, Footer unten,
+     kein Scroll-Past. Closing nimmt mit flex:1 den verfügbaren Raum,
+     Footer wird per margin-top:auto an die Unterkante gedrückt.
+     Schriftgrößen + Logo-Frame proportional verkleinert für die
+     engere Höhe. */
   @media (max-width: 768px) {
     .section-5 {
-      padding: 120px 20px 24px;
+      min-height: 100vh;
+      max-height: 100vh;
+      height: 100vh;
+      padding: 90px 16px 16px;
+      overflow: hidden;
+    }
+
+    .closing {
+      flex: 1;
+      gap: 16px;
+      max-width: 100%;
+    }
+
+    .closing-eyebrow {
+      font-size: 0.7rem;
+    }
+
+    .closing-headline {
+      font-size: 1.6rem;
+    }
+
+    .closing-sub {
+      font-size: 0.9rem;
+      max-width: 320px;
+    }
+
+    .closing-cta {
+      padding: 12px 24px;
+      font-size: 0.95rem;
+    }
+
+    .closing-secondary {
+      font-size: 0.8rem;
     }
   }
 
@@ -225,8 +262,8 @@ const { eyebrow, headline, subtext, primaryCta, secondaryEmail, footer } = SECTI
 
   @media (max-width: 768px) {
     .logo-frame {
-      width: 220px;
-      height: 220px;
+      width: 180px;
+      height: 180px;
     }
   }
 
@@ -348,11 +385,26 @@ const { eyebrow, headline, subtext, primaryCta, secondaryEmail, footer } = SECTI
   }
 
   @media (max-width: 768px) {
+    .site-footer {
+      margin-top: auto;
+      padding-top: 16px;
+      gap: 8px;
+    }
+
     .footer-row {
       flex-direction: column;
       align-items: center;
-      gap: 8px;
+      gap: 4px;
       text-align: center;
+      font-size: 0.7rem;
+    }
+
+    .footer-brand {
+      font-size: 0.7rem;
+    }
+
+    .footer-row-legal {
+      font-size: 0.65rem;
     }
   }
 
