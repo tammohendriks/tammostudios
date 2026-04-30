@@ -115,6 +115,30 @@ export const SECTION4 = {
   ],
 } as const;
 
+export const SECTION5 = {
+  eyebrow: 'AM ZIEL',
+  headline: 'Bereit für Phase 01?',
+  subtext: 'Du kennst den Weg. Was fehlt, ist dein erstes Wort.',
+  primaryCta: {
+    label: 'Erstgespräch anfragen',
+    href: 'mailto:tammo@tammostudios.de',
+  },
+  secondaryEmail: 'tammo@tammostudios.de',
+  footer: {
+    brand: 'EST. 2026 · BREMEN',
+    copyright: '© 2026 Tammo Studios',
+    navLinks: [
+      { label: 'Über',       href: '/ueber' },
+      { label: 'Referenzen', href: '/referenzen' },
+      { label: 'Preise',     href: '/preise' },
+    ],
+    legalLinks: [
+      { label: 'Impressum',   href: '/impressum' },
+      { label: 'Datenschutz', href: '/datenschutz' },
+    ],
+  },
+} as const;
+
 export const NAV_ITEMS = [
   { label: 'Über', href: '/ueber' },
   { label: 'Referenzen', href: '/referenzen' },

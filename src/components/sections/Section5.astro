@@ -1,0 +1,431 @@
+---
+import { SECTION5 } from '../../lib/constants';
+
+const { eyebrow, headline, subtext, primaryCta, secondaryEmail, footer } = SECTION5;
+---
+
+<section class="section-5">
+  <div class="section-5-bg" aria-hidden="true"></div>
+
+  <div class="closing">
+    <p class="closing-eyebrow reveal">{eyebrow}</p>
+
+    <div class="logo-frame reveal">
+      <img src="/logos/logo-full.png" alt="Tammo Studios" />
+    </div>
+
+    <h2 class="closing-headline reveal">{headline}</h2>
+
+    <p class="closing-sub reveal">{subtext}</p>
+
+    <a class="closing-cta reveal" href={primaryCta.href}>
+      <span>{primaryCta.label}</span>
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        aria-hidden="true"
+      >
+        <path d="M5 12h14M13 6l6 6-6 6" />
+      </svg>
+    </a>
+
+    <p class="closing-secondary reveal">
+      Oder direkt:
+      {' '}
+      <a href={`mailto:${secondaryEmail}`}>{secondaryEmail}</a>
+    </p>
+  </div>
+
+  <footer class="site-footer reveal">
+    <div class="footer-row">
+      <span class="footer-brand">{footer.brand}</span>
+      <nav class="footer-nav" aria-label="Hauptnavigation">
+        {footer.navLinks.map((link, i) => (
+          <>
+            {i > 0 && <span aria-hidden="true">·</span>}
+            <a href={link.href}>{link.label}</a>
+          </>
+        ))}
+      </nav>
+    </div>
+    <div class="footer-row footer-row-legal">
+      <span class="footer-copy">{footer.copyright}</span>
+      <nav class="footer-legal" aria-label="Rechtliches">
+        {footer.legalLinks.map((link, i) => (
+          <>
+            {i > 0 && <span aria-hidden="true">·</span>}
+            <a href={link.href}>{link.label}</a>
+          </>
+        ))}
+      </nav>
+    </div>
+  </footer>
+</section>
+
+<style>
+  .section-5 {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #050507;
+    padding: 100px 40px 32px;
+    overflow: hidden;
+  }
+
+  @media (max-width: 768px) {
+    .section-5 {
+      padding: 80px 20px 24px;
+    }
+  }
+
+  /* Dezenter warmer Glow hinter dem Logo — sonst rein dunkel.
+     Keine Galaxy-Effekte: Section 5 ist die Pause nach der Reise. */
+  .section-5-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      ellipse at 50% 35%,
+      rgba(245, 158, 11, 0.10) 0%,
+      rgba(245, 158, 11, 0.04) 30%,
+      rgba(245, 158, 11, 0) 60%
+    );
+  }
+
+  .closing {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 24px;
+    max-width: 640px;
+    margin: 0 auto;
+    width: 100%;
+    z-index: 1;
+  }
+
+  .closing-eyebrow {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.3em;
+    color: rgba(245, 158, 11, 0.7);
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  /* Runder Logo-Frame mit warmem Glow + sanftem Atmen.
+     Mehrlagiger box-shadow für Tiefe; inset-Highlight zeichnet
+     einen feinen inneren Rand. */
+  .logo-frame {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+      0 0 40px rgba(245, 158, 11, 0.3),
+      0 0 80px rgba(245, 158, 11, 0.15),
+      0 0 140px rgba(245, 158, 11, 0.08),
+      inset 0 0 30px rgba(245, 158, 11, 0.1);
+    animation: logo-frame-breath 6s ease-in-out infinite;
+  }
+
+  .logo-frame img {
+    max-width: 70%;
+    max-height: 70%;
+    object-fit: contain;
+  }
+
+  @keyframes logo-frame-breath {
+    0%, 100% {
+      box-shadow:
+        0 0 40px rgba(245, 158, 11, 0.3),
+        0 0 80px rgba(245, 158, 11, 0.15),
+        0 0 140px rgba(245, 158, 11, 0.08),
+        inset 0 0 30px rgba(245, 158, 11, 0.1);
+    }
+    50% {
+      box-shadow:
+        0 0 60px rgba(245, 158, 11, 0.45),
+        0 0 120px rgba(245, 158, 11, 0.25),
+        0 0 200px rgba(245, 158, 11, 0.12),
+        inset 0 0 40px rgba(245, 158, 11, 0.15);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .logo-frame {
+      width: 220px;
+      height: 220px;
+    }
+  }
+
+  .closing-headline {
+    font-family: 'Aileron', 'Inter', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: clamp(2rem, 4.5vw, 3rem);
+    color: #f5f5f4;
+    letter-spacing: -0.02em;
+    margin: 8px 0 0;
+    line-height: 1.1;
+  }
+
+  .closing-sub {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: clamp(1rem, 1.4vw, 1.15rem);
+    color: rgba(245, 245, 244, 0.7);
+    max-width: 480px;
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  /* Primary CTA — gleicher Sprache wie der TopBar-Kontakt-Button:
+     Amber-Gradient mit warmem Multi-Layer Glow + Pulse-Ring. */
+  .closing-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 32px;
+    margin-top: 8px;
+    background: linear-gradient(to bottom,
+      #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+    color: #1a1a1a;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 9999px;
+    cursor: pointer;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.3),
+      0 4px 16px rgba(0, 0, 0, 0.3),
+      0 0 32px rgba(245, 158, 11, 0.45),
+      0 0 80px rgba(245, 158, 11, 0.2);
+    transition: transform 240ms ease, box-shadow 240ms ease;
+    animation: closing-cta-pulse 3s ease-out infinite;
+  }
+
+  .closing-cta:hover,
+  .closing-cta:focus-visible {
+    transform: scale(1.04);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.3),
+      0 6px 24px rgba(0, 0, 0, 0.4),
+      0 0 48px rgba(245, 158, 11, 0.6),
+      0 0 120px rgba(245, 158, 11, 0.3);
+    outline: none;
+  }
+
+  .closing-cta svg {
+    transition: transform 240ms ease;
+  }
+
+  .closing-cta:hover svg,
+  .closing-cta:focus-visible svg {
+    transform: translateX(4px);
+  }
+
+  @keyframes closing-cta-pulse {
+    0% {
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        0 4px 16px rgba(0, 0, 0, 0.3),
+        0 0 32px rgba(245, 158, 11, 0.45),
+        0 0 0 0 rgba(245, 158, 11, 0.4);
+    }
+    70% {
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        0 4px 16px rgba(0, 0, 0, 0.3),
+        0 0 32px rgba(245, 158, 11, 0.45),
+        0 0 0 18px rgba(245, 158, 11, 0);
+    }
+    100% {
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        0 4px 16px rgba(0, 0, 0, 0.3),
+        0 0 32px rgba(245, 158, 11, 0.45),
+        0 0 0 0 rgba(245, 158, 11, 0);
+    }
+  }
+
+  .closing-secondary {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 0.9rem;
+    color: rgba(245, 245, 244, 0.6);
+    margin: 4px 0 0;
+  }
+
+  .closing-secondary a {
+    color: rgba(245, 158, 11, 0.85);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.3);
+    padding-bottom: 1px;
+    transition: border-color 200ms ease, color 200ms ease;
+  }
+
+  .closing-secondary a:hover,
+  .closing-secondary a:focus-visible {
+    color: rgba(245, 158, 11, 1);
+    border-bottom-color: rgba(245, 158, 11, 0.7);
+    outline: none;
+  }
+
+  /* Footer am unteren Rand der Section. */
+  .site-footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    z-index: 1;
+  }
+
+  .footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px 32px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.8rem;
+  }
+
+  .footer-brand {
+    color: rgba(245, 245, 244, 0.7);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .footer-copy {
+    color: rgba(245, 245, 244, 0.5);
+  }
+
+  .footer-nav,
+  .footer-legal {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .footer-nav a,
+  .footer-legal a {
+    color: rgba(245, 245, 244, 0.7);
+    text-decoration: none;
+    transition: color 200ms ease;
+  }
+
+  .footer-nav a:hover,
+  .footer-nav a:focus-visible,
+  .footer-legal a:hover,
+  .footer-legal a:focus-visible {
+    color: rgba(245, 158, 11, 0.95);
+    outline: none;
+  }
+
+  .footer-row-legal {
+    color: rgba(245, 245, 244, 0.4);
+    font-size: 0.75rem;
+  }
+
+  @media (max-width: 768px) {
+    .footer-row {
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+    }
+  }
+
+  /* Reveal-Animation: Stagger-Fade beim Eintritt in den Viewport.
+     IntersectionObserver triggert .reveal-in einmal pro Element. */
+  .reveal {
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 700ms ease-out, transform 700ms ease-out;
+  }
+
+  .reveal.reveal-in {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .closing-eyebrow.reveal   { transition-delay: 0ms; }
+  .logo-frame.reveal        { transition-delay: 100ms; }
+  .closing-headline.reveal  { transition-delay: 300ms; }
+  .closing-sub.reveal       { transition-delay: 450ms; }
+  .closing-cta.reveal       { transition-delay: 600ms; }
+  .closing-secondary.reveal { transition-delay: 750ms; }
+  .site-footer.reveal       { transition-delay: 900ms; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+    }
+    .logo-frame {
+      animation: none !important;
+    }
+    .closing-cta {
+      animation: none !important;
+    }
+    .closing-cta:hover,
+    .closing-cta:focus-visible {
+      transform: none !important;
+    }
+  }
+</style>
+
+<script>
+  const section = document.querySelector('.section-5');
+  if (section) {
+    const revealEls = section.querySelectorAll('.reveal');
+    const reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches;
+
+    if (reduceMotion) {
+      revealEls.forEach((el) => el.classList.add('reveal-in'));
+    } else {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('reveal-in');
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        {
+          threshold: 0.15,
+          rootMargin: '0px 0px -10% 0px',
+        }
+      );
+      revealEls.forEach((el) => observer.observe(el));
+    }
+  }
+</script>
