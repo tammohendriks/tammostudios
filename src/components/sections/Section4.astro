@@ -29,47 +29,46 @@ import ScrollCue from '../ScrollCue.astro';
       <h2 class="section-4-title">{SECTION4.title}</h2>
     </header>
 
-    <div class="section-4-timeline-wrap">
-      <svg
-        class="timeline-line"
-        viewBox="0 0 4 1000"
-        preserveAspectRatio="none"
-        aria-hidden="true"
-      >
-        <line x1="2" y1="0" x2="2" y2="1000" class="line-track" />
-        <line
-          x1="2"
-          y1="0"
-          x2="2"
-          y2="1000"
-          class="line-progress"
-          pathLength="100"
-        />
-      </svg>
+    <div class="timeline-wrap">
+      <div class="timeline-spine" aria-hidden="true">
+        <svg
+          class="timeline-line"
+          viewBox="0 0 4 1000"
+          preserveAspectRatio="none"
+        >
+          <line x1="2" y1="0" x2="2" y2="1000" class="line-track" />
+          <line
+            x1="2"
+            y1="0"
+            x2="2"
+            y2="1000"
+            class="line-progress"
+            pathLength="100"
+          />
+        </svg>
 
-      <div class="phase-dot phase-dot-1" data-phase="0"></div>
-      <div class="phase-dot phase-dot-2" data-phase="1"></div>
-      <div class="phase-dot phase-dot-3" data-phase="2"></div>
-      <div class="phase-dot phase-dot-4" data-phase="3"></div>
-      <div class="phase-dot phase-dot-5" data-phase="4"></div>
-      <div class="phase-dot phase-dot-6" data-phase="5"></div>
+        <div class="phase-dot phase-dot-1" data-phase="0"></div>
+        <div class="phase-dot phase-dot-2" data-phase="1"></div>
+        <div class="phase-dot phase-dot-3" data-phase="2"></div>
+        <div class="phase-dot phase-dot-4" data-phase="3"></div>
+        <div class="phase-dot phase-dot-5" data-phase="4"></div>
+        <div class="phase-dot phase-dot-6" data-phase="5"></div>
+      </div>
 
-      <div class="phases-container">
+      <div class="phase-stage">
         {SECTION4.phases.map((phase, i) => (
           <article class={`phase phase-${i + 1}`} data-phase={i}>
-            <div class="phase-side">
-              <span class="phase-label">{phase.label}</span>
-              <h3 class="phase-title">{phase.title}</h3>
-              <p class="phase-body">
-                {phase.body}
-                {phase.link && (
-                  <>
-                    {' '}
-                    <a href={phase.link.href}>{phase.link.label}</a>
-                  </>
-                )}
-              </p>
-            </div>
+            <span class="phase-label">{phase.label}</span>
+            <h3 class="phase-title">{phase.title}</h3>
+            <p class="phase-body">
+              {phase.body}
+              {phase.link && (
+                <>
+                  {' '}
+                  <a href={phase.link.href}>{phase.link.label}</a>
+                </>
+              )}
+            </p>
           </article>
         ))}
       </div>
@@ -95,11 +94,9 @@ import ScrollCue from '../ScrollCue.astro';
     }
   }
 
-  /* === Galaxy Video Background ===
-     Liegt INSIDE des einen Sticky-Containers als absoluter Layer
-     hinter dem Content. Single-sticky-Pattern verhindert das
-     Engagement-Problem, das zwei sticky-Geschwister auslösen
-     (zweite würde erst nach 100vh Flow-Offset pinnen). */
+  /* === Galaxy Video Background — absolut hinter dem Content im
+     einzigen Sticky-Container. Single-sticky-Pattern verhindert das
+     Engagement-Problem zweier sticky Geschwister. */
   .section-4-video-wrap {
     position: absolute;
     inset: 0;
@@ -133,10 +130,9 @@ import ScrollCue from '../ScrollCue.astro';
     pointer-events: none;
   }
 
-  /* === Sticky Container — 3-Row Grid: header / timeline / cue ===
-     Single sticky element (jetzt FIRST child von section-4) → pinnt
-     ab Section-Eintritt. 100px Top sichert Distanz zur fixed TopBar.
-     Video lebt darin als position: absolute background. */
+  /* === Sticky Container: 3-Row Grid header / timeline / cue.
+     gap: 32px schiebt Header und ScrollCue von der zentralen
+     Timeline weg. */
   .section-4-sticky {
     position: sticky;
     top: 0;
@@ -145,16 +141,18 @@ import ScrollCue from '../ScrollCue.astro';
     display: grid;
     grid-template-rows: auto 1fr auto;
     padding: 100px 40px 40px;
+    gap: 32px;
     z-index: 2;
   }
 
   @media (max-width: 768px) {
     .section-4-sticky {
       padding: 80px 20px 32px;
+      gap: 20px;
     }
   }
 
-  /* === Header (grid-row 1, oben fix, fadet einmal ein) === */
+  /* === Header (grid-row 1) === */
   .section-4-header {
     --header-progress: 0;
     grid-row: 1;
@@ -186,32 +184,57 @@ import ScrollCue from '../ScrollCue.astro';
     margin: 0;
   }
 
-  /* === Timeline-Wrap (grid-row 2, vertikal zentriert in der 1fr Zelle) === */
-  .section-4-timeline-wrap {
+  /* === Timeline-Wrap (grid-row 2): 2 Spalten — Spine + Stage.
+     Single-Phase-Centered: alle Phasen leben in der Stage am gleichen
+     Platz. Kein nth-child Alternation mehr. */
+  .timeline-wrap {
     grid-row: 2;
     align-self: center;
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    align-items: center;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    gap: 40px;
     position: relative;
     z-index: 2;
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    height: 100%;
   }
 
-  /* Linie spannt 18%-82% des Wraps. Dots sitzen 18/34/50/66/82,
-     also genau auf den Linien-Endpunkten und Quartilen. Dadurch
-     bleibt 18% Pufferzone oben (zum Header) und 18% unten (zur
-     ScrollCue) — keine Kollision. */
+  @media (max-width: 768px) {
+    .timeline-wrap {
+      grid-template-columns: 32px 1fr;
+      gap: 20px;
+      max-width: 100%;
+    }
+  }
+
+  /* === Spine (Spalte 1): vertikale Linie + 6 Dots ===
+     Fixed Höhe → Dots sitzen verlässlich an 0/20/40/60/80/100% der
+     Spine-Höhe. Margin-top: -half-height zentriert sie pixel-genau
+     auf ihrer Top-Position. */
+  .timeline-spine {
+    grid-column: 1;
+    position: relative;
+    height: 360px;
+    width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    .timeline-spine {
+      height: 280px;
+    }
+  }
+
   .timeline-line {
     position: absolute;
-    top: 18%;
+    top: 0;
     left: 50%;
     transform: translateX(-50%);
     width: 4px;
-    height: 64%;
+    height: 100%;
     pointer-events: none;
     overflow: visible;
-    z-index: 1;
   }
 
   .line-track {
@@ -226,19 +249,19 @@ import ScrollCue from '../ScrollCue.astro';
     stroke-dasharray: 100;
     stroke-dashoffset: 100;
     filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.6));
+    transition: stroke-dashoffset 100ms linear;
   }
 
-  /* Dots äquidistant (10/30/50/70/90). Dot 3 ist visuelles Zentrum,
-     genau auf Höhe der Phasen-Inhalte. */
   .phase-dot {
     position: absolute;
     left: 50%;
-    transform: translateX(-50%);
     width: 14px;
     height: 14px;
+    margin-top: -7px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.10);
     border: 2px solid rgba(245, 158, 11, 0.30);
+    transform: translateX(-50%);
     transition:
       background-color 300ms ease,
       border-color 300ms ease,
@@ -247,108 +270,88 @@ import ScrollCue from '../ScrollCue.astro';
     z-index: 2;
   }
 
-  .phase-dot-1 { top: 18%; }
-  .phase-dot-2 { top: 30.8%; }
-  .phase-dot-3 { top: 43.6%; }
-  .phase-dot-4 { top: 56.4%; }
-  .phase-dot-5 { top: 69.2%; }
-  .phase-dot-6 { top: 82%; }
+  .phase-dot-1 { top: 0%; }
+  .phase-dot-2 { top: 20%; }
+  .phase-dot-3 { top: 40%; }
+  .phase-dot-4 { top: 60%; }
+  .phase-dot-5 { top: 80%; }
+  .phase-dot-6 { top: 100%; }
 
-  /* Lit-State: Dot leuchtet ab phase.fadeIn[0] und bleibt lit für
-     den Rest der Section. Kein passed/active Unterschied — die
-     gefadete Phasen-Logik braucht keine "current" Markierung. */
-  .phase-dot.dot-lit {
+  /* Active Dot — die aktuell sichtbarste Phase. Stark glühend. */
+  .phase-dot.dot-active {
     background: rgba(245, 158, 11, 1);
     border-color: rgba(245, 158, 11, 1);
     box-shadow:
-      0 0 12px rgba(245, 158, 11, 0.7),
-      0 0 24px rgba(245, 158, 11, 0.35);
-    transform: translateX(-50%) scale(1.2);
+      0 0 14px rgba(245, 158, 11, 0.9),
+      0 0 30px rgba(245, 158, 11, 0.5);
+    transform: translateX(-50%) scale(1.4);
   }
 
-  /* === Phasen — Two-at-a-time Crossfade ===
-     Container ist absolut auf Höhe Dot 3 zentriert. Phases teilen
-     sich grid-row 1 — alle übereinander gestapelt, Container-Höhe
-     wird von der höchsten Phase bestimmt. Sichtbarkeit kommt aus
-     --phase-opacity (JS-controlled per Phase). Odd-Phasen (1/3/5)
-     teilen sich die linke Position, Even-Phasen (2/4) die rechte —
-     beim Crossfade kreuzt sich nichts. */
-  .phases-container {
+  /* Passed Dot — Phase ist vorbei (fadeOut komplett), bleibt dezent
+     geglüht. */
+  .phase-dot.dot-passed {
+    background: rgba(245, 158, 11, 0.85);
+    border-color: rgba(245, 158, 11, 0.85);
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+  }
+
+  @media (max-width: 768px) {
+    .phase-dot {
+      width: 10px;
+      height: 10px;
+      margin-top: -5px;
+    }
+    .line-track,
+    .line-progress {
+      stroke-width: 1.5;
+    }
+  }
+
+  /* === Stage (Spalte 2): wo der Phase-Content wohnt ===
+     Alle Phasen absolut, vertikal zentriert übereinander gestapelt.
+     min-height verhindert Layout-Sprünge zwischen Phasen mit
+     unterschiedlichem Body-Volumen. */
+  .phase-stage {
+    grid-column: 2;
+    position: relative;
+    min-height: 240px;
+  }
+
+  .phase {
     position: absolute;
     top: 50%;
     left: 0;
     right: 0;
     transform: translateY(-50%);
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
-    pointer-events: none;
-  }
-
-  .phase {
-    grid-column: 1;
-    grid-row: 1;
-    display: grid;
-    grid-template-columns: 1fr 80px 1fr;
-    align-items: center;
-    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    text-align: left;
     opacity: var(--phase-opacity, 0);
-    transition: opacity 80ms linear;
+    transition: opacity 200ms ease;
+    pointer-events: none;
     will-change: opacity;
   }
 
-  /* phase-side: ein Block für Label + Title + Body.
-     Hält den Lese-Flow zusammen statt Label und Content gegenüber-
-     liegend zu verteilen. Vertikal gestapelt, horizontal eine Seite. */
-  .phase-side {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    max-width: 420px;
-    align-self: center;
-  }
-
-  /* Alternation Desktop only.
-     Odd (Phase 1/3/5): phase-side LINKS (column 1), rechtsbündig.
-     Even (Phase 2/4):  phase-side RECHTS (column 3), linksbündig.
-     Same-Side Phasen (1↔3↔5, 2↔4) crossfaden an gleicher Position. */
-  @media (min-width: 1024px) {
-    .phase:nth-child(odd) .phase-side {
-      grid-column: 1;
-      justify-self: end;
-      text-align: right;
-      padding-right: 32px;
-    }
-    .phase:nth-child(even) .phase-side {
-      grid-column: 3;
-      justify-self: start;
-      text-align: left;
-      padding-left: 32px;
-    }
-  }
-
-  /* PHASE_XX Decoration — Brand-Amber. Glow ist statisch (nicht
-     mehr active-state-driven), weil Two-at-a-time keinen "current"
-     Singularitäts-State mehr hat. */
   .phase-label {
     font-family: 'Aileron', 'Inter', sans-serif;
     font-weight: 900;
     font-style: italic;
-    font-size: clamp(2.5rem, 6vw, 4rem);
-    color: rgba(245, 158, 11, 0.95);
-    letter-spacing: -0.03em;
+    font-size: clamp(2rem, 5vw, 3.5rem);
     line-height: 1;
+    letter-spacing: -0.03em;
+    color: rgba(245, 158, 11, 0.9);
     text-shadow:
-      0 0 24px rgba(245, 158, 11, 0.7),
-      0 0 60px rgba(245, 158, 11, 0.4),
-      0 0 120px rgba(245, 158, 11, 0.2);
+      0 0 20px rgba(245, 158, 11, 0.5),
+      0 0 50px rgba(245, 158, 11, 0.3),
+      0 0 100px rgba(245, 158, 11, 0.15);
     margin: 0;
   }
 
   .phase-title {
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-weight: 700;
-    font-size: clamp(1rem, 1.4vw, 1.2rem);
+    font-size: clamp(1.05rem, 1.4vw, 1.25rem);
     color: #f5f5f4;
     letter-spacing: -0.01em;
     margin: 0;
@@ -357,10 +360,11 @@ import ScrollCue from '../ScrollCue.astro';
   .phase-body {
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-weight: 400;
-    font-size: clamp(0.9rem, 1.1vw, 1rem);
-    color: rgba(245, 245, 244, 0.75);
-    line-height: 1.55;
+    font-size: clamp(0.95rem, 1.1vw, 1.05rem);
+    color: rgba(245, 245, 244, 0.78);
+    line-height: 1.6;
     margin: 0;
+    max-width: 460px;
   }
 
   .phase-body a {
@@ -376,9 +380,13 @@ import ScrollCue from '../ScrollCue.astro';
     border-color: rgba(245, 158, 11, 1);
   }
 
-  /* === ScrollCue (grid-row 3, am unteren Rand) — eigene Visibility,
-     getrieben vom Settled-Progress. 32px padding-top sichert
-     erkennbare Distanz zum letzten Dot/Linien-Ende. */
+  @media (max-width: 768px) {
+    .phase-label {
+      font-size: clamp(1.5rem, 7vw, 2.2rem);
+    }
+  }
+
+  /* === ScrollCue (grid-row 3) — Visibility kommt vom Settled-State. */
   .section-4-scrollcue-wrap {
     --cue-progress: 0;
     grid-row: 3;
@@ -387,60 +395,18 @@ import ScrollCue from '../ScrollCue.astro';
     display: flex;
     justify-content: center;
     align-items: center;
-    padding-top: 32px;
     opacity: var(--cue-progress);
     transform: translateY(calc((1 - var(--cue-progress)) * 8px));
     transition: opacity 300ms ease, transform 300ms ease;
   }
 
-  /* Override Anchor-Defaults von ScrollCue: in Section 4 fließt der
-     Cue im Grid-Row, nicht absolute am Section-Bottom. */
   .section-4 .scroll-cue-anchor {
     position: static;
     bottom: auto;
   }
 
-  /* === Mobile (< 1024px): einseitiges Layout, Linie links ===
-     Auf Mobile gibt's keinen Two-at-a-Time Crossfade — JS zeigt
-     genau eine Phase per progress, weil sich zwei überlagerte
-     linksbündige Phasen unleserlich übereinander legen würden. */
-  @media (max-width: 1024px) {
-    .timeline-line {
-      left: 16px;
-      transform: none;
-    }
-
-    .phase-dot {
-      left: 16px;
-      width: 10px;
-      height: 10px;
-    }
-
-    .phase-dot.dot-lit {
-      transform: translateX(-50%) scale(1.2);
-    }
-
-    .phase {
-      grid-template-columns: 32px 1fr;
-    }
-
-    .phase:nth-child(odd) .phase-side,
-    .phase:nth-child(even) .phase-side {
-      grid-column: 2;
-      justify-self: start;
-      text-align: left;
-      padding: 0 0 0 24px;
-    }
-
-    .phase-label {
-      font-size: clamp(1.5rem, 8vw, 2.5rem);
-    }
-  }
-
-  /* Reduced-motion: Settled-State zeigen — Phase 5 + Phase 6 (das
-     finale Two-at-a-time Paar) sichtbar, alle Dots lit, Linie voll
-     bis Dot 6 (100%). Andere Phasen bleiben unsichtbar (kein Stacken
-     unleserlicher Übereinanderlagen). */
+  /* Reduced-motion: nur Phase 6 (last) sichtbar, alle Dots durch-
+     gelaufen, Linie voll. */
   @media (prefers-reduced-motion: reduce) {
     .section-4-header {
       --header-progress: 1 !important;
@@ -448,15 +414,9 @@ import ScrollCue from '../ScrollCue.astro';
     }
     .phase {
       transition: none !important;
-    }
-    .phase.phase-1,
-    .phase.phase-2,
-    .phase.phase-3,
-    .phase.phase-4 {
       opacity: 0 !important;
     }
-    .phase.phase-5,
-    .phase.phase-6 {
+    .phase:last-child {
       opacity: 1 !important;
     }
     .phase-dot {
@@ -501,33 +461,25 @@ import ScrollCue from '../ScrollCue.astro';
     section && header && phases.length === 6 && dots.length === 6 &&
     lineProgress && cueWrap
   ) {
-    // Two-at-a-Time Sequence — pro Phase eigener Lifecycle:
-    //   fadeIn  [start,end] — opacity 0 → 1
-    //   fadeOut [start,end] — opacity 1 → 0  (null = bleibt sichtbar)
-    // Same-Side Sequencing: Phase X fadeOut.end <= Phase X+2 fadeIn.start,
-    // damit auf gleicher Seite NIE zwei Phasen gleichzeitig sichtbar
-    // sind. Cross-Side (Phase X ↔ X+1) darf parallel laufen — andere
-    // Seite, kein Overlap. Stable-Window pro Phase ~15% Progress
-    // (genug Lesezeit ohne hetzen).
+    // Single-Phase-Centered Crossfade: jede Phase fadet ein/aus an
+    // exakt der gleichen Position. fadeOut[N] und fadeIn[N+1] über-
+    // lappen 4% — eine fadet aus während die nächste reinkommt.
+    // Same-Side-Overlap-Problem entfällt, weil es KEINE Sides mehr
+    // gibt — Stage hält genau eine Phase auf einmal.
     const phasesConfig = [
-      { fadeIn: [0.05, 0.10], fadeOut: [0.25, 0.30] },
-      { fadeIn: [0.15, 0.20], fadeOut: [0.35, 0.40] },
-      { fadeIn: [0.30, 0.35], fadeOut: [0.50, 0.55] },
-      { fadeIn: [0.40, 0.45], fadeOut: [0.60, 0.65] },
-      { fadeIn: [0.55, 0.60], fadeOut: null },
-      { fadeIn: [0.65, 0.70], fadeOut: null },
+      { fadeIn: [0.06, 0.10], fadeOut: [0.20, 0.24] },
+      { fadeIn: [0.20, 0.24], fadeOut: [0.34, 0.38] },
+      { fadeIn: [0.34, 0.38], fadeOut: [0.48, 0.52] },
+      { fadeIn: [0.48, 0.52], fadeOut: [0.62, 0.66] },
+      { fadeIn: [0.62, 0.66], fadeOut: [0.76, 0.80] },
+      { fadeIn: [0.76, 0.80], fadeOut: null },
     ];
-    // Linien-Position pro Dot (0..100, line-relativ). Linie spannt
-    // 18%-82% des Wraps; Dot 1 = Linien-Start (0), Dot 6 = Ende (100).
-    // 6 Dots → äquidistant in 20er-Schritten. dashoffset = 100 - linePos.
-    const linePositions = [0, 20, 40, 60, 80, 100];
-    // Mobile-Slices: 6 gleich-ish große Phasen-Slots nach dem Lead-In.
-    // Letzte Phase bleibt im Settled-Tail.
-    const mobileBoundaries = [0.05, 0.20, 0.35, 0.50, 0.65, 0.80];
-    const HEADER_END = 0.04;
-    const SETTLED_AT = 0.85;
-    const CUE_RANGE = 0.10;
-    const desktopMQ = window.matchMedia('(min-width: 1024px)');
+    // Y-Position pro Dot in % der Spine-Höhe — auch line-relativ,
+    // weil Linie volle Spine-Höhe hat. dashoffset = 100 - linePos.
+    const dotYPercents = [0, 20, 40, 60, 80, 100];
+    const HEADER_END = 0.05;
+    const SETTLED_AT = 0.86;
+    const CUE_RANGE = 0.06;
 
     function clamp01(v) {
       return v < 0 ? 0 : v > 1 ? 1 : v;
@@ -554,75 +506,74 @@ import ScrollCue from '../ScrollCue.astro';
       return 0;
     }
 
-    function determineActivePhaseMobile(progress) {
-      if (progress < mobileBoundaries[0]) return -1;
-      for (let i = mobileBoundaries.length - 1; i >= 0; i--) {
-        if (progress >= mobileBoundaries[i]) return i;
+    function determineActiveDot(opacities) {
+      // Active Dot = Phase mit höchster Opacity. Bei Tie (50/50
+      // crossfade midpoint) bekommt die SPÄTERE Phase Vorzug —
+      // sie ist die kommende, dort wandert das Auge hin.
+      let activeIdx = -1;
+      let maxOp = 0;
+      for (let i = 0; i < opacities.length; i++) {
+        if (opacities[i] > 0 && opacities[i] >= maxOp) {
+          maxOp = opacities[i];
+          activeIdx = i;
+        }
       }
-      return -1;
+      return activeIdx;
+    }
+
+    function isPassed(phase, progress) {
+      return phase.fadeOut !== null && progress >= phase.fadeOut[1];
     }
 
     function update() {
       if (reduceMotion) {
         header.style.setProperty('--header-progress', '1');
         for (let i = 0; i < phases.length; i++) {
-          // Settled: Phase 5 + 6 sichtbar (finales Two-at-a-time Paar)
           phases[i].style.setProperty(
             '--phase-opacity',
-            i === 4 || i === 5 ? '1' : '0'
+            i === 5 ? '1' : '0'
           );
-          phases[i].style.pointerEvents = i === 4 || i === 5 ? 'auto' : 'none';
-          dots[i].classList.add('dot-lit');
+          phases[i].style.pointerEvents = i === 5 ? 'auto' : 'none';
+          dots[i].classList.remove('dot-active', 'dot-passed');
+          dots[i].classList.add(i === 5 ? 'dot-active' : 'dot-passed');
         }
-        lineProgress.style.strokeDashoffset = String(100 - linePositions[5]);
+        lineProgress.style.strokeDashoffset = '0';
         cueWrap.style.setProperty('--cue-progress', '1');
         return;
       }
 
       const progress = getScrollProgress();
-      const isDesktop = desktopMQ.matches;
 
       // Header
       const headerP = clamp01(progress / HEADER_END);
       header.style.setProperty('--header-progress', String(headerP));
 
-      // Phase-Opacity: Desktop crossfade, Mobile hard switch
-      if (isDesktop) {
-        for (let i = 0; i < phases.length; i++) {
-          const op = phaseOpacity(phasesConfig[i], progress);
-          phases[i].style.setProperty('--phase-opacity', op.toFixed(3));
-          phases[i].style.pointerEvents = op > 0.5 ? 'auto' : 'none';
-        }
-      } else {
-        const activeIdx = determineActivePhaseMobile(progress);
-        for (let i = 0; i < phases.length; i++) {
-          const isActive = i === activeIdx;
-          phases[i].style.setProperty('--phase-opacity', isActive ? '1' : '0');
-          phases[i].style.pointerEvents = isActive ? 'auto' : 'none';
+      // Per-Phase Opacity (Single-Phase-Centered: identisch Desktop+Mobile)
+      const opacities = new Array(phases.length);
+      for (let i = 0; i < phases.length; i++) {
+        const op = phaseOpacity(phasesConfig[i], progress);
+        opacities[i] = op;
+        phases[i].style.setProperty('--phase-opacity', op.toFixed(3));
+        phases[i].style.pointerEvents = op > 0.5 ? 'auto' : 'none';
+      }
+
+      // Active Dot bestimmt sich aus Opacities, Passed Dots aus
+      // fadeOut-Vergangenheit.
+      const activeIdx = determineActiveDot(opacities);
+      for (let i = 0; i < dots.length; i++) {
+        dots[i].classList.remove('dot-active', 'dot-passed');
+        if (i === activeIdx) {
+          dots[i].classList.add('dot-active');
+        } else if (isPassed(phasesConfig[i], progress)) {
+          dots[i].classList.add('dot-passed');
         }
       }
 
-      // Dots: lit ab eigenem Trigger, bleiben für den Rest lit.
-      // Linie zieht zum letzten lit-Dot.
-      let lastLitIdx = -1;
-      if (isDesktop) {
-        for (let i = 0; i < phases.length; i++) {
-          const lit = progress >= phasesConfig[i].fadeIn[0];
-          dots[i].classList.toggle('dot-lit', lit);
-          if (lit) lastLitIdx = i;
-        }
-      } else {
-        for (let i = 0; i < phases.length; i++) {
-          const lit = progress >= mobileBoundaries[i];
-          dots[i].classList.toggle('dot-lit', lit);
-          if (lit) lastLitIdx = i;
-        }
-      }
-
-      const linePos = lastLitIdx >= 0 ? linePositions[lastLitIdx] : 0;
+      // Linie zieht zum aktiven Dot.
+      const linePos = activeIdx >= 0 ? dotYPercents[activeIdx] : 0;
       lineProgress.style.strokeDashoffset = String(100 - linePos);
 
-      // ScrollCue im Settled-Tail
+      // ScrollCue
       const cueP = clamp01((progress - SETTLED_AT) / CUE_RANGE);
       cueWrap.style.setProperty('--cue-progress', String(cueP));
     }
