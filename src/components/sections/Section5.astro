@@ -18,8 +18,8 @@ const { eyebrow, headline, subtext, primaryCta, secondaryEmail, footer } = SECTI
 
     <p class="closing-sub reveal">{subtext}</p>
 
-    <a class="closing-cta reveal" href={primaryCta.href}>
-      <span>{primaryCta.label}</span>
+    <a class="cta-orbital closing-cta reveal" href={primaryCta.href}>
+      <span class="cta-label">{primaryCta.label}</span>
       <svg
         width="14"
         height="14"
@@ -91,8 +91,8 @@ const { eyebrow, headline, subtext, primaryCta, secondaryEmail, footer } = SECTI
     pointer-events: none;
     background: radial-gradient(
       ellipse at 50% 35%,
-      rgba(245, 158, 11, 0.10) 0%,
-      rgba(245, 158, 11, 0.04) 30%,
+      rgba(245, 158, 11, 0.05) 0%,
+      rgba(245, 158, 11, 0.02) 30%,
       rgba(245, 158, 11, 0) 60%
     );
   }
@@ -141,10 +141,10 @@ const { eyebrow, headline, subtext, primaryCta, secondaryEmail, footer } = SECTI
     justify-content: center;
     isolation: isolate;
     box-shadow:
-      0 0 30px rgba(245, 158, 11, 0.25),
-      0 0 70px rgba(245, 158, 11, 0.12),
-      0 0 120px rgba(245, 158, 11, 0.06),
-      inset 0 0 25px rgba(245, 158, 11, 0.08);
+      0 0 20px rgba(245, 158, 11, 0.15),
+      0 0 50px rgba(245, 158, 11, 0.08),
+      0 0 90px rgba(245, 158, 11, 0.04),
+      inset 0 0 20px rgba(245, 158, 11, 0.06);
     animation: logo-frame-breath 4s ease-in-out infinite;
   }
 
@@ -157,12 +157,12 @@ const { eyebrow, headline, subtext, primaryCta, secondaryEmail, footer } = SECTI
     border-radius: 50%;
     background: conic-gradient(
       from 0deg,
-      rgba(245, 158, 11, 0)    0%,
-      rgba(245, 158, 11, 0.5) 20%,
-      rgba(245, 158, 11, 0)   40%,
-      rgba(245, 158, 11, 0)   60%,
-      rgba(245, 158, 11, 0.5) 80%,
-      rgba(245, 158, 11, 0)  100%
+      rgba(245, 158, 11, 0)     0%,
+      rgba(245, 158, 11, 0.28) 20%,
+      rgba(245, 158, 11, 0)    40%,
+      rgba(245, 158, 11, 0)    60%,
+      rgba(245, 158, 11, 0.28) 80%,
+      rgba(245, 158, 11, 0)   100%
     );
     filter: blur(30px);
     z-index: -1;
@@ -199,17 +199,17 @@ const { eyebrow, headline, subtext, primaryCta, secondaryEmail, footer } = SECTI
   @keyframes logo-frame-breath {
     0%, 100% {
       box-shadow:
-        0 0 30px rgba(245, 158, 11, 0.25),
-        0 0 70px rgba(245, 158, 11, 0.12),
-        0 0 120px rgba(245, 158, 11, 0.06),
-        inset 0 0 25px rgba(245, 158, 11, 0.08);
+        0 0 20px rgba(245, 158, 11, 0.15),
+        0 0 50px rgba(245, 158, 11, 0.08),
+        0 0 90px rgba(245, 158, 11, 0.04),
+        inset 0 0 20px rgba(245, 158, 11, 0.06);
     }
     50% {
       box-shadow:
-        0 0 70px rgba(245, 158, 11, 0.6),
-        0 0 140px rgba(245, 158, 11, 0.35),
-        0 0 220px rgba(245, 158, 11, 0.18),
-        inset 0 0 50px rgba(245, 158, 11, 0.2);
+        0 0 40px rgba(245, 158, 11, 0.32),
+        0 0 90px rgba(245, 158, 11, 0.18),
+        0 0 150px rgba(245, 158, 11, 0.08),
+        inset 0 0 35px rgba(245, 158, 11, 0.12);
     }
   }
 
@@ -251,75 +251,13 @@ const { eyebrow, headline, subtext, primaryCta, secondaryEmail, footer } = SECTI
     margin: 0;
   }
 
-  /* Primary CTA — gleicher Sprache wie der TopBar-Kontakt-Button:
-     Amber-Gradient mit warmem Multi-Layer Glow + Pulse-Ring. */
+  /* Section-5-spezifische Größen-Adjustments für den globalen
+     .cta-orbital — Closing-CTA darf etwas mehr Präsenz haben als
+     der kompakte TopBar-Button. */
   .closing-cta {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 14px 32px;
     margin-top: 8px;
-    background: linear-gradient(to bottom,
-      #fbbf24 0%, #f59e0b 50%, #d97706 100%);
-    color: #1a1a1a;
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-weight: 600;
-    font-size: 1rem;
-    text-decoration: none;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 9999px;
-    cursor: pointer;
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.3),
-      0 4px 16px rgba(0, 0, 0, 0.3),
-      0 0 32px rgba(245, 158, 11, 0.45),
-      0 0 80px rgba(245, 158, 11, 0.2);
-    transition: transform 240ms ease, box-shadow 240ms ease;
-    animation: closing-cta-pulse 3s ease-out infinite;
-  }
-
-  .closing-cta:hover,
-  .closing-cta:focus-visible {
-    transform: scale(1.04);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.3),
-      0 6px 24px rgba(0, 0, 0, 0.4),
-      0 0 48px rgba(245, 158, 11, 0.6),
-      0 0 120px rgba(245, 158, 11, 0.3);
-    outline: none;
-  }
-
-  .closing-cta svg {
-    transition: transform 240ms ease;
-  }
-
-  .closing-cta:hover svg,
-  .closing-cta:focus-visible svg {
-    transform: translateX(4px);
-  }
-
-  @keyframes closing-cta-pulse {
-    0% {
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.3),
-        0 4px 16px rgba(0, 0, 0, 0.3),
-        0 0 32px rgba(245, 158, 11, 0.45),
-        0 0 0 0 rgba(245, 158, 11, 0.4);
-    }
-    70% {
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.3),
-        0 4px 16px rgba(0, 0, 0, 0.3),
-        0 0 32px rgba(245, 158, 11, 0.45),
-        0 0 0 18px rgba(245, 158, 11, 0);
-    }
-    100% {
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.3),
-        0 4px 16px rgba(0, 0, 0, 0.3),
-        0 0 32px rgba(245, 158, 11, 0.45),
-        0 0 0 0 rgba(245, 158, 11, 0);
-    }
+    padding: 14px 32px;
+    font-size: 1.05rem;
   }
 
   .closing-secondary {
@@ -455,13 +393,6 @@ const { eyebrow, headline, subtext, primaryCta, secondaryEmail, footer } = SECTI
     }
     .logo-frame::after {
       opacity: 0.4;
-    }
-    .closing-cta {
-      animation: none !important;
-    }
-    .closing-cta:hover,
-    .closing-cta:focus-visible {
-      transform: none !important;
     }
   }
 </style>
