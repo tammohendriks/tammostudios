@@ -192,7 +192,7 @@ import ScrollCue from '../ScrollCue.astro';
     align-self: center;
     display: grid;
     grid-template-columns: 80px 1fr;
-    align-items: center;
+    align-items: start;
     width: 100%;
     max-width: 800px;
     margin: 0 auto;
@@ -308,21 +308,28 @@ import ScrollCue from '../ScrollCue.astro';
   }
 
   /* === Stage (Spalte 2): wo der Phase-Content wohnt ===
-     Alle Phasen absolut, vertikal zentriert übereinander gestapelt.
-     min-height verhindert Layout-Sprünge zwischen Phasen mit
-     unterschiedlichem Body-Volumen. */
+     Alle Phasen absolut, oben verankert. Label + Title sitzen also
+     IMMER auf der gleichen Y-Position; nur der Body extends nach
+     unten — kein Wandern bei Body-Längen-Variation. min-height
+     reserviert Platz auch für die längste Phase. */
   .phase-stage {
     grid-column: 2;
     position: relative;
-    min-height: 240px;
+    min-height: 320px;
+    width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    .phase-stage {
+      min-height: 280px;
+    }
   }
 
   .phase {
     position: absolute;
-    top: 50%;
+    top: 0;
     left: 0;
     right: 0;
-    transform: translateY(-50%);
     display: flex;
     flex-direction: column;
     gap: 14px;
