@@ -262,8 +262,30 @@ const { eyebrow, headline, subtext, primaryCta, secondaryEmail, footer } = SECTI
 
   @media (max-width: 768px) {
     .logo-frame {
-      width: 180px;
-      height: 180px;
+      width: 170px;
+      height: 170px;
+    }
+  }
+
+  /* Compression-Stufe für sehr kleine Mobiles (kürzer als 700px,
+     z.B. iPhone SE im Hochformat). Ohne diese Stufe würden Headline
+     + Logo + Footer am Footer-Bereich ausfransen. */
+  @media (max-width: 768px) and (max-height: 700px) {
+    .section-5 {
+      padding: 70px 16px 12px;
+    }
+    .closing {
+      gap: 10px;
+    }
+    .logo-frame {
+      width: 140px;
+      height: 140px;
+    }
+    .closing-headline {
+      font-size: 1.25rem;
+    }
+    .closing-sub {
+      font-size: 0.78rem;
     }
   }
 
