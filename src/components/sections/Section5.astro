@@ -67,57 +67,40 @@ const { eyebrow, headline, subtext, primaryCta, secondaryEmail, footer } = SECTI
 </section>
 
 <style>
+  /* Desktop + Mobile: hartes 100dvh — kein Scroll-Past. Closing
+     ist top-anchored (natural height, kein flex-grow), Footer wird
+     per margin-top:auto an die Unterkante gedrückt. Whitespace
+     dazwischen ergibt sich natürlich aus dem verfügbaren Raum. */
   .section-5 {
     position: relative;
-    min-height: 100vh;
+    height: 100dvh;
+    min-height: 100dvh;
+    max-height: 100dvh;
     display: flex;
     flex-direction: column;
     background: #050507;
-    padding: 160px 40px 32px;
+    padding: 140px 40px 32px;
     overflow: hidden;
   }
 
-  /* Mobile: Section ist EXAKT 100vh — Closing oben, Footer unten,
-     kein Scroll-Past. Closing nimmt mit flex:1 den verfügbaren Raum,
-     Footer wird per margin-top:auto an die Unterkante gedrückt.
-     Schriftgrößen + Logo-Frame proportional verkleinert für die
-     engere Höhe. */
+  /* Mobile-Override: tighteres Padding + kompaktere Typo. Layout-
+     Mechanik (100dvh, top-anchored Closing, footer margin-top:auto)
+     erbt vom Base. */
   @media (max-width: 768px) {
     .section-5 {
-      min-height: 100vh;
-      max-height: 100vh;
-      height: 100vh;
       padding: 90px 16px 16px;
-      overflow: hidden;
     }
 
     .closing {
-      flex: 1;
       gap: 16px;
       max-width: 100%;
     }
 
-    .closing-eyebrow {
-      font-size: 0.7rem;
-    }
-
-    .closing-headline {
-      font-size: 1.6rem;
-    }
-
-    .closing-sub {
-      font-size: 0.9rem;
-      max-width: 320px;
-    }
-
-    .closing-cta {
-      padding: 12px 24px;
-      font-size: 0.95rem;
-    }
-
-    .closing-secondary {
-      font-size: 0.8rem;
-    }
+    .closing-eyebrow { font-size: 0.65rem; }
+    .closing-headline { font-size: 1.45rem; }
+    .closing-sub { font-size: 0.85rem; max-width: 290px; }
+    .closing-cta { padding: 12px 26px; font-size: 0.95rem; }
+    .closing-secondary { font-size: 0.78rem; }
   }
 
   /* Dezenter warmer Glow hinter dem Logo — sonst rein dunkel.
@@ -135,11 +118,10 @@ const { eyebrow, headline, subtext, primaryCta, secondaryEmail, footer } = SECTI
   }
 
   .closing {
-    flex: 1;
+    flex: 0 0 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     text-align: center;
     gap: 24px;
     max-width: 640px;
@@ -264,6 +246,7 @@ const { eyebrow, headline, subtext, primaryCta, secondaryEmail, footer } = SECTI
     .logo-frame {
       width: 170px;
       height: 170px;
+      aspect-ratio: 1 / 1;
     }
   }
 
@@ -342,9 +325,11 @@ const { eyebrow, headline, subtext, primaryCta, secondaryEmail, footer } = SECTI
     outline: none;
   }
 
-  /* Footer am unteren Rand der Section. */
+  /* Footer am unteren Rand der Section — margin-top:auto drückt
+     ihn nach unten innerhalb der flex-Spalte. flex-shrink:0 stellt
+     sicher, dass er bei knappem Platz nicht zusammenfällt. */
   .site-footer {
-    margin-top: 80px;
+    margin-top: auto;
     padding-top: 32px;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     display: flex;
@@ -354,6 +339,7 @@ const { eyebrow, headline, subtext, primaryCta, secondaryEmail, footer } = SECTI
     max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
+    flex-shrink: 0;
     z-index: 1;
   }
 
@@ -408,25 +394,20 @@ const { eyebrow, headline, subtext, primaryCta, secondaryEmail, footer } = SECTI
 
   @media (max-width: 768px) {
     .site-footer {
-      margin-top: auto;
       padding-top: 16px;
-      gap: 8px;
     }
 
     .footer-row {
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      text-align: center;
-      font-size: 0.7rem;
-    }
-
-    .footer-brand {
-      font-size: 0.7rem;
+      flex-direction: row;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 4px 12px;
+      font-size: 0.65rem;
     }
 
     .footer-row-legal {
-      font-size: 0.65rem;
+      font-size: 0.6rem;
+      opacity: 0.7;
     }
   }
 
