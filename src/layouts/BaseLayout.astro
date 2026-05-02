@@ -10,7 +10,10 @@ interface Props {
 const { pageTitle, description = SITE.tagline } = Astro.props;
 
 const fullTitle = `${pageTitle} — ${SITE.name}`;
-const allowIndexing = import.meta.env.PUBLIC_ALLOW_INDEXING === 'true';
+// Default Allow: nur PUBLIC_ALLOW_INDEXING="false" rendert das
+// noindex-Meta-Tag. Dieselbe Inversion wie in src/pages/robots.txt.ts —
+// schützt gegen Env-Var-Fehlkonfiguration in Production.
+const allowIndexing = import.meta.env.PUBLIC_ALLOW_INDEXING !== 'false';
 const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
 ---
 

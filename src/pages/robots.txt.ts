@@ -1,7 +1,11 @@
 import type { APIRoute } from 'astro';
 
 export const GET: APIRoute = ({ site }) => {
-  const allowIndexing = import.meta.env.PUBLIC_ALLOW_INDEXING === 'true';
+  // Default ist Allow: nur ein explizites PUBLIC_ALLOW_INDEXING="false"
+  // blockt Crawling. Schützt Production gegen Env-Var-Fehlkonfiguration —
+  // wenn die Variable verschwindet oder ungesetzt ist, indexiert Google
+  // weiter. Preview-Deploys können explizit "false" setzen.
+  const allowIndexing = import.meta.env.PUBLIC_ALLOW_INDEXING !== 'false';
 
   const body = allowIndexing
     ? [
