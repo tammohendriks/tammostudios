@@ -2,9 +2,45 @@
 import { SECTION5 } from '../../lib/constants';
 
 const { eyebrow, headline, subtext, primaryCta, secondaryEmail, footer } = SECTION5;
+
+// Cosmic Background Layers — visuelle Klammer zu Section 1.
+// Weniger Partikel (12 vs 18) und langsamere Drift-Tempi (30–55s),
+// damit Closing-Section ruhiger wirkt als Hero. delta-x/y in vw/vh
+// statt %, damit translate() Viewport-Distanz fährt (% wäre element-
+// relativ und damit für 2–4px Punkte praktisch null).
+const PARTICLE_COUNT = 12;
+const particles = Array.from({ length: PARTICLE_COUNT }, () => {
+  const startX = Math.random() * 100;
+  const startY = Math.random() * 100;
+  const endX = Math.random() * 100;
+  const endY = Math.random() * 100;
+  return {
+    startX,
+    startY,
+    deltaX: endX - startX,
+    deltaY: endY - startY,
+    duration: 30 + Math.random() * 25,
+    delay: -Math.random() * 50,
+    size: 2 + Math.random() * 2,
+    opacity: 0.4 + Math.random() * 0.5,
+  };
+});
 ---
 
 <section class="section-5">
+  <div class="section-5-cosmos" aria-hidden="true">
+    <div class="s5-aurora s5-aurora-1"></div>
+    <div class="s5-aurora s5-aurora-2"></div>
+    <div class="s5-particles">
+      {particles.map((p) => (
+        <span
+          class="s5-particle"
+          style={`--start-x: ${p.startX}%; --start-y: ${p.startY}%; --delta-x: ${p.deltaX}vw; --delta-y: ${p.deltaY}vh; --duration: ${p.duration}s; --delay: ${p.delay}s; --size: ${p.size}px; --opacity: ${p.opacity};`}
+        ></span>
+      ))}
+    </div>
+  </div>
+
   <div class="section-5-bg" aria-hidden="true"></div>
 
   <div class="closing">
@@ -40,7 +76,7 @@ const { eyebrow, headline, subtext, primaryCta, secondaryEmail, footer } = SECTI
     </p>
   </div>
 
-  <footer class="site-footer reveal">
+  <footer class="site-footer">
     <div class="footer-row">
       <span class="footer-brand">{footer.brand}</span>
       <nav class="footer-nav" aria-label="Hauptnavigation">
@@ -104,18 +140,114 @@ const { eyebrow, headline, subtext, primaryCta, secondaryEmail, footer } = SECTI
     .closing-secondary { font-size: 0.78rem; }
   }
 
-  /* Dezenter warmer Glow hinter dem Logo — sonst rein dunkel.
-     Keine Galaxy-Effekte: Section 5 ist die Pause nach der Reise. */
+  /* Dezenter warmer Glow hinter dem Logo — sitzt über den Cosmos-
+     Layern, unter dem Content. */
   .section-5-bg {
     position: absolute;
     inset: 0;
     pointer-events: none;
+    z-index: 1;
     background: radial-gradient(
       ellipse at 50% 35%,
       rgba(245, 158, 11, 0.05) 0%,
       rgba(245, 158, 11, 0.02) 30%,
       rgba(245, 158, 11, 0) 60%
     );
+  }
+
+  /* === Cosmic Background — visuelle Klammer zu Section 1.
+     Aurora-Blobs driften langsam, Partikel floaten diagonal.
+     Deutlich ruhiger als Section 1 (weniger Partikel, längere
+     Tempi), damit Closing nicht hektisch wirkt. */
+  .section-5-cosmos {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  .s5-aurora {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    mix-blend-mode: screen;
+    will-change: transform;
+  }
+
+  .s5-aurora-1 {
+    width: 60vw;
+    height: 60vw;
+    top: 25%;
+    left: 20%;
+    background: radial-gradient(circle,
+      rgba(245, 158, 11, 0.15) 0%,
+      rgba(245, 158, 11, 0.06) 40%,
+      transparent 70%);
+    animation: s5-aurora-drift-1 28s ease-in-out infinite;
+  }
+
+  .s5-aurora-2 {
+    width: 50vw;
+    height: 50vw;
+    bottom: 30%;
+    right: 25%;
+    background: radial-gradient(circle,
+      rgba(252, 211, 77, 0.10) 0%,
+      rgba(252, 211, 77, 0.04) 40%,
+      transparent 70%);
+    animation: s5-aurora-drift-2 36s ease-in-out infinite;
+  }
+
+  @keyframes s5-aurora-drift-1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33%      { transform: translate(6vw, -4vh) scale(1.1); }
+    66%      { transform: translate(-5vw, 5vh) scale(0.95); }
+  }
+
+  @keyframes s5-aurora-drift-2 {
+    0%, 100% { transform: translate(0, 0) scale(0.95); }
+    50%      { transform: translate(-8vw, 4vh) scale(1.1); }
+  }
+
+  .s5-particles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .s5-particle {
+    position: absolute;
+    top: var(--start-y);
+    left: var(--start-x);
+    width: var(--size);
+    height: var(--size);
+    border-radius: 50%;
+    background: rgba(245, 158, 11, var(--opacity));
+    box-shadow:
+      0 0 6px rgba(245, 158, 11, 0.6),
+      0 0 12px rgba(252, 211, 77, 0.3);
+    animation: s5-particle-drift var(--duration) linear infinite;
+    animation-delay: var(--delay);
+    will-change: transform, opacity;
+  }
+
+  @keyframes s5-particle-drift {
+    0% {
+      transform: translate(0, 0);
+      opacity: 0;
+    }
+    8%   { opacity: var(--opacity); }
+    92%  { opacity: var(--opacity); }
+    100% {
+      transform: translate(var(--delta-x), var(--delta-y));
+      opacity: 0;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .s5-particle:nth-child(n+8) { display: none; }
+    .s5-aurora { filter: blur(60px); }
   }
 
   .closing {
@@ -128,7 +260,8 @@ const { eyebrow, headline, subtext, primaryCta, secondaryEmail, footer } = SECTI
     max-width: 600px;
     margin: 0 auto;
     width: 100%;
-    z-index: 1;
+    position: relative;
+    z-index: 2;
   }
 
   .closing-eyebrow {
@@ -365,7 +498,8 @@ const { eyebrow, headline, subtext, primaryCta, secondaryEmail, footer } = SECTI
     margin-left: auto;
     margin-right: auto;
     flex-shrink: 0;
-    z-index: 1;
+    position: relative;
+    z-index: 2;
   }
 
   .footer-row {
@@ -455,7 +589,10 @@ const { eyebrow, headline, subtext, primaryCta, secondaryEmail, footer } = SECTI
   .closing-sub.reveal       { transition-delay: 450ms; }
   .closing-cta.reveal       { transition-delay: 600ms; }
   .closing-secondary.reveal { transition-delay: 750ms; }
-  .site-footer.reveal       { transition-delay: 900ms; }
+  /* Footer wird nicht mehr gerevealed — IntersectionObserver
+     Bottom-rootMargin ließ ihn opacity:0 stuck, weil der unten
+     gepinnte Footer die Threshold-Box nie überquert. Statt das
+     Observer-Setup zu verbiegen ist Footer jetzt always visible. */
 
   @media (prefers-reduced-motion: reduce) {
     .reveal {
