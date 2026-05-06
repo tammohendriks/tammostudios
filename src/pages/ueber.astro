@@ -13,6 +13,13 @@ const { footer } = SECTION5;
   <TopBar />
 
   <main class="ueber-page">
+    <div class="ueber-bg" aria-hidden="true">
+      <div class="ueber-bg-aurora"></div>
+      <div class="ueber-bg-grid"></div>
+      <div class="ueber-bg-glow"></div>
+      <div class="ueber-bg-vignette"></div>
+    </div>
+
     <header class="ueber-hero">
       <div class="hero-text">
         <h1 class="hero-title">Hi, ich bin Tammo.</h1>
@@ -21,11 +28,15 @@ const { footer } = SECTION5;
           eine nach der anderen.
         </p>
       </div>
-      <div class="hero-mark" aria-hidden="true">
-        <span class="hero-mark-glow"></span>
-        <span class="hero-mark-disc">
-          <span class="hero-mark-letter">T</span>
-        </span>
+      <div class="hero-mark">
+        <img
+          class="hero-photo"
+          src="/tammo-foto.png"
+          alt="Tammo Hendriks, Gründer von Tammo Studios"
+          loading="eager"
+          width="480"
+          height="480"
+        />
       </div>
     </header>
 
@@ -172,9 +183,11 @@ const { footer } = SECTION5;
 
 <style>
   .ueber-page {
+    position: relative;
     background: #050507;
     padding: 140px 40px 80px;
     min-height: calc(100vh - 200px);
+    overflow: hidden;
   }
 
   @media (max-width: 768px) {
@@ -183,13 +196,101 @@ const { footer } = SECTION5;
     }
   }
 
-  /* === Hero: 60/40 Grid auf Desktop, Stack auf Mobile (Mark zuerst) */
+  /* === Atmosphäre: vier statische Layer hinter dem Content.
+     Bewusst KEINE Animation — die Über-Seite soll zum Lesen
+     einladen, nicht ablenken. Alle Layer pointer-events: none,
+     z-index 0; Hero und Content steigen auf z-index 1. */
+  .ueber-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  /* Layer A — sehr dezenter Grid mit radialer Maske, sodass die
+     Linien nur in der Bildmitte angedeutet sind und zu den Rändern
+     hin sauber ausfaden. */
+  .ueber-bg-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+    background-size: 60px 60px;
+    -webkit-mask-image: radial-gradient(ellipse at 50% 40%, black 10%, transparent 75%);
+    mask-image: radial-gradient(ellipse at 50% 40%, black 10%, transparent 75%);
+  }
+
+  /* Layer B — Amber-Radial hinter dem Foto. Trägt das Foto, ohne
+     es zu überstrahlen. Auf Mobile nach oben mittig verschoben,
+     wo das Foto bei Stack-Layout sitzt. */
+  .ueber-bg-glow {
+    position: absolute;
+    top: 5%;
+    right: 8%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(
+      circle,
+      rgba(245, 158, 11, 0.15) 0%,
+      transparent 60%
+    );
+    filter: blur(80px);
+  }
+
+  @media (max-width: 768px) {
+    .ueber-bg-glow {
+      top: 3%;
+      right: 50%;
+      transform: translateX(50%);
+      width: 400px;
+      height: 400px;
+    }
+  }
+
+  /* Layer C — leichte Vignette unten, beruhigt den Blick zum
+     Footer hin und nimmt den unteren Drittel optisch Gewicht. */
+  .ueber-bg-vignette {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 35%;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(0, 0, 0, 0.6) 100%
+    );
+  }
+
+  /* Layer D — sehr blasse Aurora-Wolke ganz oben am Viewport-Rand,
+     keine Animation. Setzt den Brand-Kontext fort, ohne Lautstärke. */
+  .ueber-bg-aurora {
+    position: absolute;
+    top: -120px;
+    left: -10%;
+    right: -10%;
+    height: 400px;
+    background: radial-gradient(
+      ellipse at center top,
+      rgba(245, 158, 11, 0.08) 0%,
+      transparent 70%
+    );
+    filter: blur(120px);
+  }
+
+  /* === Hero: 55/45 Grid auf Desktop, Stack auf Mobile (Foto zuerst).
+     45-Anteil und 1200px max-width geben der Photo-Spalte ~520px,
+     genug für 480px Photo + Atemraum. */
   .ueber-hero {
+    position: relative;
+    z-index: 1;
     display: grid;
-    grid-template-columns: minmax(0, 60fr) minmax(0, 40fr);
+    grid-template-columns: minmax(0, 55fr) minmax(0, 45fr);
     gap: 60px;
     align-items: center;
-    max-width: 1100px;
+    max-width: 1200px;
     margin: 0 auto 96px;
   }
 
@@ -233,87 +334,63 @@ const { footer } = SECTION5;
     }
   }
 
-  /* === Initialen-Kreis: amber Disc mit weißem T + dezenter Glow.
-     Glow als separates Pseudo-Element via screen-blend, damit er
-     den Page-Hintergrund "anhebt" statt zu überdecken. */
+  /* === Foto-Avatar: rundes Bild mit amber Ring + Glow-Aura.
+     ::after-Pseudo legt eine subtile Vignette an die Innenkanten,
+     damit das Foto nicht hart gegen den Hintergrund schneidet. */
   .hero-mark {
     position: relative;
-    width: 240px;
-    height: 240px;
+    width: min(480px, 100%);
     aspect-ratio: 1 / 1;
+    justify-self: end;
     isolation: isolate;
   }
 
   @media (max-width: 768px) {
     .hero-mark {
       width: 140px;
-      height: 140px;
+      justify-self: center;
     }
   }
 
-  .hero-mark-glow {
-    position: absolute;
-    inset: -40px;
+  .hero-photo {
+    width: 100%;
+    height: 100%;
     border-radius: 50%;
-    background: radial-gradient(
-      circle,
-      rgba(245, 158, 11, 0.35) 0%,
-      rgba(245, 158, 11, 0.12) 40%,
-      transparent 70%
-    );
-    filter: blur(20px);
-    mix-blend-mode: screen;
-    pointer-events: none;
-    z-index: -1;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+    box-shadow:
+      0 0 80px rgba(245, 158, 11, 0.25),
+      inset 0 0 0 2px rgba(245, 158, 11, 0.4);
   }
 
-  .hero-mark-disc {
+  /* Innenkanten-Vignette: weiches dunkles Gradient an den Rändern,
+     damit das Foto sauber in den Hintergrund übergeht. */
+  .hero-mark::after {
+    content: '';
     position: absolute;
     inset: 0;
     border-radius: 50%;
-    background: linear-gradient(
-      135deg,
-      #fbbf24 0%,
-      #f59e0b 50%,
-      #d97706 100%
+    background: radial-gradient(
+      circle,
+      transparent 55%,
+      rgba(0, 0, 0, 0.25) 100%
     );
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow:
-      inset 0 2px 0 rgba(255, 255, 255, 0.25),
-      inset 0 -3px 0 rgba(0, 0, 0, 0.08),
-      0 8px 32px rgba(0, 0, 0, 0.4);
-  }
-
-  .hero-mark-letter {
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-weight: 700;
-    font-size: 130px;
-    line-height: 1;
-    color: #f5f5f4;
-    letter-spacing: -0.04em;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-    /* Optisch zentrieren: Neue-Montreal "T" hat etwas mehr Whitespace
-       rechts vom Stamm — ein Hauch nach links rückt die Form auf den
-       Mittelpunkt. */
-    transform: translate(-2px, 4px);
+    pointer-events: none;
   }
 
   @media (max-width: 768px) {
-    .hero-mark-letter {
-      font-size: 76px;
-      transform: translate(-1px, 2px);
-    }
-    .hero-mark-glow {
-      inset: -24px;
-      filter: blur(12px);
+    .hero-photo {
+      box-shadow:
+        0 0 40px rgba(245, 158, 11, 0.25),
+        inset 0 0 0 2px rgba(245, 158, 11, 0.4);
     }
   }
 
   /* === Content: einspaltig zentriert, max-width für Lesbarkeit */
   .ueber-content {
+    position: relative;
+    z-index: 1;
     max-width: 720px;
     margin: 0 auto;
   }
