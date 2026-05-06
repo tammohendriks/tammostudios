@@ -1,0 +1,711 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TopBar from '../components/TopBar.astro';
+import { REFERENCES } from '../lib/references';
+import { SECTION5 } from '../lib/constants';
+
+const { footer } = SECTION5;
+---
+
+<BaseLayout
+  pageTitle="Referenzen"
+  description="Aktuelle Webentwicklungs-Projekte aus Bremen — individuelle Websites für lokale Unternehmen."
+>
+  <TopBar />
+
+  <main class="referenzen-page">
+    <header class="ref-hero">
+      <p class="ref-eyebrow">PORTFOLIO</p>
+      <h1 class="ref-title">Referenzen</h1>
+      <p class="ref-description">
+        Eine kleine Auswahl der Sites die ich zuletzt für lokale
+        Unternehmen gebaut habe — von der Praxis bis zur Kneipe.
+      </p>
+    </header>
+
+    <section class="ref-grid">
+      {REFERENCES.map((ref) => (
+        <article class="ref-card" data-slug={ref.slug}>
+          <div class="ref-preview">
+            <img
+              src={ref.preview}
+              alt={`Vorschau von ${ref.title}`}
+              loading="lazy"
+            />
+            <div class="ref-overlay">
+              <span class="ref-overlay-label">Ansehen</span>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M7 17L17 7M7 7h10v10" />
+              </svg>
+            </div>
+          </div>
+          <div class="ref-info">
+            <h3 class="ref-card-title">{ref.title}</h3>
+            <p class="ref-card-subtitle">{ref.subtitle}</p>
+            <div class="ref-tags">
+              {ref.tags.map((tag) => (
+                <span class="ref-tag">{tag}</span>
+              ))}
+            </div>
+          </div>
+          <button
+            class="ref-card-trigger"
+            data-url={ref.url}
+            data-title={ref.title}
+            type="button"
+            aria-label={`${ref.title} im Modal öffnen`}
+          />
+        </article>
+      ))}
+    </section>
+
+    <div class="ref-modal" id="ref-modal" hidden>
+      <div class="ref-modal-backdrop" data-close-modal></div>
+      <div class="ref-modal-content" role="dialog" aria-modal="true" aria-labelledby="ref-modal-url">
+        <header class="ref-modal-header">
+          <span class="ref-modal-url" id="ref-modal-url"></span>
+          <div class="ref-modal-actions">
+            <a
+              class="ref-modal-external"
+              id="ref-modal-external"
+              href="#"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span>In neuem Tab</span>
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M7 17L17 7M7 7h10v10" />
+              </svg>
+            </a>
+            <button
+              class="ref-modal-close"
+              data-close-modal
+              type="button"
+              aria-label="Modal schließen"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </header>
+        <div class="ref-modal-frame-wrap">
+          <iframe
+            class="ref-modal-iframe"
+            id="ref-modal-iframe"
+            src=""
+            title="Referenz-Vorschau"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+            loading="lazy"
+          ></iframe>
+          <div class="ref-modal-fallback" id="ref-modal-fallback" hidden>
+            <p>Diese Seite kann nicht direkt eingebettet werden.</p>
+            <a
+              class="ref-modal-fallback-link"
+              id="ref-modal-fallback-link"
+              href="#"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Im neuen Tab öffnen →
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-row">
+      <span class="footer-brand">{footer.brand}</span>
+      <nav class="footer-nav" aria-label="Hauptnavigation">
+        {footer.navLinks.map((link, i) => (
+          <>
+            {i > 0 && <span aria-hidden="true">·</span>}
+            <a href={link.href}>{link.label}</a>
+          </>
+        ))}
+      </nav>
+    </div>
+    <div class="footer-row footer-row-legal">
+      <span class="footer-copy">{footer.copyright}</span>
+      <nav class="footer-legal" aria-label="Rechtliches">
+        {footer.legalLinks.map((link, i) => (
+          <>
+            {i > 0 && <span aria-hidden="true">·</span>}
+            <a href={link.href}>{link.label}</a>
+          </>
+        ))}
+      </nav>
+    </div>
+  </footer>
+</BaseLayout>
+
+<style>
+  .referenzen-page {
+    min-height: calc(100vh - 200px);
+    background: #050507;
+    padding: 140px 40px 80px;
+    position: relative;
+  }
+
+  /* Subtiler Aurora-Hintergrund (passend zum Galaxy-Pattern). */
+  .referenzen-page::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 10%,
+        rgba(245, 158, 11, 0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%,
+        rgba(245, 158, 11, 0.04) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .ref-hero {
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .ref-eyebrow {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.3em;
+    color: rgba(245, 158, 11, 0.8);
+    text-transform: uppercase;
+    margin: 0 0 16px;
+  }
+
+  .ref-title {
+    font-family: 'Aileron', 'Inter', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    color: #f5f5f4;
+    letter-spacing: -0.03em;
+    margin: 0 0 24px;
+    line-height: 1;
+  }
+
+  .ref-description {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: clamp(1rem, 1.4vw, 1.15rem);
+    color: rgba(245, 245, 244, 0.7);
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  .ref-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    gap: 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (max-width: 768px) {
+    .ref-grid {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    .referenzen-page {
+      padding: 100px 16px 60px;
+    }
+  }
+
+  .ref-card {
+    position: relative;
+    background: rgba(15, 15, 18, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    overflow: hidden;
+    transition:
+      transform 300ms ease,
+      border-color 300ms ease,
+      box-shadow 300ms ease;
+  }
+
+  .ref-card:hover,
+  .ref-card:focus-within {
+    transform: translateY(-4px);
+    border-color: rgba(245, 158, 11, 0.4);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.4),
+      0 0 48px rgba(245, 158, 11, 0.15);
+  }
+
+  .ref-preview {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: #0a0a0c;
+  }
+
+  .ref-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    transition: transform 600ms ease;
+  }
+
+  .ref-card:hover .ref-preview img,
+  .ref-card:focus-within .ref-preview img {
+    transform: scale(1.05);
+  }
+
+  .ref-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(245, 158, 11, 0.15) 0%,
+      rgba(0, 0, 0, 0.4) 100%
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: #fff;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 0.05em;
+    opacity: 0;
+    transition: opacity 300ms ease;
+  }
+
+  .ref-card:hover .ref-overlay,
+  .ref-card:focus-within .ref-overlay {
+    opacity: 1;
+  }
+
+  .ref-info {
+    padding: 24px;
+  }
+
+  .ref-card-title {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: #f5f5f4;
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+
+  .ref-card-subtitle {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 0.95rem;
+    color: rgba(245, 245, 244, 0.65);
+    margin: 0 0 16px;
+  }
+
+  .ref-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .ref-tag {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(245, 158, 11, 0.85);
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    padding: 4px 10px;
+    border-radius: 4px;
+  }
+
+  /* Unsichtbarer Click-Layer über die ganze Card — fängt Click,
+     liest data-url. Nutzt button statt a href, damit Modal-Logik
+     vor Navigation greift. focus-visible Ring für Tastatur-User. */
+  .ref-card-trigger {
+    position: absolute;
+    inset: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 2;
+  }
+
+  .ref-card-trigger:focus-visible {
+    outline: 2px solid rgba(245, 158, 11, 0.8);
+    outline-offset: 4px;
+  }
+
+  /* Modal */
+  .ref-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    opacity: 0;
+    transition: opacity 200ms ease;
+    pointer-events: none;
+  }
+
+  .ref-modal.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .ref-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    cursor: pointer;
+  }
+
+  .ref-modal-content {
+    position: relative;
+    width: 100%;
+    max-width: 1280px;
+    height: 100%;
+    max-height: 800px;
+    background: #0a0a0c;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow:
+      0 20px 60px rgba(0, 0, 0, 0.6),
+      0 0 80px rgba(245, 158, 11, 0.1);
+  }
+
+  .ref-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    background: rgba(15, 15, 18, 0.95);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    flex-shrink: 0;
+    gap: 16px;
+  }
+
+  .ref-modal-url {
+    font-family: 'SF Mono', Monaco, monospace;
+    font-size: 0.8rem;
+    color: rgba(245, 245, 244, 0.6);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ref-modal-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .ref-modal-external {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    border-radius: 6px;
+    color: rgba(245, 158, 11, 0.95);
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: background 200ms ease;
+  }
+
+  .ref-modal-external:hover,
+  .ref-modal-external:focus-visible {
+    background: rgba(245, 158, 11, 0.25);
+    outline: none;
+  }
+
+  .ref-modal-close {
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+    color: rgba(245, 245, 244, 0.8);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 200ms ease;
+  }
+
+  .ref-modal-close:hover,
+  .ref-modal-close:focus-visible {
+    background: rgba(255, 255, 255, 0.1);
+    outline: none;
+  }
+
+  .ref-modal-frame-wrap {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background: #fff;
+  }
+
+  .ref-modal-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+  }
+
+  .ref-modal-fallback {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    background: #0a0a0c;
+    color: rgba(245, 245, 244, 0.8);
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    text-align: center;
+    padding: 40px;
+  }
+
+  .ref-modal-fallback-link {
+    color: rgba(245, 158, 11, 0.95);
+    text-decoration: none;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.4);
+    padding-bottom: 2px;
+    transition: border-color 200ms ease;
+  }
+
+  .ref-modal-fallback-link:hover {
+    border-bottom-color: rgba(245, 158, 11, 1);
+  }
+
+  @media (max-width: 768px) {
+    .ref-modal {
+      padding: 0;
+    }
+    .ref-modal-content {
+      max-width: 100%;
+      max-height: 100%;
+      height: 100dvh;
+      border-radius: 0;
+      border: none;
+    }
+  }
+
+  /* Footer (gleicher Stil wie in Section 5 — bewusst dupliziert,
+     statt Section 5 für eine Komponentenextraktion zu refaktorieren). */
+  .site-footer {
+    background: #050507;
+    padding: 32px 40px 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.78rem;
+  }
+
+  .footer-brand {
+    color: rgba(245, 245, 244, 0.7);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .footer-copy {
+    color: rgba(245, 245, 244, 0.5);
+  }
+
+  .footer-nav,
+  .footer-legal {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .footer-nav a,
+  .footer-legal a {
+    color: rgba(245, 245, 244, 0.7);
+    text-decoration: none;
+    transition: color 200ms ease;
+  }
+
+  .footer-nav a:hover,
+  .footer-nav a:focus-visible,
+  .footer-legal a:hover,
+  .footer-legal a:focus-visible {
+    color: rgba(245, 158, 11, 0.95);
+    outline: none;
+  }
+
+  .footer-row-legal {
+    color: rgba(245, 245, 244, 0.4);
+    font-size: 0.72rem;
+  }
+
+  @media (max-width: 768px) {
+    .footer-row {
+      flex-direction: row;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 4px 12px;
+      font-size: 0.65rem;
+    }
+    .footer-row-legal {
+      font-size: 0.6rem;
+      opacity: 0.7;
+    }
+  }
+</style>
+
+<script>
+  const modal = document.getElementById('ref-modal');
+  const iframe = document.getElementById('ref-modal-iframe') as HTMLIFrameElement | null;
+  const fallback = document.getElementById('ref-modal-fallback');
+  const fallbackLink = document.getElementById('ref-modal-fallback-link') as HTMLAnchorElement | null;
+  const urlDisplay = document.getElementById('ref-modal-url');
+  const externalLink = document.getElementById('ref-modal-external') as HTMLAnchorElement | null;
+  const triggers = document.querySelectorAll<HTMLButtonElement>('.ref-card-trigger');
+  const closeBtns = document.querySelectorAll<HTMLElement>('[data-close-modal]');
+
+  if (modal && iframe && fallback && fallbackLink && urlDisplay && externalLink) {
+    let blockTimer: number | null = null;
+    let lastFocused: HTMLElement | null = null;
+
+    function showFallback() {
+      if (!iframe || !fallback) return;
+      iframe.style.display = 'none';
+      fallback.hidden = false;
+    }
+
+    function openModal(url: string) {
+      if (!modal || !iframe || !fallback || !urlDisplay || !externalLink || !fallbackLink) return;
+      lastFocused = document.activeElement as HTMLElement;
+      urlDisplay.textContent = url;
+      externalLink.href = url;
+      fallbackLink.href = url;
+
+      fallback.hidden = true;
+      iframe.style.display = 'block';
+      iframe.src = url;
+
+      modal.hidden = false;
+      requestAnimationFrame(() => modal.classList.add('is-open'));
+      document.body.style.overflow = 'hidden';
+
+      // Best-effort Block-Detection: nach 4s prüfen ob Iframe leer
+      // ist. Cross-origin wirft beim Document-Zugriff, das ist normal
+      // (Site lädt). Nur wenn contentDocument null oder body leer →
+      // Fallback. Most modern sites without X-Frame-Options laden
+      // sauber.
+      if (blockTimer) window.clearTimeout(blockTimer);
+      blockTimer = window.setTimeout(() => {
+        if (!iframe) return;
+        try {
+          const doc = iframe.contentDocument;
+          if (!doc || doc.body.children.length === 0) {
+            showFallback();
+          }
+        } catch {
+          // Cross-origin SecurityError — Site lädt cross-origin,
+          // alles in Ordnung.
+        }
+      }, 4000);
+    }
+
+    function closeModal() {
+      if (!modal || !iframe) return;
+      modal.classList.remove('is-open');
+      document.body.style.overflow = '';
+      if (blockTimer) {
+        window.clearTimeout(blockTimer);
+        blockTimer = null;
+      }
+      window.setTimeout(() => {
+        modal.hidden = true;
+        iframe.src = '';
+        if (lastFocused) lastFocused.focus();
+      }, 200);
+    }
+
+    triggers.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const url = btn.dataset.url;
+        if (url) openModal(url);
+      });
+    });
+
+    closeBtns.forEach((btn) => {
+      btn.addEventListener('click', closeModal);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !modal.hidden) {
+        closeModal();
+      }
+    });
+  }
+</script>
