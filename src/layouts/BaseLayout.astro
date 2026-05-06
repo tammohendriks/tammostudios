@@ -13,10 +13,12 @@ const { pageTitle, description = `${SITE.name} — Webentwicklung aus ${SITE.loc
 const fullTitle = `${pageTitle} — ${SITE.name}`;
 const allowIndexing = import.meta.env.PUBLIC_ALLOW_INDEXING === 'true';
 const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
+const isLanding = Astro.url.pathname === '/' || Astro.url.pathname === '/index.html';
+const initialPage = isLanding ? 'landing' : 'subpage';
 ---
 
 <!doctype html>
-<html lang="de">
+<html lang="de" data-page={initialPage}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -73,6 +75,47 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
         document.addEventListener('astro:before-swap', applySplashState);
         // page-load: sichert state nach jedem Swap (auch initial).
         document.addEventListener('astro:page-load', applySplashState);
+      })();
+    </script>
+    <script is:inline>
+      // TopBar-State-Sync: data-page auf <html> + auf [data-topbar]
+      // sowie aria-current pro Nav-Link aktualisieren. Notwendig, weil
+      // die TopBar via transition:persist über Page-Wechsel hinweg im
+      // DOM erhalten bleibt — ohne dieses Update bliebe data-page beim
+      // Wert der zuerst geladenen Page hängen, und "Startseite" würde
+      // auf Sub-Pages nicht eingeblendet.
+      (function () {
+        function updateTopbarState() {
+          try {
+            var path = window.location.pathname;
+            var isLanding = path === '/' || path === '/index.html';
+            var pageType = isLanding ? 'landing' : 'subpage';
+            document.documentElement.setAttribute('data-page', pageType);
+            var topbar = document.querySelector('[data-topbar]');
+            if (topbar) topbar.setAttribute('data-page', pageType);
+
+            var links = document.querySelectorAll(
+              '[data-topbar] .nav-link, .mobile-menu .mobile-link'
+            );
+            links.forEach(function (link) {
+              var href = link.getAttribute('href') || '';
+              var active = false;
+              if (href === '/') {
+                active = isLanding;
+              } else {
+                active =
+                  path === href || path.indexOf(href + '/') === 0;
+              }
+              if (active) link.setAttribute('aria-current', 'page');
+              else link.removeAttribute('aria-current');
+            });
+          } catch (e) {}
+        }
+        updateTopbarState();
+        // after-swap feuert nach jedem ClientRouter-Swap, das ist der
+        // richtige Moment um die persistierte TopBar an die neue URL
+        // anzupassen.
+        document.addEventListener('astro:after-swap', updateTopbarState);
       })();
     </script>
   </head>

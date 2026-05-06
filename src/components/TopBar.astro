@@ -1,17 +1,20 @@
 ---
-import { fade } from 'astro:transitions';
 import { SITE_LABELS, NAV_ITEMS, CTA } from '../lib/constants';
 
-// Auf Sub-Pages "← Startseite" als ersten Eintrag prepended, sodass
-// User immer einen klaren Weg zurück hat. Auf der Landing-Page wäre
-// der Link redundant — er erscheint dort nicht.
+// "Startseite" wird IMMER ins DOM gerendert. Sichtbarkeit kommt
+// per CSS aus dem globalen html[data-page]-State (BaseLayout setzt
+// das per SSR + per inline-Script bei jeder ClientRouter-Navigation
+// neu). transition:persist auf der TopBar bleibt damit konfliktfrei
+// — die Items selbst sind statisch, nur der Startseite-Slot fadet
+// per CSS-Transition rein/raus.
 const currentPath = Astro.url.pathname;
 const isLanding = currentPath === '/' || currentPath === '/index.html';
 
-type NavItem = { label: string; href: string };
-const navItems: NavItem[] = isLanding
-  ? [...NAV_ITEMS]
-  : [{ label: 'Startseite', href: '/' }, ...NAV_ITEMS];
+type NavItem = { label: string; href: string; key?: string };
+const navItems: NavItem[] = [
+  { label: 'Startseite', href: '/', key: 'startseite' },
+  ...NAV_ITEMS,
+];
 
 function isActive(href: string) {
   if (href === '/') return isLanding;
@@ -21,13 +24,12 @@ function isActive(href: string) {
 }
 ---
 
-<header class="topbar" transition:animate={fade({ duration: '300ms' })}>
+<header class="topbar" data-topbar transition:persist="topbar">
   <span class="top-left label-tracked">{SITE_LABELS.establishedLine}</span>
 
   <nav class="nav" aria-label="Hauptnavigation">
     {navItems.map((item, i) => (
-      <span class="nav-item">
-        {i > 0 ? <span class="dot" aria-hidden="true"> · </span> : null}
+      <span class:list={['nav-item', item.key && `nav-item-${item.key}`]}>
         <a
           class="nav-link"
           href={item.href}
@@ -35,6 +37,9 @@ function isActive(href: string) {
         >
           {item.label}
         </a>
+        {i < navItems.length - 1 && (
+          <span class="dot" aria-hidden="true"> · </span>
+        )}
       </span>
     ))}
   </nav>
@@ -72,7 +77,7 @@ function isActive(href: string) {
 <div id="mobile-menu" class="mobile-menu" hidden>
   <ul>
     {navItems.map((item) => (
-      <li>
+      <li class:list={[item.key && `mobile-item-${item.key}`]}>
         <a
           class="mobile-link"
           href={item.href}
@@ -238,6 +243,55 @@ function isActive(href: string) {
 
   .mobile-link[aria-current="page"] {
     color: rgba(245, 158, 11, 1);
+  }
+
+  /* "Startseite" hängt im DOM auf jeder Page — Sichtbarkeit kommt
+     aus dem globalen html[data-page]-State. Auf der Landing
+     (data-page="landing") wird das Item per opacity + visibility
+     versteckt, auf Sub-Pages gefadet eingeblendet. visibility-
+     Transition ist verzögert beim Hide, sodass das Element erst
+     nach dem opacity-Fade gesperrt wird. Das vermeidet Flackern.
+     Das Element bleibt mit seiner natürlichen Breite erhalten —
+     die Pille ist auf Landing genauso breit wie auf Sub-Pages, der
+     Rest der Nav springt nicht. */
+  .nav-item-startseite {
+    opacity: 0;
+    transform: translateX(-8px);
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 400ms ease-out,
+      transform 400ms ease-out,
+      visibility 0s linear 400ms;
+  }
+
+  :global(html[data-page="subpage"]) .nav-item-startseite {
+    opacity: 1;
+    transform: translateX(0);
+    visibility: visible;
+    pointer-events: auto;
+    transition:
+      opacity 400ms ease-out,
+      transform 400ms ease-out,
+      visibility 0s linear 0s;
+  }
+
+  /* Mobile-Menü: Startseite-Eintrag ohne Layout-Reservierung —
+     auf Landing display:none, auf Sub-Pages list-item. Stack-Layout
+     hier braucht keine Breiten-Stabilität wie das Pill-Inline-
+     Layout der Desktop-Nav. */
+  .mobile-item-startseite {
+    display: none;
+  }
+
+  :global(html[data-page="subpage"]) .mobile-item-startseite {
+    display: list-item;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-item-startseite {
+      transition: none;
+    }
   }
 
   .dot {
