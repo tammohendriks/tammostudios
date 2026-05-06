@@ -1,0 +1,503 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TopBar from '../components/TopBar.astro';
+import { SECTION5 } from '../lib/constants';
+
+const { footer } = SECTION5;
+---
+
+<BaseLayout
+  pageTitle="Über mich"
+  description="Tammo Hendriks aus Bremen — handgemachte Websites, eine Person, ein Projekt zur Zeit."
+>
+  <TopBar />
+
+  <main class="ueber-page">
+    <header class="ueber-hero">
+      <div class="hero-text">
+        <h1 class="hero-title">Hi, ich bin Tammo.</h1>
+        <p class="hero-subtitle">
+          25 Jahre alt, Bremen, und ich baue Websites — handgemacht,
+          eine nach der anderen.
+        </p>
+      </div>
+      <div class="hero-mark" aria-hidden="true">
+        <span class="hero-mark-glow"></span>
+        <span class="hero-mark-disc">
+          <span class="hero-mark-letter">T</span>
+        </span>
+      </div>
+    </header>
+
+    <article class="ueber-content">
+      <section class="ueber-section">
+        <h2>Wer ich bin</h2>
+        <p>
+          Angefangen hat alles mit einer Ausbildung zum Kaufmann
+          für Digitalisierungsmanagement bei einer
+          Sparkassen-Tochter. Danach bin ich dort als Online
+          Marketing Manager geblieben — und arbeite das auch heute
+          noch. Nebenbei habe ich aber gemerkt, dass mir etwas
+          fehlt: das Programmieren. Genau das, was mich am Anfang
+          am meisten gepackt hat.
+        </p>
+        <p>
+          Im Mai 2026 habe ich mich entschieden, das nicht länger
+          nur nebenbei zu machen. Tammo Studios ist mein Weg zurück
+          zum Code — und gleichzeitig zu einer Arbeitsweise, die
+          zu meinem Leben passt: Ab August reise ich für längere
+          Zeit durch Asien. Videos kann man schlecht aus 9.000
+          Kilometern Entfernung drehen. Websites schon.
+        </p>
+      </section>
+
+      <section class="ueber-section">
+        <h2>Wie ich arbeite</h2>
+        <p>
+          Ein Projekt zur Zeit. Du sprichst direkt mit der Person,
+          die Deine Seite baut — keine Agentur-Hierarchie
+          dazwischen.
+        </p>
+        <p>
+          Ich arbeite vollständig remote, auf Deutsch oder
+          Englisch. Wo Du sitzt, ist mir egal — eine gute
+          Internetverbindung reicht.
+        </p>
+        <p>
+          Was mir wichtig ist: Geduld bei Feedback und ein Gespür
+          für den richtigen Ton. Eine Kneipenwebsite soll nicht
+          clean wie ein SaaS-Startup aussehen — sie darf dunkel
+          sein, ein bisschen rau, vintage. Eine Yogapraxis darf
+          weich atmen. Ich höre mir an, wer Du bist, und baue dann
+          genau das.
+        </p>
+        <p>
+          Eine normale Website steht in maximal
+          <strong>14 Tagen</strong>. Ein Online-Shop in maximal
+          <strong>30</strong>. Schneller meistens — länger nie.
+        </p>
+      </section>
+
+      <section class="ueber-section">
+        <h2>Was es kostet</h2>
+        <p>
+          Eine Website (Landing + bis zu 5 Unterseiten) kostet
+          <strong>1.000 €</strong>.
+        </p>
+        <p>
+          Größere Projekte wie Online-Shops liegen bei maximal
+          <strong>2.000 €</strong>.
+        </p>
+        <p>
+          Keine versteckten Stundensätze, keine Pakete mit
+          Sternchen.
+        </p>
+        <a class="inline-link" href="/preise">
+          <span>Volle Preisübersicht ansehen</span>
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </a>
+      </section>
+
+      <section class="ueber-section">
+        <h2>Außerhalb vom Code</h2>
+        <p>
+          Wenn ich nicht arbeite, bin ich meistens beim Sport oder
+          unterwegs. Reisen ist das, was mir Energie gibt — und
+          gleichzeitig der Grund, warum ich das hier so aufgebaut
+          habe, wie ich's aufgebaut habe.
+        </p>
+      </section>
+
+      <section class="ueber-close">
+        <p class="close-line">
+          Wenn das nach Deinem Stil klingt: schreib mir.
+        </p>
+        <a class="inline-link inline-link-cta" href="/kontakt">
+          <span>Kontakt aufnehmen</span>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </a>
+      </section>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-row">
+      <span class="footer-brand">{footer.brand}</span>
+      <nav class="footer-nav" aria-label="Hauptnavigation">
+        {footer.navLinks.map((link, i) => (
+          <>
+            {i > 0 && <span aria-hidden="true">·</span>}
+            <a href={link.href}>{link.label}</a>
+          </>
+        ))}
+      </nav>
+    </div>
+    <div class="footer-row footer-row-legal">
+      <span class="footer-copy">{footer.copyright}</span>
+      <nav class="footer-legal" aria-label="Rechtliches">
+        {footer.legalLinks.map((link, i) => (
+          <>
+            {i > 0 && <span aria-hidden="true">·</span>}
+            <a href={link.href}>{link.label}</a>
+          </>
+        ))}
+      </nav>
+    </div>
+  </footer>
+</BaseLayout>
+
+<style>
+  .ueber-page {
+    background: #050507;
+    padding: 140px 40px 80px;
+    min-height: calc(100vh - 200px);
+  }
+
+  @media (max-width: 768px) {
+    .ueber-page {
+      padding: 100px 20px 60px;
+    }
+  }
+
+  /* === Hero: 60/40 Grid auf Desktop, Stack auf Mobile (Mark zuerst) */
+  .ueber-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 60fr) minmax(0, 40fr);
+    gap: 60px;
+    align-items: center;
+    max-width: 1100px;
+    margin: 0 auto 96px;
+  }
+
+  @media (max-width: 768px) {
+    .ueber-hero {
+      grid-template-columns: 1fr;
+      gap: 36px;
+      text-align: center;
+      margin-bottom: 72px;
+    }
+    .hero-mark {
+      order: -1;
+      justify-self: center;
+    }
+  }
+
+  .hero-title {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(2.5rem, 5.5vw, 4rem);
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    color: #f5f5f4;
+    margin: 0 0 18px;
+  }
+
+  .hero-subtitle {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: clamp(1.05rem, 1.4vw, 1.2rem);
+    line-height: 1.55;
+    color: rgba(245, 245, 244, 0.65);
+    margin: 0;
+    max-width: 520px;
+  }
+
+  @media (max-width: 768px) {
+    .hero-subtitle {
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+
+  /* === Initialen-Kreis: amber Disc mit weißem T + dezenter Glow.
+     Glow als separates Pseudo-Element via screen-blend, damit er
+     den Page-Hintergrund "anhebt" statt zu überdecken. */
+  .hero-mark {
+    position: relative;
+    width: 240px;
+    height: 240px;
+    aspect-ratio: 1 / 1;
+    isolation: isolate;
+  }
+
+  @media (max-width: 768px) {
+    .hero-mark {
+      width: 140px;
+      height: 140px;
+    }
+  }
+
+  .hero-mark-glow {
+    position: absolute;
+    inset: -40px;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      rgba(245, 158, 11, 0.35) 0%,
+      rgba(245, 158, 11, 0.12) 40%,
+      transparent 70%
+    );
+    filter: blur(20px);
+    mix-blend-mode: screen;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .hero-mark-disc {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: linear-gradient(
+      135deg,
+      #fbbf24 0%,
+      #f59e0b 50%,
+      #d97706 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+      inset 0 2px 0 rgba(255, 255, 255, 0.25),
+      inset 0 -3px 0 rgba(0, 0, 0, 0.08),
+      0 8px 32px rgba(0, 0, 0, 0.4);
+  }
+
+  .hero-mark-letter {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 130px;
+    line-height: 1;
+    color: #f5f5f4;
+    letter-spacing: -0.04em;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    /* Optisch zentrieren: Neue-Montreal "T" hat etwas mehr Whitespace
+       rechts vom Stamm — ein Hauch nach links rückt die Form auf den
+       Mittelpunkt. */
+    transform: translate(-2px, 4px);
+  }
+
+  @media (max-width: 768px) {
+    .hero-mark-letter {
+      font-size: 76px;
+      transform: translate(-1px, 2px);
+    }
+    .hero-mark-glow {
+      inset: -24px;
+      filter: blur(12px);
+    }
+  }
+
+  /* === Content: einspaltig zentriert, max-width für Lesbarkeit */
+  .ueber-content {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .ueber-section {
+    margin-bottom: 56px;
+  }
+
+  .ueber-section:last-of-type {
+    margin-bottom: 32px;
+  }
+
+  /* Section-Headline mit vertikaler Amber-Bar links — 3px breit,
+     volle Höhe der Headline. Padding-left schiebt den Text rechts
+     vom Bar-Position weg. */
+  .ueber-content h2 {
+    position: relative;
+    padding-left: 18px;
+    margin: 0 0 20px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.4rem, 2.2vw, 1.75rem);
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    color: #f5f5f4;
+  }
+
+  .ueber-content h2::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 4px;
+    bottom: 4px;
+    width: 3px;
+    background: rgba(245, 158, 11, 0.9);
+    border-radius: 2px;
+  }
+
+  .ueber-content p {
+    margin: 0 0 18px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: clamp(1.05rem, 1.15vw, 1.125rem);
+    line-height: 1.7;
+    color: rgba(245, 245, 244, 0.78);
+  }
+
+  .ueber-content p:last-child {
+    margin-bottom: 0;
+  }
+
+  .ueber-content strong {
+    color: #f5f5f4;
+    font-weight: 600;
+  }
+
+  /* Inline-Link mit amber Pfeil — leiser als ein Pill-Button. */
+  .inline-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #f5f5f4;
+    text-decoration: none;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 1rem;
+    border-bottom: 1px solid transparent;
+    padding-bottom: 1px;
+    transition: border-color 200ms ease, color 200ms ease;
+    margin-top: 8px;
+  }
+
+  .inline-link svg {
+    color: rgba(245, 158, 11, 0.95);
+    transition: transform 200ms ease;
+    flex-shrink: 0;
+  }
+
+  .inline-link:hover,
+  .inline-link:focus-visible {
+    border-bottom-color: rgba(245, 158, 11, 0.6);
+    color: #fff;
+    outline: none;
+  }
+
+  .inline-link:hover svg,
+  .inline-link:focus-visible svg {
+    transform: translateX(3px);
+  }
+
+  /* Schluss-Block: bewusst leiser Ausstieg, leichtes Trennluft nach oben */
+  .ueber-close {
+    margin-top: 80px;
+    padding-top: 40px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .close-line {
+    margin: 0 0 12px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: clamp(1.1rem, 1.3vw, 1.2rem);
+    line-height: 1.55;
+    color: rgba(245, 245, 244, 0.85);
+  }
+
+  .inline-link-cta {
+    font-size: 1.05rem;
+    font-weight: 500;
+  }
+
+  /* Footer (gleicher Stil wie /referenzen — bewusst dupliziert,
+     bis es ein eigenes <SiteFooter />-Component gibt). */
+  .site-footer {
+    background: #050507;
+    padding: 32px 40px 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.78rem;
+  }
+
+  .footer-brand {
+    color: rgba(245, 245, 244, 0.7);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .footer-copy {
+    color: rgba(245, 245, 244, 0.5);
+  }
+
+  .footer-nav,
+  .footer-legal {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .footer-nav a,
+  .footer-legal a {
+    color: rgba(245, 245, 244, 0.7);
+    text-decoration: none;
+    transition: color 200ms ease;
+  }
+
+  .footer-nav a:hover,
+  .footer-nav a:focus-visible,
+  .footer-legal a:hover,
+  .footer-legal a:focus-visible {
+    color: rgba(245, 158, 11, 0.95);
+    outline: none;
+  }
+
+  .footer-row-legal {
+    color: rgba(245, 245, 244, 0.4);
+    font-size: 0.72rem;
+  }
+
+  @media (max-width: 768px) {
+    .footer-row {
+      flex-direction: row;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 4px 12px;
+      font-size: 0.65rem;
+    }
+    .footer-row-legal {
+      font-size: 0.6rem;
+      opacity: 0.7;
+    }
+  }
+</style>
