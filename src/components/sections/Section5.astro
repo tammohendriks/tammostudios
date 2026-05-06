@@ -117,15 +117,20 @@ const particles = Array.from({ length: PARTICLE_COUNT }, () => {
     padding: 100px 40px 28px;
   }
 
-  /* Mobile-Override: hartes 100dvh, kein Scroll-Past. Closing-Block
-     + Footer müssen zusammen reinpassen — ultra-compact-Variante
-     für sehr kurze Viewports liegt weiter unten. */
+  /* Mobile-Override: natürlicher Content-Flow. Vorher: hartes 100dvh
+     + overflow:hidden hat einen großen leeren Bereich zwischen E-Mail-
+     Link und Footer hinterlassen, weil der Content nicht den ganzen
+     Viewport gefüllt hat. Jetzt wächst die Section mit dem Content;
+     Footer folgt direkt drunter. margin-top:auto auf .site-footer
+     kollabiert in einer höhen-flexiblen Section automatisch zu 0,
+     also kein zusätzlicher Code nötig. */
   @media (max-width: 768px) {
     .section-5 {
-      height: 100dvh;
-      max-height: 100dvh;
-      overflow: hidden;
-      padding: 90px 16px 16px;
+      height: auto;
+      min-height: auto;
+      max-height: none;
+      overflow: visible;
+      padding: 80px 16px 60px;
     }
 
     .closing {

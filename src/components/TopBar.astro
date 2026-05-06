@@ -309,8 +309,8 @@ function isActive(href: string) {
 
   /* Hamburger */
   .hamburger {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     display: none;
     flex-direction: column;
     align-items: center;
@@ -320,6 +320,14 @@ function isActive(href: string) {
     background: transparent;
     border: 0;
     padding: 0;
+    /* iOS-Tap-Reliability: 44px ist Apple HIG-Minimum, damit Finger
+       das Element zuverlässig trifft. touch-action:manipulation
+       unterdrückt den 300ms-Doppel-Tap-Delay, der unter iOS Safari
+       Klicks "verschluckt". Pointer-events explizit auf auto, damit
+       kein Parent-Override den Hit-Bereich versehentlich abklemmt. */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    pointer-events: auto;
   }
 
   .hamburger span {
@@ -355,8 +363,8 @@ function isActive(href: string) {
     }
     .hamburger {
       display: inline-flex;
-      width: 40px;
-      height: 40px;
+      width: 44px;
+      height: 44px;
       padding: 0;
       background: rgba(5, 5, 7, 0.55);
       backdrop-filter: blur(12px);
