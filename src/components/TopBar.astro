@@ -248,12 +248,11 @@ function isActive(href: string) {
 
   /* "Startseite" hängt im DOM auf jeder Page, Sichtbarkeit kommt
      aus dem globalen html[data-page]-State. display:none auf Landing
-     reserviert KEINEN Layout-Space — der vorherige Ansatz mit
-     visibility:hidden hat einen sichtbaren Leerslot vor "Über"
-     hinterlassen. Beim Wechsel zu subpage spielt eine einmalige
-     @keyframes-Animation, die das Item smooth einblendet. Beim
-     Zurück zur Landing verschwindet es ohne Fade-out — bewusst, da
-     display:none nicht transitionierbar ist. */
+     reserviert KEINEN Layout-Space. Auf Sub-Pages wird inline-flex
+     gesetzt; die Fade-Animation läuft NUR, wenn das Inline-Script in
+     BaseLayout data-startseite-anim="1" auf <html> setzt — das passiert
+     genau einmal pro Session beim ersten Wechsel von Landing → Sub-
+     Page. Ohne Flag ist Startseite einfach da, kein erneutes Triggern. */
   .nav-item-startseite {
     display: none;
   }
@@ -261,6 +260,9 @@ function isActive(href: string) {
   :global(html[data-page="subpage"]) .nav-item-startseite {
     display: inline-flex;
     align-items: center;
+  }
+
+  :global(html[data-startseite-anim="1"][data-page="subpage"]) .nav-item-startseite {
     animation: startseite-fade-in 400ms ease-out;
   }
 
@@ -275,7 +277,8 @@ function isActive(href: string) {
     }
   }
 
-  /* Mobile-Menü: Stack-Layout, gleiches Schema. */
+  /* Mobile-Menü: Stack-Layout, gleiches Schema (ohne Animation,
+     reicht für die kleine Liste). */
   .mobile-item-startseite {
     display: none;
   }
@@ -285,7 +288,7 @@ function isActive(href: string) {
   }
 
   @media (prefers-reduced-motion: reduce) {
-    :global(html[data-page="subpage"]) .nav-item-startseite {
+    :global(html[data-startseite-anim="1"][data-page="subpage"]) .nav-item-startseite {
       animation: none;
     }
   }

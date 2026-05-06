@@ -9,7 +9,12 @@
     url('/fonts/montreal/NeueMontreal-Bold.woff') format('woff');
   font-weight: 700;
   font-style: normal;
-  font-display: swap;
+  /* optional statt swap: kein Late-Swap-Layout-Shift mehr. Beim
+     ersten Visit fällt der Browser ggf. auf den System-Sans zurück,
+     bei späteren Page-Loads (Cache-Hit) ist der Brand-Font sofort
+     da. Vermeidet das sichtbare Springen von Eyebrow/Headline beim
+     Page-Wechsel. */
+  font-display: optional;
 }
 
 @font-face {
@@ -17,7 +22,12 @@
   src: url('/fonts/aileron/Aileron-BoldItalic.otf') format('opentype');
   font-weight: 700;
   font-style: italic;
-  font-display: swap;
+  /* optional statt swap: kein Late-Swap-Layout-Shift mehr. Beim
+     ersten Visit fällt der Browser ggf. auf den System-Sans zurück,
+     bei späteren Page-Loads (Cache-Hit) ist der Brand-Font sofort
+     da. Vermeidet das sichtbare Springen von Eyebrow/Headline beim
+     Page-Wechsel. */
+  font-display: optional;
 }
 
 @font-face {
@@ -25,5 +35,10 @@
   src: url('/fonts/aileron/Aileron-BlackItalic.otf') format('opentype');
   font-weight: 900;
   font-style: italic;
-  font-display: swap;
+  /* optional statt swap: kein Late-Swap-Layout-Shift mehr. Beim
+     ersten Visit fällt der Browser ggf. auf den System-Sans zurück,
+     bei späteren Page-Loads (Cache-Hit) ist der Brand-Font sofort
+     da. Vermeidet das sichtbare Springen von Eyebrow/Headline beim
+     Page-Wechsel. */
+  font-display: optional;
 }

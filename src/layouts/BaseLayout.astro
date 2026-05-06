@@ -35,6 +35,40 @@ const initialPage = isLanding ? 'landing' : 'subpage';
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={SITE.name} />
     <meta name="theme-color" content="#0a0a0c" />
+    <link
+      rel="preload"
+      href="/fonts/montreal/NeueMontreal-Bold.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/aileron/Aileron-BlackItalic.otf"
+      as="font"
+      type="font/otf"
+      crossorigin
+    />
+    <script is:inline>
+      // Startseite-Reveal-Flag: setzt einmalig pro Session
+      // data-startseite-anim="1" auf <html>, sobald der User von der
+      // Landing auf eine Sub-Page wechselt. Die Keyframe-Animation
+      // im TopBar-CSS hängt an genau diesem Attribut, sodass das Item
+      // beim ERSTEN Sub-Page-Besuch smooth einfadet — bei späteren
+      // Sub-Page-Wechseln ist es einfach da, ohne erneutes Re-Triggern.
+      // Bei Rückkehr zur Landing wird das Flag gelöscht, sodass der
+      // nächste Wechsel wieder eine Animation produziert.
+      try {
+        var path = window.location.pathname;
+        var isLanding = path === '/' || path === '/index.html';
+        if (isLanding) {
+          window.sessionStorage.removeItem('ts-startseite-shown');
+        } else if (!window.sessionStorage.getItem('ts-startseite-shown')) {
+          document.documentElement.setAttribute('data-startseite-anim', '1');
+          window.sessionStorage.setItem('ts-startseite-shown', '1');
+        }
+      } catch (e) {}
+    </script>
     <script is:inline>
       // Splash-State VOR dem ersten Paint setzen, damit TopBar (außerhalb
       // Section1) und Section1-Inhalte gleichzeitig korrekt rendern.
