@@ -36,8 +36,8 @@ const includedItems = [
     <SubPageBackground />
 
     <header class="preise-hero">
-      <h1 class="hero-title">Was es kostet.</h1>
-      <p class="hero-subtitle">Klar, fix, ohne Sternchen.</p>
+      <h1 class="subpage-hero-title">Was es kostet.</h1>
+      <p class="subpage-hero-subtitle">Klar, fix, ohne Sternchen.</p>
     </header>
 
     <section class="preise-intro" aria-label="Preise auf einen Blick" data-reveal>
@@ -241,24 +241,8 @@ const includedItems = [
     padding-top: 32px;
   }
 
-  .hero-title {
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-weight: 700;
-    font-size: clamp(2.5rem, 5.5vw, 4rem);
-    line-height: 1.05;
-    letter-spacing: -0.025em;
-    color: #f5f5f4;
-    margin: 0 0 18px;
-  }
-
-  .hero-subtitle {
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-weight: 400;
-    font-size: clamp(1.05rem, 1.4vw, 1.2rem);
-    line-height: 1.55;
-    color: rgba(245, 245, 244, 0.65);
-    margin: 0;
-  }
+  /* Typografie der H1 + Subtitle kommt aus .subpage-hero-title /
+     .subpage-hero-subtitle in global.css. */
 
   /* === Intro-Statement: drei Zeilen, Preise in Amber === */
   .preise-intro {

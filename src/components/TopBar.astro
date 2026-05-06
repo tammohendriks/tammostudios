@@ -1,4 +1,5 @@
 ---
+import { fade } from 'astro:transitions';
 import { SITE_LABELS, NAV_ITEMS, CTA } from '../lib/constants';
 
 // Auf Sub-Pages "← Startseite" als ersten Eintrag prepended, sodass
@@ -20,7 +21,7 @@ function isActive(href: string) {
 }
 ---
 
-<header class="topbar" transition:persist="topbar">
+<header class="topbar" transition:animate={fade({ duration: '300ms' })}>
   <span class="top-left label-tracked">{SITE_LABELS.establishedLine}</span>
 
   <nav class="nav" aria-label="Hauptnavigation">
