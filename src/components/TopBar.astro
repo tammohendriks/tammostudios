@@ -7,10 +7,10 @@ import { SITE_LABELS, NAV_ITEMS, CTA } from '../lib/constants';
 const currentPath = Astro.url.pathname;
 const isLanding = currentPath === '/' || currentPath === '/index.html';
 
-type NavItem = { label: string; href: string; isHome?: boolean };
+type NavItem = { label: string; href: string };
 const navItems: NavItem[] = isLanding
   ? [...NAV_ITEMS]
-  : [{ label: 'Startseite', href: '/', isHome: true }, ...NAV_ITEMS];
+  : [{ label: 'Startseite', href: '/' }, ...NAV_ITEMS];
 
 function isActive(href: string) {
   if (href === '/') return isLanding;
@@ -28,7 +28,7 @@ function isActive(href: string) {
       <span class="nav-item">
         {i > 0 ? <span class="dot" aria-hidden="true"> · </span> : null}
         <a
-          class:list={['nav-link', { 'is-home': item.isHome }]}
+          class="nav-link"
           href={item.href}
           aria-current={isActive(item.href) ? 'page' : undefined}
         >
@@ -73,7 +73,7 @@ function isActive(href: string) {
     {navItems.map((item) => (
       <li>
         <a
-          class:list={['mobile-link', { 'is-home': item.isHome }]}
+          class="mobile-link"
           href={item.href}
           aria-current={isActive(item.href) ? 'page' : undefined}
         >
@@ -227,34 +227,9 @@ function isActive(href: string) {
     color: rgba(245, 245, 244, 1);
   }
 
-  /* "← Startseite" — Back-Hinweis auf Sub-Pages. Text bleibt im
-     normalen Nav-Weiß; nur der Pfeil davor ist amber als Affordance.
-     Beim Hover wandert der Pfeil nach links. */
-  .nav-link.is-home {
-    color: rgba(245, 245, 244, 0.85);
-    font-weight: 500;
-  }
-
-  .nav-link.is-home:hover,
-  .nav-link.is-home:focus-visible {
-    color: rgba(245, 245, 244, 1);
-  }
-
-  .nav-link.is-home::before {
-    content: '←';
-    margin-right: 6px;
-    color: rgba(245, 158, 11, 1);
-    display: inline-block;
-    transition: transform 200ms ease;
-  }
-
-  .nav-link.is-home:hover::before,
-  .nav-link.is-home:focus-visible::before {
-    transform: translateX(-3px);
-  }
-
   /* Aktive Page: amber + bold, damit User auf einen Blick sieht
-     wo er ist. */
+     wo er ist. "Startseite" auf Sub-Pages ist KEIN Sonderfall mehr —
+     gleicher Stil wie alle anderen Nav-Items, hover ins helle Weiß. */
   .nav-link[aria-current="page"] {
     color: rgba(245, 158, 11, 1);
     font-weight: 600;
@@ -262,16 +237,6 @@ function isActive(href: string) {
 
   .mobile-link[aria-current="page"] {
     color: rgba(245, 158, 11, 1);
-  }
-
-  .mobile-link.is-home {
-    color: rgba(245, 245, 244, 0.95);
-  }
-
-  .mobile-link.is-home::before {
-    content: '← ';
-    color: rgba(245, 158, 11, 1);
-    display: inline;
   }
 
   .dot {
