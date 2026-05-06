@@ -67,29 +67,28 @@ const { eyebrow, headline, subtext, primaryCta, secondaryEmail, footer } = SECTI
 </section>
 
 <style>
-  /* Desktop + Mobile: hartes 100dvh — kein Scroll-Past. Closing
-     ist top-anchored (natural height, kein flex-grow), Footer wird
-     per margin-top:auto an die Unterkante gedrückt. Whitespace
-     dazwischen ergibt sich natürlich aus dem verfügbaren Raum.
-     Padding kompakt gehalten, damit auch auf 1080p-Viewports der
-     Footer noch innerhalb der Section sichtbar ist. */
+  /* Desktop: min-height 100dvh — Section ist mindestens viewport-hoch,
+     darf aber wachsen wenn Content mehr braucht. Garantiert dass der
+     Footer auch auf knappen Höhen sichtbar bleibt (vorheriges hartes
+     max-height + overflow:hidden hat den Footer auf 1080p geclippt).
+     Mobile übernimmt den harten 100dvh-Cap im @media-Block weiter unten. */
   .section-5 {
     position: relative;
-    height: 100dvh;
     min-height: 100dvh;
-    max-height: 100dvh;
     display: flex;
     flex-direction: column;
     background: #050507;
     padding: 100px 40px 28px;
-    overflow: hidden;
   }
 
-  /* Mobile-Override: tighteres Padding + kompaktere Typo. Layout-
-     Mechanik (100dvh, top-anchored Closing, footer margin-top:auto)
-     erbt vom Base. */
+  /* Mobile-Override: hartes 100dvh, kein Scroll-Past. Closing-Block
+     + Footer müssen zusammen reinpassen — ultra-compact-Variante
+     für sehr kurze Viewports liegt weiter unten. */
   @media (max-width: 768px) {
     .section-5 {
+      height: 100dvh;
+      max-height: 100dvh;
+      overflow: hidden;
       padding: 90px 16px 16px;
     }
 

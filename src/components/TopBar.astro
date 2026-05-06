@@ -1,15 +1,39 @@
 ---
 import { SITE_LABELS, NAV_ITEMS, CTA } from '../lib/constants';
+
+// Auf Sub-Pages "← Startseite" als ersten Eintrag prepended, sodass
+// User immer einen klaren Weg zurück hat. Auf der Landing-Page wäre
+// der Link redundant — er erscheint dort nicht.
+const currentPath = Astro.url.pathname;
+const isLanding = currentPath === '/' || currentPath === '/index.html';
+
+type NavItem = { label: string; href: string; isHome?: boolean };
+const navItems: NavItem[] = isLanding
+  ? [...NAV_ITEMS]
+  : [{ label: 'Startseite', href: '/', isHome: true }, ...NAV_ITEMS];
+
+function isActive(href: string) {
+  if (href === '/') return isLanding;
+  // Sub-Pages: aktiv wenn currentPath mit href beginnt — fängt
+  // auch potenzielle Sub-Routes wie /referenzen/foo später ab.
+  return currentPath === href || currentPath.startsWith(href + '/');
+}
 ---
 
 <header class="topbar" transition:persist="topbar">
   <span class="top-left label-tracked">{SITE_LABELS.establishedLine}</span>
 
   <nav class="nav" aria-label="Hauptnavigation">
-    {NAV_ITEMS.map((item, i) => (
+    {navItems.map((item, i) => (
       <span class="nav-item">
         {i > 0 ? <span class="dot" aria-hidden="true"> · </span> : null}
-        <a class="nav-link" href={item.href}>{item.label}</a>
+        <a
+          class:list={['nav-link', { 'is-home': item.isHome }]}
+          href={item.href}
+          aria-current={isActive(item.href) ? 'page' : undefined}
+        >
+          {item.label}
+        </a>
       </span>
     ))}
   </nav>
@@ -47,9 +71,15 @@ import { SITE_LABELS, NAV_ITEMS, CTA } from '../lib/constants';
 
 <div id="mobile-menu" class="mobile-menu" hidden>
   <ul>
-    {NAV_ITEMS.map((item) => (
+    {navItems.map((item) => (
       <li>
-        <a class="mobile-link" href={item.href}>{item.label}</a>
+        <a
+          class:list={['mobile-link', { 'is-home': item.isHome }]}
+          href={item.href}
+          aria-current={isActive(item.href) ? 'page' : undefined}
+        >
+          {item.label}
+        </a>
       </li>
     ))}
     <li class="mobile-cta-wrap">
@@ -88,6 +118,22 @@ import { SITE_LABELS, NAV_ITEMS, CTA } from '../lib/constants';
     gap: 16px;
     pointer-events: none;
     overflow: visible;
+    border-bottom: 1px solid transparent;
+    transition:
+      background 300ms ease,
+      backdrop-filter 300ms ease,
+      border-color 300ms ease;
+  }
+
+  /* Beim Top der Page transparent. Sobald gescrolled wird (>60px),
+     fadet ein subtiler Backdrop ein, damit Nav vor jedem Section-
+     Hintergrund lesbar bleibt — z.B. /referenzen scrollt einen
+     großen "Referenzen"-Title direkt unter die Nav. */
+  :global(html[data-scrolled="true"]) .topbar {
+    background: rgba(5, 5, 7, 0.75);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom-color: rgba(255, 255, 255, 0.06);
   }
 
   .topbar > * {
@@ -161,6 +207,44 @@ import { SITE_LABELS, NAV_ITEMS, CTA } from '../lib/constants';
   .nav-link:hover,
   .nav-link:focus-visible {
     color: rgba(245, 245, 244, 1);
+  }
+
+  /* "← Startseite" — Back-Hinweis auf Sub-Pages. Amber gefärbt, mit
+     Pfeil-Affordance der bei Hover leicht nach links wandert. */
+  .nav-link.is-home {
+    color: rgba(245, 158, 11, 0.95);
+  }
+
+  .nav-link.is-home::before {
+    content: '←';
+    margin-right: 4px;
+    display: inline-block;
+    transition: transform 200ms ease;
+  }
+
+  .nav-link.is-home:hover::before,
+  .nav-link.is-home:focus-visible::before {
+    transform: translateX(-3px);
+  }
+
+  /* Aktive Page: amber + bold, damit User auf einen Blick sieht
+     wo er ist. */
+  .nav-link[aria-current="page"] {
+    color: rgba(245, 158, 11, 1);
+    font-weight: 600;
+  }
+
+  .mobile-link[aria-current="page"] {
+    color: rgba(245, 158, 11, 1);
+  }
+
+  .mobile-link.is-home {
+    color: rgba(245, 158, 11, 0.95);
+  }
+
+  .mobile-link.is-home::before {
+    content: '← ';
+    display: inline;
   }
 
   .dot {
