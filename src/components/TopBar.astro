@@ -24,7 +24,7 @@ function isActive(href: string) {
 }
 ---
 
-<header class="topbar" data-topbar transition:persist="topbar">
+<header class="topbar" data-topbar transition:persist="tammo-topbar">
   <span class="top-left label-tracked">{SITE_LABELS.establishedLine}</span>
 
   <nav class="nav" aria-label="Hauptnavigation">
@@ -245,41 +245,36 @@ function isActive(href: string) {
     color: rgba(245, 158, 11, 1);
   }
 
-  /* "Startseite" hängt im DOM auf jeder Page — Sichtbarkeit kommt
-     aus dem globalen html[data-page]-State. Auf der Landing
-     (data-page="landing") wird das Item per opacity + visibility
-     versteckt, auf Sub-Pages gefadet eingeblendet. visibility-
-     Transition ist verzögert beim Hide, sodass das Element erst
-     nach dem opacity-Fade gesperrt wird. Das vermeidet Flackern.
-     Das Element bleibt mit seiner natürlichen Breite erhalten —
-     die Pille ist auf Landing genauso breit wie auf Sub-Pages, der
-     Rest der Nav springt nicht. */
+  /* "Startseite" hängt im DOM auf jeder Page, Sichtbarkeit kommt
+     aus dem globalen html[data-page]-State. display:none auf Landing
+     reserviert KEINEN Layout-Space — der vorherige Ansatz mit
+     visibility:hidden hat einen sichtbaren Leerslot vor "Über"
+     hinterlassen. Beim Wechsel zu subpage spielt eine einmalige
+     @keyframes-Animation, die das Item smooth einblendet. Beim
+     Zurück zur Landing verschwindet es ohne Fade-out — bewusst, da
+     display:none nicht transitionierbar ist. */
   .nav-item-startseite {
-    opacity: 0;
-    transform: translateX(-8px);
-    visibility: hidden;
-    pointer-events: none;
-    transition:
-      opacity 400ms ease-out,
-      transform 400ms ease-out,
-      visibility 0s linear 400ms;
+    display: none;
   }
 
   :global(html[data-page="subpage"]) .nav-item-startseite {
-    opacity: 1;
-    transform: translateX(0);
-    visibility: visible;
-    pointer-events: auto;
-    transition:
-      opacity 400ms ease-out,
-      transform 400ms ease-out,
-      visibility 0s linear 0s;
+    display: inline-flex;
+    align-items: center;
+    animation: startseite-fade-in 400ms ease-out;
   }
 
-  /* Mobile-Menü: Startseite-Eintrag ohne Layout-Reservierung —
-     auf Landing display:none, auf Sub-Pages list-item. Stack-Layout
-     hier braucht keine Breiten-Stabilität wie das Pill-Inline-
-     Layout der Desktop-Nav. */
+  @keyframes startseite-fade-in {
+    from {
+      opacity: 0;
+      transform: translateX(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  /* Mobile-Menü: Stack-Layout, gleiches Schema. */
   .mobile-item-startseite {
     display: none;
   }
@@ -289,8 +284,8 @@ function isActive(href: string) {
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .nav-item-startseite {
-      transition: none;
+    :global(html[data-page="subpage"]) .nav-item-startseite {
+      animation: none;
     }
   }
 

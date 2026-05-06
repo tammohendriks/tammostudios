@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import { ClientRouter } from 'astro:transitions';
+import TopBar from '../components/TopBar.astro';
 import { SITE } from '../lib/constants';
 
 interface Props {
@@ -120,6 +121,7 @@ const initialPage = isLanding ? 'landing' : 'subpage';
     </script>
   </head>
   <body class="min-h-dvh bg-ts-bg text-ts-fg">
+    <TopBar />
     <slot />
     <script>
       // Site-weiter Scroll-Reveal: alle [data-reveal] Elemente werden

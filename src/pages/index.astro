@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import TopBar from '../components/TopBar.astro';
 import Section1 from '../components/sections/Section1.astro';
 import Section2 from '../components/sections/Section2.astro';
 import Section3 from '../components/sections/Section3.astro';
@@ -13,8 +12,6 @@ import { SITE } from '../lib/constants';
   pageTitle="Webentwicklung mit Charakter"
   description={`${SITE.name} — Webentwicklung aus ${SITE.location}.`}
 >
-  <TopBar />
-
   <main>
     <Section1 />
     <Section2 />

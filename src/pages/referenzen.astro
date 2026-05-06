@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import TopBar from '../components/TopBar.astro';
 import SubPageBackground from '../components/SubPageBackground.astro';
 import { REFERENCES } from '../lib/references';
 import { SECTION5 } from '../lib/constants';
@@ -12,8 +11,6 @@ const { footer } = SECTION5;
   pageTitle="Referenzen"
   description="Aktuelle Webentwicklungs-Projekte aus Bremen — individuelle Websites für lokale Unternehmen."
 >
-  <TopBar />
-
   <main class="referenzen-page" transition:animate="fade">
     <SubPageBackground />
     <header class="ref-hero">

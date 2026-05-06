@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import TopBar from '../components/TopBar.astro';
 import SubPageBackground from '../components/SubPageBackground.astro';
 import { SECTION5 } from '../lib/constants';
 
@@ -11,8 +10,6 @@ const { footer } = SECTION5;
   pageTitle="Über mich"
   description="Tammo Hendriks aus Bremen — handgemachte Websites, eine Person, ein Projekt zur Zeit."
 >
-  <TopBar />
-
   <main class="ueber-page" transition:animate="fade">
     <SubPageBackground />
 
