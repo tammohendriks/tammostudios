@@ -38,35 +38,34 @@ function isActive(href: string) {
     ))}
   </nav>
 
-  <div class="topbar-right">
-    <a class="cta-orbital topbar-cta" href={CTA.href}>
-      <span class="cta-label">{CTA.label}</span>
-      <svg
-        width="14"
-        height="14"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
-      >
-        <path d="M5 12h14M13 6l6 6-6 6" />
-      </svg>
-    </a>
-    <button
-      id="nav-toggle"
-      class="hamburger"
-      type="button"
-      aria-label="Menü öffnen"
-      aria-expanded="false"
-      aria-controls="mobile-menu"
+  <button
+    id="nav-toggle"
+    class="hamburger"
+    type="button"
+    aria-label="Menü öffnen"
+    aria-expanded="false"
+    aria-controls="mobile-menu"
+  >
+    <span></span>
+    <span></span>
+  </button>
+
+  <a class="cta-orbital topbar-cta" href={CTA.href}>
+    <span class="cta-label">{CTA.label}</span>
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
     >
-      <span></span>
-      <span></span>
-    </button>
-  </div>
+      <path d="M5 12h14M13 6l6 6-6 6" />
+    </svg>
+  </a>
 </header>
 
 <div id="mobile-menu" class="mobile-menu" hidden>
@@ -104,20 +103,22 @@ function isActive(href: string) {
 </div>
 
 <style>
-  /* TopBar-Wrapper: nur Layout, KEIN Backdrop. Die drei Direkt-
-     Kinder (eyebrow, nav, CTA-rechts) tragen jeweils ihren eigenen
-     Glass-Pill — dazwischen scheint der Page-Hintergrund durch.
-     pointer-events: none auf dem Wrapper, auto auf den Kindern,
-     damit die Lücken zwischen den Pills nicht klickbar sind. */
+  /* TopBar-Wrapper: 3-Spalten-Grid 1fr/auto/1fr. Die mittlere
+     auto-Spalte hat die Breite ihres Inhalts (Nav-Pille bzw. auf
+     Mobile der Hamburger); links und rechts sind je 1fr — exakt
+     gleich breit, sodass die Mitte garantiert in der Viewport-
+     Mitte liegt, egal wie unterschiedlich Eyebrow und CTA in der
+     Breite sind. Ohne Grid (flex space-between) hingen die Pillen
+     asymmetrisch. */
   .topbar {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     z-index: 50;
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    justify-content: space-between;
     padding: 20px 32px;
     gap: 16px;
     pointer-events: none;
@@ -126,6 +127,22 @@ function isActive(href: string) {
 
   .topbar > * {
     pointer-events: auto;
+  }
+
+  .label-tracked {
+    grid-column: 1;
+    justify-self: start;
+  }
+
+  .nav,
+  .hamburger {
+    grid-column: 2;
+    justify-self: center;
+  }
+
+  .topbar-cta {
+    grid-column: 3;
+    justify-self: end;
   }
 
   /* Splash-Coupling: TopBar-Items sind während Splash + Reveal
@@ -260,13 +277,6 @@ function isActive(href: string) {
   .dot {
     color: rgba(245, 245, 244, 0.3);
     padding: 0 6px;
-  }
-
-  .topbar-right {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    overflow: visible;
   }
 
   /* TopBar-spezifische Verkleinerung des globalen .cta-orbital.
