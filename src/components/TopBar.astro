@@ -2,13 +2,14 @@
 import { SITE_LABELS, NAV_ITEMS, CTA } from '../lib/constants';
 
 // "Startseite" wird IMMER ins DOM gerendert. Sichtbarkeit kommt
-// per CSS aus dem globalen html[data-page]-State (BaseLayout setzt
-// das per SSR + per inline-Script bei jeder ClientRouter-Navigation
-// neu). transition:persist auf der TopBar bleibt damit konfliktfrei
-// — die Items selbst sind statisch, nur der Startseite-Slot fadet
-// per CSS-Transition rein/raus.
+// per CSS aus dem html[data-page]- bzw. header[data-page]-State,
+// beide werden bei jedem Page-Reload server-seitig korrekt gesetzt.
+// Ohne View Transitions: kein Sync nötig, jede Navigation ist ein
+// Full-Page-Reload und liefert das richtige data-page direkt vom
+// Server.
 const currentPath = Astro.url.pathname;
 const isLanding = currentPath === '/' || currentPath === '/index.html';
+const pageType = isLanding ? 'landing' : 'subpage';
 
 type NavItem = { label: string; href: string; key?: string };
 const navItems: NavItem[] = [
@@ -24,7 +25,7 @@ function isActive(href: string) {
 }
 ---
 
-<header class="topbar" data-topbar transition:persist="tammo-topbar">
+<header class="topbar" data-topbar data-page={pageType}>
   <span class="top-left label-tracked">{SITE_LABELS.establishedLine}</span>
 
   <nav class="nav" aria-label="Hauptnavigation">

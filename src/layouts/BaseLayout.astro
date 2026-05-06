@@ -1,6 +1,5 @@
 ---
 import '../styles/global.css';
-import { ClientRouter } from 'astro:transitions';
 import TopBar from '../components/TopBar.astro';
 import { SITE } from '../lib/constants';
 
@@ -36,13 +35,12 @@ const initialPage = isLanding ? 'landing' : 'subpage';
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={SITE.name} />
     <meta name="theme-color" content="#0a0a0c" />
-    <ClientRouter />
     <script is:inline>
-      // Splash-State VOR dem ersten Paint UND vor jeder ClientRouter-
-      // Navigation neu setzen. Mit View Transitions persistiert <html>
-      // zwischen Pages — ohne Reset würde z.B. data-splash="ready" von
-      // einer Landing-Navigation weiter auf einer Sub-Page hängen, oder
-      // umgekehrt.
+      // Splash-State VOR dem ersten Paint setzen, damit TopBar (außerhalb
+      // Section1) und Section1-Inhalte gleichzeitig korrekt rendern.
+      // Ohne View Transitions reicht der einmalige Aufruf beim Page-
+      // Parse — bei Sub-Page-Navigationen folgt ein Full-Reload, bei
+      // dem dieser Block erneut läuft.
       //
       //   Landing + erstes Mal + keine reduced-motion → data-splash="splash"
       //                                                  (Section1-Script
@@ -50,74 +48,19 @@ const initialPage = isLanding ? 'landing' : 'subpage';
       //                                                  reveal/ready)
       //   Alles andere (Sub-Pages, returning visitor, reduced-motion)
       //                                               → splash-skip
-      (function () {
-        function applySplashState() {
-          try {
-            var html = document.documentElement;
-            html.classList.remove('splash-skip');
-            html.removeAttribute('data-splash');
-            var path = window.location.pathname;
-            var isLanding = path === '/' || path === '/index.html';
-            if (
-              !isLanding ||
-              window.sessionStorage.getItem('ts-splash-seen') === '1' ||
-              window.matchMedia('(prefers-reduced-motion: reduce)').matches
-            ) {
-              html.classList.add('splash-skip');
-            } else {
-              html.setAttribute('data-splash', 'splash');
-            }
-          } catch (e) {}
+      try {
+        var path = window.location.pathname;
+        var isLanding = path === '/' || path === '/index.html';
+        if (
+          !isLanding ||
+          window.sessionStorage.getItem('ts-splash-seen') === '1' ||
+          window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        ) {
+          document.documentElement.classList.add('splash-skip');
+        } else {
+          document.documentElement.setAttribute('data-splash', 'splash');
         }
-        applySplashState();
-        // before-swap: korrigiert state BEVOR die neue Page gepainted
-        // wird, sodass kein "data-splash=ready" von der vorherigen Page
-        // kurz die neue Sub-Page treffen kann.
-        document.addEventListener('astro:before-swap', applySplashState);
-        // page-load: sichert state nach jedem Swap (auch initial).
-        document.addEventListener('astro:page-load', applySplashState);
-      })();
-    </script>
-    <script is:inline>
-      // TopBar-State-Sync: data-page auf <html> + auf [data-topbar]
-      // sowie aria-current pro Nav-Link aktualisieren. Notwendig, weil
-      // die TopBar via transition:persist über Page-Wechsel hinweg im
-      // DOM erhalten bleibt — ohne dieses Update bliebe data-page beim
-      // Wert der zuerst geladenen Page hängen, und "Startseite" würde
-      // auf Sub-Pages nicht eingeblendet.
-      (function () {
-        function updateTopbarState() {
-          try {
-            var path = window.location.pathname;
-            var isLanding = path === '/' || path === '/index.html';
-            var pageType = isLanding ? 'landing' : 'subpage';
-            document.documentElement.setAttribute('data-page', pageType);
-            var topbar = document.querySelector('[data-topbar]');
-            if (topbar) topbar.setAttribute('data-page', pageType);
-
-            var links = document.querySelectorAll(
-              '[data-topbar] .nav-link, .mobile-menu .mobile-link'
-            );
-            links.forEach(function (link) {
-              var href = link.getAttribute('href') || '';
-              var active = false;
-              if (href === '/') {
-                active = isLanding;
-              } else {
-                active =
-                  path === href || path.indexOf(href + '/') === 0;
-              }
-              if (active) link.setAttribute('aria-current', 'page');
-              else link.removeAttribute('aria-current');
-            });
-          } catch (e) {}
-        }
-        updateTopbarState();
-        // after-swap feuert nach jedem ClientRouter-Swap, das ist der
-        // richtige Moment um die persistierte TopBar an die neue URL
-        // anzupassen.
-        document.addEventListener('astro:after-swap', updateTopbarState);
-      })();
+      } catch (e) {}
     </script>
   </head>
   <body class="min-h-dvh bg-ts-bg text-ts-fg">
@@ -128,21 +71,10 @@ const initialPage = isLanding ? 'landing' : 'subpage';
       // beim Eintritt in den Viewport (15% sichtbar) eingefadet. Pro
       // Callback-Batch wird ein 100ms-Stagger zwischen den Elementen
       // gelegt, damit gleichzeitig sichtbar werdende Blöcke nicht
-      // synchron, sondern leicht versetzt erscheinen.
-      //
-      // Mit Astro ClientRouter persistiert der globale Code zwischen
-      // Pages — der Listener läuft nur einmal, fired aber bei jedem
-      // astro:page-load (initial + nach jeder Navigation). Pro Run
-      // wird der vorherige Observer disconnected, sodass keine
-      // veralteten Element-Referenzen oder Memory-Leaks entstehen.
-      let revealObserver: IntersectionObserver | null = null;
-
+      // synchron, sondern leicht versetzt erscheinen. Initialisiert
+      // bei DOMContentLoaded — Full-Page-Reloads triggern das Event
+      // bei jeder Navigation neu, kein Astro-Event nötig.
       function setupReveal() {
-        if (revealObserver) {
-          revealObserver.disconnect();
-          revealObserver = null;
-        }
-
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
           // Reduced-Motion: Elemente bleiben sichtbar via CSS-Override.
           return;
@@ -153,14 +85,14 @@ const initialPage = isLanding ? 'landing' : 'subpage';
         );
         if (targets.length === 0) return;
 
-        revealObserver = new IntersectionObserver(
-          (entries, observer) => {
+        const observer = new IntersectionObserver(
+          (entries, obs) => {
             const intersecting = entries.filter((e) => e.isIntersecting);
             intersecting.forEach((entry, i) => {
               const el = entry.target as HTMLElement;
               el.style.transitionDelay = i * 100 + 'ms';
               el.classList.add('is-revealed');
-              observer.unobserve(el);
+              obs.unobserve(el);
             });
           },
           {
@@ -169,10 +101,14 @@ const initialPage = isLanding ? 'landing' : 'subpage';
           }
         );
 
-        targets.forEach((el) => revealObserver!.observe(el));
+        targets.forEach((el) => observer.observe(el));
       }
 
-      document.addEventListener('astro:page-load', setupReveal);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupReveal);
+      } else {
+        setupReveal();
+      }
     </script>
   </body>
 </html>
