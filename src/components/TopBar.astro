@@ -104,6 +104,11 @@ function isActive(href: string) {
 </div>
 
 <style>
+  /* TopBar-Wrapper: nur Layout, KEIN Backdrop. Die drei Direkt-
+     Kinder (eyebrow, nav, CTA-rechts) tragen jeweils ihren eigenen
+     Glass-Pill — dazwischen scheint der Page-Hintergrund durch.
+     pointer-events: none auf dem Wrapper, auto auf den Kindern,
+     damit die Lücken zwischen den Pills nicht klickbar sind. */
   .topbar {
     position: fixed;
     top: 0;
@@ -113,27 +118,10 @@ function isActive(href: string) {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    /* Etwas mehr Bottom-Padding, damit der untere CTA-Glow Luft hat. */
-    padding: 28px 28px 36px;
+    padding: 20px 32px;
     gap: 16px;
     pointer-events: none;
     overflow: visible;
-    border-bottom: 1px solid transparent;
-    transition:
-      background 300ms ease,
-      backdrop-filter 300ms ease,
-      border-color 300ms ease;
-  }
-
-  /* Beim Top der Page transparent. Sobald gescrolled wird (>60px),
-     fadet ein subtiler Backdrop ein, damit Nav vor jedem Section-
-     Hintergrund lesbar bleibt — z.B. /referenzen scrollt einen
-     großen "Referenzen"-Title direkt unter die Nav. */
-  :global(html[data-scrolled="true"]) .topbar {
-    background: rgba(5, 5, 7, 0.75);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border-bottom-color: rgba(255, 255, 255, 0.06);
   }
 
   .topbar > * {
@@ -172,23 +160,36 @@ function isActive(href: string) {
   :global(html[data-splash="ready"]) .cta-orbital   { transition-delay: 160ms; }
   :global(html[data-splash="ready"]) .hamburger     { transition-delay: 80ms;  }
 
-  @media (max-width: 767px) {
-    .topbar {
-      padding: 20px 20px 28px;
-    }
+
+  /* Glass-Pill: subtiler dunkler Backdrop mit blur, dünne Border,
+     leichter Shadow + inset-Highlight. Wiederverwendet für eyebrow,
+     nav und (auf Mobile) hamburger. */
+  .label-tracked,
+  .nav {
+    background: rgba(5, 5, 7, 0.55);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 9999px;
+    box-shadow:
+      0 4px 24px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
   }
 
   .label-tracked {
+    padding: 10px 18px;
     text-transform: uppercase;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.2em;
     font-weight: 500;
-    font-size: 12px;
-    color: rgba(245, 245, 244, 0.5);
+    font-size: 0.7rem;
+    color: rgba(245, 245, 244, 0.7);
   }
 
   .nav {
     display: inline-flex;
     align-items: center;
+    padding: 10px 20px;
+    gap: 0 4px;
   }
 
   .nav-item {
@@ -209,15 +210,23 @@ function isActive(href: string) {
     color: rgba(245, 245, 244, 1);
   }
 
-  /* "← Startseite" — Back-Hinweis auf Sub-Pages. Amber gefärbt, mit
-     Pfeil-Affordance der bei Hover leicht nach links wandert. */
+  /* "← Startseite" — Back-Hinweis auf Sub-Pages. Text bleibt im
+     normalen Nav-Weiß; nur der Pfeil davor ist amber als Affordance.
+     Beim Hover wandert der Pfeil nach links. */
   .nav-link.is-home {
-    color: rgba(245, 158, 11, 0.95);
+    color: rgba(245, 245, 244, 0.85);
+    font-weight: 500;
+  }
+
+  .nav-link.is-home:hover,
+  .nav-link.is-home:focus-visible {
+    color: rgba(245, 245, 244, 1);
   }
 
   .nav-link.is-home::before {
     content: '←';
-    margin-right: 4px;
+    margin-right: 6px;
+    color: rgba(245, 158, 11, 1);
     display: inline-block;
     transition: transform 200ms ease;
   }
@@ -239,11 +248,12 @@ function isActive(href: string) {
   }
 
   .mobile-link.is-home {
-    color: rgba(245, 158, 11, 0.95);
+    color: rgba(245, 245, 244, 0.95);
   }
 
   .mobile-link.is-home::before {
     content: '← ';
+    color: rgba(245, 158, 11, 1);
     display: inline;
   }
 
@@ -300,16 +310,33 @@ function isActive(href: string) {
     transform: translateY(-4px) rotate(-45deg);
   }
 
-  /* Mobile breakpoint */
+  /* Mobile breakpoint: kompaktere Pills, Nav versteckt zugunsten
+     Hamburger der seinerseits als Pill rendert. */
   @media (max-width: 767px) {
+    .topbar {
+      padding: 16px;
+    }
     .nav {
       display: none;
     }
+    .label-tracked {
+      padding: 8px 14px;
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+    }
     .hamburger {
       display: inline-flex;
-    }
-    .label-tracked {
-      font-size: 11px;
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      background: rgba(5, 5, 7, 0.55);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 9999px;
+      box-shadow:
+        0 4px 24px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
     }
   }
 

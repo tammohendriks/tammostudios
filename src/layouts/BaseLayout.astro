@@ -58,22 +58,6 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
         }
       } catch (e) {}
     </script>
-    <script is:inline>
-      // data-scrolled wird auf html gesetzt sobald > 60px gescrollt
-      // wurde. TopBar liest das Attribut via :global() Selector und
-      // fadet ihren Backdrop ein. Damit liest sich Nav lesbar vor
-      // jedem Section-Header (z.B. /referenzen "Referenzen" Title).
-      (function () {
-        function update() {
-          var y = window.scrollY || window.pageYOffset || 0;
-          var html = document.documentElement;
-          if (y > 60) html.setAttribute('data-scrolled', 'true');
-          else html.removeAttribute('data-scrolled');
-        }
-        window.addEventListener('scroll', update, { passive: true });
-        update();
-      })();
-    </script>
   </head>
   <body class="min-h-dvh bg-ts-bg text-ts-fg">
     <slot />
