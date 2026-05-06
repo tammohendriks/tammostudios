@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import TopBar from '../components/TopBar.astro';
+import SubPageBackground from '../components/SubPageBackground.astro';
 import { SECTION5 } from '../lib/constants';
 
 const { footer } = SECTION5;
@@ -31,28 +32,22 @@ const includedItems = [
 >
   <TopBar />
 
-  <main class="preise-page">
-    <div class="preise-bg" aria-hidden="true">
-      <div class="preise-bg-aurora"></div>
-      <div class="preise-bg-grid"></div>
-      <div class="preise-bg-glow preise-bg-glow-top"></div>
-      <div class="preise-bg-glow preise-bg-glow-bottom"></div>
-      <div class="preise-bg-vignette"></div>
-    </div>
+  <main class="preise-page" transition:animate="fade">
+    <SubPageBackground />
 
     <header class="preise-hero">
       <h1 class="hero-title">Was es kostet.</h1>
       <p class="hero-subtitle">Klar, fix, ohne Sternchen.</p>
     </header>
 
-    <section class="preise-intro" aria-label="Preise auf einen Blick">
+    <section class="preise-intro" aria-label="Preise auf einen Blick" data-reveal>
       <p>Eine Website kostet <strong>1.000 €</strong>.</p>
       <p>Ein Online-Shop kostet <strong>2.000 €</strong>.</p>
       <p>Punkt.</p>
     </section>
 
     <section class="preise-cards" aria-label="Pakete">
-      <article class="price-card">
+      <article class="price-card" data-reveal>
         <p class="price-eyebrow">WEBSITE</p>
         <p class="price-amount">1.000 €</p>
         <p class="price-sublabel">Einmalig. Fix.</p>
@@ -72,7 +67,7 @@ const includedItems = [
         </p>
       </article>
 
-      <article class="price-card">
+      <article class="price-card" data-reveal>
         <p class="price-eyebrow">ONLINE-SHOP</p>
         <p class="price-amount">2.000 €</p>
         <p class="price-sublabel">Einmalig. Fix.</p>
@@ -90,14 +85,14 @@ const includedItems = [
       </article>
     </section>
 
-    <section class="preise-section">
+    <section class="preise-section" data-reveal>
       <h2>Erweiterungen</h2>
       <p>Manchmal braucht es mehr.</p>
       <ul class="dash-list">
         <li>Weitere Unterseite: <strong>100 €</strong></li>
         <li>
           Änderungen nach Launch (neue Bilder, Layout-Updates,
-          zusätzliche Funktionen): <strong>35 €/Stunde</strong>,
+          zusätzliche Funktionen): <strong>50 €/Stunde</strong>,
           je nach Umfang
         </li>
       </ul>
@@ -107,7 +102,7 @@ const includedItems = [
       </p>
     </section>
 
-    <section class="preise-pflege" aria-label="Pflege-Paket">
+    <section class="preise-pflege" aria-label="Pflege-Paket" data-reveal>
       <article class="pflege-card">
         <p class="price-eyebrow">PFLEGE-PAKET</p>
         <div class="pflege-amount-row">
@@ -137,7 +132,7 @@ const includedItems = [
       </article>
     </section>
 
-    <section class="preise-section preise-included">
+    <section class="preise-section preise-included" data-reveal>
       <h2>Was schon drin ist</h2>
       <p>
         Damit Du weißt, was Du bekommst, ohne dass am Ende eine
@@ -157,7 +152,7 @@ const includedItems = [
       </p>
     </section>
 
-    <section class="preise-section preise-manifest">
+    <section class="preise-section preise-manifest" data-reveal>
       <h2>Warum diese Preise so klar sind?</h2>
       <p>
         Ich glaube an einfache Verhältnisse. Du sollst vorher
@@ -171,7 +166,7 @@ const includedItems = [
       </p>
     </section>
 
-    <section class="preise-cta">
+    <section class="preise-cta" data-reveal>
       <p class="cta-pre">Klingt fair?</p>
       <a class="inline-link inline-link-cta" href="/kontakt">
         <span>Lass uns sprechen</span>
@@ -233,101 +228,8 @@ const includedItems = [
     }
   }
 
-  /* === Atmosphäre — analog zu /ueber: vier statische Layer plus
-     ein zweiter Glow ganz unten beim CTA. Keine Animation — die
-     Seite soll Vertrauen ausstrahlen, nicht ablenken. */
-  .preise-bg {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    overflow: hidden;
-  }
-
-  .preise-bg-grid {
-    position: absolute;
-    inset: 0;
-    background-image:
-      linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
-    background-size: 60px 60px;
-    -webkit-mask-image: radial-gradient(ellipse at 50% 30%, black 10%, transparent 75%);
-    mask-image: radial-gradient(ellipse at 50% 30%, black 10%, transparent 75%);
-  }
-
-  .preise-bg-aurora {
-    position: absolute;
-    top: -120px;
-    left: -10%;
-    right: -10%;
-    height: 400px;
-    background: radial-gradient(
-      ellipse at center top,
-      rgba(245, 158, 11, 0.08) 0%,
-      transparent 70%
-    );
-    filter: blur(120px);
-  }
-
-  .preise-bg-glow {
-    position: absolute;
-    width: 700px;
-    height: 700px;
-    border-radius: 50%;
-    background: radial-gradient(
-      circle,
-      rgba(245, 158, 11, 0.12) 0%,
-      transparent 60%
-    );
-    filter: blur(100px);
-  }
-
-  /* Oberer Glow zwischen Hero und Karten — trägt die Karten ohne
-     sie zu überstrahlen. */
-  .preise-bg-glow-top {
-    top: 480px;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
-  /* Unterer Glow beim CTA — leiser, lässt den Schluss leuchten. */
-  .preise-bg-glow-bottom {
-    width: 500px;
-    height: 500px;
-    bottom: 40px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: radial-gradient(
-      circle,
-      rgba(245, 158, 11, 0.08) 0%,
-      transparent 60%
-    );
-  }
-
-  .preise-bg-vignette {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 30%;
-    background: linear-gradient(
-      to bottom,
-      transparent 0%,
-      rgba(0, 0, 0, 0.5) 100%
-    );
-  }
-
-  @media (max-width: 768px) {
-    .preise-bg-glow-top {
-      top: 360px;
-      width: 500px;
-      height: 500px;
-    }
-    .preise-bg-glow-bottom {
-      width: 360px;
-      height: 360px;
-    }
-  }
+  /* Atmosphäre liegt jetzt in <SubPageBackground /> — geteilt mit
+     /ueber und /referenzen. */
 
   /* === Hero === */
   .preise-hero {

@@ -1,0 +1,197 @@
+---
+// Wiederverwendbarer Hintergrund für /ueber, /referenzen, /preise.
+// Vier statische Layer + sehr langsame Atmen-Animationen, die NICHT
+// die Position bewegen — nur Opacity. Damit bleibt das Lesen ruhig.
+//
+// Aufbau:
+//   A — masked Grid (60px, mehr Präsenz als die alte 0.025-Variante)
+//   B — drei Amber-Radial-Glows mit versetzten Breath-Tempi (90/105/120s)
+//   C — Floating Particles, vertikaler Drift nach oben (60–90s)
+//   D — Vignette unten
+//
+// prefers-reduced-motion: reduce → alle Animationen aus.
+
+const PARTICLE_COUNT = 14;
+const particles = Array.from({ length: PARTICLE_COUNT }, () => ({
+  startX: Math.random() * 100,
+  startY: Math.random() * 100,
+  drift: -(80 + Math.random() * 40),
+  duration: 60 + Math.random() * 30,
+  delay: -Math.random() * 90,
+  size: 3 + Math.random() * 2,
+  opacity: 0.15 + Math.random() * 0.15,
+}));
+---
+
+<div class="subpage-bg" aria-hidden="true">
+  <div class="subpage-bg-grid"></div>
+  <div class="subpage-bg-glow subpage-bg-glow-1"></div>
+  <div class="subpage-bg-glow subpage-bg-glow-2"></div>
+  <div class="subpage-bg-glow subpage-bg-glow-3"></div>
+  <div class="subpage-bg-particles">
+    {particles.map((p) => (
+      <span
+        class="subpage-bg-particle"
+        style={`--start-x:${p.startX}%; --start-y:${p.startY}%; --drift:${p.drift}vh; --duration:${p.duration}s; --delay:${p.delay}s; --size:${p.size}px; --opacity:${p.opacity};`}
+      ></span>
+    ))}
+  </div>
+  <div class="subpage-bg-vignette"></div>
+</div>
+
+<style>
+  .subpage-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  /* Layer A — Grid mit radialer Maske, in der Mitte sichtbar,
+     zu den Rändern ausgefadet. Opacity etwas höher als zuvor
+     (0.04 statt 0.025) — bleibt dezent, hat aber spürbare
+     Brand-Präsenz. */
+  .subpage-bg-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    -webkit-mask-image: radial-gradient(ellipse at 50% 40%, black 10%, transparent 75%);
+    mask-image: radial-gradient(ellipse at 50% 40%, black 10%, transparent 75%);
+  }
+
+  /* Layer B — drei Amber-Radial-Glows. Position fix; nur Opacity
+     atmet langsam, versetzt pro Glow → weiches, organisches
+     Wechselspiel ohne Bewegungsablenkung. */
+  .subpage-bg-glow {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      rgba(245, 158, 11, 0.12) 0%,
+      transparent 65%
+    );
+    filter: blur(120px);
+    will-change: opacity;
+    animation: subpage-glow-breath 100s ease-in-out infinite;
+  }
+
+  .subpage-bg-glow-1 {
+    top: 10%;
+    right: 5%;
+    width: 800px;
+    height: 800px;
+    animation-duration: 90s;
+    animation-delay: 0s;
+  }
+
+  .subpage-bg-glow-2 {
+    top: 45%;
+    left: 0;
+    width: 600px;
+    height: 600px;
+    animation-duration: 105s;
+    animation-delay: -30s;
+  }
+
+  .subpage-bg-glow-3 {
+    bottom: 5%;
+    right: 10%;
+    width: 700px;
+    height: 700px;
+    animation-duration: 120s;
+    animation-delay: -60s;
+  }
+
+  @keyframes subpage-glow-breath {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+
+  /* Layer C — Floating Particles. Drift nach oben (negative
+     translateY in vh), Cycle-Loop teleportiert zurück zur
+     Startposition. Opacity-Fade an den Rändern macht das
+     Teleport unsichtbar. */
+  .subpage-bg-particles {
+    position: absolute;
+    inset: 0;
+  }
+
+  .subpage-bg-particle {
+    position: absolute;
+    top: var(--start-y);
+    left: var(--start-x);
+    width: var(--size);
+    height: var(--size);
+    border-radius: 50%;
+    background: rgba(245, 158, 11, var(--opacity));
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+    animation: subpage-particle-rise var(--duration) linear infinite;
+    animation-delay: var(--delay);
+    will-change: transform, opacity;
+  }
+
+  @keyframes subpage-particle-rise {
+    0% {
+      transform: translateY(0);
+      opacity: 0;
+    }
+    10% { opacity: var(--opacity); }
+    90% { opacity: var(--opacity); }
+    100% {
+      transform: translateY(var(--drift));
+      opacity: 0;
+    }
+  }
+
+  /* Layer D — Vignette unten, beruhigt den Blick zum Footer hin. */
+  .subpage-bg-vignette {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 30%;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(0, 0, 0, 0.5) 100%
+    );
+  }
+
+  @media (max-width: 768px) {
+    .subpage-bg-glow {
+      filter: blur(80px);
+    }
+    .subpage-bg-glow-1 {
+      width: 500px;
+      height: 500px;
+    }
+    .subpage-bg-glow-2 {
+      width: 400px;
+      height: 400px;
+    }
+    .subpage-bg-glow-3 {
+      width: 450px;
+      height: 450px;
+    }
+    .subpage-bg-particle:nth-child(n+8) {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .subpage-bg-glow,
+    .subpage-bg-particle {
+      animation: none !important;
+    }
+    .subpage-bg-glow {
+      opacity: 0.7;
+    }
+    .subpage-bg-particle {
+      opacity: var(--opacity);
+    }
+  }
+</style>

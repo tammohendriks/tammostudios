@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import TopBar from '../components/TopBar.astro';
+import SubPageBackground from '../components/SubPageBackground.astro';
 import { SECTION5 } from '../lib/constants';
 
 const { footer } = SECTION5;
@@ -12,13 +13,8 @@ const { footer } = SECTION5;
 >
   <TopBar />
 
-  <main class="ueber-page">
-    <div class="ueber-bg" aria-hidden="true">
-      <div class="ueber-bg-aurora"></div>
-      <div class="ueber-bg-grid"></div>
-      <div class="ueber-bg-glow"></div>
-      <div class="ueber-bg-vignette"></div>
-    </div>
+  <main class="ueber-page" transition:animate="fade">
+    <SubPageBackground />
 
     <header class="ueber-hero">
       <div class="hero-text">
@@ -41,7 +37,7 @@ const { footer } = SECTION5;
     </header>
 
     <article class="ueber-content">
-      <section class="ueber-section">
+      <section class="ueber-section" data-reveal>
         <h2>Wer ich bin</h2>
         <p>
           Angefangen hat alles mit einer Ausbildung zum Kaufmann
@@ -62,7 +58,7 @@ const { footer } = SECTION5;
         </p>
       </section>
 
-      <section class="ueber-section">
+      <section class="ueber-section" data-reveal>
         <h2>Wie ich arbeite</h2>
         <p>
           Ein Projekt zur Zeit. Du sprichst direkt mit der Person,
@@ -89,7 +85,7 @@ const { footer } = SECTION5;
         </p>
       </section>
 
-      <section class="ueber-section">
+      <section class="ueber-section" data-reveal>
         <h2>Was es kostet</h2>
         <p>
           Eine Website (Landing + bis zu 5 Unterseiten) kostet
@@ -121,7 +117,7 @@ const { footer } = SECTION5;
         </a>
       </section>
 
-      <section class="ueber-section">
+      <section class="ueber-section" data-reveal>
         <h2>Außerhalb vom Code</h2>
         <p>
           Wenn ich nicht arbeite, bin ich meistens beim Sport oder
@@ -131,7 +127,7 @@ const { footer } = SECTION5;
         </p>
       </section>
 
-      <section class="ueber-close">
+      <section class="ueber-close" data-reveal>
         <p class="close-line">
           Wenn das nach Deinem Stil klingt: schreib mir.
         </p>
@@ -196,89 +192,8 @@ const { footer } = SECTION5;
     }
   }
 
-  /* === Atmosphäre: vier statische Layer hinter dem Content.
-     Bewusst KEINE Animation — die Über-Seite soll zum Lesen
-     einladen, nicht ablenken. Alle Layer pointer-events: none,
-     z-index 0; Hero und Content steigen auf z-index 1. */
-  .ueber-bg {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    overflow: hidden;
-  }
-
-  /* Layer A — sehr dezenter Grid mit radialer Maske, sodass die
-     Linien nur in der Bildmitte angedeutet sind und zu den Rändern
-     hin sauber ausfaden. */
-  .ueber-bg-grid {
-    position: absolute;
-    inset: 0;
-    background-image:
-      linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
-    background-size: 60px 60px;
-    -webkit-mask-image: radial-gradient(ellipse at 50% 40%, black 10%, transparent 75%);
-    mask-image: radial-gradient(ellipse at 50% 40%, black 10%, transparent 75%);
-  }
-
-  /* Layer B — Amber-Radial hinter dem Foto. Trägt das Foto, ohne
-     es zu überstrahlen. Auf Mobile nach oben mittig verschoben,
-     wo das Foto bei Stack-Layout sitzt. */
-  .ueber-bg-glow {
-    position: absolute;
-    top: 5%;
-    right: 8%;
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(
-      circle,
-      rgba(245, 158, 11, 0.15) 0%,
-      transparent 60%
-    );
-    filter: blur(80px);
-  }
-
-  @media (max-width: 768px) {
-    .ueber-bg-glow {
-      top: 3%;
-      right: 50%;
-      transform: translateX(50%);
-      width: 400px;
-      height: 400px;
-    }
-  }
-
-  /* Layer C — leichte Vignette unten, beruhigt den Blick zum
-     Footer hin und nimmt den unteren Drittel optisch Gewicht. */
-  .ueber-bg-vignette {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 35%;
-    background: linear-gradient(
-      to bottom,
-      transparent 0%,
-      rgba(0, 0, 0, 0.6) 100%
-    );
-  }
-
-  /* Layer D — sehr blasse Aurora-Wolke ganz oben am Viewport-Rand,
-     keine Animation. Setzt den Brand-Kontext fort, ohne Lautstärke. */
-  .ueber-bg-aurora {
-    position: absolute;
-    top: -120px;
-    left: -10%;
-    right: -10%;
-    height: 400px;
-    background: radial-gradient(
-      ellipse at center top,
-      rgba(245, 158, 11, 0.08) 0%,
-      transparent 70%
-    );
-    filter: blur(120px);
-  }
+  /* Atmosphäre liegt jetzt in <SubPageBackground /> — gemeinsame
+     Komponente für /ueber, /referenzen, /preise. */
 
   /* === Hero: 55/45 Grid auf Desktop, Stack auf Mobile (Foto zuerst).
      45-Anteil und 1200px max-width geben der Photo-Spalte ~520px,

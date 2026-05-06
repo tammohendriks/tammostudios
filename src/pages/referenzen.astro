@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import TopBar from '../components/TopBar.astro';
+import SubPageBackground from '../components/SubPageBackground.astro';
 import { REFERENCES } from '../lib/references';
 import { SECTION5 } from '../lib/constants';
 
@@ -13,9 +14,9 @@ const { footer } = SECTION5;
 >
   <TopBar />
 
-  <main class="referenzen-page">
+  <main class="referenzen-page" transition:animate="fade">
+    <SubPageBackground />
     <header class="ref-hero">
-      <p class="ref-eyebrow">PORTFOLIO</p>
       <h1 class="ref-title">Referenzen</h1>
       <p class="ref-description">
         Eine kleine Auswahl der Sites die ich zuletzt für lokale
@@ -25,7 +26,7 @@ const { footer } = SECTION5;
 
     <section class="ref-grid">
       {REFERENCES.map((ref) => (
-        <article class="ref-card" data-slug={ref.slug}>
+        <article class="ref-card" data-slug={ref.slug} data-reveal>
           <div class="ref-preview">
             <img
               src={ref.preview}
@@ -177,20 +178,9 @@ const { footer } = SECTION5;
     background: #050507;
     padding: 140px 40px 80px;
     position: relative;
+    overflow: hidden;
   }
-
-  /* Subtiler Aurora-Hintergrund (passend zum Galaxy-Pattern). */
-  .referenzen-page::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(ellipse at 20% 10%,
-        rgba(245, 158, 11, 0.06) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 80%,
-        rgba(245, 158, 11, 0.04) 0%, transparent 50%);
-    pointer-events: none;
-  }
+  /* Atmosphäre via <SubPageBackground />, geteilt mit /ueber + /preise. */
 
   .ref-hero {
     text-align: center;
@@ -198,27 +188,17 @@ const { footer } = SECTION5;
     margin: 0 auto 80px;
     position: relative;
     z-index: 1;
-  }
-
-  .ref-eyebrow {
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-size: 0.8rem;
-    font-weight: 500;
-    letter-spacing: 0.3em;
-    color: rgba(245, 158, 11, 0.8);
-    text-transform: uppercase;
-    margin: 0 0 16px;
+    padding-top: 32px;
   }
 
   .ref-title {
-    font-family: 'Aileron', 'Inter', sans-serif;
-    font-weight: 900;
-    font-style: italic;
-    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(48px, 8vw, 96px);
     color: #f5f5f4;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.025em;
     margin: 0 0 24px;
-    line-height: 1;
+    line-height: 1.05;
   }
 
   .ref-description {

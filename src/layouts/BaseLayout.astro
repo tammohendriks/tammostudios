@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
 import { SITE } from '../lib/constants';
 
 interface Props {
@@ -32,34 +33,101 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={SITE.name} />
     <meta name="theme-color" content="#0a0a0c" />
+    <ClientRouter />
     <script is:inline>
-      // Splash-State VOR dem ersten Paint setzen, damit TopBar (außerhalb
-      // Section1) und Section1-Inhalte gleichzeitig korrekt rendern:
-      //   - Sub-Pages (/impressum, /datenschutz, …) → splash-skip:
-      //     Section1 existiert dort nicht, also gibt es nichts, was
-      //     den Splash weiterschalten würde. Ohne Skip blieben die
-      //     TopBar-Items dauerhaft hidden.
-      //   - Returning visitor / reduced-motion → html.splash-skip → CSS
-      //     macht alles sofort sichtbar
-      //   - Sonst → html[data-splash="splash"] → CSS hält .top-left, .nav,
-      //     .cta, .intro, .scroll-cue und .background unsichtbar, bis das
-      //     Section1-Modul-Script die Phasen weiterschaltet.
-      try {
-        var path = window.location.pathname;
-        var isLanding = path === '/' || path === '/index.html';
-        if (
-          !isLanding ||
-          window.sessionStorage.getItem('ts-splash-seen') === '1' ||
-          window.matchMedia('(prefers-reduced-motion: reduce)').matches
-        ) {
-          document.documentElement.classList.add('splash-skip');
-        } else {
-          document.documentElement.setAttribute('data-splash', 'splash');
+      // Splash-State VOR dem ersten Paint UND vor jeder ClientRouter-
+      // Navigation neu setzen. Mit View Transitions persistiert <html>
+      // zwischen Pages — ohne Reset würde z.B. data-splash="ready" von
+      // einer Landing-Navigation weiter auf einer Sub-Page hängen, oder
+      // umgekehrt.
+      //
+      //   Landing + erstes Mal + keine reduced-motion → data-splash="splash"
+      //                                                  (Section1-Script
+      //                                                  zieht weiter zu
+      //                                                  reveal/ready)
+      //   Alles andere (Sub-Pages, returning visitor, reduced-motion)
+      //                                               → splash-skip
+      (function () {
+        function applySplashState() {
+          try {
+            var html = document.documentElement;
+            html.classList.remove('splash-skip');
+            html.removeAttribute('data-splash');
+            var path = window.location.pathname;
+            var isLanding = path === '/' || path === '/index.html';
+            if (
+              !isLanding ||
+              window.sessionStorage.getItem('ts-splash-seen') === '1' ||
+              window.matchMedia('(prefers-reduced-motion: reduce)').matches
+            ) {
+              html.classList.add('splash-skip');
+            } else {
+              html.setAttribute('data-splash', 'splash');
+            }
+          } catch (e) {}
         }
-      } catch (e) {}
+        applySplashState();
+        // before-swap: korrigiert state BEVOR die neue Page gepainted
+        // wird, sodass kein "data-splash=ready" von der vorherigen Page
+        // kurz die neue Sub-Page treffen kann.
+        document.addEventListener('astro:before-swap', applySplashState);
+        // page-load: sichert state nach jedem Swap (auch initial).
+        document.addEventListener('astro:page-load', applySplashState);
+      })();
     </script>
   </head>
   <body class="min-h-dvh bg-ts-bg text-ts-fg">
     <slot />
+    <script>
+      // Site-weiter Scroll-Reveal: alle [data-reveal] Elemente werden
+      // beim Eintritt in den Viewport (15% sichtbar) eingefadet. Pro
+      // Callback-Batch wird ein 100ms-Stagger zwischen den Elementen
+      // gelegt, damit gleichzeitig sichtbar werdende Blöcke nicht
+      // synchron, sondern leicht versetzt erscheinen.
+      //
+      // Mit Astro ClientRouter persistiert der globale Code zwischen
+      // Pages — der Listener läuft nur einmal, fired aber bei jedem
+      // astro:page-load (initial + nach jeder Navigation). Pro Run
+      // wird der vorherige Observer disconnected, sodass keine
+      // veralteten Element-Referenzen oder Memory-Leaks entstehen.
+      let revealObserver: IntersectionObserver | null = null;
+
+      function setupReveal() {
+        if (revealObserver) {
+          revealObserver.disconnect();
+          revealObserver = null;
+        }
+
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          // Reduced-Motion: Elemente bleiben sichtbar via CSS-Override.
+          return;
+        }
+
+        const targets = document.querySelectorAll<HTMLElement>(
+          '[data-reveal]:not(.is-revealed)'
+        );
+        if (targets.length === 0) return;
+
+        revealObserver = new IntersectionObserver(
+          (entries, observer) => {
+            const intersecting = entries.filter((e) => e.isIntersecting);
+            intersecting.forEach((entry, i) => {
+              const el = entry.target as HTMLElement;
+              el.style.transitionDelay = i * 100 + 'ms';
+              el.classList.add('is-revealed');
+              observer.unobserve(el);
+            });
+          },
+          {
+            threshold: 0.15,
+            rootMargin: '0px 0px -5% 0px',
+          }
+        );
+
+        targets.forEach((el) => revealObserver!.observe(el));
+      }
+
+      document.addEventListener('astro:page-load', setupReveal);
+    </script>
   </body>
 </html>

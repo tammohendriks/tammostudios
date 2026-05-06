@@ -48,6 +48,32 @@ a:hover {
   color: var(--color-ts-fg);
 }
 
+/* === Scroll-Reveal ===
+   Site-weites Reveal-Pattern für Sub-Pages: Elemente mit
+   data-reveal starten unsichtbar und faden ein, sobald sie 15% im
+   Viewport sind. JS in BaseLayout setzt .is-revealed beim Eintritt
+   und disconnected den Observer pro Element (one-time).
+   Stagger-Delays werden vom Script per inline style gesetzt, sodass
+   gleichzeitig auftauchende Elemente um 100ms versetzt erscheinen. */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 800ms ease-out, transform 800ms ease-out;
+}
+
+[data-reveal].is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
 /* === CTA Orbital ===
    Pill-CTA mit permanentem warmem Glow, kontinuierlich pulsierender
    Welle nach außen, und periodischem Shimmer-Sweep über die Fläche.
