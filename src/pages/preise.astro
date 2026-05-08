@@ -27,7 +27,7 @@ const includedItems = [
 
 <BaseLayout
   pageTitle="Preise"
-  description="1.000 € für eine Website, 2.000 € für einen Online-Shop. Klar, fix, ohne Sternchen."
+  description="1.500 € für eine Website, 2.500 € für einen Online-Shop. Klar, fix, ohne Sternchen."
 >
   <main class="preise-page">
     <SubPageBackground />
@@ -38,15 +38,15 @@ const includedItems = [
     </header>
 
     <section class="preise-intro" aria-label="Preise auf einen Blick" data-reveal>
-      <p>Eine Website kostet <strong>1.000 €</strong>.</p>
-      <p>Ein Online-Shop kostet <strong>2.000 €</strong>.</p>
+      <p>Eine Website kostet <strong>1.500 €</strong>.</p>
+      <p>Ein Online-Shop kostet <strong>2.500 €</strong>.</p>
       <p>Punkt.</p>
     </section>
 
     <section class="preise-cards" aria-label="Pakete">
       <article class="price-card" data-reveal>
         <p class="price-eyebrow">WEBSITE</p>
-        <p class="price-amount">1.000 €</p>
+        <p class="price-amount">1.500 €</p>
         <p class="price-sublabel">Einmalig. Fix.</p>
         <div class="price-divider"></div>
         <ul class="dash-list">
@@ -66,7 +66,7 @@ const includedItems = [
 
       <article class="price-card" data-reveal>
         <p class="price-eyebrow">ONLINE-SHOP</p>
-        <p class="price-amount">2.000 €</p>
+        <p class="price-amount">2.500 €</p>
         <p class="price-sublabel">Einmalig. Fix.</p>
         <div class="price-divider"></div>
         <ul class="dash-list">
@@ -86,7 +86,7 @@ const includedItems = [
       <h2>Erweiterungen</h2>
       <p>Manchmal braucht es mehr.</p>
       <ul class="dash-list">
-        <li>Weitere Unterseite: <strong>100 €</strong></li>
+        <li>Weitere Unterseite: <strong>150 €</strong></li>
         <li>
           Änderungen nach Launch (neue Bilder, Layout-Updates,
           zusätzliche Funktionen): <strong>50 €/Stunde</strong>,
@@ -165,7 +165,11 @@ const includedItems = [
 
     <section class="preise-cta" data-reveal>
       <p class="cta-pre">Klingt fair?</p>
-      <a class="inline-link inline-link-cta" href="/kontakt">
+      <button
+        class="inline-link inline-link-cta"
+        type="button"
+        data-action="open-contact"
+      >
         <span>Lass uns sprechen</span>
         <svg
           width="16"
@@ -180,7 +184,7 @@ const includedItems = [
         >
           <path d="M5 12h14M13 6l6 6-6 6" />
         </svg>
-      </a>
+      </button>
     </section>
   </main>
 
@@ -562,16 +566,23 @@ const includedItems = [
     margin: 0 0 16px;
   }
 
+  /* Inline-Link mit amber Pfeil — funktioniert auf <a> und
+     <button> identisch (Browser-Default-Reset auf .inline-link
+     selbst, damit ein Button-Trigger fürs Kontakt-Modal sich
+     visuell wie der vorherige Anchor verhält). */
   .inline-link {
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid transparent;
     color: #f5f5f4;
     text-decoration: none;
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-weight: 500;
-    border-bottom: 1px solid transparent;
-    padding-bottom: 1px;
+    padding: 0 0 1px;
+    cursor: pointer;
     transition: border-color 200ms ease, color 200ms ease;
   }
 

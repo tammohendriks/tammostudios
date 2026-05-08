@@ -57,7 +57,7 @@ function isActive(href: string) {
     <span></span>
   </button>
 
-  <a class="cta-orbital topbar-cta" href={CTA.href}>
+  <button class="cta-orbital topbar-cta" type="button" data-action="open-contact">
     <span class="cta-label">{CTA.label}</span>
     <svg
       width="14"
@@ -72,7 +72,7 @@ function isActive(href: string) {
     >
       <path d="M5 12h14M13 6l6 6-6 6" />
     </svg>
-  </a>
+  </button>
 </header>
 
 <div id="mobile-menu" class="mobile-menu" hidden>
@@ -89,7 +89,7 @@ function isActive(href: string) {
       </li>
     ))}
     <li class="mobile-cta-wrap">
-      <a class="cta-orbital" href={CTA.href}>
+      <button class="cta-orbital" type="button" data-action="open-contact">
         <span class="cta-label">{CTA.label}</span>
         <svg
           width="14"
@@ -104,7 +104,7 @@ function isActive(href: string) {
         >
           <path d="M5 12h14M13 6l6 6-6 6" />
         </svg>
-      </a>
+      </button>
     </li>
   </ul>
 </div>

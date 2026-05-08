@@ -54,7 +54,11 @@ const particles = Array.from({ length: PARTICLE_COUNT }, () => {
 
     <p class="closing-sub reveal">{subtext}</p>
 
-    <a class="cta-orbital closing-cta reveal" href={primaryCta.href}>
+    <button
+      class="cta-orbital closing-cta reveal"
+      type="button"
+      data-action="open-contact"
+    >
       <span class="cta-label">{primaryCta.label}</span>
       <svg
         width="14"
@@ -67,7 +71,7 @@ const particles = Array.from({ length: PARTICLE_COUNT }, () => {
       >
         <path d="M5 12h14M13 6l6 6-6 6" />
       </svg>
-    </a>
+    </button>
 
     <p class="closing-secondary reveal">
       Oder direkt:
@@ -117,20 +121,23 @@ const particles = Array.from({ length: PARTICLE_COUNT }, () => {
     padding: 100px 40px 28px;
   }
 
-  /* Mobile-Override: natürlicher Content-Flow. Vorher: hartes 100dvh
-     + overflow:hidden hat einen großen leeren Bereich zwischen E-Mail-
-     Link und Footer hinterlassen, weil der Content nicht den ganzen
-     Viewport gefüllt hat. Jetzt wächst die Section mit dem Content;
-     Footer folgt direkt drunter. margin-top:auto auf .site-footer
-     kollabiert in einer höhen-flexiblen Section automatisch zu 0,
-     also kein zusätzlicher Code nötig. */
+  /* Mobile-Override: natürlicher Content-Flow. Closing oben,
+     Footer direkt drunter. align-items:center horizontal-mittig,
+     justify-content:flex-start verhindert dass irgendwas mittig
+     im Viewport landet wenn die Section zufällig größer ausfällt.
+     gap:32px gibt verlässlichen Abstand zwischen Closing und
+     Footer (margin-top:auto kollabiert in flexibler Section eh
+     zu 0). */
   @media (max-width: 768px) {
     .section-5 {
       height: auto;
       min-height: auto;
       max-height: none;
       overflow: visible;
-      padding: 80px 16px 60px;
+      padding: 80px 24px 60px;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 32px;
     }
 
     .closing {

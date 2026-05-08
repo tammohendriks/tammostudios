@@ -1,6 +1,5 @@
 ---
 import { SECTION3 } from '../../lib/constants';
-import ScrollCue from '../ScrollCue.astro';
 ---
 
 <section class="section-3">
@@ -20,8 +19,6 @@ import ScrollCue from '../ScrollCue.astro';
         ))}
       </div>
     </div>
-
-    <ScrollCue />
   </div>
 </section>
 
@@ -236,31 +233,6 @@ import ScrollCue from '../ScrollCue.astro';
   }
 </style>
 
-<style is:global>
-  /* Section3-spezifische Steuerung des ScrollCue-Anchors. Liegt in
-     einem global-Block, weil .scroll-cue-anchor in der ScrollCue-
-     Komponente lebt (eigener Astro-Scope). Cue erscheint erst im
-     Settled-State (progress > 0.55), damit der User nicht in die
-     letzte Box reinscrollt während er noch denkt, da kommt was. */
-  .section-3 .scroll-cue-anchor {
-    --cue-visibility: 0;
-    opacity: var(--cue-visibility);
-    transition: opacity 400ms ease-out;
-  }
-
-  @media (max-width: 768px) {
-    .section-3 .scroll-cue-label {
-      font-size: 0.65rem;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .section-3 .scroll-cue-anchor {
-      --cue-visibility: 1 !important;
-    }
-  }
-</style>
-
 <script>
   const section = document.querySelector('.section-3');
   const items = section
@@ -269,26 +241,17 @@ import ScrollCue from '../ScrollCue.astro';
   const eyebrow = section
     ? section.querySelector('.section-3-eyebrow')
     : null;
-  const cueAnchor = section
-    ? section.querySelector('.scroll-cue-anchor')
-    : null;
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  if (section && items.length === 3 && eyebrow && cueAnchor) {
+  if (section && items.length === 3 && eyebrow) {
     // Mit 300vh Runway gehen wir auf langsame, dramatische Cascade:
-    // jeder Übergang hat Atemzug, Box 3 ist erst bei 85% voll. Kurzer
-    // Settled-Tail danach, ScrollCue signalisiert das Ende.
+    // jeder Übergang hat Atemzug, Box 3 ist erst bei 85% voll.
     const ranges = [
       { start: 0.00, end: 0.40 },
       { start: 0.25, end: 0.60 },
       { start: 0.50, end: 0.85 },
     ];
     const EYEBROW_END = 0.12;
-    // Cue erscheint später — auf Mobile noch später, weil weniger Platz
-    // nach unten und Box 3 sonst überlagert würde.
-    const isMobile = window.matchMedia('(max-width: 768px)').matches;
-    const CUE_START = isMobile ? 0.85 : 0.78;
-    const CUE_END = CUE_START + 0.10;
 
     function clamp01(v) {
       return v < 0 ? 0 : v > 1 ? 1 : v;
@@ -308,7 +271,6 @@ import ScrollCue from '../ScrollCue.astro';
         for (const item of items) {
           item.style.setProperty('--item-progress', '1');
         }
-        cueAnchor.style.setProperty('--cue-visibility', '1');
         return;
       }
 
@@ -323,9 +285,6 @@ import ScrollCue from '../ScrollCue.astro';
         const ip = clamp01((progress - start) / (end - start));
         items[i].style.setProperty('--item-progress', String(ip));
       }
-
-      const cueP = clamp01((progress - CUE_START) / (CUE_END - CUE_START));
-      cueAnchor.style.setProperty('--cue-visibility', String(cueP));
     }
 
     let ticking = false;
