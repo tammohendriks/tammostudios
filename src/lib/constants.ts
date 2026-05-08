@@ -43,17 +43,12 @@ export const SECTION3 = {
         'Jede Website ist ein Original. Keine Themes, keine kopierten ' +
         'Layouts — Visuals, die nur zu dir passen.',
     },
-    // Mittlere Box als Preis-USP — sticht visuell durch amber Title
-     // und durch die KLARE-PREISE Eyebrow (überschreibt die 01/02/03
-     // Nummerierung der anderen beiden Boxen).
     {
       number: '02',
-      eyebrow: 'KLARE PREISE',
-      title: '1.500 € fix.',
+      title: 'Klare Preise',
       body:
-        'Keine versteckten Stundensätze, keine Pakete mit Sternchen. ' +
-        'Was hier steht, ist was Du zahlst.',
-      accent: true,
+        '1.500 € fix. Keine versteckten Stundensätze, keine Pakete ' +
+        'mit Sternchen.',
     },
     {
       number: '03',

@@ -10,23 +10,13 @@ import { SECTION3 } from '../../lib/constants';
       <p class="section-3-eyebrow">{SECTION3.eyebrow}</p>
 
       <div class="differentiators">
-        {SECTION3.items.map((item, i) => {
-          const hasEyebrow = 'eyebrow' in item && item.eyebrow;
-          const hasAccent = 'accent' in item && item.accent;
-          return (
-            <article class="diff-item" style={`--item-index: ${i};`}>
-              {hasEyebrow ? (
-                <span class="diff-eyebrow">{item.eyebrow}</span>
-              ) : (
-                <span class="diff-number">{item.number}</span>
-              )}
-              <h3 class:list={['diff-title', { 'diff-title-accent': hasAccent }]}>
-                {item.title}
-              </h3>
-              <p class="diff-body">{item.body}</p>
-            </article>
-          );
-        })}
+        {SECTION3.items.map((item, i) => (
+          <article class="diff-item" style={`--item-index: ${i};`}>
+            <span class="diff-number">{item.number}</span>
+            <h3 class="diff-title">{item.title}</h3>
+            <p class="diff-body">{item.body}</p>
+          </article>
+        ))}
       </div>
     </div>
   </div>
@@ -194,21 +184,6 @@ import { SECTION3 } from '../../lib/constants';
     }
   }
 
-  /* Eyebrow-Variante (KLARE PREISE) — ersetzt die Nummer auf der
-     Preis-USP-Box. Kompakter Caps-Text in Amber statt der großen
-     Aileron-Italic-Nummer, damit es eindeutig als anderer Item-Typ
-     liest und nicht in der 01/02/03 Sequenz mitläuft. */
-  .diff-eyebrow {
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-weight: 600;
-    font-size: 0.78rem;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    color: rgba(245, 158, 11, 0.95);
-    line-height: 1.4;
-    padding: 6px 0;
-  }
-
   .diff-title {
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-weight: 700;
@@ -219,23 +194,9 @@ import { SECTION3 } from '../../lib/constants';
     line-height: 1.25;
   }
 
-  /* Accent-Variante: Amber Title für die Preis-USP-Box. Etwas
-     größer als die anderen Titel (clamp gegen die Nummern, damit
-     "1.500 € fix." als visueller Anker des Triptychons liest). */
-  .diff-title-accent {
-    color: rgba(245, 158, 11, 1);
-    font-size: clamp(1.4rem, 2.2vw, 1.85rem);
-    text-shadow:
-      0 0 24px rgba(245, 158, 11, 0.35),
-      0 0 60px rgba(245, 158, 11, 0.15);
-  }
-
   @media (max-width: 768px) {
     .diff-title {
       font-size: 1.05rem;
-    }
-    .diff-title-accent {
-      font-size: 1.45rem;
     }
   }
 
