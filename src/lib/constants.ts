@@ -38,17 +38,22 @@ export const SECTION3 = {
   items: [
     {
       number: '01',
-      title: 'Eine Person, ein Ansprechpartner',
-      body:
-        'Direkt mit mir. Kein Account-Manager, kein wechselnder Kontakt — ' +
-        'vom Briefing bis zum Launch immer derselbe Mensch.',
-    },
-    {
-      number: '02',
       title: 'Modernes Design, kein Template',
       body:
         'Jede Website ist ein Original. Keine Themes, keine kopierten ' +
         'Layouts — Visuals, die nur zu dir passen.',
+    },
+    // Mittlere Box als Preis-USP — sticht visuell durch amber Title
+     // und durch die KLARE-PREISE Eyebrow (überschreibt die 01/02/03
+     // Nummerierung der anderen beiden Boxen).
+    {
+      number: '02',
+      eyebrow: 'KLARE PREISE',
+      title: '1.500 € fix.',
+      body:
+        'Keine versteckten Stundensätze, keine Pakete mit Sternchen. ' +
+        'Was hier steht, ist was Du zahlst.',
+      accent: true,
     },
     {
       number: '03',

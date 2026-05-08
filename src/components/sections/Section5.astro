@@ -80,6 +80,96 @@ const particles = Array.from({ length: PARTICLE_COUNT }, () => {
     </p>
   </div>
 
+  <section class="pricing-summary" aria-label="Preise auf einen Blick" data-reveal>
+    <div class="pricing-summary-grid">
+      <div class="pricing-item">
+        <p class="pricing-eyebrow">WEBSITE</p>
+        <p class="pricing-amount">1.500 €</p>
+        <p class="pricing-sub">einmalig</p>
+      </div>
+      <div class="pricing-item">
+        <p class="pricing-eyebrow">ONLINE-SHOP</p>
+        <p class="pricing-amount">2.500 €</p>
+        <p class="pricing-sub">einmalig</p>
+      </div>
+      <div class="pricing-item">
+        <p class="pricing-eyebrow">PFLEGE</p>
+        <p class="pricing-amount">30 €/Mo</p>
+        <p class="pricing-sub">optional</p>
+      </div>
+    </div>
+    <a class="pricing-link" href="/preise">
+      <span>Volle Preisübersicht</span>
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M5 12h14M13 6l6 6-6 6" />
+      </svg>
+    </a>
+  </section>
+
+  <ul class="trust-trio" aria-label="Was Du erwarten kannst" data-reveal>
+    <li>
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="12 6 12 12 15 14" />
+      </svg>
+      <span>Antwort &lt; 24 h</span>
+    </li>
+    <li>
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+      </svg>
+      <span>Erstgespräch gratis</span>
+    </li>
+    <li>
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <circle cx="12" cy="12" r="10" />
+        <line x1="2" y1="12" x2="22" y2="12" />
+        <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
+      </svg>
+      <span>DE &amp; EN</span>
+    </li>
+  </ul>
+
   <footer class="site-footer">
     <div class="footer-row">
       <span class="footer-brand">{footer.brand}</span>
@@ -490,6 +580,149 @@ const particles = Array.from({ length: PARTICLE_COUNT }, () => {
     color: rgba(245, 158, 11, 1);
     border-bottom-color: rgba(245, 158, 11, 0.7);
     outline: none;
+  }
+
+  /* === Pricing-Summary: drei Spalten Text auf transparentem Grund.
+     Sehr ruhig — keine Karten-Container, keine Border-Wrapper, nur
+     dünne Trennlinien zwischen den Items. Auf Mobile gestapelt mit
+     horizontalen Trennern. */
+  .pricing-summary {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 720px;
+    margin: 60px auto 0;
+    text-align: center;
+  }
+
+  .pricing-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    align-items: stretch;
+  }
+
+  .pricing-item {
+    padding: 12px 24px;
+  }
+
+  .pricing-item + .pricing-item {
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .pricing-eyebrow {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(245, 158, 11, 0.95);
+    margin: 0 0 8px;
+  }
+
+  .pricing-amount {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.6rem, 2.4vw, 2rem);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: #f5f5f4;
+    margin: 0 0 6px;
+  }
+
+  .pricing-sub {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.85rem;
+    color: rgba(245, 245, 244, 0.5);
+    margin: 0;
+  }
+
+  .pricing-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 18px;
+    color: #f5f5f4;
+    text-decoration: none;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 500;
+    border-bottom: 1px solid transparent;
+    padding-bottom: 1px;
+    transition: border-color 200ms ease, color 200ms ease;
+  }
+
+  .pricing-link svg {
+    color: rgba(245, 158, 11, 0.95);
+    transition: transform 200ms ease;
+  }
+
+  .pricing-link:hover,
+  .pricing-link:focus-visible {
+    border-bottom-color: rgba(245, 158, 11, 0.6);
+    outline: none;
+  }
+
+  .pricing-link:hover svg,
+  .pricing-link:focus-visible svg {
+    transform: translateX(3px);
+  }
+
+  @media (max-width: 768px) {
+    .pricing-summary {
+      margin-top: 36px;
+    }
+    .pricing-summary-grid {
+      grid-template-columns: 1fr;
+    }
+    .pricing-item {
+      padding: 14px 0;
+    }
+    .pricing-item + .pricing-item {
+      border-left: 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+  }
+
+  /* === Trust-Trio: drei Items mit kleinem Icon, einreihig zentriert.
+     Wenn Platz nicht reicht, wrap auf zwei Zeilen. Sehr klein, fast
+     Footnote-Charakter — soll Vertrauen signalisieren ohne wieder
+     ein neuer Sales-Block zu wirken. */
+  .trust-trio {
+    position: relative;
+    z-index: 2;
+    list-style: none;
+    margin: 32px 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 8px 24px;
+  }
+
+  .trust-trio li {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.85rem;
+    color: rgba(245, 245, 244, 0.55);
+  }
+
+  .trust-trio li svg {
+    color: rgba(245, 158, 11, 0.85);
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 768px) {
+    .trust-trio {
+      margin-top: 24px;
+      gap: 8px 18px;
+      font-size: 0.78rem;
+    }
+    .trust-trio li {
+      font-size: 0.78rem;
+    }
   }
 
   /* Footer am unteren Rand der Section — margin-top:auto drückt
