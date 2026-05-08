@@ -10,13 +10,34 @@ import { SECTION3 } from '../../lib/constants';
       <p class="section-3-eyebrow">{SECTION3.eyebrow}</p>
 
       <div class="differentiators">
-        {SECTION3.items.map((item, i) => (
-          <article class="diff-item" style={`--item-index: ${i};`}>
-            <span class="diff-number">{item.number}</span>
-            <h3 class="diff-title">{item.title}</h3>
-            <p class="diff-body">{item.body}</p>
-          </article>
-        ))}
+        {SECTION3.items.map((item, i) => {
+          const link = 'link' in item ? item.link : null;
+          return (
+            <article class="diff-item" style={`--item-index: ${i};`}>
+              <span class="diff-number">{item.number}</span>
+              <h3 class="diff-title">{item.title}</h3>
+              <p class="diff-body" set:html={item.body} />
+              {link && (
+                <a class="diff-link" href={link.href}>
+                  <span>{link.label}</span>
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M5 12h14M13 6l6 6-6 6" />
+                  </svg>
+                </a>
+              )}
+            </article>
+          );
+        })}
       </div>
     </div>
   </div>
@@ -220,6 +241,47 @@ import { SECTION3 } from '../../lib/constants';
     .diff-body {
       font-size: 0.9rem;
     }
+  }
+
+  /* Inline-Bold im Body (für die Preis-USP-Box, "1.500 €" und
+     "2.500 €" werden in Amber gehighlighted). */
+  .diff-body :global(strong) {
+    color: rgba(245, 158, 11, 1);
+    font-weight: 700;
+  }
+
+  /* Optionaler Sub-Link unter dem Body (z.B. "→ Volle Preisliste"
+     auf der Preis-USP-Box). White Text + amber Pfeil, hover amber
+     Underline — gleiches Pattern wie auf Über/Preise. */
+  .diff-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 16px;
+    color: #f5f5f4;
+    text-decoration: none;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-bottom: 1px solid transparent;
+    padding-bottom: 1px;
+    transition: border-color 200ms ease;
+  }
+
+  .diff-link svg {
+    color: rgba(245, 158, 11, 0.95);
+    transition: transform 200ms ease;
+  }
+
+  .diff-link:hover,
+  .diff-link:focus-visible {
+    border-bottom-color: rgba(245, 158, 11, 0.6);
+    outline: none;
+  }
+
+  .diff-link:hover svg,
+  .diff-link:focus-visible svg {
+    transform: translateX(3px);
   }
 
   @media (prefers-reduced-motion: reduce) {

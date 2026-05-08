@@ -175,32 +175,54 @@ const particles = Array.from({ length: PARTICLE_COUNT }, () => {
     padding: 100px 40px 28px;
   }
 
-  /* Mobile-Override: natürlicher Content-Flow. padding-top auf 56px
-     gesenkt, damit "AM ZIEL" auf vergleichbarer Höhe rendert wie die
-     Eyebrows der anderen Sections (vorher 80px war zu tief und ließ
-     den Eyebrow visuell nach unten driften gegenüber Section 2/3/4). */
+  /* Mobile-Override: natürlicher Content-Flow + handpolierte
+     Spacings pro Closing-Child. Statt einheitlichem gap auf der
+     .closing nutzt jedes Item ein eigenes margin-bottom — damit
+     bekommt z.B. der Sprung Logo→Headline mehr Atmenzug als
+     Headline→Sub. AM ZIEL liegt jetzt 40px vom Section-Top, das
+     ist konsistent mit den Eyebrows in Section 2/3/4. */
   @media (max-width: 768px) {
     .section-5 {
       height: auto;
       min-height: auto;
       max-height: none;
       overflow: visible;
-      padding: 56px 24px 60px;
+      padding: 40px 24px 60px;
       align-items: center;
       justify-content: flex-start;
-      gap: 32px;
+      gap: 0;
     }
 
     .closing {
-      gap: 16px;
+      gap: 0;
       max-width: 100%;
     }
 
-    .closing-eyebrow { font-size: 0.65rem; }
-    .closing-headline { font-size: 1.45rem; }
-    .closing-sub { font-size: 0.85rem; max-width: 290px; }
-    .closing-cta { padding: 12px 26px; font-size: 0.95rem; }
-    .closing-secondary { font-size: 0.78rem; }
+    .closing-eyebrow {
+      font-size: 0.65rem;
+      margin: 0 0 28px;
+    }
+    .logo-frame {
+      margin: 0 0 40px;
+    }
+    .closing-headline {
+      font-size: 1.45rem;
+      margin: 0 0 14px;
+    }
+    .closing-sub {
+      font-size: 0.85rem;
+      max-width: 290px;
+      margin: 0 0 32px;
+    }
+    .closing-cta {
+      padding: 12px 26px;
+      font-size: 0.95rem;
+      margin: 0 0 18px;
+    }
+    .closing-secondary {
+      font-size: 0.78rem;
+      margin: 0;
+    }
   }
 
   /* Dezenter warmer Glow hinter dem Logo — sitzt über den Cosmos-
@@ -579,7 +601,7 @@ const particles = Array.from({ length: PARTICLE_COUNT }, () => {
 
   @media (max-width: 768px) {
     .trust-trio {
-      margin-top: 32px;
+      margin-top: 72px;
       gap: 8px 18px;
       font-size: 0.78rem;
     }
