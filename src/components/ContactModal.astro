@@ -358,6 +358,7 @@ import { SITE } from '../lib/constants';
       const target = e.target as HTMLElement | null;
       if (!target) return;
 
+      // Trigger to open
       const trigger = target.closest('[data-action="open-contact"]');
       if (trigger) {
         e.preventDefault();
@@ -365,20 +366,21 @@ import { SITE } from '../lib/constants';
         return;
       }
 
-      if (html.getAttribute('data-modal') === 'contact') {
-        const closer = target.closest('[data-close-modal]');
-        if (closer) {
-          e.preventDefault();
-          close();
-        }
+      // Only react to close-clicks while modal is actually open
+      if (html.getAttribute('data-modal') !== 'contact') return;
+
+      // Backdrop OR X-Button — beide tragen [data-close-modal].
+      // Wichtig: KEIN stopPropagation auf der Card, sonst wird der
+      // X-Button-Click verschluckt bevor er hier ankommt. Card-Body-
+      // Clicks (Headline, Subline, Action-Boxen) treffen weder
+      // Backdrop noch X, finden also kein matching closest() und
+      // schließen das Modal nicht.
+      const closer = target.closest('[data-close-modal]');
+      if (closer) {
+        e.preventDefault();
+        close();
       }
     });
-
-    // Card-Klicks dürfen nicht bis zum Backdrop durchfallen.
-    const card = modal.querySelector('.contact-modal-card');
-    if (card) {
-      card.addEventListener('click', (e) => e.stopPropagation());
-    }
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && html.getAttribute('data-modal') === 'contact') {

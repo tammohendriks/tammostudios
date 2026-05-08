@@ -121,20 +121,17 @@ const particles = Array.from({ length: PARTICLE_COUNT }, () => {
     padding: 100px 40px 28px;
   }
 
-  /* Mobile-Override: natürlicher Content-Flow. Closing oben,
-     Footer direkt drunter. align-items:center horizontal-mittig,
-     justify-content:flex-start verhindert dass irgendwas mittig
-     im Viewport landet wenn die Section zufällig größer ausfällt.
-     gap:32px gibt verlässlichen Abstand zwischen Closing und
-     Footer (margin-top:auto kollabiert in flexibler Section eh
-     zu 0). */
+  /* Mobile-Override: natürlicher Content-Flow. padding-top auf 56px
+     gesenkt, damit "AM ZIEL" auf vergleichbarer Höhe rendert wie die
+     Eyebrows der anderen Sections (vorher 80px war zu tief und ließ
+     den Eyebrow visuell nach unten driften gegenüber Section 2/3/4). */
   @media (max-width: 768px) {
     .section-5 {
       height: auto;
       min-height: auto;
       max-height: none;
       overflow: visible;
-      padding: 80px 24px 60px;
+      padding: 56px 24px 60px;
       align-items: center;
       justify-content: flex-start;
       gap: 32px;
