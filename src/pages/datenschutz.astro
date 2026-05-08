@@ -1,72 +1,70 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { SITE } from '../lib/constants';
+import SubPageBackground from '../components/SubPageBackground.astro';
+import { SECTION5 } from '../lib/constants';
 
-const year = new Date().getFullYear();
+const { footer } = SECTION5;
 ---
 
 <BaseLayout
-  pageTitle="Datenschutz"
-  description={`Datenschutzerklärung von ${SITE.name}.`}
+  pageTitle="Datenschutzerklärung"
+  description="Wie ich auf tammostudios.de mit personenbezogenen Daten umgehe."
 >
-  <main class="relative mx-auto flex min-h-dvh max-w-2xl flex-col px-6 py-16 sm:py-24">
-    <a href="/" class="text-[12px] uppercase tracking-[0.3em] text-ts-muted hover:text-ts-fg">
-      ← Zurück
-    </a>
+  <main class="legal-page">
+    <SubPageBackground />
 
-    <article class="mt-12 flex-1">
-      <h1 class="text-2xl font-medium text-ts-fg sm:text-3xl">Datenschutzerklärung</h1>
-      <p class="mt-2 text-[12px] uppercase tracking-[0.3em] text-ts-muted">
-        Stand: Platzhalter-Version
-      </p>
+    <header class="legal-hero">
+      <h1 class="subpage-hero-title">Datenschutzerklärung</h1>
+      <p class="subpage-hero-subtitle legal-stand">Stand: Mai 2026</p>
+    </header>
 
-      <div class="mt-6 rounded border border-white/5 bg-white/[0.02] p-4 text-[13px] leading-relaxed text-ts-muted">
-        Diese Datenschutzerklärung ist Platzhalter und wird vor offiziellem
-        Launch durch eine geprüfte Version ersetzt.
-      </div>
-
-      <section class="mt-10 space-y-3 leading-relaxed text-ts-fg/90">
-        <h2 class="text-[12px] uppercase tracking-[0.3em] text-ts-muted">
-          1. Verantwortlicher
-        </h2>
-        <p>
-          Verantwortlich für die Datenverarbeitung auf dieser Website ist:
-        </p>
-        <p>
+    <article class="legal-content">
+      <section>
+        <h2>1. Verantwortlicher</h2>
+        <p>Verantwortlich für die Datenverarbeitung auf dieser Website ist:</p>
+        <p class="legal-address">
           Tammo Hendriks<br />
-          {SITE.address.street}<br />
-          {SITE.address.zip} {SITE.address.city}<br />
-          {SITE.address.country}<br />
+          Eckernförder Straße 6<br />
+          28219 Bremen<br />
+          Deutschland<br />
           E-Mail:
-          <a class="underline-offset-4 hover:underline" href={`mailto:${SITE.email}`}>{SITE.email}</a>
+          {' '}
+          <a href="mailto:tammo@tammostudios.de">tammo@tammostudios.de</a>
         </p>
       </section>
 
-      <section class="mt-8 space-y-3 leading-relaxed text-ts-fg/90">
-        <h2 class="text-[12px] uppercase tracking-[0.3em] text-ts-muted">
-          2. Hosting
-        </h2>
+      <section>
+        <h2>2. Hosting</h2>
         <p>
-          Diese Website wird bei Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA
-          91789, USA, gehostet. Beim Aufruf der Website werden technisch
-          notwendige Daten an Vercel übertragen. Da Vercel Server in den USA
-          betreibt, kann eine Übermittlung in ein Drittland stattfinden. Als
-          rechtliche Grundlage dafür dienen die EU-Standardvertragsklauseln.
-          Weitere Informationen finden sich in der Datenschutzerklärung von
-          Vercel.
+          Diese Website wird bei Vercel Inc., 340 S Lemon Ave
+          #4133, Walnut, CA 91789, USA, gehostet. Beim Aufruf der
+          Website werden technisch notwendige Daten an Vercel
+          übertragen. Da Vercel Server in den USA betreibt, kann
+          eine Übermittlung in ein Drittland stattfinden. Als
+          rechtliche Grundlage dafür dienen die
+          EU-Standardvertragsklauseln. Vercel ist zudem nach dem
+          EU-U.S. Data Privacy Framework zertifiziert.
+        </p>
+        <p>
+          Weitere Informationen zur Datenverarbeitung durch Vercel:
+          {' '}
+          <a
+            href="https://vercel.com/legal/privacy-policy"
+            target="_blank"
+            rel="noopener noreferrer"
+          >https://vercel.com/legal/privacy-policy</a>
         </p>
       </section>
 
-      <section class="mt-8 space-y-3 leading-relaxed text-ts-fg/90">
-        <h2 class="text-[12px] uppercase tracking-[0.3em] text-ts-muted">
-          3. Server-Logfiles
-        </h2>
+      <section>
+        <h2>3. Server-Logfiles</h2>
         <p>
-          Bei jedem Aufruf werden durch den Hosting-Provider technische
-          Informationen in sogenannten Server-Logfiles gespeichert, die der
-          Browser automatisch übermittelt. Dazu gehören insbesondere:
+          Bei jedem Aufruf werden durch den Hosting-Provider
+          technische Informationen in Server-Logfiles
+          gespeichert, die Dein Browser automatisch übermittelt.
+          Dazu gehören insbesondere:
         </p>
-        <ul class="list-inside list-disc space-y-1 pl-2">
+        <ul class="legal-list">
           <li>IP-Adresse des zugreifenden Geräts</li>
           <li>Datum und Uhrzeit des Zugriffs</li>
           <li>Aufgerufene URL</li>
@@ -74,42 +72,68 @@ const year = new Date().getFullYear();
           <li>Verwendeter Browser und Betriebssystem</li>
         </ul>
         <p>
-          Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse
-          an der technischen Bereitstellung und Sicherheit der Website).
+          Diese Daten werden nicht mit anderen Datenquellen
+          zusammengeführt und nach 14 Tagen automatisch gelöscht.
+          Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO
+          (berechtigtes Interesse an der technischen
+          Bereitstellung und Sicherheit der Website).
         </p>
       </section>
 
-      <section class="mt-8 space-y-3 leading-relaxed text-ts-fg/90">
-        <h2 class="text-[12px] uppercase tracking-[0.3em] text-ts-muted">
-          4. Cookies, Analytics, externe Schriften
-        </h2>
+      <section>
+        <h2>4. SSL-/TLS-Verschlüsselung</h2>
+        <p>
+          Diese Seite nutzt aus Sicherheitsgründen und zum
+          Schutz der Übertragung vertraulicher Inhalte eine
+          SSL-/TLS-Verschlüsselung. Eine verschlüsselte
+          Verbindung erkennst Du an der „https://"-Adresszeile
+          Deines Browsers und am Schloss-Symbol.
+        </p>
+      </section>
+
+      <section>
+        <h2>5. Cookies, Analytics, externe Schriften</h2>
         <p>
           Diese Website setzt keine Cookies, verwendet keine
-          Analyse-Werkzeuge und lädt keine externen Schriftarten von
-          Drittanbietern. Schriftarten werden lokal vom eigenen Server
-          ausgeliefert.
+          Analyse- oder Tracking-Werkzeuge und lädt keine
+          externen Schriftarten von Drittanbietern. Schriftarten
+          werden lokal vom eigenen Server ausgeliefert.
         </p>
       </section>
 
-      <section class="mt-8 space-y-3 leading-relaxed text-ts-fg/90">
-        <h2 class="text-[12px] uppercase tracking-[0.3em] text-ts-muted">
-          5. Kontaktaufnahme
-        </h2>
+      <section>
+        <h2>6. Kontaktaufnahme</h2>
         <p>
-          Bei Kontaktaufnahme per E-Mail werden die übermittelten Daten zur
-          Bearbeitung der Anfrage verarbeitet (Art. 6 Abs. 1 lit. b bzw. f
-          DSGVO). Die Daten werden gelöscht, sobald sie für den Zweck nicht
-          mehr erforderlich sind und keine gesetzlichen Aufbewahrungspflichten
-          entgegenstehen.
+          Bei Kontaktaufnahme per E-Mail oder über externe
+          Plattformen (z. B. Instagram) werden die übermittelten
+          Daten ausschließlich zur Bearbeitung der Anfrage
+          verarbeitet (Art. 6 Abs. 1 lit. b bzw. f DSGVO). Die
+          Daten werden gelöscht, sobald sie für den Zweck nicht
+          mehr erforderlich sind und keine gesetzlichen
+          Aufbewahrungspflichten entgegenstehen.
         </p>
       </section>
 
-      <section class="mt-8 space-y-3 leading-relaxed text-ts-fg/90">
-        <h2 class="text-[12px] uppercase tracking-[0.3em] text-ts-muted">
-          6. Rechte der betroffenen Person
-        </h2>
-        <p>Betroffene Personen haben gegenüber dem Verantwortlichen folgende Rechte:</p>
-        <ul class="list-inside list-disc space-y-1 pl-2">
+      <section>
+        <h2>7. Externe Links</h2>
+        <p>
+          Diese Website enthält Links zu externen Plattformen
+          (z. B. Instagram). Beim Anklicken dieser Links
+          verlässt Du diese Website. Auf die Datenverarbeitung
+          durch die Betreiber der verlinkten Seiten habe ich
+          keinen Einfluss. Die jeweiligen Datenschutzerklärungen
+          der Anbieter findest Du auf deren Seiten.
+        </p>
+      </section>
+
+      <section>
+        <h2>8. Rechte der betroffenen Person</h2>
+        <p>
+          Du hast gegenüber dem Verantwortlichen folgende Rechte
+          hinsichtlich der Dich betreffenden personenbezogenen
+          Daten:
+        </p>
+        <ul class="legal-list">
           <li>Recht auf Auskunft (Art. 15 DSGVO)</li>
           <li>Recht auf Berichtigung (Art. 16 DSGVO)</li>
           <li>Recht auf Löschung (Art. 17 DSGVO)</li>
@@ -117,19 +141,268 @@ const year = new Date().getFullYear();
           <li>Recht auf Datenübertragbarkeit (Art. 20 DSGVO)</li>
           <li>Recht auf Widerspruch (Art. 21 DSGVO)</li>
           <li>
-            Recht auf Beschwerde bei einer Datenschutz-Aufsichtsbehörde
-            (Art. 77 DSGVO)
+            Recht auf Beschwerde bei einer
+            Datenschutz-Aufsichtsbehörde (Art. 77 DSGVO)
           </li>
         </ul>
       </section>
-    </article>
 
-    <footer class="mt-16 flex flex-col items-center gap-3 text-center text-[12px] text-ts-muted sm:flex-row sm:justify-between sm:text-left">
-      <span>© {year} {SITE.name}</span>
-      <nav class="flex items-center gap-5">
-        <a href="/impressum" class="hover:text-ts-fg">Impressum</a>
-        <a href="/datenschutz" class="hover:text-ts-fg">Datenschutz</a>
-      </nav>
-    </footer>
+      <section>
+        <h2>9. Aufsichtsbehörde</h2>
+        <p>Die zuständige Aufsichtsbehörde ist:</p>
+        <p class="legal-address">
+          Die Landesbeauftragte für Datenschutz und
+          Informationsfreiheit der Freien Hansestadt Bremen<br />
+          Arndtstraße 1<br />
+          27570 Bremerhaven<br />
+          <a
+            href="https://www.datenschutz.bremen.de"
+            target="_blank"
+            rel="noopener noreferrer"
+          >https://www.datenschutz.bremen.de</a>
+        </p>
+      </section>
+
+      <section>
+        <h2>10. Aktualisierung dieser Datenschutzerklärung</h2>
+        <p>
+          Ich behalte mir vor, diese Datenschutzerklärung
+          gelegentlich anzupassen, damit sie stets den aktuellen
+          rechtlichen Anforderungen entspricht oder um
+          Änderungen meiner Leistungen umzusetzen. Für Deinen
+          erneuten Besuch gilt dann die neue Datenschutzerklärung.
+        </p>
+      </section>
+    </article>
   </main>
+
+  <footer class="site-footer">
+    <div class="footer-row">
+      <span class="footer-brand">{footer.brand}</span>
+      <nav class="footer-nav" aria-label="Hauptnavigation">
+        {footer.navLinks.map((link, i) => (
+          <>
+            {i > 0 && <span aria-hidden="true">·</span>}
+            <a href={link.href}>{link.label}</a>
+          </>
+        ))}
+      </nav>
+    </div>
+    <div class="footer-row footer-row-legal">
+      <span class="footer-copy">{footer.copyright}</span>
+      <nav class="footer-legal" aria-label="Rechtliches">
+        {footer.legalLinks.map((link, i) => (
+          <>
+            {i > 0 && <span aria-hidden="true">·</span>}
+            <a href={link.href}>{link.label}</a>
+          </>
+        ))}
+      </nav>
+    </div>
+  </footer>
 </BaseLayout>
+
+<style>
+  .legal-page {
+    position: relative;
+    background: #050507;
+    padding: 140px 40px 80px;
+    min-height: calc(100vh - 200px);
+    overflow: hidden;
+  }
+
+  @media (max-width: 768px) {
+    .legal-page {
+      padding: 100px 20px 60px;
+    }
+  }
+
+  .legal-hero {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto 64px;
+    padding-top: 32px;
+  }
+
+  .legal-stand {
+    margin-top: 12px;
+    font-style: italic;
+    color: rgba(245, 245, 244, 0.45);
+    font-size: 0.9rem;
+  }
+
+  .legal-content {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .legal-content section {
+    margin-bottom: 40px;
+  }
+
+  .legal-content section:last-of-type {
+    margin-bottom: 0;
+  }
+
+  .legal-content h2 {
+    position: relative;
+    padding-left: 18px;
+    margin: 0 0 14px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.2rem, 1.7vw, 1.4rem);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: #f5f5f4;
+  }
+
+  .legal-content h2::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 4px;
+    bottom: 4px;
+    width: 3px;
+    background: rgba(245, 158, 11, 0.9);
+    border-radius: 2px;
+  }
+
+  .legal-content p {
+    margin: 0 0 12px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: clamp(0.95rem, 1.1vw, 1.05rem);
+    line-height: 1.7;
+    color: rgba(245, 245, 244, 0.78);
+  }
+
+  .legal-content p:last-child {
+    margin-bottom: 0;
+  }
+
+  .legal-address {
+    color: rgba(245, 245, 244, 0.85);
+  }
+
+  /* Em-Dash-Liste — gleiches Pattern wie auf /preise. */
+  .legal-list {
+    list-style: none;
+    margin: 0 0 16px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .legal-list li {
+    position: relative;
+    padding-left: 22px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: clamp(0.95rem, 1.1vw, 1.05rem);
+    line-height: 1.55;
+    color: rgba(245, 245, 244, 0.78);
+  }
+
+  .legal-list li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: rgba(245, 158, 11, 0.85);
+  }
+
+  .legal-content a {
+    color: #f5f5f4;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+    padding-bottom: 1px;
+    transition: color 200ms ease, border-color 200ms ease;
+    word-break: break-word;
+  }
+
+  .legal-content a:hover,
+  .legal-content a:focus-visible {
+    color: rgba(245, 158, 11, 1);
+    border-bottom-color: rgba(245, 158, 11, 0.6);
+    outline: none;
+  }
+
+  /* Footer (gleicher Stil wie /ueber, /preise, /referenzen, /impressum) */
+  .site-footer {
+    background: #050507;
+    padding: 32px 40px 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.78rem;
+  }
+
+  .footer-brand {
+    color: rgba(245, 245, 244, 0.7);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .footer-copy {
+    color: rgba(245, 245, 244, 0.5);
+  }
+
+  .footer-nav,
+  .footer-legal {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .footer-nav a,
+  .footer-legal a {
+    color: rgba(245, 245, 244, 0.7);
+    text-decoration: none;
+    transition: color 200ms ease;
+  }
+
+  .footer-nav a:hover,
+  .footer-nav a:focus-visible,
+  .footer-legal a:hover,
+  .footer-legal a:focus-visible {
+    color: rgba(245, 158, 11, 0.95);
+    outline: none;
+  }
+
+  .footer-row-legal {
+    color: rgba(245, 245, 244, 0.4);
+    font-size: 0.72rem;
+  }
+
+  @media (max-width: 768px) {
+    .footer-row {
+      flex-direction: row;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 4px 12px;
+      font-size: 0.65rem;
+    }
+    .footer-row-legal {
+      font-size: 0.6rem;
+      opacity: 0.7;
+    }
+  }
+</style>

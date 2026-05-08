@@ -1,66 +1,325 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { SITE } from '../lib/constants';
+import SubPageBackground from '../components/SubPageBackground.astro';
+import { SECTION5 } from '../lib/constants';
 
-const year = new Date().getFullYear();
+const { footer } = SECTION5;
 ---
 
 <BaseLayout
   pageTitle="Impressum"
-  description={`Impressum von ${SITE.name}.`}
+  description="Anbieterkennzeichnung gemäß § 5 TMG für Tammo Studios."
 >
-  <main class="relative mx-auto flex min-h-dvh max-w-2xl flex-col px-6 py-16 sm:py-24">
-    <a href="/" class="text-[12px] uppercase tracking-[0.3em] text-ts-muted hover:text-ts-fg">
-      ← Zurück
-    </a>
+  <main class="legal-page">
+    <SubPageBackground />
 
-    <article class="mt-12 flex-1">
-      <h1 class="text-2xl font-medium text-ts-fg sm:text-3xl">Impressum</h1>
-      <p class="mt-2 text-[12px] uppercase tracking-[0.3em] text-ts-muted">
-        Angaben gemäß §5 TMG
-      </p>
+    <header class="legal-hero">
+      <h1 class="subpage-hero-title">Impressum</h1>
+    </header>
 
-      <section class="mt-10 space-y-2 leading-relaxed text-ts-fg/90">
-        <h2 class="text-[12px] uppercase tracking-[0.3em] text-ts-muted">Anbieter</h2>
-        <p>Tammo Hendriks</p>
-        <p>{SITE.address.street}</p>
-        <p>{SITE.address.zip} {SITE.address.city}</p>
-        <p>{SITE.address.country}</p>
+    <article class="legal-content">
+      <section>
+        <h2>Angaben gemäß § 5 TMG</h2>
+        <p class="legal-address">
+          Tammo Hendriks<br />
+          Eckernförder Straße 6<br />
+          28219 Bremen<br />
+          Deutschland
+        </p>
       </section>
 
-      <section class="mt-8 space-y-2 leading-relaxed text-ts-fg/90">
-        <h2 class="text-[12px] uppercase tracking-[0.3em] text-ts-muted">Kontakt</h2>
-        <p>E-Mail: <a class="underline-offset-4 hover:underline" href={`mailto:${SITE.email}`}>{SITE.email}</a></p>
+      <section>
+        <h2>Kontakt</h2>
+        <p>
+          E-Mail:
+          {' '}
+          <a href="mailto:tammo@tammostudios.de">tammo@tammostudios.de</a>
+        </p>
       </section>
 
-      <section class="mt-8 space-y-2 leading-relaxed text-ts-fg/90">
-        <h2 class="text-[12px] uppercase tracking-[0.3em] text-ts-muted">
-          Umsatzsteuer-Identifikationsnummer (gem. §27a UStG)
-        </h2>
-        <p>{SITE.legal.vatId}</p>
+      <section>
+        <h2>Umsatzsteuer-Identifikationsnummer</h2>
+        <p>Beantragt.</p>
       </section>
 
-      <section class="mt-8 space-y-2 leading-relaxed text-ts-fg/90">
-        <h2 class="text-[12px] uppercase tracking-[0.3em] text-ts-muted">
-          Steuernummer
-        </h2>
-        <p>{SITE.legal.taxId}</p>
+      <section>
+        <h2>Steuernummer</h2>
+        <p>Beantragt.</p>
       </section>
 
-      <section class="mt-8 space-y-2 leading-relaxed text-ts-fg/90">
-        <h2 class="text-[12px] uppercase tracking-[0.3em] text-ts-muted">
-          Verantwortlich für den Inhalt nach §18 Abs. 2 MStV
-        </h2>
+      <section>
+        <h2>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
         <p>Tammo Hendriks (Anschrift wie oben)</p>
       </section>
-    </article>
 
-    <footer class="mt-16 flex flex-col items-center gap-3 text-center text-[12px] text-ts-muted sm:flex-row sm:justify-between sm:text-left">
-      <span>© {year} {SITE.name}</span>
-      <nav class="flex items-center gap-5">
-        <a href="/impressum" class="hover:text-ts-fg">Impressum</a>
-        <a href="/datenschutz" class="hover:text-ts-fg">Datenschutz</a>
-      </nav>
-    </footer>
+      <section>
+        <h2>EU-Streitschlichtung</h2>
+        <p>
+          Die Europäische Kommission stellt eine Plattform zur
+          Online-Streitbeilegung (OS) bereit:
+          {' '}
+          <a
+            href="https://ec.europa.eu/consumers/odr/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >https://ec.europa.eu/consumers/odr/</a>. Meine
+          E-Mail-Adresse findest Du oben.
+        </p>
+      </section>
+
+      <section>
+        <h2>Verbraucherstreitbeilegung / Universalschlichtungsstelle</h2>
+        <p>
+          Ich bin nicht bereit oder verpflichtet, an
+          Streitbeilegungsverfahren vor einer
+          Verbraucherschlichtungsstelle teilzunehmen.
+        </p>
+      </section>
+
+      <section>
+        <h2>Haftung für Inhalte</h2>
+        <p>
+          Als Diensteanbieter bin ich gemäß § 7 Abs. 1 TMG für
+          eigene Inhalte auf diesen Seiten nach den allgemeinen
+          Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG bin ich
+          als Diensteanbieter jedoch nicht verpflichtet,
+          übermittelte oder gespeicherte fremde Informationen zu
+          überwachen oder nach Umständen zu forschen, die auf
+          eine rechtswidrige Tätigkeit hinweisen. Verpflichtungen
+          zur Entfernung oder Sperrung der Nutzung von
+          Informationen nach den allgemeinen Gesetzen bleiben
+          hiervon unberührt. Eine diesbezügliche Haftung ist
+          jedoch erst ab dem Zeitpunkt der Kenntnis einer
+          konkreten Rechtsverletzung möglich. Bei Bekanntwerden
+          von entsprechenden Rechtsverletzungen werde ich diese
+          Inhalte umgehend entfernen.
+        </p>
+      </section>
+
+      <section>
+        <h2>Haftung für Links</h2>
+        <p>
+          Mein Angebot enthält Links zu externen Websites
+          Dritter, auf deren Inhalte ich keinen Einfluss habe.
+          Deshalb kann ich für diese fremden Inhalte auch keine
+          Gewähr übernehmen. Für die Inhalte der verlinkten
+          Seiten ist stets der jeweilige Anbieter oder Betreiber
+          der Seiten verantwortlich. Bei Bekanntwerden von
+          Rechtsverletzungen werde ich derartige Links umgehend
+          entfernen.
+        </p>
+      </section>
+
+      <section>
+        <h2>Urheberrecht</h2>
+        <p>
+          Die durch den Seitenbetreiber erstellten Inhalte und
+          Werke auf diesen Seiten unterliegen dem deutschen
+          Urheberrecht. Die Vervielfältigung, Bearbeitung,
+          Verbreitung und jede Art der Verwertung außerhalb der
+          Grenzen des Urheberrechtes bedürfen der schriftlichen
+          Zustimmung des jeweiligen Autors bzw. Erstellers.
+        </p>
+      </section>
+    </article>
   </main>
+
+  <footer class="site-footer">
+    <div class="footer-row">
+      <span class="footer-brand">{footer.brand}</span>
+      <nav class="footer-nav" aria-label="Hauptnavigation">
+        {footer.navLinks.map((link, i) => (
+          <>
+            {i > 0 && <span aria-hidden="true">·</span>}
+            <a href={link.href}>{link.label}</a>
+          </>
+        ))}
+      </nav>
+    </div>
+    <div class="footer-row footer-row-legal">
+      <span class="footer-copy">{footer.copyright}</span>
+      <nav class="footer-legal" aria-label="Rechtliches">
+        {footer.legalLinks.map((link, i) => (
+          <>
+            {i > 0 && <span aria-hidden="true">·</span>}
+            <a href={link.href}>{link.label}</a>
+          </>
+        ))}
+      </nav>
+    </div>
+  </footer>
 </BaseLayout>
+
+<style>
+  .legal-page {
+    position: relative;
+    background: #050507;
+    padding: 140px 40px 80px;
+    min-height: calc(100vh - 200px);
+    overflow: hidden;
+  }
+
+  @media (max-width: 768px) {
+    .legal-page {
+      padding: 100px 20px 60px;
+    }
+  }
+
+  .legal-hero {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto 64px;
+    padding-top: 32px;
+  }
+
+  /* Body: einspaltig zentriert. Section-Headlines mit 3px amber-Bar
+     links — gleiche Pattern wie auf /ueber. Body-Text in zinc-300
+     und 1.7 Zeilenhöhe für lesbare Legalprosa. */
+  .legal-content {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .legal-content section {
+    margin-bottom: 40px;
+  }
+
+  .legal-content section:last-of-type {
+    margin-bottom: 0;
+  }
+
+  .legal-content h2 {
+    position: relative;
+    padding-left: 18px;
+    margin: 0 0 14px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.2rem, 1.7vw, 1.4rem);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: #f5f5f4;
+  }
+
+  .legal-content h2::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 4px;
+    bottom: 4px;
+    width: 3px;
+    background: rgba(245, 158, 11, 0.9);
+    border-radius: 2px;
+  }
+
+  .legal-content p {
+    margin: 0 0 12px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: clamp(0.95rem, 1.1vw, 1.05rem);
+    line-height: 1.7;
+    color: rgba(245, 245, 244, 0.78);
+  }
+
+  .legal-content p:last-child {
+    margin-bottom: 0;
+  }
+
+  .legal-address {
+    color: rgba(245, 245, 244, 0.85);
+  }
+
+  .legal-content a {
+    color: #f5f5f4;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+    padding-bottom: 1px;
+    transition: color 200ms ease, border-color 200ms ease;
+  }
+
+  .legal-content a:hover,
+  .legal-content a:focus-visible {
+    color: rgba(245, 158, 11, 1);
+    border-bottom-color: rgba(245, 158, 11, 0.6);
+    outline: none;
+  }
+
+  /* Footer (gleicher Stil wie /ueber, /preise, /referenzen) */
+  .site-footer {
+    background: #050507;
+    padding: 32px 40px 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.78rem;
+  }
+
+  .footer-brand {
+    color: rgba(245, 245, 244, 0.7);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .footer-copy {
+    color: rgba(245, 245, 244, 0.5);
+  }
+
+  .footer-nav,
+  .footer-legal {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .footer-nav a,
+  .footer-legal a {
+    color: rgba(245, 245, 244, 0.7);
+    text-decoration: none;
+    transition: color 200ms ease;
+  }
+
+  .footer-nav a:hover,
+  .footer-nav a:focus-visible,
+  .footer-legal a:hover,
+  .footer-legal a:focus-visible {
+    color: rgba(245, 158, 11, 0.95);
+    outline: none;
+  }
+
+  .footer-row-legal {
+    color: rgba(245, 245, 244, 0.4);
+    font-size: 0.72rem;
+  }
+
+  @media (max-width: 768px) {
+    .footer-row {
+      flex-direction: row;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 4px 12px;
+      font-size: 0.65rem;
+    }
+    .footer-row-legal {
+      font-size: 0.6rem;
+      opacity: 0.7;
+    }
+  }
+</style>
