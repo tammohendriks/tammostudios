@@ -1,0 +1,294 @@
+---
+// Background — drei Layer:
+// A: statisches, langsam driftendes Grid (CSS)
+// B: pulsierende Knoten an Grid-Intersections (Canvas 2D, JS-erzeugt)
+// C: warmer Spotlight, der dem Cursor folgt (CSS, --mouse-x/--mouse-y)
+---
+
+<div class="background" aria-hidden="true">
+  <div class="grid-mask">
+    <div class="grid-drift"></div>
+  </div>
+  <div class="spotlight"></div>
+</div>
+
+<style is:global>
+  /* Canvas wird zur Laufzeit angelegt → Style muss global sein. */
+  canvas.node-canvas {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      black 14%,
+      black 86%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      black 14%,
+      black 86%,
+      transparent 100%
+    );
+  }
+</style>
+
+<style>
+  .background {
+    /* Section-scoped: Parent (Section1) ist position: relative, Background
+       deckt nur diese Section ab. */
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .grid-mask {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      black 14%,
+      black 86%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      black 14%,
+      black 86%,
+      transparent 100%
+    );
+  }
+
+  .grid-drift {
+    --cell: 56px;
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: var(--cell) var(--cell);
+    animation: grid-drift 60s linear infinite;
+    will-change: transform;
+  }
+
+  @media (min-width: 768px) {
+    .grid-drift {
+      --cell: 80px;
+    }
+  }
+
+  .spotlight {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: radial-gradient(
+      600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      rgba(245, 158, 11, 0.10) 0%,
+      rgba(245, 158, 11, 0.04) 30%,
+      transparent 60%
+    );
+    transition: background 80ms linear;
+    pointer-events: none;
+  }
+
+  @keyframes grid-drift {
+    0%   { transform: translate(0, 0); }
+    100% { transform: translate(var(--cell), calc(var(--cell) * -1)); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .grid-drift {
+      animation: none;
+    }
+    .spotlight {
+      transition: none;
+    }
+  }
+
+  /* Touch-Devices: Spotlight ergibt ohne Cursor keinen Sinn —
+     komplett ausblenden. (hover: none) ist zuverlässiger als
+     (pointer: coarse) für Touch-Detection. !important, damit kein
+     anderer Selector den Spotlight wieder einblenden kann. */
+  @media (hover: none) {
+    .spotlight {
+      display: none !important;
+    }
+  }
+</style>
+
+<script>
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Strenger gefasst: (hover: hover) UND (pointer: fine). Erfasst echte
+  // Maus-Devices verlässlich, vermeidet Hybrid-Reports und sorgt dafür,
+  // dass auf Mobile garantiert keine dynamischen Mouse/Spotlight-Pfade
+  // laufen.
+  const isHoverCapable = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  // Geteilte Mausposition für Spotlight (Layer C) und Knoten-Proximity (Layer B).
+  // Auf Touch / vor erstem mousemove bleibt sie in der Viewport-Mitte.
+  let mouseX = window.innerWidth / 2;
+  let mouseY = window.innerHeight / 2;
+
+  const PROX_RADIUS = 280;
+  const PROX_RADIUS_SQ = PROX_RADIUS * PROX_RADIUS;
+
+  // === Layer B: Canvas mit pulsierenden Knoten ===
+  const bgEl = document.querySelector('.background');
+  if (bgEl) {
+    const canvas = document.createElement('canvas');
+    canvas.classList.add('node-canvas');
+    bgEl.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let nodes = [];
+    let cellSize = 80;
+    let nodeRadius = 2;
+
+    function rebuildNodes() {
+      cellSize = window.innerWidth < 768 ? 56 : 80;
+      nodeRadius = window.innerWidth < 768 ? 1.5 : 2;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      canvas.style.width = window.innerWidth + 'px';
+      canvas.style.height = window.innerHeight + 'px';
+      // canvas.width-Set resettet die Context-Transformation auf identity.
+      ctx.scale(dpr, dpr);
+
+      nodes = [];
+      for (let x = 0; x <= window.innerWidth; x += cellSize) {
+        for (let y = 0; y <= window.innerHeight; y += cellSize) {
+          nodes.push({
+            x,
+            y,
+            phase: Math.random() * Math.PI * 2,
+            amplitude: 0.05 + Math.random() * 0.35,
+          });
+        }
+      }
+    }
+
+    function drawFrame(t) {
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      for (const n of nodes) {
+        // Proximity nur auf Hover-fähigen Devices — auf Touch wird mouseX/Y
+        // nie aktualisiert, da würde der Boost an einem statischen Punkt
+        // hängen bleiben. Auf Touch übernimmt der Scroll-Flicker.
+        let proximity = 0;
+        if (isHoverCapable) {
+          const dx = n.x - mouseX;
+          const dy = n.y - mouseY;
+          const distSq = dx * dx + dy * dy;
+          if (distSq < PROX_RADIUS_SQ) {
+            proximity = 1 - Math.sqrt(distSq) / PROX_RADIUS;
+          }
+        }
+
+        // Pulse-Phase friert bei reduced-motion ein, Proximity bleibt aktiv
+        // (interaktiv, nicht decorative).
+        const phaseValue = reduceMotion
+          ? 0.5
+          : Math.sin(t * 0.6 + n.phase) * 0.5 + 0.5;
+        const baseBrightness = 0.05 + n.amplitude * phaseValue;
+        const brightness = Math.min(0.9, baseBrightness + proximity * 0.5);
+        const radius = nodeRadius + proximity * 1.5;
+
+        ctx.fillStyle = 'rgba(245, 158, 11, ' + brightness + ')';
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    rebuildNodes();
+
+    let raf = 0;
+    let running = true;
+
+    function tick() {
+      raf = requestAnimationFrame(tick);
+      drawFrame(performance.now() / 1000);
+    }
+
+    tick();
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        if (!running) {
+          running = true;
+          tick();
+        }
+      } else {
+        running = false;
+        if (raf) cancelAnimationFrame(raf);
+      }
+    });
+
+    let resizeRaf = 0;
+    window.addEventListener('resize', () => {
+      if (resizeRaf) cancelAnimationFrame(resizeRaf);
+      resizeRaf = requestAnimationFrame(() => {
+        rebuildNodes();
+        if (!isHoverCapable) {
+          // Touch ohne realen Cursor: Mitte nachziehen
+          mouseX = window.innerWidth / 2;
+          mouseY = window.innerHeight / 2;
+        }
+      });
+    });
+
+    // Auf Touch: KEINE dynamischen Effekte. Kein Mouse-Listener, kein
+    // Scroll-Flicker, keine Proximity-Berechnung. Das natürliche
+    // Knoten-Pulsen via drawFrame läuft weiter — das war's.
+    // Stabilität > clevere Mobile-Spielereien.
+
+    document.addEventListener('astro:before-preparation', () => {
+      running = false;
+      if (raf) cancelAnimationFrame(raf);
+      canvas.remove();
+    });
+  }
+
+  // === Layer C: Spotlight + geteilte Mausposition ===
+  const root = document.documentElement;
+  const setPos = (x, y) => {
+    root.style.setProperty('--mouse-x', x + 'px');
+    root.style.setProperty('--mouse-y', y + 'px');
+  };
+
+  if (isHoverCapable) {
+    // Mauslistener läuft auch bei reduced-motion: die Knoten-Proximity ist
+    // nutzergetrieben, nicht decorative.
+    let pending = false;
+    const flush = () => {
+      pending = false;
+      setPos(mouseX, mouseY);
+    };
+    window.addEventListener(
+      'mousemove',
+      (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        if (!pending) {
+          pending = true;
+          requestAnimationFrame(flush);
+        }
+      },
+      { passive: true },
+    );
+  }
+  // Touch → mouseX/mouseY bleibt zentral; Spotlight ist via CSS auf
+  // (hover: none) ausgeblendet, kein Flicker durch verwaiste --mouse-x/y.
+</script>

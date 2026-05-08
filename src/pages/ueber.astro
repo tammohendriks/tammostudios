@@ -1,0 +1,490 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SubPageBackground from '../components/SubPageBackground.astro';
+import { SECTION5 } from '../lib/constants';
+
+const { footer } = SECTION5;
+---
+
+<BaseLayout
+  pageTitle="Über mich"
+  description="Tammo Hendriks, 25, aus Bremen — Webdeveloper im Mittelstand-Background. Tammo Studios baut Websites, die zu Dir passen, nicht zu einem Template."
+>
+  <main class="ueber-page">
+    <SubPageBackground />
+
+    <header class="ueber-hero">
+      <div class="hero-text">
+        <h1 class="subpage-hero-title">Hi, ich bin Tammo.</h1>
+        <p class="subpage-hero-subtitle">
+          25 Jahre alt, Bremen, und ich baue Websites — handgemacht,
+          eine nach der anderen.
+        </p>
+      </div>
+      <div class="hero-mark">
+        <img
+          class="hero-photo"
+          src="/tammo-foto.png?v=2026-05-08-2"
+          alt="Tammo Hendriks, Gründer von Tammo Studios"
+          loading="eager"
+          width="480"
+          height="480"
+        />
+      </div>
+    </header>
+
+    <article class="ueber-content">
+      <section class="ueber-section" data-reveal>
+        <h2>Wer ich bin</h2>
+        <p>
+          Angefangen hat alles mit einer Ausbildung zum Kaufmann
+          für Digitalisierungsmanagement bei einer
+          Sparkassen-Tochter. Danach bin ich dort als Online
+          Marketing Manager geblieben — und arbeite das auch heute
+          noch. Nebenbei habe ich aber gemerkt, dass mir etwas
+          fehlt: das Programmieren. Genau das, was mich am Anfang
+          am meisten gepackt hat.
+        </p>
+        <p>
+          Im Mai 2026 habe ich mich entschieden, das nicht länger
+          nur nebenbei zu machen. Tammo Studios ist mein Weg zurück
+          zum Code — und gleichzeitig zu einer Arbeitsweise, die
+          zu meinem Leben passt: Ab August reise ich für längere
+          Zeit durch Asien. Videos kann man schlecht aus 9.000
+          Kilometern Entfernung drehen. Websites schon.
+        </p>
+      </section>
+
+      <section class="ueber-section" data-reveal>
+        <h2>Wie ich arbeite</h2>
+        <p>
+          Ein Projekt zur Zeit. Du sprichst direkt mit der Person,
+          die Deine Seite baut — keine Agentur-Hierarchie
+          dazwischen.
+        </p>
+        <p>
+          Ich arbeite vollständig remote, auf Deutsch oder
+          Englisch. Wo Du sitzt, ist mir egal — eine gute
+          Internetverbindung reicht.
+        </p>
+        <p>
+          Was mir wichtig ist: Geduld bei Feedback und ein Gespür
+          für den richtigen Ton. Eine Kneipenwebsite soll nicht
+          clean wie ein SaaS-Startup aussehen — sie darf dunkel
+          sein, ein bisschen rau, vintage. Eine Yogapraxis darf
+          weich atmen. Ich höre mir an, wer Du bist, und baue dann
+          genau das.
+        </p>
+        <p>
+          Eine normale Website steht in maximal
+          <strong>14 Tagen</strong>. Ein Online-Shop in maximal
+          <strong>30</strong>. Schneller meistens — länger nie.
+        </p>
+      </section>
+
+      <section class="ueber-section" data-reveal>
+        <h2>Was es kostet</h2>
+        <p>
+          Eine Website (Landing + bis zu 5 Unterseiten) kostet
+          <strong>1.500 €</strong>.
+        </p>
+        <p>
+          Größere Projekte wie Online-Shops liegen bei
+          <strong>2.500 €</strong>.
+        </p>
+        <p>
+          Keine versteckten Stundensätze, keine Pakete mit
+          Sternchen.
+        </p>
+        <a class="inline-link" href="/preise">
+          <span>Volle Preisübersicht ansehen</span>
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </a>
+      </section>
+
+      <section class="ueber-section" data-reveal>
+        <h2>Außerhalb vom Code</h2>
+        <p>
+          Wenn ich nicht arbeite, bin ich meistens beim Sport oder
+          unterwegs. Reisen ist das, was mir Energie gibt — und
+          gleichzeitig der Grund, warum ich das hier so aufgebaut
+          habe, wie ich's aufgebaut habe.
+        </p>
+      </section>
+
+      <section class="ueber-close" data-reveal>
+        <p class="close-line">
+          Wenn das nach Deinem Stil klingt: schreib mir.
+        </p>
+        <button
+          class="inline-link inline-link-cta"
+          type="button"
+          data-action="open-contact"
+        >
+          <span>Kontakt aufnehmen</span>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </button>
+      </section>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-row">
+      <span class="footer-brand">{footer.brand}</span>
+      <nav class="footer-nav" aria-label="Hauptnavigation">
+        {footer.navLinks.map((link, i) => (
+          <>
+            {i > 0 && <span aria-hidden="true">·</span>}
+            <a href={link.href}>{link.label}</a>
+          </>
+        ))}
+      </nav>
+    </div>
+    <div class="footer-row footer-row-legal">
+      <span class="footer-copy">{footer.copyright}</span>
+      <nav class="footer-legal" aria-label="Rechtliches">
+        {footer.legalLinks.map((link, i) => (
+          <>
+            {i > 0 && <span aria-hidden="true">·</span>}
+            <a href={link.href}>{link.label}</a>
+          </>
+        ))}
+      </nav>
+    </div>
+  </footer>
+</BaseLayout>
+
+<style>
+  .ueber-page {
+    position: relative;
+    background: #050507;
+    padding: 140px 40px 80px;
+    min-height: calc(100vh - 200px);
+    overflow: hidden;
+  }
+
+  @media (max-width: 768px) {
+    .ueber-page {
+      padding: 100px 20px 60px;
+    }
+  }
+
+  /* Atmosphäre liegt jetzt in <SubPageBackground /> — gemeinsame
+     Komponente für /ueber, /referenzen, /preise. */
+
+  /* === Hero: 55/45 Grid auf Desktop, Stack auf Mobile (Foto zuerst).
+     45-Anteil und 1200px max-width geben der Photo-Spalte ~520px,
+     genug für 480px Photo + Atemraum. */
+  .ueber-hero {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 55fr) minmax(0, 45fr);
+    gap: 60px;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto 96px;
+  }
+
+  @media (max-width: 768px) {
+    .ueber-hero {
+      grid-template-columns: 1fr;
+      gap: 36px;
+      text-align: center;
+      margin-bottom: 72px;
+    }
+    .hero-mark {
+      order: -1;
+      justify-self: center;
+    }
+  }
+
+  /* Typografie der H1 + Subtitle kommt aus .subpage-hero-title /
+     .subpage-hero-subtitle in global.css — hier nur layout-spezifisch
+     der max-width und das Mobile-Centering. */
+  .subpage-hero-subtitle {
+    max-width: 520px;
+  }
+
+  @media (max-width: 768px) {
+    .subpage-hero-subtitle {
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+
+  /* === Foto-Avatar: rundes Bild mit amber Ring + Glow-Aura.
+     ::after-Pseudo legt eine subtile Vignette an die Innenkanten,
+     damit das Foto nicht hart gegen den Hintergrund schneidet. */
+  .hero-mark {
+    position: relative;
+    width: min(480px, 100%);
+    aspect-ratio: 1 / 1;
+    justify-self: end;
+    isolation: isolate;
+  }
+
+  @media (max-width: 768px) {
+    .hero-mark {
+      width: 140px;
+      justify-self: center;
+    }
+  }
+
+  .hero-photo {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+    box-shadow:
+      0 0 80px rgba(245, 158, 11, 0.25),
+      inset 0 0 0 2px rgba(245, 158, 11, 0.4);
+  }
+
+  /* Innenkanten-Vignette: weiches dunkles Gradient an den Rändern,
+     damit das Foto sauber in den Hintergrund übergeht. */
+  .hero-mark::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      transparent 55%,
+      rgba(0, 0, 0, 0.25) 100%
+    );
+    pointer-events: none;
+  }
+
+  @media (max-width: 768px) {
+    .hero-photo {
+      box-shadow:
+        0 0 40px rgba(245, 158, 11, 0.25),
+        inset 0 0 0 2px rgba(245, 158, 11, 0.4);
+    }
+  }
+
+  /* === Content: einspaltig zentriert, max-width für Lesbarkeit */
+  .ueber-content {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .ueber-section {
+    margin-bottom: 56px;
+  }
+
+  .ueber-section:last-of-type {
+    margin-bottom: 32px;
+  }
+
+  /* Section-Headline mit vertikaler Amber-Bar links — 3px breit,
+     volle Höhe der Headline. Padding-left schiebt den Text rechts
+     vom Bar-Position weg. */
+  .ueber-content h2 {
+    position: relative;
+    padding-left: 18px;
+    margin: 0 0 20px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.4rem, 2.2vw, 1.75rem);
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    color: #f5f5f4;
+  }
+
+  .ueber-content h2::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 4px;
+    bottom: 4px;
+    width: 3px;
+    background: rgba(245, 158, 11, 0.9);
+    border-radius: 2px;
+  }
+
+  .ueber-content p {
+    margin: 0 0 18px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: clamp(1.05rem, 1.15vw, 1.125rem);
+    line-height: 1.7;
+    color: rgba(245, 245, 244, 0.78);
+  }
+
+  .ueber-content p:last-child {
+    margin-bottom: 0;
+  }
+
+  .ueber-content strong {
+    color: #f5f5f4;
+    font-weight: 600;
+  }
+
+  /* Inline-Link mit amber Pfeil — leiser als ein Pill-Button.
+     Funktioniert auf <a> und <button> identisch — Browser-Defaults
+     werden hier explizit zurückgesetzt, damit ein semantischer
+     Button-Trigger (z.B. fürs Kontakt-Modal) nicht wie ein nativer
+     Button rendert. */
+  .inline-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid transparent;
+    color: #f5f5f4;
+    text-decoration: none;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 1rem;
+    padding: 0 0 1px;
+    cursor: pointer;
+    transition: border-color 200ms ease, color 200ms ease;
+    margin-top: 8px;
+  }
+
+  .inline-link svg {
+    color: rgba(245, 158, 11, 0.95);
+    transition: transform 200ms ease;
+    flex-shrink: 0;
+  }
+
+  .inline-link:hover,
+  .inline-link:focus-visible {
+    border-bottom-color: rgba(245, 158, 11, 0.6);
+    color: #fff;
+    outline: none;
+  }
+
+  .inline-link:hover svg,
+  .inline-link:focus-visible svg {
+    transform: translateX(3px);
+  }
+
+  /* Schluss-Block: bewusst leiser Ausstieg, leichtes Trennluft nach oben */
+  .ueber-close {
+    margin-top: 80px;
+    padding-top: 40px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .close-line {
+    margin: 0 0 12px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: clamp(1.1rem, 1.3vw, 1.2rem);
+    line-height: 1.55;
+    color: rgba(245, 245, 244, 0.85);
+  }
+
+  .inline-link-cta {
+    font-size: 1.05rem;
+    font-weight: 500;
+  }
+
+  /* Footer (gleicher Stil wie /referenzen — bewusst dupliziert,
+     bis es ein eigenes <SiteFooter />-Component gibt). */
+  .site-footer {
+    background: #050507;
+    padding: 32px 40px 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.78rem;
+  }
+
+  .footer-brand {
+    color: rgba(245, 245, 244, 0.7);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .footer-copy {
+    color: rgba(245, 245, 244, 0.5);
+  }
+
+  .footer-nav,
+  .footer-legal {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .footer-nav a,
+  .footer-legal a {
+    color: rgba(245, 245, 244, 0.7);
+    text-decoration: none;
+    transition: color 200ms ease;
+  }
+
+  .footer-nav a:hover,
+  .footer-nav a:focus-visible,
+  .footer-legal a:hover,
+  .footer-legal a:focus-visible {
+    color: rgba(245, 158, 11, 0.95);
+    outline: none;
+  }
+
+  .footer-row-legal {
+    color: rgba(245, 245, 244, 0.4);
+    font-size: 0.72rem;
+  }
+
+  @media (max-width: 768px) {
+    .footer-row {
+      flex-direction: row;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 4px 12px;
+      font-size: 0.65rem;
+    }
+    .footer-row-legal {
+      font-size: 0.6rem;
+      opacity: 0.7;
+    }
+  }
+</style>

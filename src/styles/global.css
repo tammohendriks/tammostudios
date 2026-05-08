@@ -4,6 +4,8 @@
 @import "@fontsource/inter/500.css";
 @import "@fontsource/inter/600.css";
 
+@import "./fonts.css";
+
 @theme {
   --color-ts-bg: #0a0a0c;
   --color-ts-bg-deep: #050507;
@@ -12,8 +14,19 @@
   --color-ts-accent: #f59e0b;
   --color-ts-grid: rgba(255, 255, 255, 0.04);
 
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system,
-    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /* Neue Montreal als Display/Brand-Font, Inter als Fallback für nicht
+     deklarierte Gewichte (Regular/Medium/SemiBold).
+     Aileron lebt nur lokal auf .wm-studios. */
+  --font-sans: "Neue Montreal", "Inter", ui-sans-serif, system-ui,
+    -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+html {
+  /* Reserviert dauerhaft Platz für die Scrollbar — der visuelle
+     Mittelpunkt des Viewports bleibt konstant, egal ob die Seite
+     gerade scrollbar ist oder nicht. ScrollCues bleiben damit
+     pixelgenau zentriert. */
+  scrollbar-gutter: stable;
 }
 
 html,
@@ -33,4 +46,188 @@ a {
 
 a:hover {
   color: var(--color-ts-fg);
+}
+
+/* === Sub-Page Hero ===
+   Wiederverwendbare Typografie für die H1 + Subtitle auf /ueber,
+   /referenzen und /preise. Vorher hatte jede Seite ihre eigenen
+   clamp-Werte (40–64px vs. 48–96px), wodurch "Referenzen" sichtbar
+   größer rendert als "Was es kostet.". Globale Klasse vereint
+   alle drei H1s auf clamp(48px, 8vw, 96px) und garantiert
+   Neue Montreal Bold gerade (kein italic). */
+.subpage-hero-title {
+  font-family: 'Neue Montreal', 'Inter', sans-serif;
+  font-weight: 700;
+  font-style: normal;
+  font-size: clamp(48px, 8vw, 96px);
+  line-height: 1;
+  letter-spacing: -0.025em;
+  color: #f5f5f4;
+  margin: 0 0 18px;
+}
+
+.subpage-hero-subtitle {
+  font-family: 'Neue Montreal', 'Inter', sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: clamp(1.05rem, 1.4vw, 1.2rem);
+  line-height: 1.55;
+  color: rgba(245, 245, 244, 0.65);
+  margin: 0;
+}
+
+/* === Scroll-Reveal ===
+   Site-weites Reveal-Pattern für Sub-Pages: Elemente mit
+   data-reveal starten unsichtbar und faden ein, sobald sie 15% im
+   Viewport sind. JS in BaseLayout setzt .is-revealed beim Eintritt
+   und disconnected den Observer pro Element (one-time).
+   Stagger-Delays werden vom Script per inline style gesetzt, sodass
+   gleichzeitig auftauchende Elemente um 100ms versetzt erscheinen. */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 800ms ease-out, transform 800ms ease-out;
+}
+
+[data-reveal].is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* === CTA Orbital ===
+   Pill-CTA mit permanentem warmem Glow, kontinuierlich pulsierender
+   Welle nach außen, und periodischem Shimmer-Sweep über die Fläche.
+   Hover: Scale + Glow-Intensify + Shimmer-Speedup. */
+.cta-orbital {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 26px;
+  border-radius: 9999px;
+  overflow: hidden;
+  background: linear-gradient(to bottom,
+    #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+  color: #1a1a1a;
+  font-family: 'Neue Montreal', 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    0 2px 8px rgba(0, 0, 0, 0.25),
+    0 0 32px rgba(245, 158, 11, 0.45),
+    0 0 80px rgba(245, 158, 11, 0.20);
+  animation: cta-pulse 3s ease-out infinite;
+  transition: transform 240ms ease, box-shadow 240ms ease;
+}
+
+/* Pulse-Welle: ein zusätzlicher 0-Blur Spread-Ring atmet von 0 → 18px
+   und fadet dabei aus. Permanenter Glow bleibt darunter konstant. */
+@keyframes cta-pulse {
+  0% {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.25),
+      0 2px 8px rgba(0, 0, 0, 0.25),
+      0 0 32px rgba(245, 158, 11, 0.45),
+      0 0 80px rgba(245, 158, 11, 0.20),
+      0 0 0 0 rgba(245, 158, 11, 0.4);
+  }
+  70% {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.25),
+      0 2px 8px rgba(0, 0, 0, 0.25),
+      0 0 32px rgba(245, 158, 11, 0.45),
+      0 0 80px rgba(245, 158, 11, 0.20),
+      0 0 0 18px rgba(245, 158, 11, 0);
+  }
+  100% {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.25),
+      0 2px 8px rgba(0, 0, 0, 0.25),
+      0 0 32px rgba(245, 158, 11, 0.45),
+      0 0 80px rgba(245, 158, 11, 0.20),
+      0 0 0 0 rgba(245, 158, 11, 0);
+  }
+}
+
+/* Shimmer-Sweep: schräger Highlight-Streifen läuft alle 5s über
+   die Fläche. Parent overflow:hidden clippt zur Pill-Form. */
+.cta-orbital::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.25) 50%,
+    transparent 100%
+  );
+  transform: skewX(-20deg);
+  border-radius: inherit;
+  pointer-events: none;
+  animation: cta-shimmer 5s ease-in-out infinite;
+}
+
+@keyframes cta-shimmer {
+  0%, 70% { left: -100%; }
+  100%    { left: 200%; }
+}
+
+.cta-orbital:hover {
+  transform: scale(1.04);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 2px 10px rgba(0, 0, 0, 0.3),
+    0 0 48px rgba(245, 158, 11, 0.6),
+    0 0 120px rgba(245, 158, 11, 0.3);
+}
+
+.cta-orbital:hover::before {
+  animation-duration: 2s;
+}
+
+.cta-orbital:active {
+  transform: scale(0.98);
+}
+
+.cta-orbital:focus-visible {
+  outline: 2px solid rgba(245, 158, 11, 0.8);
+  outline-offset: 4px;
+}
+
+.cta-orbital svg {
+  transition: transform 240ms ease;
+  flex-shrink: 0;
+}
+
+.cta-orbital:hover svg,
+.cta-orbital:focus-visible svg {
+  transform: translateX(4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cta-orbital,
+  .cta-orbital::before {
+    animation: none !important;
+  }
+  .cta-orbital:hover {
+    transform: none !important;
+  }
+  .cta-orbital:hover svg {
+    transform: none !important;
+  }
 }

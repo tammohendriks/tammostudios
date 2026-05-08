@@ -1,0 +1,372 @@
+---
+import { SECTION3 } from '../../lib/constants';
+---
+
+<section class="section-3">
+  <div class="section-3-bg" aria-hidden="true"></div>
+
+  <div class="section-3-sticky">
+    <div class="section-3-content">
+      <p class="section-3-eyebrow">{SECTION3.eyebrow}</p>
+
+      <div class="differentiators">
+        {SECTION3.items.map((item, i) => {
+          const link = 'link' in item ? item.link : null;
+          return (
+            <article class="diff-item" style={`--item-index: ${i};`}>
+              <span class="diff-number">{item.number}</span>
+              <h3 class="diff-title">{item.title}</h3>
+              <p class="diff-body" set:html={item.body} />
+              {link && (
+                <a class="diff-link" href={link.href}>
+                  <span>{link.label}</span>
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M5 12h14M13 6l6 6-6 6" />
+                  </svg>
+                </a>
+              )}
+            </article>
+          );
+        })}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .section-3 {
+    position: relative;
+    /* 300vh wie Section2: Sticky-Duration = 200vh, Animation läuft
+       die ersten 75% (= 150vh of scroll), Settled-Tail die letzten
+       25% (= 50vh of scroll). So fühlt sich jede Scroll-Bewegung
+       kontrolliert an und es bleibt halbe Viewport-Höhe Lesezeit
+       am Ende. Mobile proportional kürzer. */
+    min-height: 300vh;
+    background: linear-gradient(to bottom, #050507 0%, #0a0a0c 100%);
+    /* overflow: clip statt hidden — moderner Property der das
+       Bg-Pattern clippt, ohne Sticky-Children zu brechen. */
+    overflow: clip;
+  }
+
+  @media (max-width: 768px) {
+    .section-3 {
+      min-height: 220vh;
+    }
+  }
+
+  .section-3-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+      45deg,
+      transparent 0px,
+      transparent 39px,
+      rgba(255, 255, 255, 0.025) 39px,
+      rgba(255, 255, 255, 0.025) 40px
+    );
+    -webkit-mask-image: radial-gradient(
+      ellipse 80% 70% at center,
+      black 0%,
+      black 40%,
+      transparent 90%
+    );
+    mask-image: radial-gradient(
+      ellipse 80% 70% at center,
+      black 0%,
+      black 40%,
+      transparent 90%
+    );
+  }
+
+  .section-3-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 40px;
+  }
+
+  @media (max-width: 768px) {
+    .section-3-sticky {
+      /* 120px top: TopBar + Spielraum für Eyebrow.
+         100px bottom: Platz für ScrollCue ohne Box-Overlap. */
+      padding: 120px 20px 100px;
+    }
+  }
+
+  .section-3-content {
+    width: 100%;
+    max-width: 1280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 64px;
+  }
+
+  @media (max-width: 768px) {
+    .section-3-content {
+      gap: 32px;
+    }
+  }
+
+  /* Eyebrow läuft scroll-driven, JS schreibt opacity + transform direkt
+     inline. Initial-Hidden hier hartkodiert — verhindert FOUC während
+     das Script noch nicht den ersten Tick gemacht hat. */
+  .section-3-eyebrow {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.3em;
+    color: rgba(245, 158, 11, 0.7);
+    text-transform: uppercase;
+    margin: 0;
+    opacity: 0;
+    transform: translateY(12px);
+    will-change: transform, opacity;
+  }
+
+  .differentiators {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 64px;
+    width: 100%;
+  }
+
+  @media (max-width: 1024px) {
+    .differentiators {
+      grid-template-columns: 1fr;
+      gap: 48px;
+      max-width: 540px;
+      margin: 0 auto;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .differentiators {
+      gap: 32px;
+    }
+  }
+
+  /* Per-Item Cascade: --item-progress 0..1 wird vom Section-Script
+     gesetzt. opacity + translateY ableiten — alles über transform
+     und opacity, kein Layout-Trigger, CLS-sicher. */
+  .diff-item {
+    --item-progress: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    opacity: var(--item-progress);
+    transform: translateY(calc((1 - var(--item-progress)) * 40px));
+    will-change: transform, opacity;
+  }
+
+  @media (max-width: 768px) {
+    .diff-item {
+      gap: 12px;
+    }
+  }
+
+  .diff-number {
+    font-family: 'Aileron', 'Inter', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: clamp(4rem, 8vw, 6rem);
+    line-height: 0.9;
+    color: rgba(245, 158, 11, 0.85);
+    letter-spacing: -0.04em;
+    text-shadow:
+      0 0 30px rgba(245, 158, 11, 0.25),
+      0 0 60px rgba(245, 158, 11, 0.10);
+  }
+
+  @media (max-width: 1024px) {
+    .diff-number {
+      font-size: 4rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .diff-number {
+      font-size: 3rem;
+    }
+  }
+
+  .diff-title {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.1rem, 1.6vw, 1.35rem);
+    color: #f5f5f4;
+    letter-spacing: -0.01em;
+    margin: 0;
+    line-height: 1.25;
+  }
+
+  @media (max-width: 768px) {
+    .diff-title {
+      font-size: 1.05rem;
+    }
+  }
+
+  .diff-body {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: clamp(0.95rem, 1.1vw, 1.05rem);
+    color: rgba(245, 245, 244, 0.65);
+    line-height: 1.55;
+    margin: 0;
+    max-width: 320px;
+  }
+
+  @media (max-width: 1024px) {
+    .diff-body {
+      max-width: 100%;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .diff-body {
+      font-size: 0.9rem;
+    }
+  }
+
+  /* Inline-Bold im Body (für die Preis-USP-Box, "1.500 €" und
+     "2.500 €" werden in Amber gehighlighted). */
+  .diff-body :global(strong) {
+    color: rgba(245, 158, 11, 1);
+    font-weight: 700;
+  }
+
+  /* Optionaler Sub-Link unter dem Body (z.B. "→ Volle Preisliste"
+     auf der Preis-USP-Box). White Text + amber Pfeil, hover amber
+     Underline — gleiches Pattern wie auf Über/Preise. */
+  .diff-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 16px;
+    color: #f5f5f4;
+    text-decoration: none;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-bottom: 1px solid transparent;
+    padding-bottom: 1px;
+    transition: border-color 200ms ease;
+  }
+
+  .diff-link svg {
+    color: rgba(245, 158, 11, 0.95);
+    transition: transform 200ms ease;
+  }
+
+  .diff-link:hover,
+  .diff-link:focus-visible {
+    border-bottom-color: rgba(245, 158, 11, 0.6);
+    outline: none;
+  }
+
+  .diff-link:hover svg,
+  .diff-link:focus-visible svg {
+    transform: translateX(3px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .diff-item {
+      --item-progress: 1 !important;
+    }
+    .section-3-eyebrow {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+</style>
+
+<script>
+  const section = document.querySelector('.section-3');
+  const items = section
+    ? Array.from(section.querySelectorAll('.diff-item'))
+    : [];
+  const eyebrow = section
+    ? section.querySelector('.section-3-eyebrow')
+    : null;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (section && items.length === 3 && eyebrow) {
+    // Mit 300vh Runway gehen wir auf langsame, dramatische Cascade:
+    // jeder Übergang hat Atemzug, Box 3 ist erst bei 85% voll.
+    const ranges = [
+      { start: 0.00, end: 0.40 },
+      { start: 0.25, end: 0.60 },
+      { start: 0.50, end: 0.85 },
+    ];
+    const EYEBROW_END = 0.12;
+
+    function clamp01(v) {
+      return v < 0 ? 0 : v > 1 ? 1 : v;
+    }
+
+    function getScrollProgress() {
+      const rect = section.getBoundingClientRect();
+      const total = section.offsetHeight - window.innerHeight;
+      if (total <= 0) return 0;
+      return clamp01(-rect.top / total);
+    }
+
+    function update() {
+      if (reduceMotion) {
+        eyebrow.style.opacity = '1';
+        eyebrow.style.transform = 'none';
+        for (const item of items) {
+          item.style.setProperty('--item-progress', '1');
+        }
+        return;
+      }
+
+      const progress = getScrollProgress();
+
+      const eyeP = clamp01(progress / EYEBROW_END);
+      eyebrow.style.opacity = String(eyeP);
+      eyebrow.style.transform = `translateY(${(1 - eyeP) * 12}px)`;
+
+      for (let i = 0; i < items.length; i++) {
+        const { start, end } = ranges[i];
+        const ip = clamp01((progress - start) / (end - start));
+        items[i].style.setProperty('--item-progress', String(ip));
+      }
+    }
+
+    let ticking = false;
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        update();
+        ticking = false;
+      });
+    }
+
+    let resizeTimer = 0;
+    function onResize() {
+      if (resizeTimer) clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(update, 120);
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onResize, { passive: true });
+    update();
+  }
+</script>

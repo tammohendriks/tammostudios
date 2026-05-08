@@ -1,0 +1,617 @@
+---
+import { SECTION4 } from '../../lib/constants';
+---
+
+<section class="section-4">
+  <div class="section-4-sticky">
+    <div class="section-4-video-wrap" aria-hidden="true">
+      <video
+        class="section-4-video"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="auto"
+      >
+        <source
+          media="(min-width: 768px)"
+          src="/videos/desktop.mp4"
+          type="video/mp4"
+        />
+        <source src="/videos/mobile.mp4" type="video/mp4" />
+      </video>
+      <div class="section-4-scrim"></div>
+    </div>
+
+    <header class="section-4-header">
+      <p class="section-4-eyebrow">{SECTION4.eyebrow}</p>
+      <h2 class="section-4-title">{SECTION4.title}</h2>
+    </header>
+
+    <div class="timeline-wrap">
+      <div class="timeline-spine" aria-hidden="true">
+        <svg
+          class="timeline-line"
+          viewBox="0 0 4 1000"
+          preserveAspectRatio="none"
+        >
+          <line x1="2" y1="0" x2="2" y2="1000" class="line-track" />
+          <line
+            x1="2"
+            y1="0"
+            x2="2"
+            y2="1000"
+            class="line-progress"
+            pathLength="100"
+          />
+        </svg>
+
+        <div class="phase-dot phase-dot-1" data-phase="0"></div>
+        <div class="phase-dot phase-dot-2" data-phase="1"></div>
+        <div class="phase-dot phase-dot-3" data-phase="2"></div>
+        <div class="phase-dot phase-dot-4" data-phase="3"></div>
+        <div class="phase-dot phase-dot-5" data-phase="4"></div>
+        <div class="phase-dot phase-dot-6" data-phase="5"></div>
+      </div>
+
+      <div class="phase-stage">
+        {SECTION4.phases.map((phase, i) => (
+          <article class={`phase phase-${i + 1}`} data-phase={i}>
+            <span class="phase-label">{phase.label}</span>
+            <h3 class="phase-title">{phase.title}</h3>
+            <p class="phase-body">
+              {phase.body}
+              {phase.link && phase.link.href === '/kontakt' ? (
+                <>
+                  {' '}
+                  <button
+                    type="button"
+                    class="phase-body-button"
+                    data-action="open-contact"
+                  >
+                    {phase.link.label}
+                  </button>
+                </>
+              ) : phase.link ? (
+                <>
+                  {' '}
+                  <a href={phase.link.href}>{phase.link.label}</a>
+                </>
+              ) : null}
+            </p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .section-4 {
+    position: relative;
+    min-height: 350vh;
+    overflow: clip;
+    background: #050507;
+  }
+
+  @media (max-width: 768px) {
+    .section-4 {
+      min-height: 280vh;
+    }
+  }
+
+  /* === Galaxy Video Background — absolut hinter dem Content im
+     einzigen Sticky-Container. Single-sticky-Pattern verhindert das
+     Engagement-Problem zweier sticky Geschwister. */
+  .section-4-video-wrap {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .section-4-video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: translate(-50%, -50%);
+    filter: brightness(0.85) contrast(1.1) saturate(1.15);
+  }
+
+  .section-4-scrim {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.55) 90%),
+      linear-gradient(
+        180deg,
+        rgba(5, 5, 7, 0.55) 0%,
+        rgba(5, 5, 7, 0.4) 50%,
+        rgba(5, 5, 7, 0.65) 100%
+      );
+    pointer-events: none;
+  }
+
+  /* === Sticky Container: 3-Row Grid header / timeline / cue.
+     gap: 32px schiebt Header und ScrollCue von der zentralen
+     Timeline weg. */
+  .section-4-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100dvh;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    padding: 100px 40px 40px;
+    gap: 32px;
+    z-index: 2;
+  }
+
+  @media (max-width: 768px) {
+    .section-4-sticky {
+      padding: 80px 20px 32px;
+      gap: 20px;
+    }
+  }
+
+  /* === Header (grid-row 1) === */
+  .section-4-header {
+    --header-progress: 0;
+    grid-row: 1;
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    opacity: var(--header-progress);
+    transform: translateY(calc((1 - var(--header-progress)) * 12px));
+    will-change: transform, opacity;
+  }
+
+  .section-4-eyebrow {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.3em;
+    color: rgba(245, 158, 11, 0.85);
+    text-transform: uppercase;
+    margin: 0 0 6px;
+  }
+
+  .section-4-title {
+    font-family: 'Aileron', 'Inter', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: clamp(1.3rem, 2.5vw, 1.85rem);
+    color: #f5f5f4;
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+
+  /* === Timeline-Wrap (grid-row 2): 2 Spalten — Spine + Stage.
+     Single-Phase-Centered: alle Phasen leben in der Stage am gleichen
+     Platz. Kein nth-child Alternation mehr. */
+  .timeline-wrap {
+    grid-row: 2;
+    align-self: center;
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    align-items: start;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    gap: 40px;
+    position: relative;
+    z-index: 2;
+  }
+
+  @media (max-width: 768px) {
+    .timeline-wrap {
+      grid-template-columns: 32px 1fr;
+      gap: 20px;
+      max-width: 100%;
+    }
+  }
+
+  /* === Spine (Spalte 1): vertikale Linie + 6 Dots ===
+     Fixed Höhe → Dots sitzen verlässlich an 0/20/40/60/80/100% der
+     Spine-Höhe. Margin-top: -half-height zentriert sie pixel-genau
+     auf ihrer Top-Position. */
+  .timeline-spine {
+    grid-column: 1;
+    position: relative;
+    height: 360px;
+    width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    .timeline-spine {
+      height: 280px;
+    }
+  }
+
+  .timeline-line {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 100%;
+    pointer-events: none;
+    overflow: visible;
+  }
+
+  .line-track {
+    stroke: rgba(255, 255, 255, 0.08);
+    stroke-width: 2;
+  }
+
+  .line-progress {
+    stroke: rgba(245, 158, 11, 0.85);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.6));
+    transition: stroke-dashoffset 100ms linear;
+  }
+
+  .phase-dot {
+    position: absolute;
+    left: 50%;
+    width: 14px;
+    height: 14px;
+    margin-top: -7px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.10);
+    border: 2px solid rgba(245, 158, 11, 0.30);
+    transform: translateX(-50%);
+    transition:
+      background-color 300ms ease,
+      border-color 300ms ease,
+      box-shadow 300ms ease,
+      transform 300ms ease;
+    z-index: 2;
+  }
+
+  .phase-dot-1 { top: 0%; }
+  .phase-dot-2 { top: 20%; }
+  .phase-dot-3 { top: 40%; }
+  .phase-dot-4 { top: 60%; }
+  .phase-dot-5 { top: 80%; }
+  .phase-dot-6 { top: 100%; }
+
+  /* Active Dot — die aktuell sichtbarste Phase. Stark glühend. */
+  .phase-dot.dot-active {
+    background: rgba(245, 158, 11, 1);
+    border-color: rgba(245, 158, 11, 1);
+    box-shadow:
+      0 0 14px rgba(245, 158, 11, 0.9),
+      0 0 30px rgba(245, 158, 11, 0.5);
+    transform: translateX(-50%) scale(1.4);
+  }
+
+  /* Passed Dot — Phase ist vorbei (fadeOut komplett), bleibt dezent
+     geglüht. */
+  .phase-dot.dot-passed {
+    background: rgba(245, 158, 11, 0.85);
+    border-color: rgba(245, 158, 11, 0.85);
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+  }
+
+  @media (max-width: 768px) {
+    .phase-dot {
+      width: 10px;
+      height: 10px;
+      margin-top: -5px;
+    }
+    .line-track,
+    .line-progress {
+      stroke-width: 1.5;
+    }
+  }
+
+  /* === Stage (Spalte 2): wo der Phase-Content wohnt ===
+     Alle Phasen absolut, oben verankert. Label + Title sitzen also
+     IMMER auf der gleichen Y-Position; nur der Body extends nach
+     unten — kein Wandern bei Body-Längen-Variation. min-height
+     reserviert Platz auch für die längste Phase. */
+  .phase-stage {
+    grid-column: 2;
+    position: relative;
+    min-height: 320px;
+    width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    .phase-stage {
+      min-height: 280px;
+    }
+  }
+
+  .phase {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    text-align: left;
+    opacity: var(--phase-opacity, 0);
+    transition: opacity 200ms ease;
+    pointer-events: none;
+    will-change: opacity;
+  }
+
+  .phase-label {
+    font-family: 'Aileron', 'Inter', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: rgba(245, 158, 11, 0.9);
+    text-shadow:
+      0 0 20px rgba(245, 158, 11, 0.5),
+      0 0 50px rgba(245, 158, 11, 0.3),
+      0 0 100px rgba(245, 158, 11, 0.15);
+    margin: 0;
+  }
+
+  .phase-title {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.05rem, 1.4vw, 1.25rem);
+    color: #f5f5f4;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+
+  .phase-body {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: clamp(0.95rem, 1.1vw, 1.05rem);
+    color: rgba(245, 245, 244, 0.78);
+    line-height: 1.6;
+    margin: 0;
+    max-width: 460px;
+  }
+
+  /* .phase-body-button (Phase 06 → Kontakt-Modal-Trigger) rendert
+     visuell identisch zum normalen <a> Inline-Link. Browser-Button-
+     Defaults werden hier explizit zurückgesetzt. */
+  .phase-body a,
+  .phase-body-button {
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.4);
+    color: rgba(245, 158, 11, 0.95);
+    text-decoration: none;
+    font: inherit;
+    padding: 0 0 1px;
+    cursor: pointer;
+    transition: border-color 200ms ease;
+  }
+
+  .phase-body a:hover,
+  .phase-body a:focus-visible,
+  .phase-body-button:hover,
+  .phase-body-button:focus-visible {
+    border-color: rgba(245, 158, 11, 1);
+    outline: none;
+  }
+
+  @media (max-width: 768px) {
+    .phase-label {
+      font-size: clamp(1.5rem, 7vw, 2.2rem);
+    }
+  }
+
+  /* === ScrollCue (grid-row 3) — Visibility kommt vom Settled-State. */
+  .section-4-scrollcue-wrap {
+    --cue-progress: 0;
+    grid-row: 3;
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: var(--cue-progress);
+    transform: translateY(calc((1 - var(--cue-progress)) * 8px));
+    transition: opacity 300ms ease, transform 300ms ease;
+  }
+
+  .section-4 .scroll-cue-anchor {
+    position: static;
+    bottom: auto;
+  }
+
+  /* Reduced-motion: nur Phase 6 (last) sichtbar, alle Dots durch-
+     gelaufen, Linie voll. */
+  @media (prefers-reduced-motion: reduce) {
+    .section-4-header {
+      --header-progress: 1 !important;
+      transform: none !important;
+    }
+    .phase {
+      transition: none !important;
+      opacity: 0 !important;
+    }
+    .phase:last-child {
+      opacity: 1 !important;
+    }
+    .phase-dot {
+      background: rgba(245, 158, 11, 1) !important;
+      border-color: rgba(245, 158, 11, 1) !important;
+      box-shadow: 0 0 8px rgba(245, 158, 11, 0.5) !important;
+      transition: none !important;
+    }
+    .line-progress {
+      stroke-dashoffset: 0 !important;
+    }
+    .section-4-scrollcue-wrap {
+      --cue-progress: 1 !important;
+      transform: none !important;
+    }
+  }
+</style>
+
+<script>
+  const section = document.querySelector('.section-4');
+  const header = section ? section.querySelector('.section-4-header') : null;
+  const phases = section
+    ? Array.from(section.querySelectorAll('.phase'))
+    : [];
+  const dots = section
+    ? Array.from(section.querySelectorAll('.phase-dot'))
+    : [];
+  const lineProgress = section
+    ? section.querySelector('.line-progress')
+    : null;
+  const video = section ? section.querySelector('.section-4-video') : null;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (reduceMotion && video) {
+    try { video.pause(); } catch (e) {}
+  }
+
+  if (
+    section && header && phases.length === 6 && dots.length === 6 &&
+    lineProgress
+  ) {
+    // Single-Phase-Centered Crossfade: jede Phase fadet ein/aus an
+    // exakt der gleichen Position. fadeOut[N] und fadeIn[N+1] über-
+    // lappen 4% — eine fadet aus während die nächste reinkommt.
+    // Same-Side-Overlap-Problem entfällt, weil es KEINE Sides mehr
+    // gibt — Stage hält genau eine Phase auf einmal.
+    const phasesConfig = [
+      { fadeIn: [0.06, 0.10], fadeOut: [0.20, 0.24] },
+      { fadeIn: [0.20, 0.24], fadeOut: [0.34, 0.38] },
+      { fadeIn: [0.34, 0.38], fadeOut: [0.48, 0.52] },
+      { fadeIn: [0.48, 0.52], fadeOut: [0.62, 0.66] },
+      { fadeIn: [0.62, 0.66], fadeOut: [0.76, 0.80] },
+      { fadeIn: [0.76, 0.80], fadeOut: null },
+    ];
+    // Y-Position pro Dot in % der Spine-Höhe — auch line-relativ,
+    // weil Linie volle Spine-Höhe hat. dashoffset = 100 - linePos.
+    const dotYPercents = [0, 20, 40, 60, 80, 100];
+    const HEADER_END = 0.05;
+    const SETTLED_AT = 0.86;
+    const CUE_RANGE = 0.06;
+
+    function clamp01(v) {
+      return v < 0 ? 0 : v > 1 ? 1 : v;
+    }
+
+    function getScrollProgress() {
+      const rect = section.getBoundingClientRect();
+      const total = section.offsetHeight - window.innerHeight;
+      if (total <= 0) return 0;
+      return clamp01(-rect.top / total);
+    }
+
+    function phaseOpacity(phase, progress) {
+      if (progress < phase.fadeIn[0]) return 0;
+      if (progress < phase.fadeIn[1]) {
+        return (progress - phase.fadeIn[0]) /
+               (phase.fadeIn[1] - phase.fadeIn[0]);
+      }
+      if (!phase.fadeOut || progress < phase.fadeOut[0]) return 1;
+      if (progress < phase.fadeOut[1]) {
+        return 1 - (progress - phase.fadeOut[0]) /
+                   (phase.fadeOut[1] - phase.fadeOut[0]);
+      }
+      return 0;
+    }
+
+    function determineActiveDot(opacities) {
+      // Active Dot = Phase mit höchster Opacity. Bei Tie (50/50
+      // crossfade midpoint) bekommt die SPÄTERE Phase Vorzug —
+      // sie ist die kommende, dort wandert das Auge hin.
+      let activeIdx = -1;
+      let maxOp = 0;
+      for (let i = 0; i < opacities.length; i++) {
+        if (opacities[i] > 0 && opacities[i] >= maxOp) {
+          maxOp = opacities[i];
+          activeIdx = i;
+        }
+      }
+      return activeIdx;
+    }
+
+    function isPassed(phase, progress) {
+      return phase.fadeOut !== null && progress >= phase.fadeOut[1];
+    }
+
+    function update() {
+      if (reduceMotion) {
+        header.style.setProperty('--header-progress', '1');
+        for (let i = 0; i < phases.length; i++) {
+          phases[i].style.setProperty(
+            '--phase-opacity',
+            i === 5 ? '1' : '0'
+          );
+          phases[i].style.pointerEvents = i === 5 ? 'auto' : 'none';
+          dots[i].classList.remove('dot-active', 'dot-passed');
+          dots[i].classList.add(i === 5 ? 'dot-active' : 'dot-passed');
+        }
+        lineProgress.style.strokeDashoffset = '0';
+        return;
+      }
+
+      const progress = getScrollProgress();
+
+      // Header
+      const headerP = clamp01(progress / HEADER_END);
+      header.style.setProperty('--header-progress', String(headerP));
+
+      // Per-Phase Opacity (Single-Phase-Centered: identisch Desktop+Mobile)
+      const opacities = new Array(phases.length);
+      for (let i = 0; i < phases.length; i++) {
+        const op = phaseOpacity(phasesConfig[i], progress);
+        opacities[i] = op;
+        phases[i].style.setProperty('--phase-opacity', op.toFixed(3));
+        phases[i].style.pointerEvents = op > 0.5 ? 'auto' : 'none';
+      }
+
+      // Active Dot bestimmt sich aus Opacities, Passed Dots aus
+      // fadeOut-Vergangenheit.
+      const activeIdx = determineActiveDot(opacities);
+      for (let i = 0; i < dots.length; i++) {
+        dots[i].classList.remove('dot-active', 'dot-passed');
+        if (i === activeIdx) {
+          dots[i].classList.add('dot-active');
+        } else if (isPassed(phasesConfig[i], progress)) {
+          dots[i].classList.add('dot-passed');
+        }
+      }
+
+      // Linie zieht zum aktiven Dot.
+      const linePos = activeIdx >= 0 ? dotYPercents[activeIdx] : 0;
+      lineProgress.style.strokeDashoffset = String(100 - linePos);
+    }
+
+    let ticking = false;
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        update();
+        ticking = false;
+      });
+    }
+
+    let resizeTimer = 0;
+    function onResize() {
+      if (resizeTimer) clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(update, 120);
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onResize, { passive: true });
+    update();
+  }
+</script>

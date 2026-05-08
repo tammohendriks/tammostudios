@@ -1,0 +1,44 @@
+/* Lokal gehostete Schriften für Wordmark + spätere Brand-Anwendungen.
+   Bewusst minimal: Body-Text nutzt aktuell weiterhin Inter als Fallback,
+   bis weitere Neue-Montreal-Gewichte gebraucht werden. */
+
+@font-face {
+  font-family: 'Neue Montreal';
+  src:
+    url('/fonts/montreal/NeueMontreal-Bold.woff2') format('woff2'),
+    url('/fonts/montreal/NeueMontreal-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  /* optional statt swap: kein Late-Swap-Layout-Shift mehr. Beim
+     ersten Visit fällt der Browser ggf. auf den System-Sans zurück,
+     bei späteren Page-Loads (Cache-Hit) ist der Brand-Font sofort
+     da. Vermeidet das sichtbare Springen von Eyebrow/Headline beim
+     Page-Wechsel. */
+  font-display: optional;
+}
+
+@font-face {
+  font-family: 'Aileron';
+  src: url('/fonts/aileron/Aileron-BoldItalic.otf') format('opentype');
+  font-weight: 700;
+  font-style: italic;
+  /* optional statt swap: kein Late-Swap-Layout-Shift mehr. Beim
+     ersten Visit fällt der Browser ggf. auf den System-Sans zurück,
+     bei späteren Page-Loads (Cache-Hit) ist der Brand-Font sofort
+     da. Vermeidet das sichtbare Springen von Eyebrow/Headline beim
+     Page-Wechsel. */
+  font-display: optional;
+}
+
+@font-face {
+  font-family: 'Aileron';
+  src: url('/fonts/aileron/Aileron-BlackItalic.otf') format('opentype');
+  font-weight: 900;
+  font-style: italic;
+  /* optional statt swap: kein Late-Swap-Layout-Shift mehr. Beim
+     ersten Visit fällt der Browser ggf. auf den System-Sans zurück,
+     bei späteren Page-Loads (Cache-Hit) ist der Brand-Font sofort
+     da. Vermeidet das sichtbare Springen von Eyebrow/Headline beim
+     Page-Wechsel. */
+  font-display: optional;
+}

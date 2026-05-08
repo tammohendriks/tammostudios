@@ -1,0 +1,156 @@
+---
+// "tammo — STUDIOS." als animierte Wordmark.
+// 2-Zeilen-Layout wie das Logo-PNG:
+//   Zeile 1: tammo (Neue Montreal Bold)
+//   Zeile 2: Bar + STUDIOS. (Aileron Black Italic)
+// Steuerung: ausschließlich über --char-progress pro Char, gesetzt
+// vom Section2-Scroll-Listener. Komponente ist passiv.
+---
+
+<h2 class="wordmark" aria-label="Tammo Studios">
+  <span class="wm-line wm-line-top">
+    <span class="wm-block wm-tammo">
+      <span class="char" style="--i: 0;">t</span>
+      <span class="char" style="--i: 1;">a</span>
+      <span class="char" style="--i: 2;">m</span>
+      <span class="char" style="--i: 3;">m</span>
+      <span class="char" style="--i: 4;">o</span>
+    </span>
+  </span>
+  <span class="wm-line wm-line-bottom">
+    <span class="wm-block wm-dash">
+      <span class="char wm-bar" style="--i: 5;" aria-hidden="true"></span>
+    </span>
+    <span class="wm-block wm-studios">
+      <span class="char" style="--i: 6;">S</span>
+      <span class="char" style="--i: 7;">T</span>
+      <span class="char" style="--i: 8;">U</span>
+      <span class="char" style="--i: 9;">D</span>
+      <span class="char" style="--i: 10;">I</span>
+      <span class="char" style="--i: 11;">O</span>
+      <span class="char" style="--i: 12;">S</span>
+      <span class="char" style="--i: 13;">.</span>
+    </span>
+  </span>
+</h2>
+
+<style>
+  .wordmark {
+    display: inline-flex;
+    flex-direction: column;
+    /* stretch statt flex-start: beide Zeilen nehmen die Breite der
+       breitesten Zeile (= tammo) an. Die Bottom-Line nutzt das, um Bar
+       links und STUDIOS rechts auf die Außenkanten zu pinnen. */
+    align-items: stretch;
+    /* 14vw statt 9vw: gibt Mobile + Tablet deutlich mehr Präsenz, ohne
+       Desktop am 7rem-Cap zu verändern. Zusätzlicher Mobile-Boost weiter
+       unten. */
+    font-size: clamp(3rem, 14vw, 7rem);
+    color: #f5f5f4;
+    line-height: 0.95;
+    margin: 0;
+    /* Filter (brightness + drop-shadow) auf der Wordmark wurde bewusst
+       entfernt — war GPU-teuer pro Scroll-Tick. Der Settle-Effekt
+       kommt jetzt vollständig vom Spotlight + den intensiven
+       Char-Glows. */
+  }
+
+  .wm-line {
+    display: flex;
+    align-items: baseline;
+  }
+
+  /* Optisch kalibriert zum Match des Logo-PNG: tammo dominiert die obere
+     Zeile, Bottom-Line stretched auf tammo-Breite. space-between pinnt
+     Bar links und STUDIOS rechts an die Wordmark-Außenkanten. */
+  .wm-line-bottom {
+    align-items: center;
+    justify-content: space-between;
+    margin-top: -0.08em;
+  }
+
+  .wm-block {
+    display: inline-flex;
+  }
+
+  .wm-block.wm-dash {
+    align-items: center;
+    margin-left: 0;
+  }
+
+  .wm-tammo {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+  }
+
+  /* Im Logo-PNG ist STUDIOS deutlich kleiner als tammo. font-size relativ
+     zum Wordmark-em, damit clamp() weiterhin die Skalierung steuert.
+     flex-shrink: 0 sichert, dass STUDIOS auf engen Viewports nicht
+     gestaucht wird — die Außenkante bleibt verlässlich rechts unter "o". */
+  .wm-studios {
+    font-family: 'Aileron', 'Inter', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    letter-spacing: -0.02em;
+    font-size: 0.42em;
+    flex-shrink: 0;
+  }
+
+  /* Per-Char Progress 0..1 wird vom Section2-Script gesetzt.
+     Position, Sichtbarkeit, Schärfe und Glow leiten sich linear ab.
+     Vier-Layer-Glow inkl. heller Goldton (#fcd34d) für äußere Tiefe. */
+  .char {
+    --char-progress: 0;
+    display: inline-block;
+    transform: translateY(calc((1 - var(--char-progress)) * 100%));
+    opacity: var(--char-progress);
+    filter: blur(calc((1 - var(--char-progress)) * 6px));
+    text-shadow:
+      0 0 calc(var(--char-progress) * 40px)
+        rgba(245, 158, 11, calc(var(--char-progress) * 0.7)),
+      0 0 calc(var(--char-progress) * 100px)
+        rgba(245, 158, 11, calc(var(--char-progress) * 0.5)),
+      0 0 calc(var(--char-progress) * 200px)
+        rgba(245, 158, 11, calc(var(--char-progress) * 0.25)),
+      0 0 calc(var(--char-progress) * 300px)
+        rgba(252, 211, 77, calc(var(--char-progress) * 0.10));
+    will-change: transform, opacity, filter;
+  }
+
+  /* Custom Bar als Dash — länger & dicker, näher am Logo-PNG.
+     Translation-Distanz 1em, weil 100% von der Mini-Höhe quasi nichts
+     wäre und der Bar sonst nur "blink-on" statt einfliegen würde.
+     flex-shrink: 0 sichert die Breite auch wenn die Bottom-Line
+     gestreckt wird — Bar bleibt links und behält Logo-Proportion. */
+  .char.wm-bar {
+    width: 0.95em;
+    height: 0.13em;
+    background: currentColor;
+    margin: 0;
+    align-self: center;
+    flex-shrink: 0;
+    transform: translateY(calc((1 - var(--char-progress)) * 1em));
+    /* text-shadow rendert nichts auf einem Bar ohne Inhalt → eigener
+       box-shadow Glow, parallel zum Char-Glow. */
+    box-shadow:
+      0 0 calc(var(--char-progress) * 24px)
+        rgba(245, 158, 11, calc(var(--char-progress) * 0.6)),
+      0 0 calc(var(--char-progress) * 60px)
+        rgba(245, 158, 11, calc(var(--char-progress) * 0.35));
+  }
+
+  /* Expliziter Mobile-Boost: auf 390px ergibt 16vw ≈ 62px, die Wordmark
+     wirkt damit auf dem Phone genauso dominant wie das Logo auf Desktop. */
+  @media (max-width: 768px) {
+    .wordmark {
+      font-size: clamp(3.5rem, 16vw, 5rem);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .char {
+      --char-progress: 1 !important;
+    }
+  }
+</style>
