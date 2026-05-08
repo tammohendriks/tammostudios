@@ -4,7 +4,7 @@ export const REFERENCES = [
     title: 'Samedos',
     subtitle: 'Arbeitsmedizinische Praxis',
     url: 'https://www.samedos.de',
-    preview: '/referenzen/samedoswebsite.png',
+    preview: '/referenzen/samedoswebsite.webp',
     tags: ['Astro', 'Sanity', 'Vercel'],
   },
   {
@@ -12,7 +12,7 @@ export const REFERENCES = [
     title: 'Er & Sie',
     subtitle: 'Eckkneipe in Bremen Walle',
     url: 'https://erundsiebremen.de',
-    preview: '/referenzen/erundsiewebsite.png',
+    preview: '/referenzen/erundsiewebsite.webp',
     tags: ['Astro', 'Tailwind', 'Sanity'],
   },
 ] as const;

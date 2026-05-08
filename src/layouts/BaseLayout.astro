@@ -7,12 +7,18 @@ import { SITE } from '../lib/constants';
 interface Props {
   pageTitle: string;
   description?: string;
+  noindex?: boolean;
 }
 
-const { pageTitle, description = `${SITE.name} — Webentwicklung aus ${SITE.location}.` } = Astro.props;
+const { pageTitle, description = `${SITE.name} — Webentwicklung aus ${SITE.location}.`, noindex = false } = Astro.props;
 
 const fullTitle = `${pageTitle} — ${SITE.name}`;
-const allowIndexing = import.meta.env.PUBLIC_ALLOW_INDEXING === 'true';
+// Default Allow: nur PUBLIC_ALLOW_INDEXING="false" rendert das
+// noindex-Meta-Tag. Dieselbe Inversion wie in src/pages/robots.txt.ts —
+// schützt gegen Env-Var-Fehlkonfiguration in Production. Plus: Pages
+// können selbst noindex erzwingen (z.B. 404).
+const allowIndexing = import.meta.env.PUBLIC_ALLOW_INDEXING !== 'false';
+const renderNoindex = !allowIndexing || noindex;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
 const isLanding = Astro.url.pathname === '/' || Astro.url.pathname === '/index.html';
 const initialPage = isLanding ? 'landing' : 'subpage';
@@ -26,7 +32,7 @@ const initialPage = isLanding ? 'landing' : 'subpage';
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalURL} />
-    {!allowIndexing && <meta name="robots" content="noindex,nofollow" />}
+    {renderNoindex && <meta name="robots" content="noindex,nofollow" />}
     <link rel="icon" type="image/png" href="/logos/logo-websiteicon.png" />
     <link rel="apple-touch-icon" href="/logos/logo-websiteicon.png" />
     <meta name="generator" content={Astro.generator} />
@@ -35,6 +41,15 @@ const initialPage = isLanding ? 'landing' : 'subpage';
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:locale" content="de_DE" />
+    <meta property="og:image" content={new URL('og-image.png', Astro.site).toString()} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Tammo Studios — Websites, handgemacht in Bremen" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={new URL('og-image.png', Astro.site).toString()} />
     <meta name="theme-color" content="#0a0a0c" />
     <link
       rel="preload"

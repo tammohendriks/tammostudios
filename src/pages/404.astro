@@ -1,0 +1,251 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SubPageBackground from '../components/SubPageBackground.astro';
+import { SECTION5, SITE } from '../lib/constants';
+
+const { footer } = SECTION5;
+---
+
+<BaseLayout
+  pageTitle="Seite nicht gefunden"
+  description="Diese Seite existiert nicht — zurück zur Startseite gehts hier."
+  noindex
+>
+  <main class="error-page">
+    <SubPageBackground />
+
+    <header class="error-hero">
+      <h1 class="subpage-hero-title">Seite nicht gefunden.</h1>
+      <p class="subpage-hero-subtitle">
+        Sieht aus, als wäre der Pfad nicht ganz zu Ende gebaut.
+        Kein Stress — zurück zur Startseite ist nur ein Klick.
+      </p>
+    </header>
+
+    <section class="error-actions">
+      <a class="error-link error-link-primary" href="/">
+        <span>Zurück zur Startseite</span>
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M5 12h14M13 6l6 6-6 6" />
+        </svg>
+      </a>
+      <p class="error-secondary">
+        Oder schreib mir:
+        {' '}
+        <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+      </p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-row">
+      <span class="footer-brand">{footer.brand}</span>
+      <nav class="footer-nav" aria-label="Hauptnavigation">
+        {footer.navLinks.map((link, i) => (
+          <>
+            {i > 0 && <span aria-hidden="true">·</span>}
+            <a href={link.href}>{link.label}</a>
+          </>
+        ))}
+      </nav>
+    </div>
+    <div class="footer-row footer-row-legal">
+      <span class="footer-copy">{footer.copyright}</span>
+      <nav class="footer-legal" aria-label="Rechtliches">
+        {footer.legalLinks.map((link, i) => (
+          <>
+            {i > 0 && <span aria-hidden="true">·</span>}
+            <a href={link.href}>{link.label}</a>
+          </>
+        ))}
+      </nav>
+    </div>
+  </footer>
+</BaseLayout>
+
+<style>
+  .error-page {
+    position: relative;
+    background: #050507;
+    padding: 140px 40px 80px;
+    min-height: calc(100vh - 200px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @media (max-width: 768px) {
+    .error-page {
+      padding: 100px 20px 60px;
+    }
+  }
+
+  .error-hero {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto 48px;
+  }
+
+  .error-hero .subpage-hero-subtitle {
+    margin-top: 16px;
+    max-width: 540px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .error-actions {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .error-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #f5f5f4;
+    text-decoration: none;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    border-bottom: 1px solid transparent;
+    padding-bottom: 1px;
+    transition: border-color 200ms ease, color 200ms ease;
+  }
+
+  .error-link svg {
+    color: rgba(245, 158, 11, 0.95);
+    transition: transform 200ms ease;
+  }
+
+  .error-link:hover,
+  .error-link:focus-visible {
+    border-bottom-color: rgba(245, 158, 11, 0.6);
+    outline: none;
+  }
+
+  .error-link:hover svg,
+  .error-link:focus-visible svg {
+    transform: translateX(3px);
+  }
+
+  .error-link-primary {
+    font-size: clamp(1.1rem, 1.6vw, 1.3rem);
+    font-weight: 600;
+  }
+
+  .error-secondary {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.9rem;
+    color: rgba(245, 245, 244, 0.55);
+    margin: 8px 0 0;
+  }
+
+  .error-secondary a {
+    color: rgba(245, 158, 11, 0.85);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.3);
+    padding-bottom: 1px;
+    transition: border-color 200ms ease, color 200ms ease;
+  }
+
+  .error-secondary a:hover,
+  .error-secondary a:focus-visible {
+    color: rgba(245, 158, 11, 1);
+    border-bottom-color: rgba(245, 158, 11, 0.7);
+    outline: none;
+  }
+
+  /* Footer (gleicher Stil wie auf den Sub-Pages) */
+  .site-footer {
+    background: #050507;
+    padding: 32px 40px 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.78rem;
+  }
+
+  .footer-brand {
+    color: rgba(245, 245, 244, 0.7);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .footer-copy {
+    color: rgba(245, 245, 244, 0.5);
+  }
+
+  .footer-nav,
+  .footer-legal {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .footer-nav a,
+  .footer-legal a {
+    color: rgba(245, 245, 244, 0.7);
+    text-decoration: none;
+    transition: color 200ms ease;
+  }
+
+  .footer-nav a:hover,
+  .footer-nav a:focus-visible,
+  .footer-legal a:hover,
+  .footer-legal a:focus-visible {
+    color: rgba(245, 158, 11, 0.95);
+    outline: none;
+  }
+
+  .footer-row-legal {
+    color: rgba(245, 245, 244, 0.4);
+    font-size: 0.72rem;
+  }
+
+  @media (max-width: 768px) {
+    .footer-row {
+      flex-direction: row;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 4px 12px;
+      font-size: 0.65rem;
+    }
+    .footer-row-legal {
+      font-size: 0.6rem;
+      opacity: 0.7;
+    }
+  }
+</style>
