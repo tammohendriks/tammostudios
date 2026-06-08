@@ -3,6 +3,8 @@ export const SITE = {
   domain: 'tammostudios.de',
   url: 'https://tammostudios.de',
   email: 'tammo@tammostudios.de',
+  phone: '0177 1962704',
+  phoneHref: 'tel:+491771962704',
   location: 'Bremen',
 
   // Genutzt von /impressum und /datenschutz — daher hier behalten,
