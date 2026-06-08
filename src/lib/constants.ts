@@ -27,7 +27,7 @@ export const SITE_LABELS = {
   serviceLine: 'Individuelle Websites, handgemacht in Bremen.',
   introText:
     'Eine Person, eine Handschrift, komplett individuell gebaut. ' +
-    'Für Unternehmen, die online ankommen wollen — dort, wo ihre Kunden suchen.',
+    'Für Unternehmen, die online ankommen wollen. Dort, wo ihre Kunden suchen.',
   scrollCue: 'SCROLLEN',
 } as const;
 
@@ -43,7 +43,7 @@ export const SECTION3 = {
       title: 'Modernes Design, kein Template',
       body:
         'Jede Website ist ein Original. Keine Themes, keine kopierten ' +
-        'Layouts — Visuals, die nur zu dir passen.',
+        'Layouts. Visuals, die nur zu dir passen.',
     },
     {
       number: '02',
@@ -89,9 +89,9 @@ export const SECTION4 = {
       label: 'PHASE 03',
       title: 'Ich baue sie',
       body:
-        'Aus dem Entwurf wird die echte Website — mit deinen Texten ' +
+        'Aus dem Entwurf wird die echte Website, mit deinen Texten ' +
         'und Bildern. Plus ein eigener Bereich, in dem du ' +
-        'Öffnungszeiten, Bilder oder Texte später selbst änderst — ' +
+        'Öffnungszeiten, Bilder oder Texte später selbst änderst, ' +
         'so ausführlich wie du willst.',
       link: { label: 'Was kostet was?', href: '/preise' },
     },
@@ -107,7 +107,7 @@ export const SECTION4 = {
       title: 'Deine Website geht online',
       body:
         'Live-Schaltung auf deine Domain. Plus 30 Minuten Einweisung, ' +
-        'wie du selbst weiterarbeiten kannst — ohne mich jedes Mal ' +
+        'wie du selbst weiterarbeiten kannst. Ohne mich jedes Mal ' +
         'anrufen zu müssen.',
     },
     {
@@ -116,7 +116,7 @@ export const SECTION4 = {
       body:
         'Du kennst den Weg. Wenn er sich richtig anfühlt: schreib ' +
         'mir. Dann nehmen wir uns 30 Minuten Zeit für dein ' +
-        'Projekt — kostenlos und ohne Verpflichtung.',
+        'Projekt. Kostenlos und ohne Verpflichtung.',
       link: { label: 'Erstgespräch anfragen', href: '/kontakt' },
     },
   ],
