@@ -22,3 +22,6 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# design reference assets (mockups, research material — not production code)
+design-reference/
