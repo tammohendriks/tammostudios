@@ -258,6 +258,36 @@ import AnimatedWordmark from '../AnimatedWordmark.astro';
       width: 110vmax;
       height: 110vmax;
       opacity: calc(var(--aurora-intensity) * 0.7);
+      /* Blur halbiert (30 → 15px). Rasterkosten ~quadratisch
+         im Radius. */
+      filter: blur(15px);
+    }
+  }
+
+  /* === Mobile Reveal-Entlastung ===
+     filter:blur + scroll-driven text-shadow sind auf Phone-GPUs
+     die teuersten Live-Properties. Auf Mobile durch statische
+     Varianten ersetzt; Spotlight rastet direkt an Endposition
+     (kein per-Tick transform-Update). */
+  @media (max-width: 768px) {
+    /* Char-Reveal: kein Live-Blur, statischer Single-Layer-Glow.
+       :global, weil .char in AnimatedWordmark scoped lebt. */
+    :global(.char) {
+      filter: none !important;
+      text-shadow: 0 0 16px rgba(245, 158, 11, 0.4) !important;
+    }
+    /* Boom-Headline ohne Live-Blur; Text-Shadow bleibt scroll-
+       driven (single Element, vertretbar). */
+    .boom-headline,
+    .boom-headline.headline-on {
+      filter: none !important;
+    }
+    /* Spotlight: kleinerer Blur, statische End-Position.
+       JS schreibt --spotlight-offset weiter, transform ignoriert
+       die Var — kein per-Tick Reflow/Repaint mehr. */
+    .wordmark-spotlight {
+      filter: blur(20px);
+      transform: translate(-50%, calc(-50% - 22vh));
     }
   }
 
