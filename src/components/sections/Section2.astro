@@ -264,30 +264,73 @@ import AnimatedWordmark from '../AnimatedWordmark.astro';
     }
   }
 
-  /* === Mobile Reveal-Entlastung ===
-     filter:blur + scroll-driven text-shadow sind auf Phone-GPUs
-     die teuersten Live-Properties. Auf Mobile durch statische
-     Varianten ersetzt; Spotlight rastet direkt an Endposition
-     (kein per-Tick transform-Update). */
+  /* === Mobile Stufe C — Section komplett statisch ===
+     Scroll-driven JS-Update läuft nicht (early-return im <script>
+     via matchMedia). Alles wird auf End-State fixiert; nur die
+     Sticky-Bühne fadet via IntersectionObserver einmal ein, wenn
+     sie in den Viewport scrollt. */
   @media (max-width: 768px) {
-    /* Char-Reveal: kein Live-Blur, statischer Single-Layer-Glow.
-       :global, weil .char in AnimatedWordmark scoped lebt. */
-    :global(.char) {
-      filter: none !important;
-      text-shadow: 0 0 16px rgba(245, 158, 11, 0.4) !important;
+    /* Scroll-Stage kollabieren — keine 220vh-Scrollbühne mehr */
+    .section-2 {
+      min-height: 100vh;
+      height: auto;
     }
-    /* Boom-Headline ohne Live-Blur; Text-Shadow bleibt scroll-
-       driven (single Element, vertretbar). */
+    .section-2-sticky {
+      position: relative;
+      height: 100vh;
+    }
+
+    /* Per-Char: alle Animationen aus, direkt End-State + statischer
+       Single-Layer Glow. :global, weil .char in AnimatedWordmark
+       scoped lebt. */
+    :global(.char) {
+      transform: none !important;
+      opacity: 1 !important;
+      filter: none !important;
+      text-shadow: 0 0 16px rgba(245, 158, 11, 0.4);
+      transition: none !important;
+      animation: none !important;
+    }
+
+    /* Boom-Headline statisch sichtbar, keine Live-Filter */
     .boom-headline,
     .boom-headline.headline-on {
+      opacity: 1 !important;
+      visibility: visible !important;
+      transform: none !important;
       filter: none !important;
+      animation: none !important;
     }
-    /* Spotlight: kleinerer Blur, statische End-Position.
-       JS schreibt --spotlight-offset weiter, transform ignoriert
-       die Var — kein per-Tick Reflow/Repaint mehr. */
+
+    /* Headline-Circle komplett gezeichnet, kein Stroke-Draw mehr */
+    .headline-circle ellipse {
+      stroke-dashoffset: 0 !important;
+      animation: none !important;
+    }
+
+    /* Aurora ohne Drift; Blur 15px bleibt aus erstem Mobile-Block */
+    .aurora-1,
+    .aurora-layer {
+      animation: none !important;
+    }
+
+    /* Spotlight: statische End-Position, kein mix-blend-mode mehr
+       (eliminiert Off-Screen-Composition über die ganze Fläche) */
     .wordmark-spotlight {
       filter: blur(20px);
       transform: translate(-50%, calc(-50% - 22vh));
+      mix-blend-mode: normal !important;
+      opacity: 0.6;
+    }
+
+    /* Section-Level Fade-In: JS toggelt .is-visible bei
+       Viewport-Entry (IntersectionObserver, threshold 0.15) */
+    .section-2 .section-2-sticky {
+      opacity: 0;
+      transition: opacity 700ms ease-out;
+    }
+    .section-2.is-visible .section-2-sticky {
+      opacity: 1;
     }
   }
 
@@ -362,8 +405,30 @@ import AnimatedWordmark from '../AnimatedWordmark.astro';
   const aurora = section ? section.querySelector('.ambient-aurora') : null;
   const spotlight = section ? section.querySelector('.wordmark-spotlight') : null;
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
-  if (
+  if (isMobile && section) {
+    // Mobile: scroll-driven Update-Loop läuft nicht. CSS rendert die
+    // Section direkt im End-State; nur ein einmaliger Section-Level
+    // Fade-In via IntersectionObserver bringt sie sanft rein.
+    if (reduceMotion) {
+      section.classList.add('is-visible');
+    } else {
+      const mobileObserver = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              mobileObserver.disconnect();
+              break;
+            }
+          }
+        },
+        { threshold: 0.15 }
+      );
+      mobileObserver.observe(section);
+    }
+  } else if (
     section && stickyChars.length && headline && ellipse &&
     aurora && spotlight
   ) {
