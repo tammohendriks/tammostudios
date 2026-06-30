@@ -603,6 +603,7 @@ const { footer } = SECTION5;
 
   if (modal && iframe && fallback && fallbackLink && urlDisplay && externalLink) {
     let blockTimer: number | null = null;
+    let abortController: AbortController | null = null;
     let lastFocused: HTMLElement | null = null;
 
     function showFallback() {
@@ -613,6 +614,12 @@ const { footer } = SECTION5;
 
     function openModal(url: string) {
       if (!modal || !iframe || !fallback || !urlDisplay || !externalLink || !fallbackLink) return;
+
+      // Vorigen Listener-Set + Safety-Timer abräumen, falls offen
+      if (abortController) abortController.abort();
+      if (blockTimer) window.clearTimeout(blockTimer);
+      abortController = new AbortController();
+
       lastFocused = document.activeElement as HTMLElement;
       urlDisplay.textContent = url;
       externalLink.href = url;
@@ -620,36 +627,41 @@ const { footer } = SECTION5;
 
       fallback.hidden = true;
       iframe.style.display = 'block';
+
+      // Echte iframe-Load-Detection statt contentDocument-Probe.
+      // Cross-Origin-contentDocument war kaputt: Chrome gibt
+      // stillschweigend null zurück → false-positive Fallback bei
+      // legitim ladenden Sites.
+      let loaded = false;
+      iframe.addEventListener('load', () => {
+        loaded = true;
+      }, { signal: abortController.signal });
+      iframe.addEventListener('error', () => {
+        showFallback();
+      }, { signal: abortController.signal });
+
       iframe.src = url;
 
       modal.hidden = false;
       requestAnimationFrame(() => modal.classList.add('is-open'));
       document.body.style.overflow = 'hidden';
 
-      // Best-effort Block-Detection: nach 4s prüfen ob Iframe leer
-      // ist. Cross-origin wirft beim Document-Zugriff, das ist normal
-      // (Site lädt). Nur wenn contentDocument null oder body leer →
-      // Fallback. Most modern sites without X-Frame-Options laden
-      // sauber.
-      if (blockTimer) window.clearTimeout(blockTimer);
+      // Safety-Net: nach 12s ohne Load-Event Fallback zeigen
+      // (Site komplett unerreichbar / langsames Netz / stiller
+      // X-Frame-Block ohne error-Event).
       blockTimer = window.setTimeout(() => {
-        if (!iframe) return;
-        try {
-          const doc = iframe.contentDocument;
-          if (!doc || doc.body.children.length === 0) {
-            showFallback();
-          }
-        } catch {
-          // Cross-origin SecurityError — Site lädt cross-origin,
-          // alles in Ordnung.
-        }
-      }, 4000);
+        if (!loaded) showFallback();
+      }, 12000);
     }
 
     function closeModal() {
       if (!modal || !iframe) return;
       modal.classList.remove('is-open');
       document.body.style.overflow = '';
+      if (abortController) {
+        abortController.abort();
+        abortController = null;
+      }
       if (blockTimer) {
         window.clearTimeout(blockTimer);
         blockTimer = null;
