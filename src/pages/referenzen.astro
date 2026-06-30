@@ -248,6 +248,15 @@ const { footer } = SECTION5;
     transition: transform 600ms ease;
   }
 
+  /* Per-Card object-position-Overrides: Card-Container ist 16:10,
+     WebPs sind ~2:1 → ~13% wird links+rechts gecroppt. Bei Sites
+     mit linksbündigem Hero (z.B. Wärmepower-Headline) reißt der
+     Center-Crop genau die Headline raus. Top-Left anchored den
+     Crop nach links: Headline bleibt, rechte Bildkante faellt weg. */
+  .ref-card[data-slug="waermepower"] .ref-preview img {
+    object-position: top left;
+  }
+
   .ref-card:hover .ref-preview img,
   .ref-card:focus-within .ref-preview img {
     transform: scale(1.05);
