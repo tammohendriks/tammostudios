@@ -26,4 +26,13 @@ export const REFERENCES = [
     tags: ['Astro', 'Tailwind', 'Sanity', 'Vercel'],
     category: 'Handwerk',
   },
+  {
+    slug: 'ibi-doc',
+    title: 'Institut für Betriebsmedizin Isernhagen',
+    subtitle: 'Betriebsmedizinische Praxis',
+    url: 'https://www.ibi-doc.de',
+    preview: '/referenzen/ibi-doc-website.webp',
+    tags: ['Astro', 'Tailwind', 'Sanity', 'Vercel'],
+    category: 'Medizin',
+  },
 ] as const;

@@ -233,9 +233,14 @@ const { footer } = SECTION5;
       0 0 48px rgba(245, 158, 11, 0.15);
   }
 
+  /* Card-Preview-Aspect matched die Source-WebP-Aspect (~2:1).
+     Vorher 16:10 → 13% seitliche Crops pro Card, was Sites mit
+     Randcontent (waermepower Headline links, ibi-doc Right-Nav)
+     abschnitt. 2:1 zeigt alle WebPs edge-to-edge; andere 3 verlieren
+     nur ~0.5% pro Seite (unsichtbar). */
   .ref-preview {
     position: relative;
-    aspect-ratio: 16 / 10;
+    aspect-ratio: 2 / 1;
     overflow: hidden;
     background: #0a0a0c;
   }
@@ -246,15 +251,6 @@ const { footer } = SECTION5;
     object-fit: cover;
     object-position: top center;
     transition: transform 600ms ease;
-  }
-
-  /* Per-Card object-position-Overrides: Card-Container ist 16:10,
-     WebPs sind ~2:1 → ~13% wird links+rechts gecroppt. Bei Sites
-     mit linksbündigem Hero (z.B. Wärmepower-Headline) reißt der
-     Center-Crop genau die Headline raus. Top-Left anchored den
-     Crop nach links: Headline bleibt, rechte Bildkante faellt weg. */
-  .ref-card[data-slug="waermepower"] .ref-preview img {
-    object-position: top left;
   }
 
   .ref-card:hover .ref-preview img,
