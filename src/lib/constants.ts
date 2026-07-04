@@ -27,7 +27,7 @@ export const SITE_LABELS = {
   serviceLine: 'Individuelle Websites, handgemacht in Bremen.',
   introText:
     'Eine Person, eine Handschrift, komplett individuell gebaut. ' +
-    'Für Unternehmen, die online ankommen wollen. Dort, wo ihre Kunden suchen.',
+    'Für dich, wenn du online ankommen willst. Dort, wo deine Kunden suchen.',
   scrollCue: 'SCROLLEN',
 } as const;
 
@@ -43,7 +43,7 @@ export const SECTION3 = {
       title: 'Modernes Design, kein Template',
       body:
         'Jede Website ist ein Original. Keine Themes, keine kopierten ' +
-        'Layouts. Visuals, die nur zu dir passen.',
+        'Layouts.<br class="sm:hidden" /> Visuals, die nur zu dir passen.',
     },
     {
       number: '02',
@@ -61,8 +61,8 @@ export const SECTION3 = {
       number: '03',
       title: 'Zwei Wochen, eine Website',
       body:
-        'Vom Erstgespräch bis zur Live-Schaltung in maximal 14 Tagen. ' +
-        'Klare Deadlines, klare Ergebnisse.',
+        'Vom Erstgespräch bis zur Live-Schaltung in maximal 14 Tagen.' +
+        '<br class="sm:hidden" /> Klare Deadlines, klare Ergebnisse.',
     },
   ],
 } as const;

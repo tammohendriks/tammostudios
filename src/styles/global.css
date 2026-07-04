@@ -48,6 +48,19 @@ a:hover {
   color: var(--color-ts-fg);
 }
 
+/* === Text-Wrap Globals ===
+   text-wrap: balance auf Headlines verhindert Waisenwörter
+   (einzeln stehendes letztes Wort). text-wrap: pretty auf
+   Body-Text reduziert Waisen ohne die Balance-Kosten bei
+   langen Absätzen. Beide Browser-Support >95% in 2026. */
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+}
+
+p, li {
+  text-wrap: pretty;
+}
+
 /* === Sub-Page Hero ===
    Wiederverwendbare Typografie für die H1 + Subtitle auf /ueber,
    /referenzen und /preise. Vorher hatte jede Seite ihre eigenen
