@@ -22,6 +22,59 @@ const renderNoindex = !allowIndexing || noindex;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
 const isLanding = Astro.url.pathname === '/' || Astro.url.pathname === '/index.html';
 const initialPage = isLanding ? 'landing' : 'subpage';
+
+// LocalBusiness JSON-LD Schema. ProfessionalService (Subtype von
+// LocalBusiness) matched einen Solo-Freelance-Webentwickler besser
+// als das generische LocalBusiness. Google indexiert das + zeigt es
+// bei lokaler Suche in Bremen (mit Google-Business-Profile-Match).
+// @id koppelt uns eindeutig — Google dedupliziert schema-Blocks
+// die auf den gleichen @id verweisen sitewide.
+const businessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  '@id': `${SITE.url}/#business`,
+  name: SITE.name,
+  description:
+    'Individuelle Websites, handgemacht in Bremen. ' +
+    'Kein Template-Recycling, klare Fixpreise, ' +
+    'in maximal 14 Tagen live.',
+  url: SITE.url,
+  logo: new URL('/logos/logo-websiteicon.png', SITE.url).toString(),
+  image: new URL('/og-image.png', SITE.url).toString(),
+  telephone: '+49 177 1962704',
+  email: SITE.email,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: SITE.address.street,
+    postalCode: SITE.address.zip,
+    addressLocality: SITE.address.city,
+    addressCountry: 'DE',
+  },
+  areaServed: [
+    { '@type': 'City', name: 'Bremen' },
+    { '@type': 'AdministrativeArea', name: 'Niedersachsen' },
+    { '@type': 'Country', name: 'Deutschland' },
+  ],
+  priceRange: '€€',
+  founder: {
+    '@type': 'Person',
+    name: 'Tammo Hendriks',
+    jobTitle: 'Webentwickler',
+    url: `${SITE.url}/ueber`,
+  },
+  sameAs: ['https://www.instagram.com/tammostudios/'],
+  knowsAbout: [
+    'Webentwicklung',
+    'Astro Framework',
+    'Tailwind CSS',
+    'Sanity CMS',
+    'Vercel Deployment',
+    'E-Commerce',
+    'SEO',
+  ],
+  serviceType: 'Webentwicklung',
+  slogan: 'Websites, handgemacht in Bremen.',
+};
 ---
 
 <!doctype html>
@@ -51,6 +104,11 @@ const initialPage = isLanding ? 'landing' : 'subpage';
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={new URL('og-image.png', Astro.site).toString()} />
     <meta name="theme-color" content="#0a0a0c" />
+    <script
+      type="application/ld+json"
+      is:inline
+      set:html={JSON.stringify(businessSchema)}
+    />
     <link
       rel="preload"
       href="/fonts/montreal/NeueMontreal-Bold.woff2"
