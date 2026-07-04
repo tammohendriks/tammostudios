@@ -264,14 +264,16 @@ import AnimatedWordmark from '../AnimatedWordmark.astro';
     }
   }
 
-  /* === Mobile Stufe C — Section komplett statisch ===
-     Scroll-driven JS-Update läuft nicht (early-return im <script>
-     via matchMedia). Alles wird auf End-State fixiert; nur die
-     Sticky-Bühne fadet via IntersectionObserver einmal ein, wenn
-     sie in den Viewport scrollt. */
+  /* === Mobile Stufe D — Section komplett ausgeblendet ===
+     Auf Mobile ist Section 2 rein performance-kritischer Ballast
+     ohne Content-Value. Complete display:none; Content-Flow
+     springt von Hero direkt zu Section 3. Die uebrigen Mobile-
+     Regeln unten sind damit tote CSS (Descendants rendern nicht),
+     bleiben aber drin — falls Section 2 auf Mobile jemals wieder
+     eingeblendet wird, ist die perf-optimierte Basis sofort da. */
   @media (max-width: 768px) {
-    /* Scroll-Stage kollabieren — keine 220vh-Scrollbühne mehr */
     .section-2 {
+      display: none !important;
       min-height: 100vh;
       height: auto;
     }
@@ -407,28 +409,10 @@ import AnimatedWordmark from '../AnimatedWordmark.astro';
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
-  if (isMobile && section) {
-    // Mobile: scroll-driven Update-Loop läuft nicht. CSS rendert die
-    // Section direkt im End-State; nur ein einmaliger Section-Level
-    // Fade-In via IntersectionObserver bringt sie sanft rein.
-    if (reduceMotion) {
-      section.classList.add('is-visible');
-    } else {
-      const mobileObserver = new IntersectionObserver(
-        (entries) => {
-          for (const entry of entries) {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('is-visible');
-              mobileObserver.disconnect();
-              break;
-            }
-          }
-        },
-        { threshold: 0.15 }
-      );
-      mobileObserver.observe(section);
-    }
-  } else if (
+  // Mobile: Section 2 ist per CSS display:none — kein IntersectionObserver,
+  // kein Scroll-Handler, keine Char-Iteration. Full early-return.
+  if (
+    !isMobile &&
     section && stickyChars.length && headline && ellipse &&
     aurora && spotlight
   ) {
