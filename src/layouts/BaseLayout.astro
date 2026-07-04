@@ -8,9 +8,12 @@ interface Props {
   pageTitle: string;
   description?: string;
   noindex?: boolean;
+  /** Optionales page-spezifisches JSON-LD (z.B. Person auf /ueber),
+      wird in den @graph mit aufgenommen. */
+  additionalSchema?: Record<string, unknown> | Record<string, unknown>[];
 }
 
-const { pageTitle, description = `${SITE.name} — Webentwicklung aus ${SITE.location}.`, noindex = false } = Astro.props;
+const { pageTitle, description = `${SITE.name} — Webentwicklung aus ${SITE.location}.`, noindex = false, additionalSchema } = Astro.props;
 
 const fullTitle = `${pageTitle} — ${SITE.name}`;
 // Default Allow: nur PUBLIC_ALLOW_INDEXING="false" rendert das
@@ -29,10 +32,17 @@ const initialPage = isLanding ? 'landing' : 'subpage';
 // bei lokaler Suche in Bremen (mit Google-Business-Profile-Match).
 // @id koppelt uns eindeutig — Google dedupliziert schema-Blocks
 // die auf den gleichen @id verweisen sitewide.
-const businessSchema = {
-  '@context': 'https://schema.org',
+//
+// Founder-Referenz zeigt per @id auf Tammo Hendriks (Person). Die
+// vollstaendige Person-Definition steht separat auf /ueber (via
+// additionalSchema-Prop) — Google merged Entities mit gleicher
+// @id automatisch in ihren Knowledge-Graph.
+const TAMMO_ID = `${SITE.url}/#tammo`;
+const BUSINESS_ID = `${SITE.url}/#business`;
+
+const businessSchema: Record<string, unknown> = {
   '@type': 'ProfessionalService',
-  '@id': `${SITE.url}/#business`,
+  '@id': BUSINESS_ID,
   name: SITE.name,
   description:
     'Individuelle Websites, handgemacht in Bremen. ' +
@@ -50,14 +60,62 @@ const businessSchema = {
     addressLocality: SITE.address.city,
     addressCountry: 'DE',
   },
+  // Exakte Geo-Koordinaten via OpenStreetMap Nominatim geocoded.
+  // Google kann zwar aus der Adresse selbst geocoden, aber explizit
+  // gesetzt gibt es eine hoehere Confidence + hilft bei Map-Snippets.
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: 53.1021131,
+    longitude: 8.7901098,
+  },
   areaServed: [
     { '@type': 'City', name: 'Bremen' },
     { '@type': 'AdministrativeArea', name: 'Niedersachsen' },
     { '@type': 'Country', name: 'Deutschland' },
   ],
   priceRange: '€€',
+  // Konkrete Angebote — Google kann Preise im Rich-Result ausspielen.
+  // Preise als String (schema.org empfiehlt das fuer Waehrungsangaben).
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Website-Pakete',
+    itemListElement: [
+      {
+        '@type': 'Offer',
+        priceCurrency: 'EUR',
+        price: '1500',
+        availability: 'https://schema.org/InStock',
+        url: `${SITE.url}/preise`,
+        itemOffered: {
+          '@type': 'Service',
+          name: 'Individuelle Website',
+          description:
+            'Eigenes Design, eigenes CMS, Mobile- & Desktop-optimiert, ' +
+            'schnell + sauber im SEO, DSGVO-konform. Einmalig, fix.',
+          provider: { '@id': BUSINESS_ID },
+        },
+      },
+      {
+        '@type': 'Offer',
+        priceCurrency: 'EUR',
+        price: '2500',
+        availability: 'https://schema.org/InStock',
+        url: `${SITE.url}/preise`,
+        itemOffered: {
+          '@type': 'Service',
+          name: 'Online-Shop',
+          description:
+            'Alles aus "Eine Website" plus voller Shop mit Warenkorb & ' +
+            'Checkout, Zahlungsanbieter-Integration, Produkte & ' +
+            'Bestellungen im CMS.',
+          provider: { '@id': BUSINESS_ID },
+        },
+      },
+    ],
+  },
   founder: {
     '@type': 'Person',
+    '@id': TAMMO_ID,
     name: 'Tammo Hendriks',
     jobTitle: 'Webentwickler',
     url: `${SITE.url}/ueber`,
@@ -73,6 +131,47 @@ const businessSchema = {
     'SEO',
   ],
   slogan: 'Websites, handgemacht in Bremen.',
+};
+
+// BreadcrumbList: nur auf Sub-Pages. Zwei Ebenen (Startseite -> Page),
+// da die Site flach ist (kein Category-Level). Google nutzt das fuer
+// den Breadcrumb-Snippet im Suchergebnis unter dem Titel.
+const breadcrumbSchema: Record<string, unknown> | null = isLanding
+  ? null
+  : {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: 'Startseite',
+          item: `${SITE.url}/`,
+        },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: pageTitle,
+          item: canonicalURL,
+        },
+      ],
+    };
+
+// Alle Schemas zu einem @graph zusammenfassen — Google akzeptiert das
+// als kanonische Multi-Entity-Struktur, Entities mit gleicher @id
+// werden ueber Blocks hinweg dedupliziert.
+const additionalSchemas = additionalSchema
+  ? Array.isArray(additionalSchema)
+    ? additionalSchema
+    : [additionalSchema]
+  : [];
+
+const jsonLdGraph = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    businessSchema,
+    ...(breadcrumbSchema ? [breadcrumbSchema] : []),
+    ...additionalSchemas,
+  ],
 };
 ---
 
@@ -106,7 +205,7 @@ const businessSchema = {
     <script
       type="application/ld+json"
       is:inline
-      set:html={JSON.stringify(businessSchema)}
+      set:html={JSON.stringify(jsonLdGraph)}
     />
     <link
       rel="preload"
