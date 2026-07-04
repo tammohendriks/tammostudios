@@ -50,12 +50,6 @@ import AnimatedWordmark from '../AnimatedWordmark.astro';
     /* KEIN overflow: hidden — bricht position: sticky des inneren Containers. */
   }
 
-  @media (max-width: 768px) {
-    .section-2 {
-      min-height: 220vh;
-    }
-  }
-
   .section-2-sticky {
     position: sticky;
     top: 0;
@@ -67,12 +61,6 @@ import AnimatedWordmark from '../AnimatedWordmark.astro';
     align-items: center;
     justify-content: center;
     padding: 80px 24px;
-  }
-
-  @media (max-width: 768px) {
-    .section-2-sticky {
-      padding: 60px 16px;
-    }
   }
 
   /* Content zentriert den linksbündigen Wordmark-Block horizontal. */
@@ -88,25 +76,10 @@ import AnimatedWordmark from '../AnimatedWordmark.astro';
     width: 100%;
   }
 
-  @media (max-width: 768px) {
-    .content {
-      gap: 36px;
-    }
-  }
-
   .headline-wrap {
     position: relative;
     display: inline-block;
     padding: 32px 48px;
-  }
-
-  @media (max-width: 768px) {
-    .headline-wrap {
-      padding: 24px 28px;
-    }
-    .boom-headline {
-      font-size: clamp(1.5rem, 5vw, 2rem);
-    }
   }
 
   .headline-circle {
@@ -245,94 +218,12 @@ import AnimatedWordmark from '../AnimatedWordmark.astro';
     75%      { transform: translate(-7vw, -4vh) scale(1.05); }
   }
 
-  /* Mobile Performance: nur Layer 1 ist sichtbar, Layer 2 und 3
-     entfallen — spart 2× blur-Operationen pro Frame. Layer 1 wird
-     auf 110vmax skaliert + leicht hellere Multiplier um den
-     Verlust optisch zu kompensieren. */
-  @media (max-width: 768px) {
-    .aurora-2,
-    .aurora-3 {
-      display: none;
-    }
-    .aurora-1 {
-      width: 110vmax;
-      height: 110vmax;
-      opacity: calc(var(--aurora-intensity) * 0.7);
-      /* Blur halbiert (30 → 15px). Rasterkosten ~quadratisch
-         im Radius. */
-      filter: blur(15px);
-    }
-  }
-
-  /* === Mobile Stufe D — Section komplett ausgeblendet ===
-     Auf Mobile ist Section 2 rein performance-kritischer Ballast
-     ohne Content-Value. Complete display:none; Content-Flow
-     springt von Hero direkt zu Section 3. Die uebrigen Mobile-
-     Regeln unten sind damit tote CSS (Descendants rendern nicht),
-     bleiben aber drin — falls Section 2 auf Mobile jemals wieder
-     eingeblendet wird, ist die perf-optimierte Basis sofort da. */
+  /* Mobile: Section 2 komplett ausgeblendet. Content-Flow springt
+     von Hero direkt zu Section 3. Kein Whitespace-Loch, weil
+     display:none den Bounding-Box collapsed. */
   @media (max-width: 768px) {
     .section-2 {
       display: none !important;
-      min-height: 100vh;
-      height: auto;
-    }
-    .section-2-sticky {
-      position: relative;
-      height: 100vh;
-    }
-
-    /* Per-Char: alle Animationen aus, direkt End-State + statischer
-       Single-Layer Glow. :global, weil .char in AnimatedWordmark
-       scoped lebt. */
-    :global(.char) {
-      transform: none !important;
-      opacity: 1 !important;
-      filter: none !important;
-      text-shadow: 0 0 16px rgba(245, 158, 11, 0.4);
-      transition: none !important;
-      animation: none !important;
-    }
-
-    /* Boom-Headline statisch sichtbar, keine Live-Filter */
-    .boom-headline,
-    .boom-headline.headline-on {
-      opacity: 1 !important;
-      visibility: visible !important;
-      transform: none !important;
-      filter: none !important;
-      animation: none !important;
-    }
-
-    /* Headline-Circle komplett gezeichnet, kein Stroke-Draw mehr */
-    .headline-circle ellipse {
-      stroke-dashoffset: 0 !important;
-      animation: none !important;
-    }
-
-    /* Aurora ohne Drift; Blur 15px bleibt aus erstem Mobile-Block */
-    .aurora-1,
-    .aurora-layer {
-      animation: none !important;
-    }
-
-    /* Spotlight: statische End-Position, kein mix-blend-mode mehr
-       (eliminiert Off-Screen-Composition über die ganze Fläche) */
-    .wordmark-spotlight {
-      filter: blur(20px);
-      transform: translate(-50%, calc(-50% - 22vh));
-      mix-blend-mode: normal !important;
-      opacity: 0.6;
-    }
-
-    /* Section-Level Fade-In: JS toggelt .is-visible bei
-       Viewport-Entry (IntersectionObserver, threshold 0.15) */
-    .section-2 .section-2-sticky {
-      opacity: 0;
-      transition: opacity 700ms ease-out;
-    }
-    .section-2.is-visible .section-2-sticky {
-      opacity: 1;
     }
   }
 
