@@ -61,6 +61,22 @@ p, li {
   text-wrap: pretty;
 }
 
+/* === .text-lines Utility ===
+   Opt-in Utility: Elemente mit dieser Class rendern Newlines (\n)
+   im Text-Content als sichtbare Zeilenumbrueche. Text innerhalb
+   jeder Zeile wrappt weiterhin normal (text-wrap: pretty greift).
+   Konvention: in constants.ts (oder als Variable im .astro-File)
+   die Zeilenstruktur mit \n direkt in den String kodieren — dann
+   ist die visuelle Kadenz in der Datenquelle sichtbar, keine
+   <br>-Tags im Markup noetig.
+
+   Beispiel:
+     const subtitle = '25 Jahre alt, aus Bremen.\nIch baue Websites.';
+     <p class="subpage-hero-subtitle text-lines">{subtitle}</p> */
+.text-lines {
+  white-space: pre-line;
+}
+
 /* === Sub-Page Hero ===
    Wiederverwendbare Typografie für die H1 + Subtitle auf /ueber,
    /referenzen und /preise. Vorher hatte jede Seite ihre eigenen

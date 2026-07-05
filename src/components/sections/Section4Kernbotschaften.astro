@@ -105,9 +105,13 @@ import { SECTION3 } from '../../lib/constants';
 
   @media (max-width: 768px) {
     .section-4-sticky {
-      /* 120px top: TopBar + Spielraum für Eyebrow.
-         100px bottom: Platz für ScrollCue ohne Box-Overlap. */
-      padding: 120px 20px 100px;
+      /* Mobile: content anchored top-left statt zentriert, weil
+         3 Items + Header > 100vh sein koennen. Ohne flex-start
+         waere Content vertikal zentriert und laeuft oben raus
+         (hinter TopBar). Reduzierte Padding gibt Content mehr
+         Vertikalraum. */
+      align-items: flex-start;
+      padding: 90px 20px 60px;
     }
   }
 
@@ -122,7 +126,7 @@ import { SECTION3 } from '../../lib/constants';
 
   @media (max-width: 768px) {
     .section-4-content {
-      gap: 32px;
+      gap: 22px;
     }
   }
 
@@ -178,7 +182,7 @@ import { SECTION3 } from '../../lib/constants';
 
   @media (max-width: 768px) {
     .differentiators {
-      gap: 32px;
+      gap: 22px;
     }
   }
 
@@ -197,7 +201,7 @@ import { SECTION3 } from '../../lib/constants';
 
   @media (max-width: 768px) {
     .diff-item {
-      gap: 12px;
+      gap: 8px;
     }
   }
 
@@ -222,7 +226,7 @@ import { SECTION3 } from '../../lib/constants';
 
   @media (max-width: 768px) {
     .diff-number {
-      font-size: 3rem;
+      font-size: 2rem;
     }
   }
 
@@ -238,7 +242,7 @@ import { SECTION3 } from '../../lib/constants';
 
   @media (max-width: 768px) {
     .diff-title {
-      font-size: 1.05rem;
+      font-size: 1rem;
     }
   }
 
@@ -260,7 +264,8 @@ import { SECTION3 } from '../../lib/constants';
 
   @media (max-width: 768px) {
     .diff-body {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
+      line-height: 1.45;
     }
   }
 
@@ -309,7 +314,7 @@ import { SECTION3 } from '../../lib/constants';
     .diff-item {
       --item-progress: 1 !important;
     }
-    .section-4-eyebrow {
+    .section-4-header {
       opacity: 1 !important;
       transform: none !important;
     }

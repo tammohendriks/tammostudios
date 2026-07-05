@@ -25,9 +25,13 @@ export const SITE = {
 export const SITE_LABELS = {
   establishedLine: 'EST. 2026 · BREMEN',
   serviceLine: 'Individuelle Websites, handgemacht in Bremen.',
+  // \n-Zeilenstruktur: jede Zeile ein eigener Gedanke. Wird via
+  // .text-lines Utility-Class (global.css) als sichtbarer Umbruch
+  // gerendert. Text innerhalb jeder Zeile wrappt weiterhin normal.
   introText:
-    'Eine Person, eine Handschrift, komplett individuell gebaut. ' +
-    'Für dich, wenn du online ankommen willst. Dort, wo deine Kunden suchen.',
+    'Eine Person, eine Handschrift, komplett individuell gebaut.\n' +
+    'Für dich, wenn du online ankommen willst.\n' +
+    'Dort, wo deine Kunden suchen.',
   scrollCue: 'SCROLLEN',
 } as const;
 
