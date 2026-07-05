@@ -31,7 +31,10 @@ html {
 
 html,
 body {
-  background-color: var(--color-ts-bg);
+  /* --color-ts-bg-deep (#050507) statt --color-ts-bg (#0a0a0c) —
+     matcht Section-BG-Farbe. Verhindert dass residual Pixel-Gaps
+     zwischen Sections als hellerer Streifen sichtbar werden. */
+  background-color: var(--color-ts-bg-deep);
   color: var(--color-ts-fg);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
