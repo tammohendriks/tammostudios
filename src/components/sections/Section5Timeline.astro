@@ -2,11 +2,11 @@
 import { SECTION4 } from '../../lib/constants';
 ---
 
-<section class="section-4">
-  <div class="section-4-sticky">
-    <div class="section-4-video-wrap" aria-hidden="true">
+<section class="section-5">
+  <div class="section-5-sticky">
+    <div class="section-5-video-wrap" aria-hidden="true">
       <video
-        class="section-4-video"
+        class="section-5-video"
         autoplay
         muted
         loop
@@ -23,12 +23,12 @@ import { SECTION4 } from '../../lib/constants';
         />
         <source src="/videos/mobile.mp4" type="video/mp4" />
       </video>
-      <div class="section-4-scrim"></div>
+      <div class="section-5-scrim"></div>
     </div>
 
-    <header class="section-4-header">
-      <p class="section-4-eyebrow">{SECTION4.eyebrow}</p>
-      <h2 class="section-4-title">{SECTION4.title}</h2>
+    <header class="section-5-header">
+      <p class="section-5-eyebrow">{SECTION4.eyebrow}</p>
+      <h2 class="section-5-title">{SECTION4.title}</h2>
     </header>
 
     <div class="timeline-wrap">
@@ -90,7 +90,7 @@ import { SECTION4 } from '../../lib/constants';
 </section>
 
 <style>
-  .section-4 {
+  .section-5 {
     position: relative;
     min-height: 350vh;
     overflow: clip;
@@ -98,7 +98,7 @@ import { SECTION4 } from '../../lib/constants';
   }
 
   @media (max-width: 768px) {
-    .section-4 {
+    .section-5 {
       min-height: 280vh;
     }
   }
@@ -106,7 +106,7 @@ import { SECTION4 } from '../../lib/constants';
   /* === Galaxy Video Background — absolut hinter dem Content im
      einzigen Sticky-Container. Single-sticky-Pattern verhindert das
      Engagement-Problem zweier sticky Geschwister. */
-  .section-4-video-wrap {
+  .section-5-video-wrap {
     position: absolute;
     inset: 0;
     overflow: hidden;
@@ -114,7 +114,7 @@ import { SECTION4 } from '../../lib/constants';
     pointer-events: none;
   }
 
-  .section-4-video {
+  .section-5-video {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -125,7 +125,7 @@ import { SECTION4 } from '../../lib/constants';
     filter: brightness(0.85) contrast(1.1) saturate(1.15);
   }
 
-  .section-4-scrim {
+  .section-5-scrim {
     position: absolute;
     inset: 0;
     background:
@@ -142,7 +142,7 @@ import { SECTION4 } from '../../lib/constants';
   /* === Sticky Container: 3-Row Grid header / timeline / cue.
      gap: 32px schiebt Header und ScrollCue von der zentralen
      Timeline weg. */
-  .section-4-sticky {
+  .section-5-sticky {
     position: sticky;
     top: 0;
     height: 100vh;
@@ -155,14 +155,14 @@ import { SECTION4 } from '../../lib/constants';
   }
 
   @media (max-width: 768px) {
-    .section-4-sticky {
+    .section-5-sticky {
       padding: 80px 20px 32px;
       gap: 20px;
     }
   }
 
   /* === Header (grid-row 1) === */
-  .section-4-header {
+  .section-5-header {
     --header-progress: 0;
     grid-row: 1;
     position: relative;
@@ -173,7 +173,7 @@ import { SECTION4 } from '../../lib/constants';
     will-change: transform, opacity;
   }
 
-  .section-4-eyebrow {
+  .section-5-eyebrow {
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-size: 0.75rem;
     font-weight: 500;
@@ -183,11 +183,10 @@ import { SECTION4 } from '../../lib/constants';
     margin: 0 0 6px;
   }
 
-  .section-4-title {
-    font-family: 'Aileron', 'Inter', sans-serif;
-    font-weight: 900;
-    font-style: italic;
-    font-size: clamp(1.3rem, 2.5vw, 1.85rem);
+  .section-5-title {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
     color: #f5f5f4;
     letter-spacing: -0.02em;
     margin: 0;
@@ -414,7 +413,7 @@ import { SECTION4 } from '../../lib/constants';
   }
 
   /* === ScrollCue (grid-row 3) — Visibility kommt vom Settled-State. */
-  .section-4-scrollcue-wrap {
+  .section-5-scrollcue-wrap {
     --cue-progress: 0;
     grid-row: 3;
     position: relative;
@@ -427,7 +426,7 @@ import { SECTION4 } from '../../lib/constants';
     transition: opacity 300ms ease, transform 300ms ease;
   }
 
-  .section-4 .scroll-cue-anchor {
+  .section-5 .scroll-cue-anchor {
     position: static;
     bottom: auto;
   }
@@ -435,7 +434,7 @@ import { SECTION4 } from '../../lib/constants';
   /* Reduced-motion: nur Phase 6 (last) sichtbar, alle Dots durch-
      gelaufen, Linie voll. */
   @media (prefers-reduced-motion: reduce) {
-    .section-4-header {
+    .section-5-header {
       --header-progress: 1 !important;
       transform: none !important;
     }
@@ -455,7 +454,7 @@ import { SECTION4 } from '../../lib/constants';
     .line-progress {
       stroke-dashoffset: 0 !important;
     }
-    .section-4-scrollcue-wrap {
+    .section-5-scrollcue-wrap {
       --cue-progress: 1 !important;
       transform: none !important;
     }
@@ -463,8 +462,8 @@ import { SECTION4 } from '../../lib/constants';
 </style>
 
 <script>
-  const section = document.querySelector('.section-4');
-  const header = section ? section.querySelector('.section-4-header') : null;
+  const section = document.querySelector('.section-5');
+  const header = section ? section.querySelector('.section-5-header') : null;
   const phases = section
     ? Array.from(section.querySelectorAll('.phase'))
     : [];
@@ -474,7 +473,7 @@ import { SECTION4 } from '../../lib/constants';
   const lineProgress = section
     ? section.querySelector('.line-progress')
     : null;
-  const video = section ? section.querySelector('.section-4-video') : null;
+  const video = section ? section.querySelector('.section-5-video') : null;
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   if (reduceMotion && video) {

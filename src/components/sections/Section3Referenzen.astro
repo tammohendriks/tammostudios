@@ -1,0 +1,611 @@
+---
+import { REFERENCES } from '../../lib/references';
+import ReferenzModal from '../ReferenzModal.astro';
+
+// User-definierte Reihenfolge: Samedos, Wärmepower, Er & Sie, IBI.
+const TEASER_SLUGS = ['samedos', 'waermepower', 'er-und-sie', 'ibi-doc'] as const;
+const teaserRefs = TEASER_SLUGS
+  .map((slug) => REFERENCES.find((r) => r.slug === slug))
+  .filter((r): r is typeof REFERENCES[number] => Boolean(r));
+
+// 14 amber accent dots — statische Positionen, verschiedene Sizes
+// und Opacities. Reine Ambience, kein Filter, keine Animation.
+// Verteilt asymmetrisch über die ganze Section-Fläche.
+const dots = [
+  { x: '6%', y: '12%', size: 3, opacity: 0.5 },
+  { x: '18%', y: '38%', size: 2, opacity: 0.4 },
+  { x: '11%', y: '68%', size: 4, opacity: 0.6 },
+  { x: '24%', y: '85%', size: 3, opacity: 0.45 },
+  { x: '38%', y: '22%', size: 2, opacity: 0.35 },
+  { x: '42%', y: '58%', size: 4, opacity: 0.55 },
+  { x: '48%', y: '92%', size: 3, opacity: 0.5 },
+  { x: '58%', y: '15%', size: 3, opacity: 0.5 },
+  { x: '62%', y: '48%', size: 2, opacity: 0.4 },
+  { x: '72%', y: '78%', size: 5, opacity: 0.7 },
+  { x: '82%', y: '32%', size: 3, opacity: 0.45 },
+  { x: '88%', y: '62%', size: 4, opacity: 0.6 },
+  { x: '94%', y: '88%', size: 2, opacity: 0.4 },
+  { x: '5%', y: '48%', size: 2, opacity: 0.35 },
+];
+---
+
+<section class="section-3">
+  <!-- BG Layer 1: subtile Amber-Ambient von unten,
+       kein zentrales Radial-Glow, kein Grid — bewusst distinct
+       von Section 2 (Wordmark). -->
+  <div class="section-3-ambient" aria-hidden="true"></div>
+  <!-- BG Layer 2: 14 amber Accent-Dots (statisch positioniert). -->
+  <div class="section-3-dots" aria-hidden="true">
+    {dots.map((d) => (
+      <span
+        style={`left:${d.x};top:${d.y};width:${d.size}px;height:${d.size}px;opacity:${d.opacity};`}
+      />
+    ))}
+  </div>
+
+  <div class="section-3-sticky">
+    <header class="section-3-header reveal-slot">
+      <p class="section-3-eyebrow">AUSGEWÄHLTE PROJEKTE</p>
+      <h2 class="section-3-headline">Zuletzt gebaut.</h2>
+      <p class="section-3-sub">
+        Vier Sites, drei Branchen. Alle handgemacht, alle online.
+      </p>
+    </header>
+
+    <div class="ref-teaser-grid">
+      {teaserRefs.map((ref) => (
+        <button
+          class="ref-teaser-card reveal-slot"
+          type="button"
+          data-slug={ref.slug}
+          data-url={ref.url}
+          data-title={ref.title}
+          tabindex="-1"
+          aria-hidden="true"
+          aria-label={`${'shortTitle' in ref ? ref.shortTitle : ref.title} — im Modal öffnen`}
+        >
+          <span class="ref-teaser-thumb">
+            <img
+              src={ref.preview}
+              alt={`Vorschau von ${ref.title}`}
+              loading="lazy"
+              width="1200"
+              height="600"
+            />
+          </span>
+          <span class="ref-teaser-info">
+            <span class="ref-teaser-title">
+              {'shortTitle' in ref ? ref.shortTitle : ref.title}
+            </span>
+            <span class="ref-teaser-category">{ref.category}</span>
+          </span>
+        </button>
+      ))}
+    </div>
+
+    <!-- Fallback fuer JS-disabled: alle Reveal-Slots direkt sichtbar +
+         reachable. CSS-override tritt nur ohne JS in Kraft. -->
+    <noscript>
+      <style>
+        .section-3-header,
+        .ref-teaser-card,
+        .section-3-cta {
+          opacity: 1 !important;
+          transform: none !important;
+          pointer-events: auto !important;
+        }
+      </style>
+    </noscript>
+
+    <div class="section-3-cta-wrap">
+      <a
+        class="section-3-cta reveal-slot"
+        href="/referenzen"
+        tabindex="-1"
+        aria-hidden="true"
+      >
+        <span>Alle Referenzen ansehen</span>
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M5 12h14M13 6l6 6-6 6" />
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <ReferenzModal />
+</section>
+
+<style>
+  /* === Section-Container ===
+     Scroll-Jack-Pattern analog Section4Kernbotschaften: 300vh
+     Desktop, 220vh Mobile. Sticky-Child 100vh -> 200vh Desktop /
+     120vh Mobile Sticky-Travel. Cards revealen per progress-mapped
+     CSS-Var bei Scroll durch die Sticky-Zone, animieren rueckwaerts
+     beim Zurueckscrollen. */
+  .section-3 {
+    position: relative;
+    min-height: 250vh;
+    background: #0a0a0a;
+    /* overflow: clip statt hidden — hidden etabliert einen scroll
+       container und macht position:sticky am inneren Child kaputt
+       (degradiert zu relative). clip clippt visuell ohne Scroll-
+       Container-Semantik. Timeline (Section5) hat dasselbe Pattern. */
+    overflow: clip;
+  }
+
+  @media (max-width: 768px) {
+    .section-3 {
+      min-height: 220vh;
+    }
+  }
+
+  /* === BG Layer 1: Amber-Ambient von unten ===
+     Subtiler radialer Gradient von der unteren Mitte nach oben
+     ausklingend. Wirkt wie sanftes Amber-Licht von unten, keine
+     harte Fokus-Zone. Kein filter, kein backdrop-filter. */
+  .section-3-ambient {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse 80% 60% at 50% 100%,
+      rgba(245, 158, 11, 0.06) 0%,
+      rgba(245, 158, 11, 0.03) 40%,
+      transparent 75%
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* === BG Layer 2: 14 amber Accent-Dots (statisch) === */
+  .section-3-dots {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .section-3-dots span {
+    position: absolute;
+    background: rgba(245, 158, 11, 0.6);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* === Sticky-Container ===
+     Sowohl Desktop als auch Mobile: sticky 100vh. Content ist
+     kompakt genug (Header + 2x2 Grid + CTA) um in 100vh zu passen —
+     kein Overflow-Bug wie in Iteration 1. */
+  .section-3-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 40px;
+    gap: 40px;
+    z-index: 1;
+  }
+
+  @media (max-width: 768px) {
+    .section-3-sticky {
+      padding: 60px 20px 40px;
+      gap: 28px;
+    }
+  }
+
+  /* === Reveal-Slot Base ===
+     Alle 6 Slots (Header + 4 Cards + CTA) haben --reveal-progress
+     als CSS-Var und werden per JS scroll-progress-driven angesteuert.
+     Base-Effekt: opacity + translateY. Cards ueberschreiben mit
+     eigener transform-Regel (zusaetzliches scale + groesserer
+     translate). */
+  .reveal-slot {
+    --reveal-progress: 0;
+  }
+
+  /* === Header === */
+  .section-3-header {
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto;
+    opacity: var(--reveal-progress);
+    transform: translateY(calc((1 - var(--reveal-progress)) * 20px));
+  }
+
+  .section-3-eyebrow {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.3em;
+    color: rgba(245, 158, 11, 0.85);
+    text-transform: uppercase;
+    margin: 0 0 6px;
+  }
+
+  .section-3-headline {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    color: #f5f5f4;
+    letter-spacing: -0.02em;
+    margin: 0 0 12px;
+  }
+
+  .section-3-sub {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: clamp(1rem, 1.3vw, 1.15rem);
+    color: rgba(245, 245, 244, 0.65);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* === Grid: Desktop 4-col, Mobile 2x2 ===
+     Auf Mobile explizit 2x2 statt vertikal-stack, damit alle 4
+     Cards in die 100vh Sticky-Viewport passen und der Scroll-Jack
+     funktioniert. */
+  .ref-teaser-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  @media (max-width: 1023px) {
+    .ref-teaser-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      max-width: 720px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .ref-teaser-grid {
+      /* Bleibt 2x2 auf Mobile — Vertical-Stack war Iteration-1 Bug */
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      max-width: 100%;
+    }
+  }
+
+  /* === Card ===
+     Button-Element (Modal-Trigger). Scroll-progress-driven
+     Reveal per --reveal-progress CSS-Var (0..1). JS setzt den Wert
+     pro Card pro Frame. CSS interpoliert opacity, transform und
+     box-shadow davon. */
+  .ref-teaser-card {
+    --reveal-progress: 0;
+
+    display: block;
+    padding: 0;
+    background: rgba(15, 15, 18, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    overflow: hidden;
+    text-align: left;
+    color: inherit;
+    font-family: inherit;
+    cursor: pointer;
+    text-decoration: none;
+
+    /* Reveal-State direkt aus --reveal-progress interpoliert.
+       Kein transition — Progress wird per Scroll live gesetzt, eine
+       Transition wuerde schmieren. Nur opacity + transform (beides
+       Compositor-Properties, kein Paint pro Frame). Box-shadow-
+       Bell-Curve wurde entfernt weil sie per rAF-Tick paint-
+       triggered war (bounded aber technisch off-rule). */
+    opacity: var(--reveal-progress);
+    transform:
+      translateY(calc((1 - var(--reveal-progress)) * 40px))
+      scale(calc(0.95 + var(--reveal-progress) * 0.05));
+
+    /* Nur Hover-Properties bekommen Transition. */
+    transition:
+      filter 200ms ease-out,
+      border-color 200ms ease-out;
+  }
+
+  .ref-teaser-card:focus-visible {
+    outline: 2px solid rgba(245, 158, 11, 0.8);
+    outline-offset: 4px;
+  }
+
+  /* Hover — nur echter Pointer (Desktop). Reduziert auf subtile
+     Brightness-Lift + Border-Color-Shift, kein Border-Glow mehr
+     (der ist Reveal-exklusiv). */
+  @media (hover: hover) {
+    .ref-teaser-card:hover,
+    .ref-teaser-card:focus-visible {
+      filter: brightness(1.06);
+      border-color: rgba(245, 158, 11, 0.35);
+    }
+  }
+
+  /* Thumbnail: 2:1 exakt matched WebP-Aspect, kein Crop noetig. */
+  .ref-teaser-thumb {
+    display: block;
+    position: relative;
+    aspect-ratio: 2 / 1;
+    overflow: hidden;
+    background: #0a0a0c;
+  }
+
+  .ref-teaser-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    display: block;
+  }
+
+  /* Waermepower + IBI: linksbuendiger Hero -> top-left preserves
+     Headline (analog /referenzen). */
+  .ref-teaser-card[data-slug='waermepower'] .ref-teaser-thumb img,
+  .ref-teaser-card[data-slug='ibi-doc'] .ref-teaser-thumb img {
+    object-position: top left;
+  }
+
+  .ref-teaser-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+    padding: 14px 16px 16px;
+  }
+
+  @media (max-width: 640px) {
+    .ref-teaser-info {
+      padding: 10px 12px 12px;
+      gap: 6px;
+    }
+  }
+
+  .ref-teaser-title {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #f5f5f4;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+    /* Reserviere Platz fuer 2 Zeilen — damit alle Chip-Positionen
+       auf gleicher Hoehe stehen, auch wenn nur IBI 2-zeilig ist. */
+    min-height: 2lh;
+  }
+
+  @media (max-width: 640px) {
+    .ref-teaser-title {
+      font-size: 0.85rem;
+      line-height: 1.2;
+      /* Line-clamp auf max 2 Zeilen fuer schmale Viewports —
+         IBI "Institut Betriebsmedizin Isernhagen" wraps sonst
+         3-4 Zeilen und schiebt die IBI-Card ueber Sticky-Bottom
+         auf iPhone-SE-Klasse (320px). */
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  }
+
+  .ref-teaser-category {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.65rem;
+    color: rgba(245, 158, 11, 0.9);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border: 1px solid rgba(245, 158, 11, 0.32);
+    border-radius: 999px;
+  }
+
+  @media (max-width: 640px) {
+    .ref-teaser-category {
+      font-size: 0.55rem;
+      padding: 2px 7px;
+      letter-spacing: 0.15em;
+    }
+  }
+
+  /* === CTA "Alle Referenzen ansehen" === */
+  .section-3-cta-wrap {
+    text-align: center;
+  }
+
+  .section-3-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(245, 158, 11, 0.95);
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.95rem;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.4);
+    padding: 0 0 2px;
+    opacity: var(--reveal-progress);
+    transform: translateY(calc((1 - var(--reveal-progress)) * 20px));
+    transition:
+      border-color 200ms ease,
+      color 200ms ease;
+  }
+
+  .section-3-cta:hover,
+  .section-3-cta:focus-visible {
+    border-bottom-color: rgba(245, 158, 11, 1);
+    color: #ffca6b;
+    outline: none;
+  }
+
+  .section-3-cta svg {
+    transition: transform 200ms ease;
+  }
+
+  .section-3-cta:hover svg,
+  .section-3-cta:focus-visible svg {
+    transform: translateX(3px);
+  }
+
+  /* Reduced motion: alle Cards direkt sichtbar + Section
+     collapsed auf natuerliche Hoehe (kein 300vh empty scroll). */
+  @media (prefers-reduced-motion: reduce) {
+    .section-3 {
+      min-height: auto;
+    }
+    .section-3-sticky {
+      position: relative;
+      height: auto;
+      min-height: 100vh;
+    }
+    .section-3-header,
+    .ref-teaser-card,
+    .section-3-cta {
+      opacity: 1 !important;
+      transform: none !important;
+      pointer-events: auto !important;
+    }
+    .section-3-cta svg {
+      transition: none !important;
+    }
+  }
+</style>
+
+<script>
+  // Scroll-Jack-Pattern IDENTISCH zu Section5Timeline (Timeline).
+  // Basis: scrollY-basierte Progress-Berechnung, rAF-throttled,
+  // bidirektional (Cards animieren rueckwaerts beim Zurueckscrollen).
+  //
+  // Referenz-Implementation:
+  //   src/components/sections/Section5Timeline.astro:508-618
+  //
+  // Unterschied zu Timeline: statt 6 Phasen mit crossfade
+  // (fadeIn+fadeOut) haben wir 4 Cards mit reinem fadeIn
+  // (kein fadeOut - Cards bleiben sichtbar bis Section releaset).
+  const section = document.querySelector<HTMLElement>('.section-3');
+  const slots = section
+    ? Array.from(section.querySelectorAll<HTMLElement>('.reveal-slot'))
+    : [];
+  const reduceMotion = window.matchMedia(
+    '(prefers-reduced-motion: reduce)'
+  ).matches;
+
+  // 6 Reveal-Slots in DOM-Reihenfolge: Header (0), 4 Cards (1-4),
+  // CTA (5). Scroll-Progress-Ranges continuous ohne Luecken —
+  // Card 4 fertig bei 70%, CTA fertig bei 85%. 15% Dwell danach
+  // matched Section5Timeline-Rhythmus.
+  const slotsConfig = [
+    { fadeIn: [0.0, 0.1] },   // Header (eyebrow + headline + sub)
+    { fadeIn: [0.1, 0.25] },  // Card 1
+    { fadeIn: [0.25, 0.4] },  // Card 2
+    { fadeIn: [0.4, 0.55] },  // Card 3
+    { fadeIn: [0.55, 0.7] },  // Card 4
+    { fadeIn: [0.7, 0.85] },  // CTA "Alle Referenzen ansehen"
+  ];
+
+  if (section && slots.length > 0) {
+    // Reduce-motion: One-shot init, alle Slots sichtbar + reachable.
+    // KEIN scroll-listener, kein rAF-loop — respektiert User-Praeferenz
+    // (reduce-motion korreliert oft mit perf-constrained Devices).
+    if (reduceMotion) {
+      for (const slot of slots) {
+        slot.style.setProperty('--reveal-progress', '1');
+        // A11y-Attrs nur toggeln wenn Element interaktiv ist
+        // (hat tabindex/aria-hidden pre-set im SSR).
+        if (slot.hasAttribute('tabindex')) {
+          slot.style.pointerEvents = 'auto';
+          slot.setAttribute('aria-hidden', 'false');
+          slot.setAttribute('tabindex', '0');
+        }
+      }
+    } else {
+      function clamp01(v: number): number {
+        return v < 0 ? 0 : v > 1 ? 1 : v;
+      }
+
+      // Progress-Formel inline in update() — spart einen Function-Call
+      // pro rAF-Tick, matched semantisch Section5Timeline:getScrollProgress().
+
+      function slotProgress(
+        config: { fadeIn: [number, number] | number[] },
+        progress: number
+      ): number {
+        if (progress <= config.fadeIn[0]) return 0;
+        if (progress >= config.fadeIn[1]) return 1;
+        return (
+          (progress - config.fadeIn[0]) /
+          (config.fadeIn[1] - config.fadeIn[0])
+        );
+      }
+
+      // Nur so viele Slots updaten wie wir Configs haben.
+      const N = Math.min(slots.length, slotsConfig.length);
+
+      function update(): void {
+        if (!section) return;
+
+        // Off-screen early-return: wenn Section vollstaendig ausserhalb
+        // des Viewports, sparen wir die 6 setProperty-Calls +
+        // setAttribute-Calls. Section 2 hat dasselbe Pattern seit
+        // Commit c426254.
+        const rect = section.getBoundingClientRect();
+        if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+
+        const total = section.offsetHeight - window.innerHeight;
+        const progress = total <= 0 ? 0 : clamp01(-rect.top / total);
+
+        for (let i = 0; i < N; i++) {
+          const slot = slots[i];
+          const p = slotProgress(slotsConfig[i], progress);
+          slot.style.setProperty('--reveal-progress', p.toFixed(3));
+
+          // A11y + Anti-Ghost-Click Toggle: Slot ist erst dann
+          // fokussierbar/klickbar wenn > 50% revealed. Nur auf
+          // interaktive Slots (Cards + CTA) — Header hat kein
+          // tabindex und ist nicht fokussierbar. Vermeidet
+          // WCAG-2.4.7-Fail (unsichtbare Focus-Outline) und
+          // Modal-Trigger auf unsichtbare Cards.
+          if (slot.hasAttribute('tabindex')) {
+            const active = p > 0.5;
+            slot.style.pointerEvents = active ? 'auto' : 'none';
+            slot.setAttribute('aria-hidden', active ? 'false' : 'true');
+            slot.setAttribute('tabindex', active ? '0' : '-1');
+          }
+        }
+      }
+
+      let ticking = false;
+      function onScroll(): void {
+        if (ticking) return;
+        ticking = true;
+        window.requestAnimationFrame(() => {
+          update();
+          ticking = false;
+        });
+      }
+
+      let resizeTimer = 0;
+      function onResize(): void {
+        if (resizeTimer) clearTimeout(resizeTimer);
+        resizeTimer = window.setTimeout(update, 120);
+      }
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onResize, { passive: true });
+      update();
+    }
+  }
+</script>

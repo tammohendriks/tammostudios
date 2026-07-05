@@ -2,12 +2,15 @@
 import { SECTION3 } from '../../lib/constants';
 ---
 
-<section class="section-3">
-  <div class="section-3-bg" aria-hidden="true"></div>
+<section class="section-4">
+  <div class="section-4-bg" aria-hidden="true"></div>
 
-  <div class="section-3-sticky">
-    <div class="section-3-content">
-      <p class="section-3-eyebrow">{SECTION3.eyebrow}</p>
+  <div class="section-4-sticky">
+    <div class="section-4-content">
+      <header class="section-4-header">
+        <p class="section-4-eyebrow">{SECTION3.eyebrow}</p>
+        <h2 class="section-4-headline">Kein Zufall.</h2>
+      </header>
 
       <div class="differentiators">
         {SECTION3.items.map((item, i) => {
@@ -44,7 +47,7 @@ import { SECTION3 } from '../../lib/constants';
 </section>
 
 <style>
-  .section-3 {
+  .section-4 {
     position: relative;
     /* 300vh wie Section2: Sticky-Duration = 200vh, Animation läuft
        die ersten 75% (= 150vh of scroll), Settled-Tail die letzten
@@ -59,12 +62,12 @@ import { SECTION3 } from '../../lib/constants';
   }
 
   @media (max-width: 768px) {
-    .section-3 {
+    .section-4 {
       min-height: 220vh;
     }
   }
 
-  .section-3-bg {
+  .section-4-bg {
     position: absolute;
     inset: 0;
     pointer-events: none;
@@ -89,7 +92,7 @@ import { SECTION3 } from '../../lib/constants';
     );
   }
 
-  .section-3-sticky {
+  .section-4-sticky {
     position: sticky;
     top: 0;
     height: 100vh;
@@ -101,14 +104,14 @@ import { SECTION3 } from '../../lib/constants';
   }
 
   @media (max-width: 768px) {
-    .section-3-sticky {
+    .section-4-sticky {
       /* 120px top: TopBar + Spielraum für Eyebrow.
          100px bottom: Platz für ScrollCue ohne Box-Overlap. */
       padding: 120px 20px 100px;
     }
   }
 
-  .section-3-content {
+  .section-4-content {
     width: 100%;
     max-width: 1280px;
     display: flex;
@@ -118,25 +121,43 @@ import { SECTION3 } from '../../lib/constants';
   }
 
   @media (max-width: 768px) {
-    .section-3-content {
+    .section-4-content {
       gap: 32px;
     }
   }
 
-  /* Eyebrow läuft scroll-driven, JS schreibt opacity + transform direkt
-     inline. Initial-Hidden hier hartkodiert — verhindert FOUC während
-     das Script noch nicht den ersten Tick gemacht hat. */
-  .section-3-eyebrow {
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-size: 0.8rem;
-    font-weight: 500;
-    letter-spacing: 0.3em;
-    color: rgba(245, 158, 11, 0.7);
-    text-transform: uppercase;
-    margin: 0;
+  /* Header laeuft scroll-driven, JS schreibt opacity + transform
+     inline auf .section-4-header (nicht mehr auf Eyebrow allein).
+     Initial-Hidden hier hartkodiert am Header-Wrapper — verhindert
+     FOUC waehrend das Script noch nicht den ersten Tick gemacht hat.
+     Eyebrow + Headline sind statische Kinder, styling matcht
+     Section 3 (Referenzen) fuer visuelle Kohaerenz. */
+  .section-4-header {
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto;
     opacity: 0;
     transform: translateY(12px);
     will-change: transform, opacity;
+  }
+
+  .section-4-eyebrow {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.3em;
+    color: rgba(245, 158, 11, 0.85);
+    text-transform: uppercase;
+    margin: 0 0 6px;
+  }
+
+  .section-4-headline {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    color: #f5f5f4;
+    letter-spacing: -0.02em;
+    margin: 0;
   }
 
   .differentiators {
@@ -288,7 +309,7 @@ import { SECTION3 } from '../../lib/constants';
     .diff-item {
       --item-progress: 1 !important;
     }
-    .section-3-eyebrow {
+    .section-4-eyebrow {
       opacity: 1 !important;
       transform: none !important;
     }
@@ -296,16 +317,16 @@ import { SECTION3 } from '../../lib/constants';
 </style>
 
 <script>
-  const section = document.querySelector('.section-3');
+  const section = document.querySelector('.section-4');
   const items = section
     ? Array.from(section.querySelectorAll('.diff-item'))
     : [];
-  const eyebrow = section
-    ? section.querySelector('.section-3-eyebrow')
+  const header = section
+    ? section.querySelector('.section-4-header')
     : null;
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  if (section && items.length === 3 && eyebrow) {
+  if (section && items.length === 3 && header) {
     // Mit 300vh Runway gehen wir auf langsame, dramatische Cascade:
     // jeder Übergang hat Atemzug, Box 3 ist erst bei 85% voll.
     const ranges = [
@@ -313,7 +334,7 @@ import { SECTION3 } from '../../lib/constants';
       { start: 0.25, end: 0.60 },
       { start: 0.50, end: 0.85 },
     ];
-    const EYEBROW_END = 0.12;
+    const HEADER_END = 0.12;
 
     function clamp01(v) {
       return v < 0 ? 0 : v > 1 ? 1 : v;
@@ -328,8 +349,8 @@ import { SECTION3 } from '../../lib/constants';
 
     function update() {
       if (reduceMotion) {
-        eyebrow.style.opacity = '1';
-        eyebrow.style.transform = 'none';
+        header.style.opacity = '1';
+        header.style.transform = 'none';
         for (const item of items) {
           item.style.setProperty('--item-progress', '1');
         }
@@ -338,9 +359,9 @@ import { SECTION3 } from '../../lib/constants';
 
       const progress = getScrollProgress();
 
-      const eyeP = clamp01(progress / EYEBROW_END);
-      eyebrow.style.opacity = String(eyeP);
-      eyebrow.style.transform = `translateY(${(1 - eyeP) * 12}px)`;
+      const headerP = clamp01(progress / HEADER_END);
+      header.style.opacity = String(headerP);
+      header.style.transform = `translateY(${(1 - headerP) * 12}px)`;
 
       for (let i = 0; i < items.length; i++) {
         const { start, end } = ranges[i];

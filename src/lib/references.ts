@@ -29,6 +29,7 @@ export const REFERENCES = [
   {
     slug: 'ibi-doc',
     title: 'Institut für Betriebsmedizin Isernhagen',
+    shortTitle: 'Institut Betriebsmedizin Isernhagen',
     subtitle: 'Betriebsmedizinische Praxis',
     url: 'https://www.ibi-doc.de',
     preview: '/referenzen/ibi-doc-website.webp',
