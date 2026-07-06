@@ -6,6 +6,21 @@ import { REFERENCES } from '../lib/references';
 import { SECTION5 } from '../lib/constants';
 
 const { footer } = SECTION5;
+
+// Kategorien-Reihenfolge fix (Handwerk, Medizin, Gastronomie) — nicht
+// alphabetisch, nicht nach Count. Diese Reihenfolge spiegelt die
+// Sub-Zeile der Landing-Teaser ("Vier Sites, drei Branchen") und
+// gruppiert Handwerk zuerst, weil aktuell die beiden neuesten
+// Referenzen dort liegen.
+const CATEGORY_ORDER = ['Handwerk', 'Medizin', 'Gastronomie'] as const;
+
+const categoryCounts = CATEGORY_ORDER.map((cat) => ({
+  slug: cat.toLowerCase(),
+  label: cat,
+  count: REFERENCES.filter((r) => r.category === cat).length,
+})).filter((c) => c.count > 0);
+
+const totalCount = REFERENCES.length;
 ---
 
 <BaseLayout
@@ -16,15 +31,49 @@ const { footer } = SECTION5;
     <SubPageBackground />
     <header class="ref-hero">
       <h1 class="subpage-hero-title">Referenzen</h1>
-      <p class="subpage-hero-subtitle ref-description">
-        Eine kleine Auswahl der Sites, die ich zuletzt für
-        Unternehmen gebaut habe. Von der Praxis bis zur Kneipe.
+      <p class="subpage-hero-subtitle ref-description text-lines">
+        {'Eine kleine Auswahl der Sites, die ich zuletzt für Unternehmen gebaut habe.\nVon der Praxis bis zur Kneipe.'}
       </p>
     </header>
 
-    <section class="ref-grid">
+    <div
+      class="ref-filter"
+      role="group"
+      aria-label="Referenzen nach Kategorie filtern"
+      data-reveal
+    >
+      <button
+        type="button"
+        class="ref-filter-chip is-active"
+        data-filter="alle"
+        aria-pressed="true"
+      >
+        <span class="ref-filter-label">Alle</span>
+        <span class="ref-filter-count" aria-hidden="true">{totalCount}</span>
+        <span class="sr-only">, {totalCount} Referenzen</span>
+      </button>
+      {categoryCounts.map((cat) => (
+        <button
+          type="button"
+          class="ref-filter-chip"
+          data-filter={cat.slug}
+          aria-pressed="false"
+        >
+          <span class="ref-filter-label">{cat.label}</span>
+          <span class="ref-filter-count" aria-hidden="true">{cat.count}</span>
+          <span class="sr-only">, {cat.count} Referenzen</span>
+        </button>
+      ))}
+    </div>
+
+    <section class="ref-grid" data-active-filter="alle">
       {REFERENCES.map((ref) => (
-        <article class="ref-card" data-slug={ref.slug} data-reveal>
+        <article
+          class="ref-card"
+          data-slug={ref.slug}
+          data-category={ref.category.toLowerCase()}
+          data-reveal
+        >
           <div class="ref-preview">
             <img
               src={ref.preview}
@@ -120,6 +169,99 @@ const { footer } = SECTION5;
      .subpage-hero-subtitle in global.css. .ref-description bleibt
      als Marker-Klasse für etwaige seitenspezifische Overrides. */
 
+  /* === Filter Chips ===
+     Pill-Row zwischen Hero und Grid. Visuell verwandt mit den
+     .ref-tag-Badges auf den Cards (Amber-Sprache), aber groesser
+     und interaktiv. Wraps auf schmalen Viewports. */
+  .ref-filter {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    max-width: 1200px;
+    margin: 0 auto 48px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .ref-filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 18px 9px 20px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 9999px;
+    color: rgba(245, 245, 244, 0.68);
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition:
+      background-color 240ms ease,
+      border-color 240ms ease,
+      color 240ms ease,
+      box-shadow 240ms ease;
+  }
+
+  .ref-filter-chip:hover {
+    background: rgba(245, 158, 11, 0.05);
+    border-color: rgba(245, 158, 11, 0.28);
+    color: rgba(245, 245, 244, 0.9);
+  }
+
+  .ref-filter-chip:focus-visible {
+    outline: 2px solid rgba(245, 158, 11, 0.8);
+    outline-offset: 3px;
+  }
+
+  .ref-filter-chip.is-active {
+    background: rgba(245, 158, 11, 0.12);
+    border-color: rgba(245, 158, 11, 0.5);
+    color: #f5f5f4;
+    box-shadow:
+      0 0 24px rgba(245, 158, 11, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+
+  /* Count-Badge: neutraler Kreis mit Zahl. Aktiv wird er amber. */
+  .ref-filter-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(245, 245, 244, 0.7);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    transition:
+      background-color 240ms ease,
+      color 240ms ease;
+  }
+
+  .ref-filter-chip.is-active .ref-filter-count {
+    background: rgba(245, 158, 11, 0.9);
+    color: #1a1a1a;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
   .ref-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
@@ -130,6 +272,32 @@ const { footer } = SECTION5;
     z-index: 1;
   }
 
+  /* === Filter-Animation ===
+     Non-matching Cards werden direkt aus dem Flow entfernt
+     (.is-removed → display:none) — Grid reflowt instant, keine
+     Ueberschneidung zwischen fadendem Card und schon-reflowten
+     Nachbarn. Dafuer kriegen neu erscheinende Cards eine sanfte
+     Enter-Animation aus opacity 0 + translate 8px in ihre finale
+     Position (kein transform-Property, damit Hover-translateY(-4px)
+     nicht kollidiert — moderne 'translate' Longhand ist separat). */
+  .ref-card.is-removed {
+    display: none;
+  }
+
+  .ref-card.is-entering {
+    opacity: 0;
+    translate: 0 12px;
+  }
+
+  .ref-card {
+    transition:
+      transform 300ms ease,
+      translate 320ms ease,
+      opacity 320ms ease,
+      border-color 300ms ease,
+      box-shadow 300ms ease;
+  }
+
   @media (max-width: 768px) {
     .ref-grid {
       grid-template-columns: 1fr;
@@ -137,6 +305,30 @@ const { footer } = SECTION5;
     }
     .referenzen-page {
       padding: 100px 16px 60px;
+    }
+    .ref-filter {
+      gap: 8px;
+      margin-bottom: 32px;
+    }
+    .ref-filter-chip {
+      padding: 8px 14px 8px 16px;
+      font-size: 0.72rem;
+      gap: 8px;
+    }
+    .ref-filter-count {
+      min-width: 20px;
+      height: 20px;
+      font-size: 0.62rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ref-card,
+    .ref-card.is-entering,
+    .ref-filter-chip,
+    .ref-filter-count {
+      transition: none;
+      translate: 0 0;
     }
   }
 
@@ -146,10 +338,6 @@ const { footer } = SECTION5;
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 12px;
     overflow: hidden;
-    transition:
-      transform 300ms ease,
-      border-color 300ms ease,
-      box-shadow 300ms ease;
   }
 
   .ref-card:hover,
@@ -352,4 +540,88 @@ const { footer } = SECTION5;
 </style>
 
 <!-- Modal-Script lebt in src/components/ReferenzModal.astro -->
+
+<script>
+  // === Referenzen-Filter ===
+  // Chips im .ref-filter setzen data-active-filter am Grid, Cards mit
+  // nicht-matchendem data-category werden ausgeblendet.
+  //
+  // Flow: click → aria-pressed/.is-active am Chip toggeln → alle Cards
+  // markieren als .is-hidden (fade+scale) → nach 220ms transitionend
+  // .is-removed (display:none) → matching Cards direkt sichtbar lassen.
+  //
+  // URL-Hash sync (#handwerk etc.) fuer Deep-Links + Reload-Persistenz.
+
+  const filterRoot = document.querySelector<HTMLElement>('.ref-filter');
+  const grid = document.querySelector<HTMLElement>('.ref-grid');
+
+  if (filterRoot && grid) {
+    const chips = Array.from(
+      filterRoot.querySelectorAll<HTMLButtonElement>('.ref-filter-chip')
+    );
+    const cards = Array.from(
+      grid.querySelectorAll<HTMLElement>('.ref-card')
+    );
+    const validFilters = new Set(chips.map((c) => c.dataset.filter));
+
+    const applyFilter = (filter: string) => {
+      grid.dataset.activeFilter = filter;
+
+      chips.forEach((chip) => {
+        const isActive = chip.dataset.filter === filter;
+        chip.classList.toggle('is-active', isActive);
+        chip.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+      });
+
+      cards.forEach((card) => {
+        const matches =
+          filter === 'alle' || card.dataset.category === filter;
+
+        if (matches) {
+          const wasHidden = card.classList.contains('is-removed');
+          card.classList.remove('is-removed');
+          if (wasHidden) {
+            // Card kehrt in den Grid zurueck: Enter-Animation triggern.
+            // Doppelter rAF garantiert, dass der Browser den
+            // is-entering-Startzustand (opacity 0, translate 12px) in
+            // einem Frame paintet, bevor der Class-Remove die
+            // Transition auf den Normalzustand ausloest.
+            card.classList.add('is-entering');
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                card.classList.remove('is-entering');
+              });
+            });
+          }
+        } else {
+          // Direkt aus dem Flow nehmen — kein Fade-out. Verhindert
+          // die visuelle Ueberschneidung zwischen fadendem Card und
+          // schon-reflowten Nachbarn (Grid reflowt sonst mid-transition).
+          card.classList.add('is-removed');
+        }
+      });
+    };
+
+    chips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const filter = chip.dataset.filter || 'alle';
+        applyFilter(filter);
+
+        // Hash aktualisieren (ohne Scroll-Jump). "alle" clearct den Hash.
+        const nextHash = filter === 'alle' ? '' : `#${filter}`;
+        if (nextHash) {
+          history.replaceState(null, '', nextHash);
+        } else if (location.hash) {
+          history.replaceState(null, '', location.pathname);
+        }
+      });
+    });
+
+    // Initial-State aus URL-Hash lesen (falls valider Filter).
+    const initialHash = location.hash.slice(1).toLowerCase();
+    if (initialHash && validFilters.has(initialHash)) {
+      applyFilter(initialHash);
+    }
+  }
+</script>
 
