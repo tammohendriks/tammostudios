@@ -36,4 +36,13 @@ export const REFERENCES = [
     tags: ['Astro', 'Tailwind', 'Sanity', 'Vercel'],
     category: 'Medizin',
   },
+  {
+    slug: 'kirsch-dach-fassade',
+    title: 'Kirsch Dach & Fassade',
+    subtitle: 'Dach & Fassade in Bremen',
+    url: 'https://kirsch-dach-fassade.de',
+    preview: '/referenzen/kirsch-dach-fassade.webp',
+    tags: ['Astro', 'Tailwind', 'Sanity', 'Vercel'],
+    category: 'Handwerk',
+  },
 ] as const;
