@@ -147,6 +147,23 @@ export const SECTION5 = {
       { label: 'Impressum',   href: '/impressum' },
       { label: 'Datenschutz', href: '/datenschutz' },
     ],
+    // Socials neben der Nav im Footer, Icon-only. aria-label carriert
+    // Platform + Handle. platform wird von SiteFooter zur Icon-Auswahl
+    // gemapped (case-sensitive: 'instagram' | 'linkedin').
+    socials: [
+      {
+        platform: 'instagram',
+        label: 'Instagram',
+        handle: '@tammostudios',
+        href: 'https://instagram.com/tammostudios',
+      },
+      {
+        platform: 'linkedin',
+        label: 'LinkedIn',
+        handle: 'Tammo Hendriks',
+        href: 'https://www.linkedin.com/in/tammo-hendriks-93b616264',
+      },
+    ],
   },
 } as const;
 
