@@ -3,14 +3,15 @@
 // Liest Nav-/Legal-Links und Copyright aus SECTION5.footer, damit
 // die Datenquelle single-source bleibt.
 //
-// variant='default'  — standalone Footer am Seitenende (Sub-Pages).
-//                      Background + Full-Padding + max-width Container.
-// variant='embedded' — Footer innerhalb einer flex-column Section
-//                      (Landing Section 6). Kein Background, nur
-//                      Border-Top + margin-top:auto damit er unten
-//                      im Section-Flex sitzt. Section positioniert.
+// variant='default'        — standalone Footer am Seitenende (Sub-Pages).
+//                            Background + Full-Padding + max-width Container.
+// variant='embedded'       — Footer innerhalb einer flex-column Section
+//                            (dark Landing-Sections). Kein Background, nur
+//                            Border-Top + margin-top:auto.
+// variant='embedded-cream' — Wie embedded, aber Charcoal-Text auf Cream —
+//                            fuer die Cream-Landing-Section (Fahrplan/Closing).
 export interface Props {
-  variant?: 'default' | 'embedded';
+  variant?: 'default' | 'embedded' | 'embedded-cream';
 }
 
 const { variant = 'default' } = Astro.props;
@@ -123,7 +124,8 @@ const { footer } = SECTION5;
      auto zieht ihn ans untere Ende der flex-Spalte, flex-shrink:0
      verhindert Squish bei knappem Vertical Space, z-index:2 hebt ihn
      ueber die Section-6 Cosmic-Layer. */
-  .site-footer.is-embedded {
+  .site-footer.is-embedded,
+  .site-footer.is-embedded-cream {
     background: transparent;
     padding-top: 24px;
     margin-top: auto;
@@ -132,6 +134,40 @@ const { footer } = SECTION5;
     flex-shrink: 0;
     position: relative;
     z-index: 2;
+  }
+
+  /* Cream-Variant: gleiche Layout-Semantik wie embedded, aber Charcoal-
+     Text + amber-700 Hover statt Light-on-Dark. Border-Top wird dunkler
+     damit sie auf Cream sichtbar bleibt. */
+  .site-footer.is-embedded-cream {
+    border-top-color: rgba(26, 26, 28, 0.15);
+  }
+
+  .site-footer.is-embedded-cream .footer-brand,
+  .site-footer.is-embedded-cream .footer-nav a,
+  .site-footer.is-embedded-cream .footer-legal a {
+    color: rgba(26, 26, 28, 0.7);
+  }
+
+  .site-footer.is-embedded-cream .footer-copy {
+    color: rgba(26, 26, 28, 0.5);
+  }
+
+  .site-footer.is-embedded-cream .footer-nav a:hover,
+  .site-footer.is-embedded-cream .footer-nav a:focus-visible,
+  .site-footer.is-embedded-cream .footer-legal a:hover,
+  .site-footer.is-embedded-cream .footer-legal a:focus-visible {
+    color: #92400e;
+  }
+
+  .site-footer.is-embedded-cream .footer-social-link {
+    color: rgba(26, 26, 28, 0.7);
+  }
+
+  .site-footer.is-embedded-cream .footer-social-link:hover,
+  .site-footer.is-embedded-cream .footer-social-link:focus-visible {
+    color: #92400e;
+    background: rgba(180, 83, 9, 0.08);
   }
 
   .footer-row {
