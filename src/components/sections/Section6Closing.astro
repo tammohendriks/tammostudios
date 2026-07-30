@@ -248,6 +248,15 @@ const { eyebrow, subtext, secondaryEmail } = SECTION5;
     filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.35));
   }
 
+  /* Mobile: SVG drop-shadow ist auf iOS Safari software-rasterized
+     und kostet beim Section-Reveal einen Hakler. Auf Cream mit 0.35
+     opacity war der Glow eh subtil — visueller Unterschied minimal. */
+  @media (max-width: 767px) {
+    .closing-highlight-underline path {
+      filter: none;
+    }
+  }
+
   .closing-sub {
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-weight: 400;

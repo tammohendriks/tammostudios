@@ -268,7 +268,7 @@ const jsonLdGraph = {
       } catch (e) {}
     </script>
   </head>
-  <body class="min-h-dvh bg-ts-bg text-ts-fg">
+  <body class="min-h-screen bg-ts-bg text-ts-fg">
     <TopBar />
     <slot />
     <script>
@@ -295,7 +295,13 @@ const jsonLdGraph = {
             const intersecting = entries.filter((e) => e.isIntersecting);
             intersecting.forEach((entry, i) => {
               const el = entry.target as HTMLElement;
-              el.style.transitionDelay = i * 100 + 'ms';
+              // Stagger cap: Math.min(i, 4) * 60ms → maximal 240ms
+              // Verzoegerung. Vorher: i * 100 unbounded — bei 6+
+              // gleichzeitig intersect'ing Elementen (schneller Scroll
+              // durch Section 4/7) sah User das letzte Element mit
+              // 500ms+ Delay erscheinen, was auf ProMotion 120Hz
+              // als "traege" empfunden wird.
+              el.style.transitionDelay = Math.min(i, 4) * 60 + 'ms';
               el.classList.add('is-revealed');
               obs.unobserve(el);
             });
