@@ -1,0 +1,743 @@
+---
+// Template fuer die 3 Vertical Landing Pages (webdesign-handwerk /
+// -praxis / -gastronomie). Nimmt eine Vertical-Config aus
+// src/lib/verticals.ts entgegen und rendert die komplette Seite.
+//
+// Sections in Reihenfolge:
+//   1. Hero            — Full-Bleed Background-Image + Dark Gradient +
+//                        Eyebrow + Multi-Line Headline (mit Highlight-
+//                        Span + SVG-Underline) + Subheadline + CTA
+//   2. Intro           — Kurzabsatz, mit \n-Zeilenumbruechen (pre-line)
+//   3. Checklist       — 5-7 Punkte mit Amber Check-Icons
+//   4. Pricing         — Preisblock, matched /preise Styling
+//   5. Case Study      — Bild(er) + Text + Live-Link
+//   6. FAQ             — <details>/<summary> Accordions
+//   7. Final CTA       — Klarer Abschluss mit CTA
+//
+// CTA-Buttons haben data-action="open-contact" — der global gemountete
+// ContactModal (BaseLayout) faengt Klicks und oeffnet das Modal.
+//
+// FAQ-Section bekommt zusaetzlich FAQPage JSON-LD via additionalSchema —
+// Google kann daraus Rich-Snippets im Suchergebnis machen.
+
+import type { Vertical } from '../lib/verticals';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteFooter from './SiteFooter.astro';
+
+export interface Props {
+  vertical: Vertical;
+}
+
+const { vertical } = Astro.props;
+
+// FAQPage Schema fuer Rich-Snippets in Google.
+const faqSchema = {
+  '@type': 'FAQPage',
+  mainEntity: vertical.faq.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.a,
+    },
+  })),
+};
+
+// Amber Check-Icon fuer Checklist-Items (matched /preise-Style).
+const checkIcon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="rgba(245, 158, 11, 0.6)" stroke-width="1.5"/><path d="M8 12.5L11 15.5L16 9" stroke="rgba(245, 158, 11, 1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+// Hero-Focal-Point fuer object-position (default center center).
+const heroFocalPoint = vertical.hero.background.focalPoint ?? 'center center';
+---
+
+<BaseLayout
+  pageTitle={vertical.meta.title}
+  description={vertical.meta.description}
+  additionalSchema={faqSchema}
+>
+  <main class="vertical-page">
+    <!-- HERO: Full-Bleed BG-Image (CSS background-image, 100dvh) + Dark
+         Gradient-Scrim + fette Typo mit Text-Shadow fuer Punch. Bild
+         wird ueber CSS-Custom-Property injiziert damit Astro-Scoped
+         CSS clean bleibt. Preload-Link im <head> haetten wir gerne
+         auch fuer LCP, wird aber ueber BaseLayout nicht exponiert —
+         bleibt Nice-to-have. -->
+    <header
+      class="v-hero"
+      style={`--hero-image: url('${vertical.hero.background.image}'); --hero-focal: ${heroFocalPoint};`}
+    >
+      <div class="v-hero-content">
+        <p class="v-eyebrow v-hero-eyebrow">{vertical.hero.eyebrow}</p>
+        <h1 class="v-hero-title">
+          {vertical.hero.headlineLines.map((line, i) => (
+            <>
+              {i > 0 && <br />}
+              {line.highlight ? (
+                <span class="hero-highlight">
+                  {line.text}
+                  <svg
+                    class="hero-highlight-underline"
+                    viewBox="0 0 200 12"
+                    preserveAspectRatio="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M 3 7 C 50 3, 150 9, 197 4"
+                      vector-effect="non-scaling-stroke"
+                    />
+                  </svg>
+                </span>
+              ) : (
+                line.text
+              )}
+            </>
+          ))}
+        </h1>
+        <p class="v-hero-subtitle text-lines">{vertical.hero.subheadline}</p>
+        <div class="v-hero-cta">
+          <button class="cta-orbital" type="button" data-action="open-contact">
+            <span>Erstgespräch anfragen</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- INTRO — text-lines respektiert \n aus verticals.ts als Zeilenumbrueche -->
+    <section class="v-intro" data-reveal>
+      <p class="text-lines">{vertical.intro}</p>
+    </section>
+
+    <!-- CHECKLIST -->
+    <section class="v-checklist" data-reveal aria-label={vertical.checklistTitle}>
+      <h2 class="v-section-headline">{vertical.checklistTitle}</h2>
+      <ul class="v-check-list">
+        {vertical.checklist.map((item) => (
+          <li>
+            <span class="v-check-icon" set:html={checkIcon} />
+            <span class="v-check-text">{item}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- PRICING -->
+    <section class="v-pricing" data-reveal aria-label="Was es kostet">
+      <article class="v-pricing-card">
+        <p class="v-eyebrow v-eyebrow-inline">WAS ES KOSTET</p>
+        <h2 class="v-section-headline v-pricing-headline">Klar, fix, ohne Sternchen.</h2>
+        <div class="v-pricing-body">
+          {vertical.pricing.paragraphs.map((p) => <p class="text-lines">{p}</p>)}
+        </div>
+        <a class="v-inline-link" href="/preise">Volle Preisliste ansehen →</a>
+      </article>
+    </section>
+
+    <!-- CASE STUDY -->
+    <section class="v-case" data-reveal aria-label={vertical.caseStudy.eyebrow}>
+      <p class="v-eyebrow">{vertical.caseStudy.eyebrow}</p>
+      <div class={`v-case-grid ${vertical.caseStudy.references.length > 1 ? 'is-multi' : 'is-single'}`}>
+        <div class="v-case-body">
+          {vertical.caseStudy.paragraphs.map((p) => <p class="text-lines">{p}</p>)}
+          <div class="v-case-links">
+            {vertical.caseStudy.references.map((ref) => (
+              <a class="v-inline-link" href={ref.url} target="_blank" rel="noopener noreferrer">
+                {ref.linkLabel} →
+              </a>
+            ))}
+          </div>
+        </div>
+        <div class="v-case-images">
+          {vertical.caseStudy.references.map((ref) => (
+            <a class="v-case-image-link" href={ref.url} target="_blank" rel="noopener noreferrer" aria-label={`${ref.name} — Live-Site oeffnen (neuer Tab)`}>
+              <img src={ref.image} alt={ref.alt} loading="lazy" />
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="v-faq" data-reveal aria-label="Häufige Fragen">
+      <h2 class="v-section-headline">Häufige Fragen</h2>
+      <div class="v-faq-list">
+        {vertical.faq.map((entry) => (
+          <details class="v-faq-item">
+            <summary>
+              <span class="v-faq-q">{entry.q}</span>
+              <span class="v-faq-icon" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </span>
+            </summary>
+            <p class="v-faq-a">{entry.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="v-final" data-reveal>
+      <div class="v-final-inner">
+        <h2 class="v-final-headline">{vertical.finalCta.headline}</h2>
+        <p class="v-final-sub">{vertical.finalCta.sub}</p>
+        <button class="cta-orbital v-final-cta" type="button" data-action="open-contact">
+          <span>{vertical.finalCta.buttonLabel}</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+</BaseLayout>
+
+<style>
+  /* Grund-Layout: dunkler BG, generoeses Padding. Content-Kolumnen
+     unter Hero max-width 880px (editorial, schmaler als /preise). */
+  .vertical-page {
+    min-height: calc(100vh - 200px);
+    background: #050507;
+    padding: 0 0 100px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .vertical-page > *:not(:first-child) {
+    position: relative;
+    z-index: 1;
+    max-width: 880px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+
+  /* Amber Eyebrow — Section 3/5 Style. */
+  .v-eyebrow {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    color: rgba(245, 158, 11, 0.85);
+    text-transform: uppercase;
+    margin: 0 0 18px;
+  }
+
+  .v-eyebrow-inline {
+    margin-bottom: 12px;
+  }
+
+  /* === HERO ===
+     Full-Bleed 100dvh Hero. Background-Image kommt ueber CSS-Custom-
+     Property vom style-Attribut (injiziert aus vertical.hero.background.
+     image). 3-Layer-BG:
+       1. Radiales Vignette-Gradient (Center leicht heller, Rand dunkler)
+       2. Bottom-Linear-Gradient (unten fast opaque fuer Text-Safety)
+       3. Das Foto selbst
+     background-position wird per --hero-focal gesteuert (default center).
+     background-color als Fallback bevor das WebP geladen ist. */
+  .v-hero {
+    position: relative;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 140px 40px 100px;
+    overflow: hidden;
+    isolation: isolate;
+
+    background-color: #050507;
+    background-image:
+      radial-gradient(
+        ellipse at center,
+        transparent 0%,
+        rgba(5, 5, 7, 0.35) 55%,
+        rgba(5, 5, 7, 0.7) 100%
+      ),
+      linear-gradient(
+        to bottom,
+        rgba(5, 5, 7, 0.35) 0%,
+        rgba(5, 5, 7, 0.55) 45%,
+        rgba(5, 5, 7, 0.92) 100%
+      ),
+      var(--hero-image, none);
+    background-size: cover, cover, cover;
+    background-position: center, center, var(--hero-focal, center);
+    background-repeat: no-repeat;
+  }
+
+  .v-hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    text-align: center;
+    color: #ffffff;
+  }
+
+  .v-hero-eyebrow {
+    color: rgba(245, 158, 11, 0.95);
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+    margin-bottom: 22px;
+  }
+
+  /* Fette Typo mit Text-Shadow fuer Punch auf dem Foto.
+     clamp 3rem → 6rem: mobile bleibt lesbar, Desktop knallt. */
+  .v-hero-title {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-style: normal;
+    font-size: clamp(3rem, 8vw, 6rem);
+    line-height: 0.98;
+    letter-spacing: -0.035em;
+    color: #ffffff;
+    margin: 0 0 28px;
+    text-wrap: balance;
+    text-shadow:
+      0 2px 24px rgba(0, 0, 0, 0.45),
+      0 1px 3px rgba(0, 0, 0, 0.5);
+  }
+
+  .v-hero-subtitle {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: clamp(1.1rem, 1.5vw, 1.3rem);
+    line-height: 1.55;
+    color: rgba(245, 245, 244, 0.95);
+    max-width: 640px;
+    margin: 0 auto 40px;
+    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.4);
+  }
+
+  .v-hero-cta {
+    display: flex;
+    justify-content: center;
+  }
+
+  /* === Hero-Highlight ===
+     Slanted SVG-Underline unter dem highlighteten Wort. Amber, leicht
+     kurvig fuer Marker-Feel. Groesserer Stroke damit's zur fetten
+     Headline passt. Amber-Glow als drop-shadow fuer Punch auf dem Foto. */
+  .hero-highlight {
+    position: relative;
+    display: inline-block;
+    color: #f59e0b;
+    white-space: nowrap;
+    padding-bottom: 0.08em;
+  }
+
+  .hero-highlight-underline {
+    position: absolute;
+    left: -1%;
+    right: -1%;
+    bottom: -0.02em;
+    width: 102%;
+    height: 0.22em;
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  .hero-highlight-underline path {
+    stroke: #f59e0b;
+    stroke-width: 5;
+    stroke-linecap: round;
+    fill: none;
+    filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.5));
+  }
+
+  /* === INTRO ===
+     .text-lines (pre-line) im global.css respektiert \n als Zeilen-
+     umbrueche. text-wrap: pretty aus global.css bleibt aktiv fuer
+     die einzelnen Zeilen intern. */
+  .v-intro {
+    max-width: 720px;
+    margin: 96px auto 96px !important;
+  }
+
+  .v-intro p {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: clamp(1.1rem, 1.5vw, 1.3rem);
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.82);
+    text-align: center;
+    margin: 0;
+  }
+
+  /* Section-Headlines */
+  .v-section-headline {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.6rem, 2.6vw, 2.1rem);
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    color: #f5f5f4;
+    margin: 0 0 32px;
+  }
+
+  /* === CHECKLIST === */
+  .v-checklist {
+    margin-bottom: 96px;
+  }
+
+  .v-check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 14px;
+  }
+
+  .v-check-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 18px;
+    background: rgba(15, 15, 18, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: rgba(245, 245, 244, 0.85);
+    transition: border-color 240ms ease, background-color 240ms ease;
+  }
+
+  .v-check-list li:hover {
+    border-color: rgba(245, 158, 11, 0.28);
+    background: rgba(15, 15, 18, 0.7);
+  }
+
+  .v-check-icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+
+  .v-check-text {
+    flex: 1;
+  }
+
+  /* === PRICING === */
+  .v-pricing {
+    margin-bottom: 96px;
+  }
+
+  .v-pricing-card {
+    background: linear-gradient(180deg, rgba(20, 20, 24, 0.7) 0%, rgba(15, 15, 18, 0.7) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 40px 40px 36px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  }
+
+  .v-pricing-headline {
+    margin-bottom: 20px;
+  }
+
+  .v-pricing-body {
+    display: grid;
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  .v-pricing-body p {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.82);
+    margin: 0;
+  }
+
+  .v-inline-link {
+    display: inline-block;
+    color: rgba(245, 158, 11, 0.95);
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.95rem;
+    letter-spacing: 0.01em;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.3);
+    padding-bottom: 1px;
+    transition: color 200ms ease, border-color 200ms ease;
+  }
+
+  .v-inline-link:hover,
+  .v-inline-link:focus-visible {
+    color: #fbbf24;
+    border-color: rgba(245, 158, 11, 0.7);
+    outline: none;
+  }
+
+  /* === CASE STUDY === */
+  .v-case {
+    margin-bottom: 96px;
+  }
+
+  .v-case-grid {
+    display: grid;
+    gap: 28px;
+  }
+
+  .v-case-grid.is-single {
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 720px) {
+    .v-case-grid.is-single {
+      grid-template-columns: 1.1fr 1fr;
+      align-items: start;
+    }
+  }
+
+  .v-case-grid.is-multi {
+    grid-template-columns: 1fr;
+  }
+
+  .v-case-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .v-case-body p {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 1.02rem;
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.82);
+    margin: 0;
+  }
+
+  .v-case-links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+    margin-top: 8px;
+  }
+
+  .v-case-images {
+    display: grid;
+    gap: 20px;
+  }
+
+  .v-case-grid.is-multi .v-case-images {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+
+  .v-case-image-link {
+    display: block;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    aspect-ratio: 2 / 1;
+    background: #0a0a0c;
+    transition: transform 300ms ease, border-color 300ms ease, box-shadow 300ms ease;
+  }
+
+  .v-case-image-link:hover,
+  .v-case-image-link:focus-visible {
+    transform: translateY(-3px);
+    border-color: rgba(245, 158, 11, 0.4);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 40px rgba(245, 158, 11, 0.12);
+    outline: none;
+  }
+
+  .v-case-image-link img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    display: block;
+    transition: transform 600ms ease;
+  }
+
+  .v-case-image-link:hover img {
+    transform: scale(1.04);
+  }
+
+  /* === FAQ === */
+  .v-faq {
+    margin-bottom: 96px;
+  }
+
+  .v-faq-list {
+    display: grid;
+    gap: 10px;
+  }
+
+  .v-faq-item {
+    background: rgba(15, 15, 18, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: border-color 240ms ease;
+  }
+
+  .v-faq-item[open] {
+    border-color: rgba(245, 158, 11, 0.28);
+    background: rgba(15, 15, 18, 0.7);
+  }
+
+  .v-faq-item summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 22px;
+    cursor: pointer;
+    list-style: none;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 1rem;
+    line-height: 1.4;
+    color: #f5f5f4;
+    transition: color 200ms ease;
+  }
+
+  .v-faq-item summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .v-faq-item summary:hover {
+    color: rgba(245, 158, 11, 0.95);
+  }
+
+  .v-faq-item summary:focus-visible {
+    outline: 2px solid rgba(245, 158, 11, 0.6);
+    outline-offset: -2px;
+  }
+
+  .v-faq-q {
+    flex: 1;
+  }
+
+  .v-faq-icon {
+    flex-shrink: 0;
+    color: rgba(245, 158, 11, 0.85);
+    transition: transform 240ms ease;
+  }
+
+  .v-faq-item[open] .v-faq-icon {
+    transform: rotate(180deg);
+  }
+
+  .v-faq-a {
+    padding: 0 22px 20px;
+    margin: 0;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 0.98rem;
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.78);
+  }
+
+  /* === FINAL CTA === */
+  .v-final {
+    margin-top: 40px;
+  }
+
+  .v-final-inner {
+    text-align: center;
+    padding: 56px 32px;
+    background: linear-gradient(180deg, rgba(20, 20, 24, 0.5) 0%, rgba(15, 15, 18, 0.5) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+  }
+
+  .v-final-headline {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.8rem, 3vw, 2.4rem);
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    color: #f5f5f4;
+    margin: 0 0 14px;
+  }
+
+  .v-final-sub {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 1.05rem;
+    color: rgba(245, 245, 244, 0.72);
+    margin: 0 0 30px;
+  }
+
+  .v-final-cta {
+    font-size: 1.05rem;
+    padding: 13px 30px;
+  }
+
+  /* === MOBILE === */
+  @media (max-width: 768px) {
+    .vertical-page {
+      padding: 0 0 60px;
+    }
+
+    .vertical-page > *:not(:first-child) {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+
+    .v-hero {
+      padding: 120px 20px 80px;
+      min-height: 100dvh;
+    }
+
+    .v-hero-title {
+      font-size: clamp(2.4rem, 10vw, 3.8rem);
+    }
+
+    .hero-highlight-underline path {
+      stroke-width: 4;
+    }
+
+    .v-hero-cta .cta-orbital {
+      font-size: 0.98rem;
+      padding: 12px 24px;
+    }
+
+    .v-intro {
+      margin: 64px auto 64px !important;
+    }
+
+    .v-checklist,
+    .v-pricing,
+    .v-case {
+      margin-bottom: 64px;
+    }
+
+    .v-check-list li {
+      padding: 12px 14px;
+      font-size: 0.95rem;
+    }
+
+    .v-pricing-card {
+      padding: 32px 24px 28px;
+    }
+
+    .v-faq-item summary {
+      padding: 16px 18px;
+      font-size: 0.95rem;
+    }
+
+    .v-faq-a {
+      padding: 0 18px 18px;
+      font-size: 0.92rem;
+    }
+
+    .v-final-inner {
+      padding: 44px 20px;
+    }
+  }
+</style>
