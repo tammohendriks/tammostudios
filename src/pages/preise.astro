@@ -82,6 +82,35 @@ const alwaysIncludedItems = [
       </article>
     </section>
 
+    <!-- Preisrechner-Anker: dezenter CTA-Block zwischen Preis-Karten
+         und "Immer dabei". Nicht dominant — keine grosse Pill, nur
+         Card mit amber Border + kurzer Text + Link. -->
+    <section class="preise-calc-cta" data-reveal aria-label="Preisrechner-Anker">
+      <article class="calc-cta-card">
+        <p class="calc-cta-eyebrow">UNSICHER?</p>
+        <h2 class="calc-cta-headline">Was kostet dein Website-Projekt?</h2>
+        <p class="calc-cta-body">
+          In 3 Fragen zum genauen Preis für dein Vorhaben.
+        </p>
+        <a class="calc-cta-link" href="/preisrechner">
+          <span>Preisrechner öffnen</span>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </a>
+      </article>
+    </section>
+
     <section class="preise-always" aria-label="Immer dabei" data-reveal>
       <article class="always-card">
         <p class="price-eyebrow">Immer dabei</p>
@@ -693,6 +722,93 @@ const alwaysIncludedItems = [
   .inline-link:hover svg,
   .inline-link:focus-visible svg {
     transform: translateX(3px);
+  }
+
+  /* === Preisrechner-CTA-Card ===
+     Dezenter Anker-Block zwischen Preis-Karten und "Immer dabei".
+     max-width 600px, zentriert, amber Border + subtle Glow. Nicht
+     zu dominant damit die Preis-Karten drueber Blickfang bleiben. */
+  .preise-calc-cta {
+    position: relative;
+    z-index: 1;
+    max-width: 600px;
+    margin: 40px auto 60px;
+    padding: 0 20px;
+  }
+
+  .calc-cta-card {
+    background: linear-gradient(180deg, rgba(20, 20, 24, 0.6) 0%, rgba(15, 15, 18, 0.6) 100%);
+    border: 1px solid rgba(245, 158, 11, 0.32);
+    border-radius: 12px;
+    padding: 28px 28px 24px;
+    text-align: center;
+    box-shadow:
+      0 6px 24px rgba(0, 0, 0, 0.2),
+      0 0 32px rgba(245, 158, 11, 0.08);
+  }
+
+  .calc-cta-eyebrow {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.72rem;
+    letter-spacing: 0.28em;
+    color: rgba(245, 158, 11, 0.9);
+    text-transform: uppercase;
+    margin: 0 0 12px;
+  }
+
+  .calc-cta-headline {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.2rem, 1.8vw, 1.5rem);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: #f5f5f4;
+    margin: 0 0 10px;
+  }
+
+  .calc-cta-body {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: rgba(245, 245, 244, 0.7);
+    margin: 0 0 20px;
+  }
+
+  .calc-cta-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(245, 158, 11, 0.95);
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.4);
+    padding-bottom: 2px;
+    transition: color 200ms ease, border-color 200ms ease;
+  }
+
+  .calc-cta-link:hover,
+  .calc-cta-link:focus-visible {
+    color: #fbbf24;
+    border-color: rgba(245, 158, 11, 0.8);
+    outline: none;
+  }
+
+  .calc-cta-link svg {
+    transition: transform 200ms ease;
+  }
+
+  .calc-cta-link:hover svg,
+  .calc-cta-link:focus-visible svg {
+    transform: translateX(3px);
+  }
+
+  @media (max-width: 640px) {
+    .calc-cta-card {
+      padding: 24px 22px 20px;
+    }
   }
 
   .inline-link-cta {

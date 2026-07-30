@@ -167,10 +167,20 @@ export const SECTION5 = {
   },
 } as const;
 
+// NAV_ITEMS: optionales children-Array macht ein Nav-Item zum
+// Dropdown-Container. TopBar rendered dann Chevron + Dropdown-Menu
+// (Desktop) bzw. Accordion (Mobile).
 export const NAV_ITEMS = [
   { label: 'Über', href: '/ueber' },
   { label: 'Referenzen', href: '/referenzen' },
-  { label: 'Preise', href: '/preise' },
+  {
+    label: 'Preise',
+    href: '/preise',
+    children: [
+      { label: 'Preise', href: '/preise' },
+      { label: 'Preisrechner', href: '/preisrechner' },
+    ],
+  },
 ] as const;
 
 export const CTA = {

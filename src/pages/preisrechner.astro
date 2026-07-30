@@ -1,0 +1,1069 @@
+---
+// Interaktiver Preisrechner — 3-Fragen-Wizard mit Live-Summary.
+//
+// Struktur:
+//   1. Hero (matcht andere Subpages)
+//   2. Wizard: 2-Column (Fragen links / Summary sticky rechts) auf
+//      Desktop, Single-Column auf Mobile
+//   3. Final-CTA "Erstgespraech buchen" → /kontakt
+//
+// Zustand + Preis-Kalkulation im inline <script> weiter unten. Radio-
+// Buttons custom-styled, native Input visually-hidden. Number-Format
+// via Intl.NumberFormat de-DE.
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SubPageBackground from '../components/SubPageBackground.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+
+// Immer-inklusive Items — matcht /preise "Immer dabei" plus
+// Text-Sparring (User entwirft Texte selbst, wir schleifen sie
+// gemeinsam — das gehoert zum Preis, nicht in die Excluded-Liste).
+const includedItems = [
+  'Tägliche Backups',
+  'Sicherheits-Updates',
+  'SSL-Zertifikat',
+  'DSGVO-konformes EU-Hosting',
+  'Eigenes CMS zum selbst pflegen',
+  'Text- & Content-Sparring',
+];
+
+// Was NICHT im Preis ist — ehrliche Transparenz. Bewusst keine
+// Fotograf-Empfehlung (Tammo ist die naechsten 6 Monate unterwegs).
+// Content-Erstellung raus — ist Zusammenarbeit, nicht ausgeschlossen.
+const excludedItems = [
+  {
+    title: 'Domain-Registrierung',
+    body: '~10–15 €/Jahr, kaufst du direkt bei einem Registrar (Namecheap, INWX, United Domains). Ich helf bei der Auswahl.',
+  },
+  {
+    title: 'Externe Tools mit eigenen Kosten',
+    body: 'Wenn wir sowas wie OpenTable (Reservierung), Doctolib (Termin) oder Mailchimp (Newsletter) anbinden, haben die eigene Preise. Klären wir im Erstgespräch.',
+  },
+];
+
+// Preis-FAQ — Fragen die typisch vor der Auftragserteilung kommen.
+const priceFaq = [
+  {
+    q: 'Was wenn ich unsicher bin was ich brauche?',
+    a: 'Genau dafür ist das Erstgespräch — 30 Minuten, kostenlos. Wir gehen dein Vorhaben durch und ich sag dir ehrlich was Sinn macht und was nicht. Kein Verkaufsgespräch.',
+  },
+  {
+    q: 'Kann ich später upgraden oder erweitern?',
+    a: 'Ja, jederzeit. Die bestehende Website bleibt, wir bauen drauf auf. Egal ob Shop nachrüsten, neue Anwendung dazu, oder Pflege-Paket dazubuchen — der Startpreis fällt nicht nochmal an.',
+  },
+  {
+    q: 'Wie läuft die Zahlung?',
+    a: '50 % bei Auftrag, 50 % bei Launch. Keine Vorschüsse, keine Stundensätze, keine versteckten Positionen. Rechnung transparent aufgeschlüsselt.',
+  },
+  {
+    q: 'Was wenn sich der Scope während des Projekts ändert?',
+    a: 'Passiert regelmäßig — Anforderungen klären sich beim Bauen. Kleine Anpassungen (mehr Sektionen, andere Feature-Nuancen) sind normal und im Preis. Größere Scope-Erweiterungen klären wir transparent und schreiben\'s fest, bevor gebaut wird.',
+  },
+];
+---
+
+<BaseLayout
+  pageTitle="Preisrechner"
+  description="Was kostet dein Website-Projekt? In 3 Fragen zum Live-Preis. Ohne Verbindlichkeit."
+>
+  <main class="preisrechner-page">
+    <SubPageBackground />
+
+    <header class="pr-hero">
+      <p class="pr-eyebrow">PREIS-RECHNER</p>
+      <h1 class="subpage-hero-title">Was kostet dein Website-Projekt?</h1>
+      <p class="subpage-hero-subtitle">3 Fragen. Live-Preis. Ohne Verbindlichkeit.</p>
+    </header>
+
+    <section class="pr-wizard" aria-label="Preis-Konfigurator">
+      <!-- Fragen -->
+      <div class="pr-questions">
+        <!-- Frage 1: Basis -->
+        <fieldset class="pr-question" data-reveal>
+          <legend class="pr-q-legend">
+            <span class="pr-q-num">01</span>
+            <span class="pr-q-text">Was brauchst du?</span>
+          </legend>
+          <div class="pr-options">
+            <label class="pr-option">
+              <input type="radio" name="basis" value="website" />
+              <span class="pr-option-card">
+                <span class="pr-option-radio" aria-hidden="true"></span>
+                <span class="pr-option-body">
+                  <span class="pr-option-title">Eine Website</span>
+                </span>
+                <span class="pr-option-price">1.500 €</span>
+              </span>
+            </label>
+            <label class="pr-option">
+              <input type="radio" name="basis" value="shop" />
+              <span class="pr-option-card">
+                <span class="pr-option-radio" aria-hidden="true"></span>
+                <span class="pr-option-body">
+                  <span class="pr-option-title">Ein Online-Shop</span>
+                </span>
+                <span class="pr-option-price">2.500 €</span>
+              </span>
+            </label>
+          </div>
+        </fieldset>
+
+        <!-- Frage 2: Individuelle Anwendungen -->
+        <fieldset class="pr-question" data-reveal>
+          <legend class="pr-q-legend">
+            <span class="pr-q-num">02</span>
+            <span class="pr-q-text">Brauchst du individuelle Anwendungen?</span>
+          </legend>
+          <p class="pr-hint">Förderrechner, KI-Chatbots, Buchungs-Tools, ausfüllbare PDF-Formulare</p>
+          <div class="pr-options">
+            <label class="pr-option">
+              <input type="radio" name="apps" value="none" />
+              <span class="pr-option-card">
+                <span class="pr-option-radio" aria-hidden="true"></span>
+                <span class="pr-option-body">
+                  <span class="pr-option-title">Nein</span>
+                </span>
+              </span>
+            </label>
+            <label class="pr-option">
+              <input type="radio" name="apps" value="one" />
+              <span class="pr-option-card">
+                <span class="pr-option-radio" aria-hidden="true"></span>
+                <span class="pr-option-body">
+                  <span class="pr-option-title">Ja, eine</span>
+                </span>
+                <span class="pr-option-price">+ 500 €</span>
+              </span>
+            </label>
+            <label class="pr-option">
+              <input type="radio" name="apps" value="multiple" />
+              <span class="pr-option-card">
+                <span class="pr-option-radio" aria-hidden="true"></span>
+                <span class="pr-option-body">
+                  <span class="pr-option-title">Ja, mehrere</span>
+                  <span class="pr-option-sub">Endpreis individuell im Gespräch</span>
+                </span>
+                <span class="pr-option-price">Startpreis + 500 €</span>
+              </span>
+            </label>
+          </div>
+        </fieldset>
+
+        <!-- Frage 3: Pflege-Paket -->
+        <fieldset class="pr-question" data-reveal>
+          <legend class="pr-q-legend">
+            <span class="pr-q-num">03</span>
+            <span class="pr-q-text">Möchtest du monatliche Reports und Support?</span>
+          </legend>
+          <p class="pr-hint">Besucherzahlen, Performance-Reports, priorisierter Support, kleinere Fixes ohne Extra-Rechnung</p>
+          <div class="pr-options">
+            <label class="pr-option">
+              <input type="radio" name="pflege" value="none" />
+              <span class="pr-option-card">
+                <span class="pr-option-radio" aria-hidden="true"></span>
+                <span class="pr-option-body">
+                  <span class="pr-option-title">Nein</span>
+                </span>
+              </span>
+            </label>
+            <label class="pr-option">
+              <input type="radio" name="pflege" value="yes" />
+              <span class="pr-option-card">
+                <span class="pr-option-radio" aria-hidden="true"></span>
+                <span class="pr-option-body">
+                  <span class="pr-option-title">Ja, Pflege-Paket dazu</span>
+                </span>
+                <span class="pr-option-price">+ 30 €/Monat</span>
+              </span>
+            </label>
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- Live-Summary (sticky auf Desktop) -->
+      <aside class="pr-summary" aria-label="Live-Preiszusammenfassung">
+        <div class="pr-summary-card">
+          <p class="pr-summary-eyebrow">DEINE GESCHÄTZTEN KOSTEN</p>
+
+          <div class="pr-summary-content" data-summary aria-live="polite">
+            <!-- Empty-State (initial + wenn basis noch nicht gewaehlt) -->
+            <p class="pr-summary-empty" data-summary-empty>
+              Beantworte die Fragen für deinen Live-Preis.
+            </p>
+
+            <!-- Line-Items (JS populiert) -->
+            <ul class="pr-summary-lines" data-summary-lines hidden></ul>
+
+            <!-- Total-Zeile -->
+            <div class="pr-summary-total" data-summary-total hidden>
+              <span class="pr-total-label">Einmalig</span>
+              <span class="pr-total-value" data-total-value>—</span>
+            </div>
+
+            <!-- Multiple-Apps-Note (nur wenn apps=multiple) -->
+            <p class="pr-summary-note-inline" data-summary-multiple-note hidden>
+              Endpreis für weitere Anwendungen individuell im Gespräch.
+            </p>
+
+            <!-- Monatlich (nur wenn pflege=yes) -->
+            <div class="pr-summary-monthly" data-summary-monthly hidden>
+              <span class="pr-monthly-plus" aria-hidden="true">+</span>
+              <span class="pr-monthly-text">30 €/Monat für Pflege</span>
+            </div>
+          </div>
+
+          <p class="pr-summary-note">
+            Preise inklusive aller Standards. Was du hier siehst, ist was du zahlst.
+          </p>
+        </div>
+      </aside>
+    </section>
+
+    <!-- Was immer inklusive ist (matcht /preise "Immer dabei") -->
+    <section class="pr-included" data-reveal aria-label="Was immer inklusive ist">
+      <p class="pr-mini-eyebrow">IMMER DABEI</p>
+      <h2 class="pr-mini-headline">Ohne Aufpreis inklusive.</h2>
+      <ul class="pr-check-list">
+        {includedItems.map((item) => (
+          <li>
+            <span class="pr-check-icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="rgba(245, 158, 11, 0.6)" stroke-width="1.5" />
+                <path d="M8 12.5L11 15.5L16 9" stroke="rgba(245, 158, 11, 1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- Was NICHT im Preis ist — ehrliche Transparenz -->
+    <section class="pr-excluded" data-reveal aria-label="Was nicht im Preis ist">
+      <p class="pr-mini-eyebrow">EHRLICH GESAGT</p>
+      <h2 class="pr-mini-headline">Was nicht im Preis ist.</h2>
+      <ul class="pr-excluded-list">
+        {excludedItems.map((item) => (
+          <li>
+            <span class="pr-excluded-dot" aria-hidden="true"></span>
+            <div class="pr-excluded-body">
+              <p class="pr-excluded-title">{item.title}</p>
+              <p class="pr-excluded-text">{item.body}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- Preis-FAQ — typische Fragen vor Auftragserteilung -->
+    <section class="pr-faq" data-reveal aria-label="Häufige Fragen zum Preis">
+      <p class="pr-mini-eyebrow">HÄUFIGE FRAGEN</p>
+      <h2 class="pr-mini-headline">Was Kunden vorher wissen wollen.</h2>
+      <div class="pr-faq-list">
+        {priceFaq.map((entry) => (
+          <details class="pr-faq-item">
+            <summary>
+              <span class="pr-faq-q">{entry.q}</span>
+              <span class="pr-faq-icon" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </span>
+            </summary>
+            <p class="pr-faq-a">{entry.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="pr-final" data-reveal>
+      <div class="pr-final-inner">
+        <h2 class="pr-final-headline">Klingt fair?</h2>
+        <p class="pr-final-sub">Nächster Schritt: 30 Min Erstgespräch, kostenlos und unverbindlich.</p>
+        <a href="/kontakt" class="cta-orbital pr-final-cta">
+          <span>Erstgespräch buchen</span>
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+</BaseLayout>
+
+<script>
+  // === Preisrechner: Reactive State + Live-Summary ===
+  //
+  // State-Model: { basis, apps, pflege } — jedes null bis der User
+  // die Radio-Group beantwortet hat. Summary rendert erst wenn
+  // mindestens basis gesetzt ist; vorher Empty-State.
+  //
+  // Prices sind hardcoded (matcht Site-Content); wenn sich das
+  // aendert, hier UND in SECTION5/preise Text updaten.
+
+  type BasisValue = 'website' | 'shop';
+  type AppsValue = 'none' | 'one' | 'multiple';
+  type PflegeValue = 'none' | 'yes';
+
+  type WizardState = {
+    basis: BasisValue | null;
+    apps: AppsValue | null;
+    pflege: PflegeValue | null;
+  };
+
+  const state: WizardState = {
+    basis: null,
+    apps: null,
+    pflege: null,
+  };
+
+  const PRICES = {
+    basis: { website: 1500, shop: 2500 },
+    apps: { none: 0, one: 500, multiple: 500 },
+  } as const;
+
+  const LABELS = {
+    basis: { website: 'Website', shop: 'Online-Shop' },
+    apps: {
+      one: 'Individuelle Anwendung',
+      multiple: 'Individuelle Anwendungen',
+    },
+  } as const;
+
+  const euroFormat = new Intl.NumberFormat('de-DE', {
+    style: 'currency',
+    currency: 'EUR',
+    maximumFractionDigits: 0,
+  });
+
+  const $empty = document.querySelector<HTMLElement>('[data-summary-empty]');
+  const $lines = document.querySelector<HTMLElement>('[data-summary-lines]');
+  const $total = document.querySelector<HTMLElement>('[data-summary-total]');
+  const $totalValue = document.querySelector<HTMLElement>('[data-total-value]');
+  const $multipleNote = document.querySelector<HTMLElement>('[data-summary-multiple-note]');
+  const $monthly = document.querySelector<HTMLElement>('[data-summary-monthly]');
+
+  const setHidden = (el: HTMLElement | null, hidden: boolean) => {
+    if (!el) return;
+    if (hidden) el.setAttribute('hidden', '');
+    else el.removeAttribute('hidden');
+  };
+
+  const renderSummary = () => {
+    // Vor der Basis-Wahl: nur Empty-State + Note anzeigen
+    if (!state.basis) {
+      setHidden($empty, false);
+      setHidden($lines, true);
+      setHidden($total, true);
+      setHidden($multipleNote, true);
+      setHidden($monthly, true);
+      return;
+    }
+
+    setHidden($empty, true);
+    setHidden($lines, false);
+    setHidden($total, false);
+
+    // Line-Items sammeln
+    const items: Array<{ label: string; amount: number }> = [];
+    items.push({
+      label: LABELS.basis[state.basis],
+      amount: PRICES.basis[state.basis],
+    });
+    if (state.apps && state.apps !== 'none') {
+      items.push({
+        label: LABELS.apps[state.apps],
+        amount: PRICES.apps[state.apps],
+      });
+    }
+
+    // Line-Items rendern
+    if ($lines) {
+      $lines.innerHTML = items
+        .map(
+          (item) =>
+            `<li><span class="pr-line-label">${item.label}</span><span class="pr-line-amount">${euroFormat.format(item.amount)}</span></li>`
+        )
+        .join('');
+    }
+
+    // Total
+    const total = items.reduce((sum, i) => sum + i.amount, 0);
+    if ($totalValue) $totalValue.textContent = euroFormat.format(total);
+
+    // Multiple-Apps Note
+    setHidden($multipleNote, state.apps !== 'multiple');
+
+    // Monatliche Pflege
+    setHidden($monthly, state.pflege !== 'yes');
+  };
+
+  // Radio-Listener
+  document
+    .querySelectorAll<HTMLInputElement>('.pr-option input[type="radio"]')
+    .forEach((input) => {
+      input.addEventListener('change', () => {
+        const name = input.name as keyof WizardState;
+        state[name] = input.value as never;
+        renderSummary();
+      });
+    });
+
+  // Initial render (Empty-State)
+  renderSummary();
+</script>
+
+<style>
+  /* === Page-Root === */
+  .preisrechner-page {
+    min-height: calc(100vh - 200px);
+    background: #050507;
+    padding: 140px 40px 100px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .preisrechner-page > *:not(:first-child) {
+    position: relative;
+    z-index: 1;
+    max-width: 1120px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* === Hero === */
+  .pr-hero {
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto 72px;
+    padding-top: 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .pr-eyebrow {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    color: rgba(245, 158, 11, 0.85);
+    text-transform: uppercase;
+    margin: 0 0 18px;
+  }
+
+  .pr-hero .subpage-hero-title {
+    margin-bottom: 20px;
+  }
+
+  /* === Wizard: 2-Column Desktop === */
+  .pr-wizard {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 48px;
+    align-items: start;
+    margin-bottom: 96px;
+  }
+
+  @media (max-width: 900px) {
+    .pr-wizard {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+  }
+
+  /* === Fragen-Spalte === */
+  .pr-questions {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .pr-question {
+    border: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .pr-q-legend {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    padding: 0;
+    margin: 0 0 8px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    color: #f5f5f4;
+  }
+
+  .pr-q-num {
+    font-weight: 700;
+    font-size: 1rem;
+    color: rgba(245, 158, 11, 0.85);
+    letter-spacing: 0.02em;
+    min-width: 24px;
+  }
+
+  .pr-q-text {
+    font-weight: 700;
+    font-size: clamp(1.15rem, 1.6vw, 1.35rem);
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+
+  .pr-hint {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: rgba(245, 245, 244, 0.55);
+    margin: 0 0 16px 40px;
+  }
+
+  .pr-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-left: 40px;
+  }
+
+  @media (max-width: 480px) {
+    .pr-hint {
+      margin-left: 0;
+    }
+    .pr-options {
+      padding-left: 0;
+    }
+  }
+
+  /* === Custom Radio-Cards ===
+     Native input visually hidden aber accessible; die Card ist der
+     visible Klickbereich. */
+  .pr-option {
+    cursor: pointer;
+    display: block;
+  }
+
+  .pr-option input[type="radio"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .pr-option-card {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    background: rgba(15, 15, 18, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    transition:
+      border-color 200ms ease,
+      background-color 200ms ease,
+      transform 120ms ease;
+  }
+
+  .pr-option:hover .pr-option-card {
+    border-color: rgba(245, 158, 11, 0.28);
+    background: rgba(15, 15, 18, 0.75);
+  }
+
+  /* Selected: amber border + subtle amber background */
+  .pr-option input[type="radio"]:checked + .pr-option-card {
+    border-color: rgba(245, 158, 11, 0.6);
+    background: rgba(245, 158, 11, 0.06);
+  }
+
+  .pr-option input[type="radio"]:focus-visible + .pr-option-card {
+    outline: 2px solid rgba(245, 158, 11, 0.7);
+    outline-offset: 3px;
+  }
+
+  .pr-option-radio {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(245, 245, 244, 0.4);
+    position: relative;
+    transition: border-color 200ms ease;
+    flex-shrink: 0;
+  }
+
+  .pr-option:hover .pr-option-radio {
+    border-color: rgba(245, 158, 11, 0.6);
+  }
+
+  .pr-option input[type="radio"]:checked + .pr-option-card .pr-option-radio {
+    border-color: #f59e0b;
+  }
+
+  .pr-option input[type="radio"]:checked + .pr-option-card .pr-option-radio::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #f59e0b;
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+  }
+
+  .pr-option-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .pr-option-title {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 1rem;
+    color: #f5f5f4;
+  }
+
+  .pr-option-sub {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.82rem;
+    color: rgba(245, 245, 244, 0.55);
+  }
+
+  .pr-option-price {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: rgba(245, 158, 11, 0.9);
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  /* === Summary === */
+  .pr-summary {
+    position: sticky;
+    top: 100px;
+    align-self: start;
+  }
+
+  @media (max-width: 900px) {
+    .pr-summary {
+      position: static;
+      top: auto;
+    }
+  }
+
+  .pr-summary-card {
+    background: linear-gradient(180deg, rgba(20, 20, 24, 0.7) 0%, rgba(15, 15, 18, 0.7) 100%);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    border-radius: 14px;
+    padding: 28px 26px;
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.28),
+      0 0 32px rgba(245, 158, 11, 0.08);
+  }
+
+  .pr-summary-eyebrow {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    color: rgba(245, 158, 11, 0.85);
+    text-transform: uppercase;
+    margin: 0 0 18px;
+  }
+
+  .pr-summary-content {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .pr-summary-empty {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: rgba(245, 245, 244, 0.55);
+    margin: 0;
+  }
+
+  .pr-summary-lines {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* :global() weil die <li>-Items via innerHTML dynamisch injiziert
+     werden und dadurch keine Astro-cid-Attribute erben. Ohne :global()
+     wuerden die Selektoren nicht matchen und space-between/gap wuerde
+     nicht greifen → Label + Preis kleben aneinander. */
+  :global(.pr-summary-lines li) {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.95rem;
+    color: rgba(245, 245, 244, 0.8);
+  }
+
+  :global(.pr-line-label) {
+    flex: 1;
+    min-width: 0;
+  }
+
+  :global(.pr-line-amount) {
+    font-weight: 500;
+    color: #f5f5f4;
+    white-space: nowrap;
+  }
+
+  .pr-summary-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+  }
+
+  .pr-total-label {
+    font-weight: 600;
+    font-size: 0.98rem;
+    color: rgba(245, 245, 244, 0.75);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .pr-total-value {
+    font-weight: 700;
+    font-size: 1.6rem;
+    color: #f5f5f4;
+    letter-spacing: -0.01em;
+    transition: color 200ms ease;
+  }
+
+  .pr-summary-note-inline {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: rgba(245, 158, 11, 0.8);
+    margin: 0;
+    padding: 8px 12px;
+    background: rgba(245, 158, 11, 0.06);
+    border-radius: 6px;
+    border-left: 2px solid rgba(245, 158, 11, 0.5);
+  }
+
+  .pr-summary-monthly {
+    display: flex;
+    gap: 6px;
+    padding-top: 8px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.95rem;
+    color: rgba(245, 158, 11, 0.9);
+  }
+
+  .pr-monthly-plus {
+    font-weight: 700;
+  }
+
+  .pr-monthly-text {
+    font-weight: 500;
+  }
+
+  .pr-summary-note {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: rgba(245, 245, 244, 0.5);
+    margin: 20px 0 0;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  /* === Mini-Eyebrow + Headline (fuer Includes / Excludes / FAQ) ===
+     Eine Font-Groesse kleiner als der Wizard-Hero, damit sie klar
+     als Sub-Sections lesbar sind. */
+  .pr-mini-eyebrow {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.72rem;
+    letter-spacing: 0.28em;
+    color: rgba(245, 158, 11, 0.9);
+    text-transform: uppercase;
+    margin: 0 0 12px;
+  }
+
+  .pr-mini-headline {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.4rem, 2.2vw, 1.8rem);
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    color: #f5f5f4;
+    margin: 0 0 24px;
+  }
+
+  /* Sub-Sections auf 720px max-width statt der 1120px des Wizards —
+     leichter zu lesen fuer Text-lastige Blocks. Override mit erhoehter
+     Specificity (.preisrechner-page .pr-*) gegen den globalen
+     "> * :not(:first-child)"-Selektor. */
+  .preisrechner-page .pr-included,
+  .preisrechner-page .pr-excluded,
+  .preisrechner-page .pr-faq {
+    max-width: 720px;
+    margin-bottom: 72px;
+  }
+
+  /* === Immer dabei — Check-List === */
+  .pr-check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 10px 20px;
+  }
+
+  .pr-check-list li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: rgba(15, 15, 18, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.95rem;
+    color: rgba(245, 245, 244, 0.85);
+  }
+
+  .pr-check-icon {
+    flex-shrink: 0;
+    display: inline-flex;
+  }
+
+  /* === Was NICHT im Preis ist ===
+     Distinctly less-emphasized als "immer dabei": neutraler Dot
+     statt amber Check, groesserer Body-Text-Bereich fuer die
+     erklaerenden Absaetze. */
+  .pr-excluded-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .pr-excluded-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 18px 20px;
+    background: rgba(15, 15, 18, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+  }
+
+  .pr-excluded-dot {
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    margin-top: 8px;
+    border-radius: 50%;
+    background: rgba(245, 245, 244, 0.35);
+  }
+
+  .pr-excluded-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .pr-excluded-title {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.98rem;
+    color: #f5f5f4;
+    margin: 0;
+  }
+
+  .pr-excluded-text {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: rgba(245, 245, 244, 0.65);
+    margin: 0;
+  }
+
+  /* === FAQ — <details>/<summary> Accordions === */
+  .pr-faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .pr-faq-item {
+    background: rgba(15, 15, 18, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: border-color 240ms ease;
+  }
+
+  .pr-faq-item[open] {
+    border-color: rgba(245, 158, 11, 0.28);
+    background: rgba(15, 15, 18, 0.7);
+  }
+
+  .pr-faq-item summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 20px;
+    cursor: pointer;
+    list-style: none;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.98rem;
+    line-height: 1.4;
+    color: #f5f5f4;
+    transition: color 200ms ease;
+  }
+
+  .pr-faq-item summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .pr-faq-item summary:hover {
+    color: rgba(245, 158, 11, 0.95);
+  }
+
+  .pr-faq-item summary:focus-visible {
+    outline: 2px solid rgba(245, 158, 11, 0.6);
+    outline-offset: -2px;
+  }
+
+  .pr-faq-q {
+    flex: 1;
+  }
+
+  .pr-faq-icon {
+    flex-shrink: 0;
+    color: rgba(245, 158, 11, 0.85);
+    transition: transform 240ms ease;
+  }
+
+  .pr-faq-item[open] .pr-faq-icon {
+    transform: rotate(180deg);
+  }
+
+  .pr-faq-a {
+    padding: 0 20px 18px;
+    margin: 0;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.78);
+  }
+
+  /* === Final CTA === */
+  .pr-final {
+    margin-top: 40px;
+    max-width: 720px !important;
+  }
+
+  .pr-final-inner {
+    text-align: center;
+    padding: 56px 32px;
+    background: linear-gradient(180deg, rgba(20, 20, 24, 0.5) 0%, rgba(15, 15, 18, 0.5) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+  }
+
+  .pr-final-headline {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.8rem, 3vw, 2.4rem);
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    color: #f5f5f4;
+    margin: 0 0 14px;
+  }
+
+  .pr-final-sub {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 1.05rem;
+    color: rgba(245, 245, 244, 0.72);
+    margin: 0 0 30px;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .pr-final-cta {
+    font-size: 1.05rem;
+    padding: 13px 30px;
+  }
+
+  /* === Mobile === */
+  @media (max-width: 768px) {
+    .preisrechner-page {
+      padding: 100px 16px 60px;
+    }
+
+    .pr-hero {
+      margin-bottom: 56px;
+    }
+
+    .pr-wizard {
+      margin-bottom: 64px;
+    }
+
+    .pr-questions {
+      gap: 32px;
+    }
+
+    .pr-summary-card {
+      padding: 24px 20px;
+    }
+
+    .pr-total-value {
+      font-size: 1.4rem;
+    }
+
+    .pr-final-inner {
+      padding: 44px 20px;
+    }
+  }
+</style>

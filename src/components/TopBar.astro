@@ -11,7 +11,13 @@ const currentPath = Astro.url.pathname;
 const isLanding = currentPath === '/' || currentPath === '/index.html';
 const pageType = isLanding ? 'landing' : 'subpage';
 
-type NavItem = { label: string; href: string; key?: string };
+type NavChild = { label: string; href: string };
+type NavItem = {
+  label: string;
+  href: string;
+  key?: string;
+  children?: readonly NavChild[];
+};
 const navItems: NavItem[] = [
   { label: 'Startseite', href: '/', key: 'startseite' },
   ...NAV_ITEMS,
@@ -23,26 +29,69 @@ function isActive(href: string) {
   // auch potenzielle Sub-Routes wie /referenzen/foo später ab.
   return currentPath === href || currentPath.startsWith(href + '/');
 }
+
+// Ein Nav-Item ist "aktiv" wenn seine eigene href matcht ODER
+// eines seiner Kinder — sonst wuerde das Preise-Dropdown auf
+// /preisrechner keinen aktiven State zeigen.
+function itemIsActive(item: NavItem): boolean {
+  if (isActive(item.href)) return true;
+  if (item.children) return item.children.some((c) => isActive(c.href));
+  return false;
+}
 ---
 
 <header class="topbar" data-topbar data-page={pageType}>
   <span class="top-left label-tracked">{SITE_LABELS.establishedLine}</span>
 
   <nav class="nav" aria-label="Hauptnavigation">
-    {navItems.map((item, i) => (
-      <span class:list={['nav-item', item.key && `nav-item-${item.key}`]}>
-        <a
-          class="nav-link"
-          href={item.href}
-          aria-current={isActive(item.href) ? 'page' : undefined}
-        >
-          {item.label}
-        </a>
-        {i < navItems.length - 1 && (
-          <span class="dot" aria-hidden="true"> · </span>
-        )}
-      </span>
-    ))}
+    {navItems.map((item, i) => {
+      const hasChildren = !!(item.children && item.children.length > 0);
+      return (
+        <span class:list={['nav-item', item.key && `nav-item-${item.key}`, hasChildren && 'has-dropdown']}>
+          <a
+            class="nav-link"
+            href={item.href}
+            aria-current={itemIsActive(item) ? 'page' : undefined}
+            aria-haspopup={hasChildren ? 'menu' : undefined}
+          >
+            {item.label}
+            {hasChildren && (
+              <svg
+                class="nav-chevron"
+                width="10"
+                height="10"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            )}
+          </a>
+          {hasChildren && item.children && (
+            <div class="nav-dropdown" role="menu">
+              {item.children.map((child) => (
+                <a
+                  class="nav-dropdown-item"
+                  role="menuitem"
+                  href={child.href}
+                  aria-current={isActive(child.href) ? 'page' : undefined}
+                >
+                  {child.label}
+                </a>
+              ))}
+            </div>
+          )}
+          {i < navItems.length - 1 && (
+            <span class="dot" aria-hidden="true"> · </span>
+          )}
+        </span>
+      );
+    })}
   </nav>
 
   <button
@@ -77,17 +126,69 @@ function isActive(href: string) {
 
 <div id="mobile-menu" class="mobile-menu" hidden>
   <ul>
-    {navItems.map((item) => (
-      <li class:list={[item.key && `mobile-item-${item.key}`]}>
-        <a
-          class="mobile-link"
-          href={item.href}
-          aria-current={isActive(item.href) ? 'page' : undefined}
-        >
-          {item.label}
-        </a>
-      </li>
-    ))}
+    {navItems.map((item) => {
+      const hasChildren = !!(item.children && item.children.length > 0);
+      const subId = `mobile-sub-${item.href.replace(/\//g, '-') || 'root'}`;
+      return (
+        <li class:list={[item.key && `mobile-item-${item.key}`, hasChildren && 'mobile-item-has-children']}>
+          {hasChildren ? (
+            <>
+              <div class="mobile-item-row">
+                <a
+                  class="mobile-link"
+                  href={item.href}
+                  aria-current={itemIsActive(item) ? 'page' : undefined}
+                >
+                  {item.label}
+                </a>
+                <button
+                  class="mobile-expand"
+                  type="button"
+                  aria-expanded="false"
+                  aria-controls={subId}
+                  aria-label={`${item.label} Untermenü ein-/ausklappen`}
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </button>
+              </div>
+              <ul id={subId} class="mobile-sub" hidden>
+                {item.children!.map((child) => (
+                  <li>
+                    <a
+                      class="mobile-sub-link"
+                      href={child.href}
+                      aria-current={isActive(child.href) ? 'page' : undefined}
+                    >
+                      {child.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <a
+              class="mobile-link"
+              href={item.href}
+              aria-current={itemIsActive(item) ? 'page' : undefined}
+            >
+              {item.label}
+            </a>
+          )}
+        </li>
+      );
+    })}
     <li class="mobile-cta-wrap">
       <a class="cta-orbital" href="/kontakt" aria-current={isActive('/kontakt') ? 'page' : undefined}>
         <span class="cta-label">{CTA.label}</span>
@@ -246,6 +347,103 @@ function isActive(href: string) {
     color: rgba(245, 158, 11, 1);
   }
 
+  /* === Desktop Dropdown === */
+  .nav-item.has-dropdown {
+    position: relative;
+  }
+
+  .nav-item.has-dropdown .nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .nav-chevron {
+    color: rgba(245, 245, 244, 0.5);
+    transition: transform 220ms ease, color 220ms ease;
+  }
+
+  .nav-item.has-dropdown:hover .nav-chevron,
+  .nav-item.has-dropdown:focus-within .nav-chevron,
+  .nav-item.has-dropdown .nav-link:hover .nav-chevron {
+    color: rgba(245, 245, 244, 0.9);
+    transform: rotate(180deg);
+  }
+
+  /* Dropdown-Panel — sitzt unter dem parent Nav-Item, matcht die
+     Glass-Pill-Aesthetik der TopBar (dark blur + subtle border). */
+  .nav-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    min-width: 200px;
+    margin-top: 12px;
+    padding: 8px;
+    background: rgba(10, 10, 12, 0.95);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    box-shadow:
+      0 12px 40px rgba(0, 0, 0, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-50%) translateY(-6px);
+    transition:
+      opacity 180ms ease,
+      transform 180ms ease,
+      visibility 0s linear 180ms;
+    z-index: 60;
+    pointer-events: none;
+  }
+
+  .nav-item.has-dropdown:hover .nav-dropdown,
+  .nav-item.has-dropdown:focus-within .nav-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+    transition-delay: 0s;
+    pointer-events: auto;
+  }
+
+  /* Hover-Bruecke: 12px unsichtbarer Streifen zwischen Trigger und
+     Dropdown damit der User nicht rausgeht wenn er sich runterbewegt. */
+  .nav-dropdown::before {
+    content: '';
+    position: absolute;
+    top: -12px;
+    left: 0;
+    right: 0;
+    height: 12px;
+  }
+
+  .nav-dropdown-item {
+    display: block;
+    padding: 10px 14px;
+    color: rgba(245, 245, 244, 0.8);
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: background-color 180ms ease, color 180ms ease;
+    white-space: nowrap;
+  }
+
+  .nav-dropdown-item:hover,
+  .nav-dropdown-item:focus-visible {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f5f5f4;
+    outline: none;
+  }
+
+  .nav-dropdown-item[aria-current="page"] {
+    color: rgba(245, 158, 11, 0.95);
+    background: rgba(245, 158, 11, 0.06);
+  }
+
   /* "Startseite" hängt im DOM auf jeder Page, Sichtbarkeit kommt
      aus dem globalen html[data-page]-State. display:none auf Landing
      reserviert KEINEN Layout-Space. Auf Sub-Pages wird inline-flex
@@ -395,7 +593,10 @@ function isActive(href: string) {
     display: none;
   }
 
-  .mobile-menu ul {
+  /* Direkt-Child-Selektor damit nested .mobile-sub NICHT auch dieses
+     28px-gap-Layout erbt (Specificity von .mobile-menu ul war hoeher
+     als .mobile-sub und ueberschrieb die Sub-Styles). */
+  .mobile-menu > ul {
     list-style: none;
     padding: 0;
     margin: 0;
@@ -408,6 +609,90 @@ function isActive(href: string) {
   .mobile-link {
     color: var(--color-ts-fg);
     font-size: 22px;
+    font-weight: 500;
+  }
+
+  /* === Mobile Accordion (Nav-Items mit Kindern) === */
+  .mobile-item-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .mobile-item-row .mobile-link {
+    padding-right: 0;
+  }
+
+  .mobile-expand {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    color: rgba(245, 245, 244, 0.7);
+    cursor: pointer;
+    transition: color 200ms ease, border-color 200ms ease, background-color 200ms ease;
+  }
+
+  .mobile-expand:focus-visible {
+    outline: 2px solid rgba(245, 158, 11, 0.7);
+    outline-offset: 2px;
+  }
+
+  .mobile-expand svg {
+    transition: transform 220ms ease;
+  }
+
+  .mobile-expand[aria-expanded="true"] {
+    color: rgba(245, 158, 11, 0.95);
+    border-color: rgba(245, 158, 11, 0.5);
+    background: rgba(245, 158, 11, 0.08);
+  }
+
+  .mobile-expand[aria-expanded="true"] svg {
+    transform: rotate(180deg);
+  }
+
+  .mobile-sub {
+    list-style: none;
+    padding: 8px 0 0;
+    margin: 8px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .mobile-sub[hidden] {
+    display: none;
+  }
+
+  .mobile-sub-link {
+    display: block;
+    padding: 10px 14px;
+    color: rgba(245, 245, 244, 0.65);
+    font-size: 15px;
+    font-weight: 400;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: color 200ms ease, background-color 200ms ease;
+  }
+
+  .mobile-sub-link:hover,
+  .mobile-sub-link:focus-visible {
+    color: rgba(245, 158, 11, 0.95);
+    background: rgba(245, 158, 11, 0.06);
+    outline: none;
+  }
+
+  .mobile-sub-link[aria-current="page"] {
+    color: rgba(245, 158, 11, 1);
     font-weight: 500;
   }
 
@@ -466,4 +751,37 @@ function isActive(href: string) {
       if (e.matches && isOpen()) close();
     });
   }
+
+  // === Mobile Accordion Toggle ===
+  // Chevron-Button neben Nav-Items mit Kindern toggelt aria-expanded
+  // + hidden auf der Sub-Liste. Klick auf den Parent-Link daneben
+  // navigiert normal (kein preventDefault noetig).
+  document.querySelectorAll<HTMLButtonElement>('.mobile-expand').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const controls = btn.getAttribute('aria-controls');
+      if (!controls) return;
+      const sub = document.getElementById(controls);
+      if (!sub) return;
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+      if (expanded) sub.setAttribute('hidden', '');
+      else sub.removeAttribute('hidden');
+    });
+  });
+
+  // === Desktop Dropdown: Escape schliesst offenes Dropdown ===
+  // CSS handled hover/focus-within, Escape blurred das aktive Element
+  // (typischerweise ein Dropdown-Item) → :focus-within loest → Panel
+  // schliesst. Zusaetzlich Focus zurueck auf den Parent-Link.
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    const active = document.activeElement as HTMLElement | null;
+    if (!active) return;
+    const dropdownItem = active.closest('.nav-dropdown-item');
+    if (!dropdownItem) return;
+    const parentNavItem = active.closest('.nav-item.has-dropdown');
+    const parentLink = parentNavItem?.querySelector<HTMLElement>('.nav-link');
+    active.blur();
+    parentLink?.focus();
+  });
 </script>
