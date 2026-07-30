@@ -14,8 +14,8 @@
 //   6. FAQ             — <details>/<summary> Accordions
 //   7. Final CTA       — Klarer Abschluss mit CTA
 //
-// CTA-Buttons haben data-action="open-contact" — der global gemountete
-// ContactModal (BaseLayout) faengt Klicks und oeffnet das Modal.
+// CTA-Links zeigen auf /kontakt (Cal.com-Terminbuchung + alternative
+// Kontakte). Kein Modal mehr — direkter Seiten-Wechsel.
 //
 // FAQ-Section bekommt zusaetzlich FAQPage JSON-LD via additionalSchema —
 // Google kann daraus Rich-Snippets im Suchergebnis machen.
@@ -95,12 +95,12 @@ const heroFocalPoint = vertical.hero.background.focalPoint ?? 'center center';
         </h1>
         <p class="v-hero-subtitle text-lines">{vertical.hero.subheadline}</p>
         <div class="v-hero-cta">
-          <button class="cta-orbital" type="button" data-action="open-contact">
+          <a class="cta-orbital" href="/kontakt">
             <span>Erstgespräch anfragen</span>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M5 12h14M13 6l6 6-6 6" />
             </svg>
-          </button>
+          </a>
         </div>
       </div>
     </header>
@@ -184,12 +184,12 @@ const heroFocalPoint = vertical.hero.background.focalPoint ?? 'center center';
       <div class="v-final-inner">
         <h2 class="v-final-headline">{vertical.finalCta.headline}</h2>
         <p class="v-final-sub">{vertical.finalCta.sub}</p>
-        <button class="cta-orbital v-final-cta" type="button" data-action="open-contact">
+        <a class="cta-orbital v-final-cta" href="/kontakt">
           <span>{vertical.finalCta.buttonLabel}</span>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M5 12h14M13 6l6 6-6 6" />
           </svg>
-        </button>
+        </a>
       </div>
     </section>
   </main>

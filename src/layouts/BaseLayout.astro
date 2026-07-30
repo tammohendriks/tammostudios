@@ -1,7 +1,6 @@
 ---
 import '../styles/global.css';
 import TopBar from '../components/TopBar.astro';
-import ContactModal from '../components/ContactModal.astro';
 import { SITE } from '../lib/constants';
 
 interface Props {
@@ -272,7 +271,6 @@ const jsonLdGraph = {
   <body class="min-h-dvh bg-ts-bg text-ts-fg">
     <TopBar />
     <slot />
-    <ContactModal />
     <script>
       // Site-weiter Scroll-Reveal: alle [data-reveal] Elemente werden
       // beim Eintritt in den Viewport (15% sichtbar) eingefadet. Pro

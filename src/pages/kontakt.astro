@@ -1,0 +1,530 @@
+---
+// Dedizierte Kontakt-Seite mit Cal.com-Inline-Embed. Ersetzt das
+// bisherige ContactModal — alle "Erstgespraech anfragen"/"Kontakt"-
+// CTAs site-wide linken jetzt direkt hierher.
+//
+// Struktur:
+//   1. Hero — Headline + kurze Einladung
+//   2. Cal.com Embed — direkter Terminbuchungs-Kalender (dark theme)
+//   3. Alternative Kontakte — Telefon/Email/Instagram-Cards
+//   4. Was im Erstgespraech passiert — 4-Schritte Prep-Info
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SubPageBackground from '../components/SubPageBackground.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { SITE } from '../lib/constants';
+
+const prepSteps = [
+  'Du erzählst kurz was du vorhast',
+  'Ich stelle Fragen zu Zielgruppe, Timing, Budget',
+  'Wir schauen ob\'s passt',
+  'Wenn ja: Angebot innerhalb 24h',
+];
+---
+
+<BaseLayout
+  pageTitle="Kontakt"
+  description="30 Minuten Erstgespräch, kostenlos und unverbindlich. Direkt buchen oder per Mail/Telefon melden."
+>
+  <!-- Resource-Hints fuer Cal.com — starten DNS-Resolution + TLS-Handshake
+       parallel zum HTML-Parse, drastisch schnelleres Widget-Rendering.
+       preload=script beschleunigt das embed.js-Fetch zusaetzlich. -->
+  <link rel="preconnect" href="https://app.cal.com" crossorigin />
+  <link rel="preconnect" href="https://cal.com" crossorigin />
+  <link rel="dns-prefetch" href="https://app.cal.com" />
+  <link rel="dns-prefetch" href="https://cal.com" />
+  <link
+    rel="preload"
+    href="https://app.cal.com/embed/embed.js"
+    as="script"
+    crossorigin
+  />
+
+  <main class="kontakt-page">
+    <SubPageBackground />
+
+    <header class="kontakt-hero">
+      <h1 class="subpage-hero-title">Sprechen wir.</h1>
+      <p class="subpage-hero-subtitle text-lines">
+        {'30 Minuten, kostenlos, unverbindlich.\nWähl dir einen Slot.'}
+      </p>
+    </header>
+
+    <!-- Cal.com Inline Embed —
+         Ziel-Div hat feste ID die im Cal-Init-Script referenziert wird.
+         .cal-loading zeigt einen Skeleton bis Cal rendert. Cal.com-
+         Free-Tier-Branding bleibt sichtbar (steckt im cross-origin
+         iframe, hideBranding braucht Team-Plan). -->
+    <section class="kontakt-cal" data-reveal aria-label="Termin buchen">
+      <div id="my-cal-inline-erstgespraech" class="cal-embed" aria-busy="true">
+        <div class="cal-loading">
+          <div class="cal-loading-dots">
+            <span class="cal-loading-dot"></span>
+            <span class="cal-loading-dot"></span>
+            <span class="cal-loading-dot"></span>
+          </div>
+          <p class="cal-loading-text">Kalender lädt …</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Alternative Kontakte -->
+    <section class="kontakt-alternatives">
+      <p class="kontakt-eyebrow" data-reveal>LIEBER ANDERS?</p>
+      <div class="contact-cards">
+        <a class="contact-card" data-reveal href={SITE.phoneHref}>
+          <span class="contact-card-icon" aria-hidden="true">
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" />
+            </svg>
+          </span>
+          <span class="contact-card-label">Telefon</span>
+          <span class="contact-card-value">{SITE.phone}</span>
+        </a>
+
+        <a class="contact-card" data-reveal href={`mailto:${SITE.email}`}>
+          <span class="contact-card-icon" aria-hidden="true">
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+              <polyline points="22,6 12,13 2,6" />
+            </svg>
+          </span>
+          <span class="contact-card-label">E-Mail</span>
+          <span class="contact-card-value">{SITE.email}</span>
+        </a>
+
+        <a
+          class="contact-card"
+          data-reveal
+          href="https://www.instagram.com/tammostudios/"
+          target="_blank"
+          rel="noopener noreferrer me"
+        >
+          <span class="contact-card-icon" aria-hidden="true">
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="3" y="3" width="18" height="18" rx="5" ry="5" />
+              <circle cx="12" cy="12" r="4" />
+              <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+            </svg>
+          </span>
+          <span class="contact-card-label">Instagram</span>
+          <span class="contact-card-value">@tammostudios</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- Was im Erstgespraech passiert — Prep-Info -->
+    <section class="kontakt-prep">
+      <h2 class="kontakt-prep-headline" data-reveal>Was im Erstgespräch passiert</h2>
+      <ol class="prep-list">
+        {prepSteps.map((step) => (
+          <li data-reveal>
+            <span class="prep-list-text">{step}</span>
+          </li>
+        ))}
+      </ol>
+    </section>
+  </main>
+
+  <SiteFooter />
+</BaseLayout>
+
+<!--
+  Cal.com Inline-Embed Script — 1:1 vom User geliefert.
+  is:inline verhindert Astro's Standard-Bundle-Processing, das die
+  IIFE-Struktur und window.Cal-Queue-Semantik brechen wuerde.
+  Script laeuft NACH dem #my-cal-inline-erstgespraech Div im HTML-Body
+  → DOM-Reihenfolge stellt sicher dass elementOrSelector bereits
+  existiert wenn Cal.ns.erstgespraech("inline", ...) feuert.
+-->
+
+<!--
+  Loading-Skeleton-Cleanup — versteckt die "Kalender laedt …" Anzeige
+  sobald Cal sein iframe injiziert. Kein Auto-Refresh im Kalender
+  spaeter (Cal handled seinen eigenen State intern).
+-->
+<script is:inline>
+  (function () {
+    const target = document.getElementById('my-cal-inline-erstgespraech');
+    if (!target) return;
+
+    const hideLoading = () => {
+      target.setAttribute('aria-busy', 'false');
+      const loading = target.querySelector('.cal-loading');
+      if (loading) loading.style.display = 'none';
+    };
+
+    const hideLoadingOnIframe = () => {
+      const iframe = target.querySelector('iframe');
+      if (!iframe) return;
+      if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete') {
+        hideLoading();
+      } else {
+        iframe.addEventListener('load', hideLoading, { once: true });
+      }
+    };
+
+    setTimeout(hideLoadingOnIframe, 500);
+    setTimeout(hideLoadingOnIframe, 2000);
+  })();
+</script>
+<script is:inline>
+  (function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if(typeof namespace === "string"){cal.ns[namespace] = cal.ns[namespace] || api;p(cal.ns[namespace], ar);p(cal, ["initNamespace", namespace]);} else p(cal, ar); return;} p(cal, ar); }; })(window, "https://app.cal.com/embed/embed.js", "init");
+  Cal("init", "erstgespraech", {origin:"https://app.cal.com"});
+  Cal.config = Cal.config || {};
+  Cal.config.forwardQueryParams = true;
+
+  Cal.ns.erstgespraech("inline", {
+    elementOrSelector:"#my-cal-inline-erstgespraech",
+    config: {"layout":"month_view","useSlotsViewOnSmallScreen":"true","theme":"auto"},
+    calLink: "tammo.studios/erstgespraech",
+  });
+
+  Cal.ns.erstgespraech("ui", {"cssVarsPerTheme":{"light":{"cal-brand":"#f59e0b"},"dark":{"cal-brand":"#f59e0b"}},"hideEventTypeDetails":false,"layout":"month_view"});
+</script>
+
+<style>
+  .kontakt-page {
+    min-height: calc(100vh - 200px);
+    background: #050507;
+    padding: 140px 40px 100px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .kontakt-page > *:not(:first-child) {
+    position: relative;
+    z-index: 1;
+    max-width: 960px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* === Hero === */
+  .kontakt-hero {
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto 72px;
+    padding-top: 32px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .kontakt-hero .subpage-hero-title {
+    margin-bottom: 20px;
+  }
+
+  /* === Cal.com Embed Container === */
+  .kontakt-cal {
+    position: relative;
+    margin-bottom: 48px;
+    background: rgba(15, 15, 18, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28);
+  }
+
+  .cal-embed {
+    position: relative;
+    width: 100%;
+    min-height: 640px;
+    height: 100%;
+  }
+
+  /* Skeleton-Loader waehrend Cal.com laedt — Dots + Text.
+     Sobald Cal das iframe injiziert, deckt es den Loader ab
+     (iframe kommt visuell drueber). */
+  .cal-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .cal-loading-dots {
+    display: flex;
+    gap: 8px;
+  }
+
+  .cal-loading-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(245, 158, 11, 0.6);
+    animation: cal-loading-pulse 1.4s ease-in-out infinite;
+  }
+
+  .cal-loading-dot:nth-child(2) { animation-delay: 0.2s; }
+  .cal-loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  .cal-loading-text {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    color: rgba(245, 245, 244, 0.5);
+    margin: 0;
+  }
+
+  @keyframes cal-loading-pulse {
+    0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+    40% { opacity: 1; transform: scale(1.2); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cal-loading-dot { animation: none; opacity: 0.6; }
+  }
+
+
+  /* === Alternative Kontakte === */
+  .kontakt-alternatives {
+    margin-bottom: 64px;
+    text-align: center;
+  }
+
+  .kontakt-eyebrow {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    color: rgba(245, 158, 11, 0.85);
+    text-transform: uppercase;
+    margin: 0 0 32px;
+  }
+
+  .contact-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    max-width: 780px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 720px) {
+    .contact-cards {
+      grid-template-columns: 1fr;
+      max-width: 380px;
+    }
+  }
+
+  .contact-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 28px 20px 24px;
+    background: rgba(15, 15, 18, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    text-decoration: none;
+    transition:
+      border-color 240ms ease,
+      background-color 240ms ease,
+      transform 240ms ease,
+      box-shadow 240ms ease;
+  }
+
+  .contact-card:hover,
+  .contact-card:focus-visible {
+    border-color: rgba(245, 158, 11, 0.4);
+    background: rgba(20, 20, 24, 0.75);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), 0 0 32px rgba(245, 158, 11, 0.1);
+    outline: none;
+  }
+
+  .contact-card:focus-visible {
+    outline: 2px solid rgba(245, 158, 11, 0.7);
+    outline-offset: 3px;
+  }
+
+  .contact-card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(245, 158, 11, 0.08);
+    color: rgba(245, 158, 11, 0.9);
+    margin-bottom: 6px;
+    transition: background-color 240ms ease, color 240ms ease;
+  }
+
+  .contact-card:hover .contact-card-icon {
+    background: rgba(245, 158, 11, 0.14);
+    color: #fbbf24;
+  }
+
+  .contact-card-label {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(245, 245, 244, 0.55);
+  }
+
+  .contact-card-value {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.98rem;
+    font-weight: 500;
+    color: #f5f5f4;
+  }
+
+  /* === Prep-Info === */
+  .kontakt-prep {
+    text-align: center;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  .kontakt-prep-headline {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.6rem, 2.6vw, 2.1rem);
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    color: #f5f5f4;
+    margin: 0 0 32px;
+  }
+
+  /* Numbered List — 01/02/03/04 in Amber, matcht Site-Fahrplan-Sprache */
+  .prep-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+    counter-reset: prep-counter;
+  }
+
+  .prep-list li {
+    counter-increment: prep-counter;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 18px 20px;
+    background: rgba(15, 15, 18, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    margin-bottom: 10px;
+  }
+
+  .prep-list li:last-child {
+    margin-bottom: 0;
+  }
+
+  .prep-list li::before {
+    content: counter(prep-counter, decimal-leading-zero);
+    flex-shrink: 0;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 0.02em;
+    color: rgba(245, 158, 11, 0.9);
+    min-width: 32px;
+  }
+
+  .prep-list-text {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: rgba(245, 245, 244, 0.85);
+  }
+
+  /* === Enhanced Reveal — kontakt-page-scoped ===
+     Overriden das site-weite data-reveal fuer diese Seite mit einem
+     staerkeren Fade + subtle scale-in. cubic-bezier-Kurve knallt am
+     Anfang, settled sanft (matcht Section-5-Sprache). Global-Handler
+     (BaseLayout) staffelt die Elements weiterhin um 100ms. */
+  .kontakt-page [data-reveal] {
+    opacity: 0;
+    transform: translateY(32px) scale(0.97);
+    transition:
+      opacity 900ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .kontakt-page [data-reveal].is-revealed {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .kontakt-page [data-reveal],
+    .kontakt-page [data-reveal].is-revealed {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+    }
+  }
+
+  /* === Mobile === */
+  @media (max-width: 768px) {
+    .kontakt-page {
+      padding: 100px 16px 60px;
+    }
+
+    .kontakt-hero {
+      margin-bottom: 48px;
+    }
+
+    .kontakt-cal {
+      padding: 12px;
+      margin-bottom: 40px;
+    }
+
+    .cal-embed {
+      min-height: 560px;
+    }
+
+    .kontakt-alternatives {
+      margin-bottom: 48px;
+    }
+
+    .contact-card {
+      padding: 22px 18px 20px;
+    }
+
+    .prep-list li {
+      padding: 14px 16px;
+      gap: 14px;
+    }
+  }
+</style>

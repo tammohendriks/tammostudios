@@ -54,19 +54,9 @@ const phases = SECTION4.phases.slice(0, 5);
             <h3 class="phase-title">{phase.title}</h3>
             <p class="phase-body">{phase.body}</p>
             {'link' in phase && phase.link && (
-              phase.link.href.startsWith('mailto:') || phase.link.href.startsWith('/kontakt') ? (
-                <button
-                  class="phase-link"
-                  type="button"
-                  data-action="open-contact"
-                >
-                  {phase.link.label} →
-                </button>
-              ) : (
-                <a class="phase-link" href={phase.link.href}>
-                  {phase.link.label} →
-                </a>
-              )
+              <a class="phase-link" href={phase.link.href}>
+                {phase.link.label} →
+              </a>
             )}
           </article>
         ))}
