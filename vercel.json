@@ -10,6 +10,21 @@
       ],
       "destination": "https://tammostudios.de/:path*",
       "statusCode": 301
+    },
+    {
+      "source": "/handwerk",
+      "destination": "/webdesign-handwerk",
+      "statusCode": 301
+    },
+    {
+      "source": "/praxis",
+      "destination": "/webdesign-praxis",
+      "statusCode": 301
+    },
+    {
+      "source": "/gastro",
+      "destination": "/webdesign-gastronomie",
+      "statusCode": 301
     }
   ]
 }
