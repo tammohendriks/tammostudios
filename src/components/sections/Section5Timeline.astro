@@ -346,8 +346,14 @@ const phases = SECTION4.phases.slice(0, 5);
     right: 0;
     height: 1px;
     margin-top: -0.5px;
-    background: rgba(245, 158, 11, 0.9);
-    box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(245, 158, 11, 0.85) 20%,
+      rgba(245, 158, 11, 0.95) 50%,
+      rgba(245, 158, 11, 0.85) 80%,
+      transparent 100%
+    );
     z-index: 11;
     opacity: calc(1 - var(--horizon-progress) * 1.2);
   }
@@ -468,12 +474,10 @@ const phases = SECTION4.phases.slice(0, 5);
       translate3d(var(--phase-offset-x, -200px), 0, 0)
       scale(var(--phase-scale, 0.88));
     transform-origin: center center;
-    filter: blur(calc((1 - var(--phase-opacity, 0)) * 6px));
     transition:
       opacity 620ms cubic-bezier(0.22, 1, 0.36, 1),
-      transform 780ms cubic-bezier(0.22, 1, 0.36, 1),
-      filter 620ms cubic-bezier(0.22, 1, 0.36, 1);
-    will-change: opacity, transform, filter;
+      transform 780ms cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity, transform;
     pointer-events: none;
   }
 
@@ -579,7 +583,6 @@ const phases = SECTION4.phases.slice(0, 5);
     transform-origin: left center;
     transform: translateY(-50%) scaleX(var(--ink-progress, 0));
     transition: transform 120ms linear;
-    filter: drop-shadow(0 0 2px rgba(245, 158, 11, 0.35));
     pointer-events: none;
   }
 
