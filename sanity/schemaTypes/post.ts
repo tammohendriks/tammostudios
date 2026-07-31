@@ -1,4 +1,7 @@
 import { defineField, defineType } from 'sanity';
+// @ts-expect-error — plain-ESM shared constants (auch von scripts/publish-post
+// konsumiert). Vite handled den Import zur Build-Zeit.
+import { TAG_OPTIONS, CODE_LANGUAGES } from './constants.js';
 
 /**
  * Journal-Beitrag Schema.
@@ -10,19 +13,11 @@ import { defineField, defineType } from 'sanity';
  * wird: title, slug, excerpt, coverImage, publishedAt, author, tags, body
  * (Portable Text mit block/image/code/link), plus optionale SEO-Felder
  * (seoTitle, seoDescription, ogImage) im collabsible fieldset.
+ *
+ * TAG_OPTIONS + CODE_LANGUAGES kommen aus ./constants.js damit der
+ * publish-post CLI dieselben Werte kennt und Frontmatter-Tags gegen
+ * die Whitelist validieren kann (statt nur Studio-Warning nach dem Upsert).
  */
-
-const TAG_OPTIONS = [
-  'Handwerk',
-  'Praxis',
-  'Gastronomie',
-  'Preise',
-  'Prozess',
-  'Recruiting',
-  'Tools',
-  'SEO',
-  'Design',
-] as const;
 
 export const post = defineType({
   name: 'post',
@@ -164,7 +159,7 @@ export const post = defineType({
               title: 'Sprache',
               type: 'string',
               options: {
-                list: ['bash', 'ts', 'js', 'html', 'css', 'json', 'astro', 'text'].map((v) => ({
+                list: CODE_LANGUAGES.map((v: string) => ({
                   title: v,
                   value: v,
                 })),

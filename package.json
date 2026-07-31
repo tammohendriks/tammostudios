@@ -11,7 +11,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "sanity": "sanity",
-    "sanity:deploy": "sanity deploy"
+    "sanity:deploy": "sanity deploy",
+    "publish-post": "node --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/publish-post.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^6.0.2",
@@ -24,6 +25,8 @@
     "@sanity/vision": "^6.8.0",
     "@tailwindcss/vite": "^4.2.4",
     "astro": "^6.1.10",
+    "gray-matter": "^4.0.3",
+    "marked": "^18.0.7",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "sanity": "^6.8.0",
