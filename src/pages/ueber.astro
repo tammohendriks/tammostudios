@@ -214,9 +214,25 @@ const personSchema = {
     display: grid;
     grid-template-columns: minmax(0, 55fr) minmax(0, 45fr);
     gap: 60px;
-    align-items: center;
+    /* WAR: align-items:center — H1 landete relativ zum 480er-Foto in der
+       Mitte, sass visuell tiefer als auf /referenzen /preise /journal.
+       JETZT: start — H1 an gleicher Baseline wie andere Sub-Pages. Foto
+       via .hero-mark align-self:center weiter vertikal zentriert. */
+    align-items: start;
     max-width: 1200px;
     margin: 0 auto 96px;
+  }
+
+  /* Desktop: H1 padding-top matcht ref-hero/preise-hero/journal-hero →
+     H1-Baseline auf identischer Y-Position ueber alle Sub-Pages. Photo
+     bleibt via align-self:center vertikal in der Grid-Row zentriert. */
+  @media (min-width: 769px) {
+    .hero-text {
+      padding-top: 32px;
+    }
+    .hero-mark {
+      align-self: center;
+    }
   }
 
   @media (max-width: 768px) {
