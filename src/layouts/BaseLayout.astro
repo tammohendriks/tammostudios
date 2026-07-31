@@ -260,6 +260,21 @@ const jsonLdGraph = {
         document.documentElement.classList.add('splash-skip');
       } catch (e) {}
     </script>
+    <script is:inline>
+      // Journal-Theme (Dark ↔ Light) fruehzeitig setzen um FOUC zu vermeiden.
+      // WIRKT NUR auf einzelnen Beitrag-Seiten (/journal/[slug]) — nicht auf
+      // /journal Overview oder anderen Sub-Pages. Regex verlangt ein
+      // non-empty Segment nach /journal/.
+      try {
+        var isPostDetail = /^\/journal\/[^\/]+/.test(location.pathname);
+        if (
+          isPostDetail &&
+          localStorage.getItem('journal-theme') === 'light'
+        ) {
+          document.documentElement.setAttribute('data-journal-theme', 'light');
+        }
+      } catch (e) {}
+    </script>
     <slot name="head" />
   </head>
   <body class="min-h-screen bg-ts-bg text-ts-fg">

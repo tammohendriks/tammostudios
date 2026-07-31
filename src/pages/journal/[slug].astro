@@ -19,6 +19,7 @@
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SiteFooter from '../../components/SiteFooter.astro';
+import JournalThemeToggle from '../../components/JournalThemeToggle.astro';
 import {
   getJournalPosts,
   getJournalPost,
@@ -86,9 +87,10 @@ const articleSchema = {
   </Fragment>
 
   <main class="post-page">
-    <div class="post-inner">
-      <a class="post-back" href="/journal">← Zum Journal</a>
+    <a class="post-back post-back-fixed" href="/journal">← Zum Journal</a>
+    <JournalThemeToggle />
 
+    <div class="post-inner">
       <header class="post-header">
         <div class="post-meta-line">
           {post.tags?.map((tag) => (
@@ -116,14 +118,12 @@ const articleSchema = {
       <div class="post-layout">
         <div class="post-main">
           {showToc && (
-            <aside class="post-toc" aria-label="Inhaltsverzeichnis">
-              <details open>
+            <aside class="post-toc-mobile" aria-label="Inhaltsverzeichnis">
+              <details>
                 <summary>Inhalt</summary>
-                <ol>
+                <ol class="post-toc-mobile-list">
                   {toc.map((item) => (
-                    <li>
-                      <a href={`#${item.id}`}>{item.text}</a>
-                    </li>
+                    <li><a href={`#${item.id}`}>{item.text}</a></li>
                   ))}
                 </ol>
               </details>
@@ -152,7 +152,7 @@ const articleSchema = {
           </section>
         </div>
 
-        <aside class="post-sidebar" aria-label="Direkt zu">
+        <aside class="post-sidebar" aria-label="Direkt zu und Inhaltsverzeichnis">
           <div class="sidebar-sticky">
             <p class="sidebar-title">Direkt zu:</p>
             <ul class="sidebar-links">
@@ -161,6 +161,17 @@ const articleSchema = {
               <li><a href="/kontakt">Kontakt aufnehmen →</a></li>
               <li><a href="/journal">Alle Journal-Beiträge →</a></li>
             </ul>
+
+            {showToc && (
+              <>
+                <p class="sidebar-title sidebar-title-toc">Inhalt</p>
+                <ol class="sidebar-toc-list">
+                  {toc.map((item) => (
+                    <li><a href={`#${item.id}`}>{item.text}</a></li>
+                  ))}
+                </ol>
+              </>
+            )}
           </div>
         </aside>
       </div>
@@ -168,11 +179,10 @@ const articleSchema = {
 
     <section class="post-bottom-cta">
       <div class="bottom-cta-inner">
-        <h2 class="bottom-cta-h">Klingt spannend?</h2>
-        <p class="bottom-cta-p">
-          30 Minuten Erstgespräch, kostenlos, unverbindlich.
-        </p>
-        <a class="bottom-cta-btn" href="/kontakt">Erstgespräch buchen →</a>
+        <p class="bottom-cta-line">Klingt spannend?</p>
+        <a class="bottom-cta-link" href="/kontakt">
+          Jetzt Erstgespräch anfragen →
+        </a>
       </div>
     </section>
   </main>
@@ -185,18 +195,23 @@ const articleSchema = {
   // reduzierte Motion praeferiert (dann direkter Sprung).
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (!reduce) {
-    document.querySelectorAll<HTMLAnchorElement>('.post-toc a[href^="#"]').forEach((a) => {
-      a.addEventListener('click', (e) => {
-        const id = a.getAttribute('href')?.slice(1);
-        if (!id) return;
-        const target = document.getElementById(id);
-        if (target) {
-          e.preventDefault();
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          history.replaceState(null, '', `#${id}`);
-        }
+    // Smooth-scroll fuer BEIDE TOCs (Desktop-Sidebar + Mobile-oben)
+    document
+      .querySelectorAll<HTMLAnchorElement>(
+        '.sidebar-toc-list a[href^="#"], .post-toc-mobile a[href^="#"]'
+      )
+      .forEach((a) => {
+        a.addEventListener('click', (e) => {
+          const id = a.getAttribute('href')?.slice(1);
+          if (!id) return;
+          const target = document.getElementById(id);
+          if (target) {
+            e.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            history.replaceState(null, '', `#${id}`);
+          }
+        });
       });
-    });
   }
 </script>
 
@@ -219,17 +234,36 @@ const articleSchema = {
     margin: 0 auto;
   }
 
-  .post-back {
+  /* Fixed Back-Link: sitzt permanent oben-links unter der TopBar, egal
+     wie weit der User scrollt. Solid dunkles Pill matched TopBar-
+     Aesthetik in beiden Themes (Nav-Element, nicht Content). */
+  .post-back-fixed {
+    position: fixed;
+    top: 88px;
+    left: 24px;
+    z-index: 50;
     display: inline-block;
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-size: 0.85rem;
-    color: rgba(245, 245, 244, 0.6);
+    color: rgba(245, 245, 244, 0.85);
     text-decoration: none;
-    margin-bottom: 40px;
-    transition: color 200ms ease;
+    padding: 8px 14px;
+    background: rgba(5, 5, 7, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    transition: color 200ms ease, border-color 200ms ease;
   }
-  .post-back:hover {
+  .post-back-fixed:hover {
     color: rgba(245, 158, 11, 0.95);
+    border-color: rgba(245, 158, 11, 0.5);
+  }
+  @media (max-width: 768px) {
+    .post-back-fixed {
+      top: 74px;
+      left: 16px;
+      font-size: 0.8rem;
+      padding: 6px 12px;
+    }
   }
 
   /* === Header === */
@@ -268,9 +302,12 @@ const articleSchema = {
     margin: 0;
   }
 
-  /* === Cover === */
+  /* === Cover ===
+     max-width matcht .post-header (780px) damit Cover visuell unter dem
+     Header sitzt statt in die Grid-Sidebar-Zone auszulaufen. */
   .post-cover {
-    margin: 0 0 60px;
+    max-width: 780px;
+    margin: 0 auto 60px;
     border-radius: 12px;
     overflow: hidden;
     aspect-ratio: 16 / 9;
@@ -300,61 +337,108 @@ const articleSchema = {
   .post-main {
     min-width: 0;
     max-width: 720px;
+    /* margin auto auch auf Desktop → Content zentriert in seiner Grid-
+       Column (1fr). Sidebar bleibt rechts, Content bekommt Atemluft
+       links statt Kante an .post-inner max-width zu kleben. */
     margin: 0 auto;
   }
-  @media (min-width: 901px) {
-    .post-main {
-      margin: 0;
-    }
-  }
 
-  /* === TOC === */
-  .post-toc {
-    margin-bottom: 32px;
-    padding: 16px 20px;
-    border: 1px solid rgba(245, 158, 11, 0.2);
-    border-radius: 8px;
-    background: rgba(245, 158, 11, 0.04);
+  /* === Sidebar TOC (Desktop) ===
+     Table of Contents in der rechten Sidebar unter „Direkt zu:" — User
+     kann waehrend des Lesens zwischen den Kapiteln springen ohne nach
+     oben scrollen zu muessen. Sticky durch .sidebar-sticky.
+     Auf Mobile ausgeblendet, dort uebernimmt .post-toc-mobile oben. */
+  .sidebar-title-toc {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
   }
-  .post-toc summary {
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: rgba(245, 158, 11, 0.95);
-    cursor: pointer;
-    padding: 4px 0;
-    list-style: none;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .post-toc summary::before {
-    content: '▸';
-    font-size: 0.7rem;
-    transition: transform 150ms ease;
-  }
-  .post-toc[open] summary::before {
-    transform: rotate(90deg);
-  }
-  .post-toc ol {
-    list-style: none;
-    padding: 12px 0 0;
+  .sidebar-toc-list {
+    list-style: decimal;
+    padding-left: 20px;
     margin: 0;
+    color: rgba(245, 245, 244, 0.55);
   }
-  .post-toc li {
-    padding: 6px 0;
-  }
-  .post-toc a {
+  .sidebar-toc-list li {
+    padding: 4px 0;
     font-family: 'Inter', sans-serif;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+  .sidebar-toc-list a {
     color: rgba(245, 245, 244, 0.75);
     text-decoration: none;
     transition: color 180ms ease;
   }
-  .post-toc a:hover {
+  .sidebar-toc-list a:hover {
     color: rgba(245, 158, 11, 0.95);
+  }
+
+  /* === Mobile TOC ===
+     Auf Mobile stackt die Sidebar unter den Content — TOC unten ergibt
+     keinen Sinn (User will vor dem Lesen wissen was kommt). Also ein
+     collapsibles <details> oben im .post-main, nur auf Mobile sichtbar.
+     Desktop-Sidebar-TOC uebernimmt ab 901px. */
+  .post-toc-mobile {
+    display: none; /* default hidden, mobile-only */
+  }
+
+  @media (max-width: 900px) {
+    .post-toc-mobile {
+      display: block;
+      margin: 0 0 32px;
+      padding: 14px 18px;
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      border-radius: 8px;
+      background: rgba(245, 158, 11, 0.05);
+    }
+    .post-toc-mobile summary {
+      font-family: 'Neue Montreal', 'Inter', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(245, 158, 11, 0.95);
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 0;
+    }
+    .post-toc-mobile summary::-webkit-details-marker {
+      display: none;
+    }
+    .post-toc-mobile summary::before {
+      content: '▸';
+      font-size: 0.7rem;
+      transition: transform 150ms ease;
+      color: rgba(245, 158, 11, 0.7);
+    }
+    .post-toc-mobile[open] summary::before {
+      transform: rotate(90deg);
+    }
+    .post-toc-mobile-list {
+      list-style: decimal;
+      padding: 12px 0 4px 22px;
+      margin: 0;
+      color: rgba(245, 245, 244, 0.55);
+    }
+    .post-toc-mobile-list li {
+      padding: 5px 0;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.92rem;
+      line-height: 1.4;
+    }
+    .post-toc-mobile-list a {
+      color: rgba(245, 245, 244, 0.85);
+      text-decoration: none;
+    }
+    /* Sidebar-TOC auf Mobile ausblenden — nur der Mobile-Block oben */
+    .sidebar-title-toc,
+    .sidebar-toc-list {
+      display: none;
+    }
   }
 
   /* === Body: Serif Reading Font === */
@@ -524,51 +608,46 @@ const articleSchema = {
     color: rgba(245, 158, 11, 0.95);
   }
 
-  /* === Bottom CTA === */
+  /* === Bottom CTA ===
+     Editorial-Style inline-Link statt Amber-Pill-Button — matcht
+     Preisrechner-Bottom-CTA. Ruhiger, textueller Abschluss statt
+     visuell dominanter Call-to-Action Balken. */
   .post-bottom-cta {
-    padding: 80px 40px;
+    padding: 80px 40px 60px;
     text-align: center;
-    background: linear-gradient(180deg, transparent 0%, rgba(245, 158, 11, 0.05) 100%);
     border-top: 1px solid rgba(255, 255, 255, 0.05);
     margin-top: 40px;
   }
   @media (max-width: 768px) {
     .post-bottom-cta {
-      padding: 60px 20px;
+      padding: 60px 20px 40px;
     }
   }
   .bottom-cta-inner {
     max-width: 640px;
     margin: 0 auto;
   }
-  .bottom-cta-h {
+  .bottom-cta-line {
     font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-size: clamp(1.6rem, 4vw, 2.2rem);
-    font-weight: 700;
-    color: #fafaf9;
-    margin: 0 0 12px;
+    font-size: clamp(1.2rem, 3vw, 1.5rem);
+    font-weight: 500;
+    color: rgba(245, 245, 244, 0.9);
+    margin: 0 0 20px;
+    letter-spacing: -0.005em;
   }
-  .bottom-cta-p {
-    font-family: 'Inter', sans-serif;
-    font-size: 1rem;
-    color: rgba(245, 245, 244, 0.75);
-    margin: 0 0 28px;
-  }
-  .bottom-cta-btn {
+  .bottom-cta-link {
     display: inline-block;
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-size: 1rem;
-    font-weight: 600;
-    padding: 14px 32px;
-    background: rgba(245, 158, 11, 0.95);
-    color: #050507;
+    color: rgba(245, 158, 11, 0.95);
     text-decoration: none;
-    border-radius: 999px;
-    transition: transform 180ms ease, background 180ms ease;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.4);
+    padding-bottom: 2px;
+    transition: color 200ms ease, border-color 200ms ease;
   }
-  .bottom-cta-btn:hover {
-    background: rgba(252, 211, 77, 1);
-    transform: translateY(-1px);
+  .bottom-cta-link:hover {
+    color: rgba(252, 211, 77, 1);
+    border-color: rgba(252, 211, 77, 1);
   }
 
   /* === Shared Tag === */
@@ -583,5 +662,92 @@ const articleSchema = {
     padding: 4px 10px;
     border: 1px solid rgba(245, 158, 11, 0.4);
     border-radius: 999px;
+  }
+
+  /* =====================================================================
+     === Light-Theme (White Mode) Overrides ==============================
+     ===================================================================== */
+
+  /* Aktiviert wenn User in JournalThemeToggle auf Light umschaltet.
+     data-journal-theme wird von BaseLayout's inline-Script auf <html>
+     gesetzt (aus localStorage) BEVOR die Page rendert → kein Flash.
+     Amber-Akzente bleiben identisch, nur BG + Text invertiert.
+     Nav-Elements (Back-Link, Toggle) bleiben dunkle Pills — konsistent
+     mit TopBar-Aesthetik. */
+
+  html[data-journal-theme='light'] .post-page {
+    background: #f8f4ea;
+    color: rgba(26, 26, 28, 0.88);
+  }
+
+  html[data-journal-theme='light'] .post-h1,
+  html[data-journal-theme='light'] .post-body :global(h2),
+  html[data-journal-theme='light'] .post-body :global(h3) {
+    color: #1a1a1c;
+  }
+
+  html[data-journal-theme='light'] .post-lede {
+    color: rgba(26, 26, 28, 0.75);
+  }
+
+  html[data-journal-theme='light'] .post-date {
+    color: rgba(26, 26, 28, 0.55);
+  }
+
+  html[data-journal-theme='light'] .post-body {
+    color: rgba(26, 26, 28, 0.88);
+  }
+
+  html[data-journal-theme='light'] .post-body :global(.inline-code) {
+    background: rgba(245, 158, 11, 0.14);
+    color: #92400e;
+  }
+
+  html[data-journal-theme='light'] .post-body :global(.post-code) {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.08);
+    color: rgba(26, 26, 28, 0.9);
+  }
+
+  html[data-journal-theme='light'] .post-body :global(.post-quote) {
+    color: rgba(26, 26, 28, 0.75);
+  }
+
+  html[data-journal-theme='light'] .sidebar-title-toc {
+    border-top-color: rgba(0, 0, 0, 0.08);
+  }
+  html[data-journal-theme='light'] .sidebar-toc-list {
+    color: rgba(26, 26, 28, 0.5);
+  }
+  html[data-journal-theme='light'] .sidebar-toc-list a {
+    color: rgba(26, 26, 28, 0.75);
+  }
+  html[data-journal-theme='light'] .post-toc-mobile-list {
+    color: rgba(26, 26, 28, 0.5);
+  }
+  html[data-journal-theme='light'] .post-toc-mobile-list a {
+    color: rgba(26, 26, 28, 0.85);
+  }
+
+  html[data-journal-theme='light'] .post-author,
+  html[data-journal-theme='light'] .sidebar-sticky {
+    background: rgba(255, 255, 255, 0.7);
+    border-color: rgba(0, 0, 0, 0.08);
+  }
+  html[data-journal-theme='light'] .post-author-text {
+    color: rgba(26, 26, 28, 0.75);
+  }
+  html[data-journal-theme='light'] .sidebar-links li {
+    border-color: rgba(0, 0, 0, 0.08);
+  }
+  html[data-journal-theme='light'] .sidebar-links a {
+    color: rgba(26, 26, 28, 0.85);
+  }
+
+  html[data-journal-theme='light'] .post-bottom-cta {
+    border-top-color: rgba(0, 0, 0, 0.08);
+  }
+  html[data-journal-theme='light'] .bottom-cta-line {
+    color: rgba(26, 26, 28, 0.88);
   }
 </style>
