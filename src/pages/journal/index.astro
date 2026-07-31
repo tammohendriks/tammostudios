@@ -1,0 +1,456 @@
+---
+/**
+ * /journal — Uebersichts-Seite.
+ *
+ * Layout:
+ *   Centered Hero (Eyebrow, Headline, Subheadline)
+ *   Filter-Chips (client-JS, kein Reload)
+ *   Featured Post (neuester, 2-Col Cover+Text)
+ *   Grid (3 Cols Desktop, 1 Col Mobile)
+ *
+ * Content aus Sanity via getJournalPosts. Bei leerem Dataset zeigen wir
+ * einen Empty-State ("Bald mehr hier" statt Placeholder-Karten).
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SubPageBackground from '../../components/SubPageBackground.astro';
+import JournalAtmosphere from '../../components/JournalAtmosphere.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import { getJournalPosts, urlFor, formatJournalDate } from '../../lib/sanity';
+
+const posts = await getJournalPosts();
+const [featured, ...rest] = posts;
+
+const TAG_FILTERS = [
+  'Alle',
+  'Handwerk',
+  'Praxis',
+  'Gastronomie',
+  'Prozess',
+  'Preise',
+  'Recruiting',
+  'Tools',
+  'SEO',
+  'Design',
+];
+---
+
+<BaseLayout
+  pageTitle="Journal"
+  description="Gedanken über Webdesign, Preise, Prozess. Tammo Studios Journal aus Bremen."
+>
+  <Fragment slot="head">
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="Tammo Studios Journal"
+      href="/journal/rss.xml"
+    />
+  </Fragment>
+
+  <main class="journal-page">
+    <SubPageBackground />
+    <JournalAtmosphere />
+
+    <header class="journal-hero">
+      <h1 class="subpage-hero-title">Journal.</h1>
+      <p class="subpage-hero-subtitle text-lines">
+        {"Gedanken über Webdesign, Preise, Prozess.\nNur wenn's was zu sagen gibt."}
+      </p>
+    </header>
+
+    {posts.length > 0 && (
+      <nav class="journal-filters" aria-label="Beiträge nach Kategorie filtern">
+        <ul class="filter-chips">
+          {TAG_FILTERS.map((tag) => (
+            <li>
+              <button
+                type="button"
+                class:list={['filter-chip', tag === 'Alle' && 'is-active']}
+                data-filter={tag}
+              >
+                {tag}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    )}
+
+    {posts.length === 0 ? (
+      <section class="journal-empty">
+        <p>Noch keine Beiträge. Bald mehr hier.</p>
+      </section>
+    ) : (
+      <>
+        {featured && (
+          <article
+            class="featured-post"
+            data-tags={(featured.tags || []).join(',')}
+          >
+            <a class="featured-cover" href={`/journal/${featured.slug}`} aria-label={`Beitrag lesen: ${featured.title}`}>
+              <img
+                src={urlFor(featured.coverImage).width(1200).height(800).fit('crop').auto('format').url()}
+                alt={featured.coverImage.alt || featured.title}
+                loading="eager"
+                width="1200"
+                height="800"
+              />
+            </a>
+            <div class="featured-meta">
+              {featured.tags && featured.tags[0] && (
+                <span class="post-tag">{featured.tags[0]}</span>
+              )}
+              <h2 class="featured-title">
+                <a href={`/journal/${featured.slug}`}>{featured.title}</a>
+              </h2>
+              <p class="featured-excerpt">{featured.excerpt}</p>
+              <a class="featured-cta" href={`/journal/${featured.slug}`}>
+                Weiterlesen →
+              </a>
+            </div>
+          </article>
+        )}
+
+        {rest.length > 0 && (
+          <section class="journal-grid" aria-label="Weitere Beiträge">
+            {rest.map((post) => (
+              <article
+                class="post-card"
+                data-tags={(post.tags || []).join(',')}
+              >
+                <a class="post-card-link" href={`/journal/${post.slug}`} aria-label={`Beitrag lesen: ${post.title}`}>
+                  <div class="post-card-cover">
+                    <img
+                      src={urlFor(post.coverImage).width(720).height(480).fit('crop').auto('format').url()}
+                      alt={post.coverImage.alt || post.title}
+                      loading="lazy"
+                      width="720"
+                      height="480"
+                    />
+                  </div>
+                  <div class="post-card-body">
+                    {post.tags && post.tags[0] && (
+                      <span class="post-tag">{post.tags[0]}</span>
+                    )}
+                    <h3 class="post-card-title">{post.title}</h3>
+                    <p class="post-card-excerpt">{post.excerpt}</p>
+                    <time class="post-card-date" datetime={post.publishedAt}>
+                      {formatJournalDate(post.publishedAt)}
+                    </time>
+                  </div>
+                </a>
+              </article>
+            ))}
+          </section>
+        )}
+      </>
+    )}
+  </main>
+
+  <SiteFooter />
+</BaseLayout>
+
+<script>
+  // Client-Filter — filtert Cards live nach data-tags. Kein Reload, kein
+  // History-Push (Deep-Link koennen wir spaeter nachziehen falls gebraucht).
+  const chips = document.querySelectorAll<HTMLButtonElement>('.filter-chip');
+  const cards = document.querySelectorAll<HTMLElement>('[data-tags]');
+
+  const applyFilter = (tag: string) => {
+    cards.forEach((card) => {
+      const tags = (card.dataset.tags || '').split(',').filter(Boolean);
+      const match = tag === 'Alle' || tags.includes(tag);
+      card.style.display = match ? '' : 'none';
+    });
+  };
+
+  chips.forEach((chip) => {
+    chip.addEventListener('click', () => {
+      chips.forEach((c) => c.classList.remove('is-active'));
+      chip.classList.add('is-active');
+      applyFilter(chip.dataset.filter || 'Alle');
+    });
+  });
+</script>
+
+<style>
+  .journal-page {
+    position: relative;
+    background: #050507;
+    color: #f5f5f4;
+    padding: 140px 40px 80px;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  @media (max-width: 768px) {
+    .journal-page {
+      padding: 100px 20px 60px;
+    }
+  }
+
+  /* === Hero ===
+     Nutzt die geteilten .subpage-hero-title + .subpage-hero-subtitle
+     Klassen aus global.css (dieselben wie /referenzen, /ueber, /preise) —
+     einheitliche H1-Groesse (clamp 48–96px) und Subtitle-Ton ueber alle
+     Sub-Pages. Keine eigenen typografischen Overrides hier. */
+  .journal-hero {
+    position: relative;
+    z-index: 2;
+    max-width: 900px;
+    margin: 0 auto 60px;
+    text-align: center;
+    /* padding-top:32px matcht /referenzen und /preise — dadurch landet
+       die H1-Baseline auf derselben vertikalen Hoehe wie bei den anderen
+       Sub-Pages. */
+    padding-top: 32px;
+  }
+
+  /* === Filter-Chips === */
+  .journal-filters {
+    position: relative;
+    z-index: 2;
+    max-width: 1200px;
+    margin: 0 auto 60px;
+  }
+  .filter-chips {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+  .filter-chip {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    background: transparent;
+    color: rgba(245, 158, 11, 0.95);
+    cursor: pointer;
+    transition: background 180ms ease, color 180ms ease, border-color 180ms ease;
+  }
+  .filter-chip:hover {
+    background: rgba(245, 158, 11, 0.12);
+  }
+  .filter-chip.is-active {
+    background: rgba(245, 158, 11, 0.95);
+    color: #050507;
+    border-color: rgba(245, 158, 11, 0.95);
+  }
+
+  @media (max-width: 768px) {
+    .journal-filters {
+      margin-left: -20px;
+      margin-right: -20px;
+      padding: 0 20px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .filter-chips {
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      padding-bottom: 4px;
+    }
+    .filter-chip {
+      flex-shrink: 0;
+    }
+  }
+
+  /* === Featured Post === */
+  .featured-post {
+    position: relative;
+    z-index: 2;
+    max-width: 1200px;
+    margin: 0 auto 80px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: center;
+  }
+  @media (max-width: 900px) {
+    .featured-post {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+  }
+  .featured-cover {
+    display: block;
+    border-radius: 12px;
+    overflow: hidden;
+    aspect-ratio: 3 / 2;
+    background: #0a0a0c;
+  }
+  .featured-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 400ms ease;
+  }
+  .featured-cover:hover img {
+    transform: scale(1.02);
+  }
+  .featured-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .featured-title {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0;
+  }
+  .featured-title a {
+    color: #fafaf9;
+    text-decoration: none;
+    transition: color 200ms ease;
+  }
+  .featured-title a:hover {
+    color: rgba(245, 158, 11, 0.95);
+  }
+  .featured-excerpt {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.75);
+    margin: 0;
+  }
+  .featured-cta {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: rgba(245, 158, 11, 0.95);
+    text-decoration: none;
+    margin-top: 8px;
+    transition: color 200ms ease;
+    align-self: flex-start;
+  }
+  .featured-cta:hover {
+    color: rgba(252, 211, 77, 1);
+  }
+
+  /* === Grid === */
+  .journal-grid {
+    position: relative;
+    z-index: 2;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+  @media (max-width: 900px) {
+    .journal-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+  }
+  @media (max-width: 640px) {
+    .journal-grid {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+  }
+
+  .post-card {
+    background: rgba(15, 15, 18, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 200ms ease, border-color 200ms ease;
+  }
+  .post-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(245, 158, 11, 0.4);
+  }
+  .post-card-link {
+    display: flex;
+    flex-direction: column;
+    color: inherit;
+    text-decoration: none;
+    height: 100%;
+  }
+  .post-card-cover {
+    aspect-ratio: 3 / 2;
+    background: #0a0a0c;
+    overflow: hidden;
+  }
+  .post-card-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 400ms ease;
+  }
+  .post-card:hover .post-card-cover img {
+    transform: scale(1.03);
+  }
+  .post-card-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+  }
+  .post-card-title {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 1.3;
+    margin: 0;
+    color: #fafaf9;
+  }
+  .post-card-excerpt {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: rgba(245, 245, 244, 0.7);
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .post-card-date {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.78rem;
+    color: rgba(245, 245, 244, 0.5);
+    margin-top: auto;
+  }
+
+  /* === Tag Badge === */
+  .post-tag {
+    display: inline-block;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(245, 158, 11, 0.95);
+    padding: 4px 10px;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    border-radius: 999px;
+    align-self: flex-start;
+  }
+
+  /* === Empty State === */
+  .journal-empty {
+    position: relative;
+    z-index: 2;
+    max-width: 640px;
+    margin: 80px auto;
+    text-align: center;
+    color: rgba(245, 245, 244, 0.6);
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+  }
+</style>
