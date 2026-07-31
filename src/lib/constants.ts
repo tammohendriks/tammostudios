@@ -173,6 +173,7 @@ export const SECTION5 = {
 export const NAV_ITEMS = [
   { label: 'Über', href: '/ueber' },
   { label: 'Referenzen', href: '/referenzen' },
+  { label: 'Journal', href: '/journal' },
   { label: 'Studio', href: '/studio' },
   {
     label: 'Preise',

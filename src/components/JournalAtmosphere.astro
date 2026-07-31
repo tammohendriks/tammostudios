@@ -1,0 +1,89 @@
+---
+/**
+ * JournalAtmosphere — atmosphaerischer Zusatz-Layer speziell fuer /journal.
+ *
+ * Vier duenne amber-Hairlines die langsam von links nach rechts driften.
+ * Suggeriert Schreib-Bewegung wie eine Feder ueber Papier — anders als
+ * SubPageBackground's upward-particle-drift, dadurch orthogonale Achse
+ * fuer visuelle Ergaenzung, nicht Duplikat.
+ *
+ * Layer laueft ON TOP von SubPageBackground (nicht als Ersatz). Nur
+ * transform + opacity animation → composite-only, keine Paint-Kosten.
+ *
+ * prefers-reduced-motion: reduce → keine Animation, will-change auto,
+ * niedrige Rest-Opacity bleibt sichtbar (editorial Rest-Praesenz).
+ */
+const LINES = Array.from({ length: 4 }, (_, i) => ({
+  top: 22 + i * 19, // 22, 41, 60, 79 %
+  duration: 90 + i * 22, // 90..156s
+  delay: -i * 24, // gestaffelter Start damit alle nicht gleichzeitig einfaden
+  opacity: 0.06 + (i % 2) * 0.04, // 0.06 / 0.10 alternierend
+}));
+---
+
+<div class="journal-atmosphere" aria-hidden="true">
+  {LINES.map((line) => (
+    <span
+      class="journal-line"
+      style={`top:${line.top}%; animation-duration:${line.duration}s; animation-delay:${line.delay}s; --line-opacity:${line.opacity};`}
+    ></span>
+  ))}
+</div>
+
+<style>
+  .journal-atmosphere {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  .journal-line {
+    position: absolute;
+    left: 0;
+    width: 42vw;
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      transparent 0%,
+      rgba(245, 158, 11, var(--line-opacity)) 20%,
+      rgba(245, 158, 11, var(--line-opacity)) 80%,
+      transparent 100%
+    );
+    transform: translateX(-42vw);
+    animation-name: line-write;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    will-change: transform;
+  }
+
+  @keyframes line-write {
+    0%   { transform: translateX(-42vw); opacity: 0; }
+    12%  { opacity: 1; }
+    88%  { opacity: 1; }
+    100% { transform: translateX(142vw); opacity: 0; }
+  }
+
+  @media (max-width: 768px) {
+    .journal-line {
+      width: 60vw;
+      transform: translateX(-60vw);
+    }
+    @keyframes line-write {
+      0%   { transform: translateX(-60vw); opacity: 0; }
+      12%  { opacity: 1; }
+      88%  { opacity: 1; }
+      100% { transform: translateX(160vw); opacity: 0; }
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .journal-line {
+      animation: none;
+      transform: translateX(30vw);
+      opacity: 0.5;
+      will-change: auto;
+    }
+  }
+</style>

@@ -15,8 +15,10 @@
   },
   "dependencies": {
     "@astrojs/react": "^6.0.2",
+    "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.2",
     "@fontsource/inter": "^5.2.8",
+    "@portabletext/to-html": "^5.0.2",
     "@sanity/client": "^7.26.0",
     "@sanity/image-url": "^2.1.1",
     "@sanity/vision": "^6.8.0",

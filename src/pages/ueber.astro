@@ -79,19 +79,19 @@ const personSchema = {
         <p>
           Angefangen hat alles mit einer Ausbildung zum Kaufmann
           für Digitalisierungsmanagement bei einer
-          Sparkassen-Tochter. Danach bin ich dort als Online
-          Marketing Manager geblieben. Das mache ich bis heute.
-          Nebenbei habe ich aber gemerkt, dass mir etwas fehlt:
-          das Programmieren. Genau das, was mich am Anfang am
+          Sparkassen-Tochter. Danach bin ich dort ein Jahr lang
+          als Online Marketing Manager geblieben. Nebenbei habe
+          ich aber gemerkt, dass mir etwas fehlt: das
+          Programmieren. Genau das, was mich am Anfang am
           meisten gepackt hat.
         </p>
         <p>
-          Im Mai 2026 habe ich mich entschieden, das nicht länger
-          nur nebenbei zu machen. Tammo Studios ist mein Weg
-          zurück zum Code. Und zu einer Arbeitsweise, die zu
-          meinem Leben passt: Ab August reise ich für längere
-          Zeit durch Asien. Videos kann man schlecht aus 9.000
-          Kilometern Entfernung drehen. Websites schon.
+          Im Mai 2026 habe ich Tammo Studios gegründet — erst
+          nebenbei. Inzwischen habe ich meinen Job aufgegeben und
+          arbeite vollständig selbständig. Der Sprung ins Kalte,
+          mich vollständig durchzusetzen. Ab August reise ich für
+          längere Zeit durch Asien. Videos kann man schlecht aus
+          9.000 Kilometern Entfernung drehen. Websites schon.
         </p>
       </section>
 
@@ -214,9 +214,25 @@ const personSchema = {
     display: grid;
     grid-template-columns: minmax(0, 55fr) minmax(0, 45fr);
     gap: 60px;
-    align-items: center;
+    /* WAR: align-items:center — H1 landete relativ zum 480er-Foto in der
+       Mitte, sass visuell tiefer als auf /referenzen /preise /journal.
+       JETZT: start — H1 an gleicher Baseline wie andere Sub-Pages. Foto
+       via .hero-mark align-self:center weiter vertikal zentriert. */
+    align-items: start;
     max-width: 1200px;
     margin: 0 auto 96px;
+  }
+
+  /* Desktop: H1 padding-top matcht ref-hero/preise-hero/journal-hero →
+     H1-Baseline auf identischer Y-Position ueber alle Sub-Pages. Photo
+     bleibt via align-self:center vertikal in der Grid-Row zentriert. */
+  @media (min-width: 769px) {
+    .hero-text {
+      padding-top: 32px;
+    }
+    .hero-mark {
+      align-self: center;
+    }
   }
 
   @media (max-width: 768px) {
