@@ -554,6 +554,14 @@ const dots = [
       // Nur so viele Slots updaten wie wir Configs haben.
       const N = Math.min(slots.length, slotsConfig.length);
 
+      // Change-Detection Cache fuer active-State per Slot. Ohne diesen
+      // Cache liefen pro Scroll-Frame 3x setAttribute + 1x style-write
+      // pro interaktivem Slot, auch wenn sich der State nicht geaendert
+      // hat. setAttribute invalidiert den A11y-Tree und ist auf iOS
+      // Safari (VoiceOver) besonders teuer. Mit Cache: State-Uebergaenge
+      // toggeln 1-2x pro ganze Section-Scroll statt ~20+ Frames.
+      const lastActive: boolean[] = new Array(N).fill(false);
+
       function update(): void {
         if (!section) return;
 
@@ -575,14 +583,17 @@ const dots = [
           // A11y + Anti-Ghost-Click Toggle: Slot ist erst dann
           // fokussierbar/klickbar wenn > 50% revealed. Nur auf
           // interaktive Slots (Cards + CTA) — Header hat kein
-          // tabindex und ist nicht fokussierbar. Vermeidet
-          // WCAG-2.4.7-Fail (unsichtbare Focus-Outline) und
-          // Modal-Trigger auf unsichtbare Cards.
+          // tabindex und ist nicht fokussierbar. Change-Detection:
+          // setAttribute + style-write nur wenn Active-Boolean
+          // tatsaechlich flipped.
           if (slot.hasAttribute('tabindex')) {
             const active = p > 0.5;
-            slot.style.pointerEvents = active ? 'auto' : 'none';
-            slot.setAttribute('aria-hidden', active ? 'false' : 'true');
-            slot.setAttribute('tabindex', active ? '0' : '-1');
+            if (active !== lastActive[i]) {
+              lastActive[i] = active;
+              slot.style.pointerEvents = active ? 'auto' : 'none';
+              slot.setAttribute('aria-hidden', active ? 'false' : 'true');
+              slot.setAttribute('tabindex', active ? '0' : '-1');
+            }
           }
         }
       }
