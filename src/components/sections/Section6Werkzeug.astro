@@ -128,10 +128,7 @@
             </g>
             <g class="wz-side-item is-active" data-side-idx="2">
               <rect x="20" y="166" width="150" height="26" fill="transparent" pointer-events="all" style="cursor:pointer" />
-              <text class="wz-side-label is-active" style="--i:2" x="42" y="182" data-role="active-label">
-                <tspan class="wz-arrow" x="30" dy="0">▶</tspan>
-                <tspan x="42" dy="0">Speisekarte</tspan>
-              </text>
+              <text class="wz-side-label is-active" style="--i:2" x="42" y="182" data-role="active-label">Speisekarte</text>
             </g>
             <g class="wz-side-item" data-side-idx="3">
               <rect x="20" y="198" width="150" height="26" fill="transparent" pointer-events="all" style="cursor:pointer" />
@@ -399,6 +396,12 @@
       }, charDelay);
     };
 
+    // fadeSwap animiert eine kurze opacity-Absenkung waehrend der
+     // Content-Mutation, dann Rueck-Fade auf CSS-controlled opacity.
+     // WICHTIG: nach dem Fade-in inline opacity entfernen, damit die
+     // CSS-Variable (opacity: var(--p-*)) wieder greift. Sonst bleiben
+     // Elemente sichtbar wenn User zurueckscrollt und p wieder sinkt
+     // (weil inline opacity:1 den CSS-var override permanent macht).
     const fadeSwap = (el: Element | null, mutate: () => void) => {
       if (!el) return;
       const style = (el as HTMLElement | SVGElement).style;
@@ -407,6 +410,12 @@
       window.setTimeout(() => {
         mutate();
         style.opacity = '1';
+        // Nach Rueck-Fade: inline opacity entfernen → CSS-var uebernimmt
+        // wieder die Kontrolle (scroll-driven visibility)
+        window.setTimeout(() => {
+          style.opacity = '';
+          style.transition = '';
+        }, 240);
       }, 210);
     };
 
@@ -422,11 +431,10 @@
       textEl.classList.toggle('is-active', isActive);
       if (isActive) {
         textEl.setAttribute('data-role', 'active-label');
-        textEl.innerHTML = `<tspan class="wz-arrow" x="30" dy="0">▶</tspan><tspan x="42" dy="0">${tabLabel}</tspan>`;
       } else {
         textEl.removeAttribute('data-role');
-        textEl.textContent = tabLabel;
       }
+      textEl.textContent = tabLabel;
     };
 
     // Trace-Line update: setzt d-Attribute basierend auf aktuellem
@@ -846,11 +854,6 @@
 
   .wz-side-item:hover .wz-side-label:not(.is-active) {
     fill: var(--amber-deep);
-  }
-
-  .wz-arrow {
-    fill: var(--amber);
-    font-size: 9px;
   }
 
   .wz-content-h2 {
