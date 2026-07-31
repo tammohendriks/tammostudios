@@ -4,6 +4,7 @@ import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 
 import sitemap from '@astrojs/sitemap';
+import react from '@astrojs/react';
 
 // https://astro.build/config
 export default defineConfig({
@@ -33,7 +34,13 @@ export default defineConfig({
     sitemap({
       // 404 nicht in die Sitemap aufnehmen — Google soll keine Fehler-
       // Seite indexieren.
-      filter: (page) => !page.endsWith('/404'),
+      filter: (page) => !page.endsWith('/404') && !page.includes('/admin'),
+    }),
+    // React-Integration ausschliesslich fuer /admin (Sanity Studio).
+     // Alles andere bleibt reines Astro — Landing/Sub-Pages ziehen KEIN
+     // React ins Bundle.
+    react({
+      include: ['**/SanityStudio.*', '**/pages/admin/**'],
     }),
   ],
 });
