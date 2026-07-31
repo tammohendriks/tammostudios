@@ -301,6 +301,10 @@
       ticking = false;
       if (!outer) return;
       const rect = outer.getBoundingClientRect();
+      // Off-screen early-return: spart 40+ setProperty-Writes pro Frame
+      // waehrend User auf anderen Sections scrollt. Selbes Pattern wie
+      // Section3Referenzen.astro:572.
+      if (rect.bottom < 0 || rect.top > window.innerHeight) return;
       const range = rect.height - window.innerHeight;
       if (range <= 0) return;
       const p = clamp(-rect.top / range);
@@ -558,7 +562,22 @@
     if ('IntersectionObserver' in window) {
       const io = new IntersectionObserver(
         ([entry]) => {
-          section.classList.toggle('in-view', entry.isIntersecting);
+          const inView = entry.isIntersecting;
+          section.classList.toggle('in-view', inView);
+          // Cycle- & Typing-Timer stoppen wenn Section komplett aus dem
+          // Viewport ist. update() startet den cycleTimer wieder wenn
+          // Section erneut in Sicht kommt (p>=0.90). Verhindert Battery-
+          // Drain durch 6s-Interval + 55ms typing burst nach S6.
+          if (!inView) {
+            if (cycleTimer !== undefined) {
+              window.clearInterval(cycleTimer);
+              cycleTimer = undefined;
+            }
+            if (typingTimer !== undefined) {
+              window.clearInterval(typingTimer);
+              typingTimer = undefined;
+            }
+          }
         },
         { rootMargin: '200px' }
       );

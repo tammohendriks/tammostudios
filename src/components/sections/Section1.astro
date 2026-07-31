@@ -44,13 +44,18 @@ const particles = Array.from({ length: PARTICLE_COUNT }, () => {
   </div>
 
   <h1 class="logo-wrap">
-    <img
-      src="/logos/logo-full.png"
-      alt={SITE.name}
-      class="logo-img"
-      draggable="false"
-      fetchpriority="high"
-    />
+    <picture>
+      <source srcset="/logos/logo-full.webp" type="image/webp" />
+      <img
+        src="/logos/logo-full.png"
+        alt={SITE.name}
+        class="logo-img"
+        draggable="false"
+        fetchpriority="high"
+        width="2000"
+        height="2000"
+      />
+    </picture>
   </h1>
   <p class="hero-service">{SITE_LABELS.serviceLine}</p>
   <p class="intro text-lines">{SITE_LABELS.introText}</p>
