@@ -278,6 +278,10 @@ import AnimatedWordmark from '../AnimatedWordmark.astro';
     }
     .aurora-layer {
       animation: none !important;
+      /* will-change:transform,opacity bleibt sonst allokiert — iOS
+         haelt Compositor-Layers fuer 3 aurora-layers + spotlight fuer
+         nichts (iPad-LPM Fall — mobile ist Section 2 sowieso display:none). */
+      will-change: auto;
     }
     .ambient-aurora {
       --aurora-intensity: 0.5 !important;
@@ -286,6 +290,7 @@ import AnimatedWordmark from '../AnimatedWordmark.astro';
       --spotlight-offset: -22vh !important;
       --spotlight-intensity: 1 !important;
       transition: none !important;
+      will-change: auto;
     }
   }
 </style>

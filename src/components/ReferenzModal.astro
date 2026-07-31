@@ -116,6 +116,18 @@
     cursor: pointer;
   }
 
+  /* Reduced-Motion (iOS LPM): 100vw x 100vh backdrop-filter re-sample
+     beim Modal-Open stallt den Open-Transition um 100-200ms auf iPhone
+     LPM. Solid Background mit hoeherer Alpha ersetzt den Blur-Look.
+     Normal-Mobile behaelt Frosted-Glass. */
+  @media (prefers-reduced-motion: reduce) {
+    .ref-modal-backdrop {
+      background: rgba(0, 0, 0, 0.94);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+  }
+
   .ref-modal-content {
     position: relative;
     width: 100%;

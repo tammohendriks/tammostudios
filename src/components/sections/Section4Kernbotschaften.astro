@@ -392,8 +392,17 @@ import { SECTION3 } from '../../lib/constants';
       resizeTimer = window.setTimeout(update, 120);
     }
 
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onResize, { passive: true });
-    update();
+    // Unter reduced-motion (iOS LPM ab 15.4) NICHT scrollen/resizen —
+    // update() pinnt einmalig header + item-progress auf 1 und fertig.
+    // Selbes Pattern wie Section3Referenzen.astro:523 und
+    // Section5Timeline.astro:289. Vorher lief der Scroll-Handler auf jedem
+    // Frame und schrieb idempotente End-Werte, was iOS LPM lahmgelegt hat.
+    if (reduceMotion) {
+      update();
+    } else {
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onResize, { passive: true });
+      update();
+    }
   }
 </script>

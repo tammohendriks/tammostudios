@@ -200,6 +200,9 @@ const particles = Array.from({ length: PARTICLE_COUNT }, () => ({
     .subpage-bg-glow,
     .subpage-bg-particle {
       animation: none !important;
+      /* will-change bleibt sonst deklariert obwohl Animation weg — iOS
+         allokiert Compositor-Layers fuer nichts. Auto gibt sie frei. */
+      will-change: auto;
     }
     .subpage-bg-glow {
       opacity: 0.7;

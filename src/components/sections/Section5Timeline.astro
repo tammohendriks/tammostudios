@@ -655,5 +655,12 @@ const phases = SECTION4.phases.slice(0, 5);
     .fahrplan-dot {
       transition: none !important;
     }
+    /* will-change bleibt sonst deklariert auf Layers deren Animation weg
+       ist — iOS haelt trotzdem eine dedicated GraphicsLayer allokiert.
+       auto gibt sie frei (Memory-Pressure runter unter LPM). */
+    .horizon-top,
+    .horizon-bottom {
+      will-change: auto;
+    }
   }
 </style>
