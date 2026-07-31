@@ -371,7 +371,10 @@ function itemIsActive(item: NavItem): boolean {
   }
 
   /* Dropdown-Panel — sitzt unter dem parent Nav-Item, matcht die
-     Glass-Pill-Aesthetik der TopBar (dark blur + subtle border). */
+     Glass-Pill-Aesthetik der TopBar (dark subtle border). Kein
+     backdrop-filter: Panel ist mit 0.98 opacity fast opak, Blur
+     ist visuell nicht wahrnehmbar aber allokiert einen Filter-
+     Backing-Store auch bei visibility:hidden. */
   .nav-dropdown {
     position: absolute;
     top: 100%;
@@ -379,9 +382,7 @@ function itemIsActive(item: NavItem): boolean {
     min-width: 200px;
     margin-top: 12px;
     padding: 8px;
-    background: rgba(10, 10, 12, 0.95);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    background: rgba(10, 10, 12, 0.98);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 12px;
     box-shadow:
@@ -546,7 +547,10 @@ function itemIsActive(item: NavItem): boolean {
   }
 
   /* Mobile breakpoint: kompaktere Pills, Nav versteckt zugunsten
-     Hamburger der seinerseits als Pill rendert. */
+     Hamburger der seinerseits als Pill rendert. Kein backdrop-filter
+     auf mobile — fixed TopBar mit Blur ist der iOS Safari GPU-Killer
+     #1 (Re-Blur auf jedem Scroll-Frame). Opakerer Background (0.88
+     statt 0.55) kompensiert visuell. */
   @media (max-width: 767px) {
     .topbar {
       padding: 16px;
@@ -558,15 +562,16 @@ function itemIsActive(item: NavItem): boolean {
       padding: 8px 14px;
       font-size: 0.65rem;
       letter-spacing: 0.18em;
+      background: rgba(5, 5, 7, 0.88);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
     }
     .hamburger {
       display: inline-flex;
       width: 44px;
       height: 44px;
       padding: 0;
-      background: rgba(5, 5, 7, 0.55);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: rgba(5, 5, 7, 0.88);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 9999px;
       box-shadow:
@@ -575,7 +580,9 @@ function itemIsActive(item: NavItem): boolean {
     }
   }
 
-  /* Mobile menu overlay */
+  /* Mobile menu overlay — kein backdrop-filter: Full-Screen-Blur
+     (100vw × 100vh) auf iOS Safari freezed den Menu-Open-Anim um
+     100-200ms. Opakerer Background (0.98) kompensiert visuell. */
   .mobile-menu {
     position: fixed;
     inset: 0;
@@ -583,9 +590,7 @@ function itemIsActive(item: NavItem): boolean {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(10, 10, 12, 0.95);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: rgba(10, 10, 12, 0.98);
     animation: menu-enter 220ms ease-out;
   }
 

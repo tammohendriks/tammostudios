@@ -67,6 +67,12 @@ import { SECTION3 } from '../../lib/constants';
     }
   }
 
+  /* Diagonale Streifen in Amber statt Weiss — weiss auf dark hatte
+     die Section optisch grau erscheinen lassen. Direkt amber-tinted
+     Streifen halten den BG schwarz und geben subtile Struktur ohne
+     Text-Kontrast zu schmaelern.
+     Kein mask-image / kein blend-mode → Perf-freundlich (paint-once
+     repeating-linear-gradient, kein Compositor-Pass). */
   .section-4-bg {
     position: absolute;
     inset: 0;
@@ -75,20 +81,8 @@ import { SECTION3 } from '../../lib/constants';
       45deg,
       transparent 0px,
       transparent 39px,
-      rgba(255, 255, 255, 0.025) 39px,
-      rgba(255, 255, 255, 0.025) 40px
-    );
-    -webkit-mask-image: radial-gradient(
-      ellipse 80% 70% at center,
-      black 0%,
-      black 40%,
-      transparent 90%
-    );
-    mask-image: radial-gradient(
-      ellipse 80% 70% at center,
-      black 0%,
-      black 40%,
-      transparent 90%
+      rgba(245, 158, 11, 0.05) 39px,
+      rgba(245, 158, 11, 0.05) 40px
     );
   }
 

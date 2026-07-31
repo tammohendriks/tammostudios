@@ -145,6 +145,7 @@
   const PROX_RADIUS_SQ = PROX_RADIUS * PROX_RADIUS;
 
   // === Layer B: Canvas mit pulsierenden Knoten ===
+  const isMobile = window.matchMedia('(max-width: 767px)').matches;
   const bgEl = document.querySelector('.background');
   if (bgEl) {
     const canvas = document.createElement('canvas');
@@ -152,7 +153,9 @@
     bgEl.appendChild(canvas);
     const ctx = canvas.getContext('2d');
 
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // dpr=1 auf mobile: halbiert Canvas-Bytes, viertelt clearRect-Kosten.
+    // 1.5px-Nodes sind auf 3x-Retina praktisch identisch sichtbar.
+    const dpr = isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 2);
     let nodes = [];
     let cellSize = 80;
     let nodeRadius = 2;
@@ -216,28 +219,76 @@
 
     let raf = 0;
     let running = true;
+    let inView = true;
+    let lastFrameTime = 0;
+    // FPS-Cap: mobile 30fps (33ms), desktop 60fps (16ms). Halbiert
+    // die Draw-Rate auf schwacher Mobile-GPU wo 60fps sowieso nicht
+    // erreicht werden — 30fps + smooth ist besser als 45fps + jank.
+    const minInterval = isMobile ? 33 : 16;
 
     function tick() {
+      // Wenn nicht sichtbar (Tab hidden ODER Section komplett out-of-
+      // view): rAF-Loop pausieren. Wird durch visibilitychange bzw.
+      // IntersectionObserver wieder gestartet. Spart CPU/Batterie
+      // wenn User auf Section 3+ liest.
+      if (!running || !inView) {
+        raf = 0;
+        return;
+      }
+      const now = performance.now();
+      if (now - lastFrameTime >= minInterval) {
+        lastFrameTime = now;
+        drawFrame(now / 1000);
+      }
       raf = requestAnimationFrame(tick);
-      drawFrame(performance.now() / 1000);
     }
 
     tick();
+
+    // IntersectionObserver auf die Section: canvas draw pausiert
+    // sobald Section 1 komplett offscreen ist. rootMargin: 200px
+    // startet Draw kurz vor Wiederauftauchen damit Nodes schon
+    // "warm" pulsen wenn User zurueckscrollt.
+    const sectionEl = bgEl.closest('section');
+    if (sectionEl && 'IntersectionObserver' in window) {
+      const io = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            if (!inView) {
+              inView = true;
+              if (running && !raf) tick();
+            }
+          } else {
+            inView = false;
+          }
+        },
+        { rootMargin: '200px' }
+      );
+      io.observe(sectionEl);
+    }
 
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
         if (!running) {
           running = true;
-          tick();
+          if (inView && !raf) tick();
         }
       } else {
         running = false;
-        if (raf) cancelAnimationFrame(raf);
+        if (raf) { cancelAnimationFrame(raf); raf = 0; }
       }
     });
 
+    // Resize-Guard: iOS Safari feuert resize bei jedem Address-Bar-
+    // Show/Hide. Nur bei echter Breiten-Aenderung rebuilden — Height-
+    // only-Resizes (Address-Bar) ignorieren, weil canvas.width-Realloc
+    // + 120 Node-Objekte-Neuallokation der Grund fuer den ersten
+    // Scroll-Ruckler war.
     let resizeRaf = 0;
+    let lastWidth = window.innerWidth;
     window.addEventListener('resize', () => {
+      if (Math.abs(window.innerWidth - lastWidth) < 4) return;
+      lastWidth = window.innerWidth;
       if (resizeRaf) cancelAnimationFrame(resizeRaf);
       resizeRaf = requestAnimationFrame(() => {
         rebuildNodes();
@@ -256,7 +307,7 @@
 
     document.addEventListener('astro:before-preparation', () => {
       running = false;
-      if (raf) cancelAnimationFrame(raf);
+      if (raf) { cancelAnimationFrame(raf); raf = 0; }
       canvas.remove();
     });
   }

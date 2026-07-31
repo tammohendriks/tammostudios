@@ -39,6 +39,12 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* text-rendering: optimizeLegibility nur auf Headlines — auf Body
+   zwingt es Kerning/Ligature-Berechnung fuer jeden Text-Node und ist
+   auf Mobile spuerbar teuer (langes Impressum/Datenschutz). */
+h1, h2, h3, h4, h5, h6 {
   text-rendering: optimizeLegibility;
 }
 
@@ -194,12 +200,14 @@ p, li {
 }
 
 /* Shimmer-Sweep: schräger Highlight-Streifen läuft alle 5s über
-   die Fläche. Parent overflow:hidden clippt zur Pill-Form. */
+   die Fläche. Parent overflow:hidden clippt zur Pill-Form. Animiert
+   translateX (Composite-only) statt left (Layout-Property) — der
+   Browser muss den Layout-Tree nicht bei jedem Frame neu vermessen. */
 .cta-orbital::before {
   content: '';
   position: absolute;
   top: 0;
-  left: -100%;
+  left: 0;
   width: 60%;
   height: 100%;
   background: linear-gradient(
@@ -208,15 +216,15 @@ p, li {
     rgba(255, 255, 255, 0.25) 50%,
     transparent 100%
   );
-  transform: skewX(-20deg);
+  transform: translateX(-167%) skewX(-20deg);
   border-radius: inherit;
   pointer-events: none;
   animation: cta-shimmer 5s ease-in-out infinite;
 }
 
 @keyframes cta-shimmer {
-  0%, 70% { left: -100%; }
-  100%    { left: 200%; }
+  0%, 70% { transform: translateX(-167%) skewX(-20deg); }
+  100%    { transform: translateX(333%)  skewX(-20deg); }
 }
 
 .cta-orbital:hover {
@@ -249,6 +257,57 @@ p, li {
 .cta-orbital:hover svg,
 .cta-orbital:focus-visible svg {
   transform: translateX(4px);
+}
+
+/* Mobile: cta-pulse (box-shadow-Animation) und shimmer ganz aus —
+   box-shadow-Keyframes zwingen Paint pro Frame, plus CTA existiert
+   auf mobile 2x parallel (TopBar + Section). Statischer Glow reicht
+   visuell. */
+@media (max-width: 767px) {
+  .cta-orbital {
+    animation: none;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.25),
+      0 2px 8px rgba(0, 0, 0, 0.25),
+      0 0 24px rgba(245, 158, 11, 0.35);
+  }
+  .cta-orbital::before {
+    display: none;
+  }
+}
+
+/* === CTA-Orbital Cream-Variant ===
+   Auf Cream-Sections (Landing S5/S6/S7) wird der Amber-Pulse-Button
+   zu einem Dark-Solid-Button. Amber gradient + amber glow verschmilzt
+   optisch mit Cream-BG. Dark solid Button hat maximalen Kontrast auf
+   Cream und wirkt als klarer Action-Anker.
+   IO in BaseLayout setzt body[data-current-bg="cream"] wenn eine
+   Cream-Section die Viewport-Mitte durchschreitet — CTA switched
+   automatisch mit 400ms Fade. */
+body[data-current-bg="cream"] .cta-orbital {
+  background: linear-gradient(to bottom, #2a2a2e 0%, #1a1a1c 100%);
+  color: #f5f5f4;
+  border-color: rgba(255, 255, 255, 0.06);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 2px 12px rgba(0, 0, 0, 0.25),
+    0 4px 24px rgba(0, 0, 0, 0.15);
+  animation: none;
+}
+
+body[data-current-bg="cream"] .cta-orbital::before {
+  display: none;
+}
+
+/* Smooth Fade-Transition beim BG-Wechsel (dark <-> cream). Erweitert
+   die existierende transition-Property um background + color. */
+.cta-orbital {
+  transition:
+    transform 240ms ease,
+    box-shadow 240ms ease,
+    background 400ms ease,
+    color 400ms ease,
+    border-color 400ms ease;
 }
 
 @media (prefers-reduced-motion: reduce) {
