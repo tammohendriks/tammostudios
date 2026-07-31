@@ -82,6 +82,15 @@ const TAG_FILTERS = [
       </section>
     ) : (
       <>
+        <div class="journal-filter-empty" data-filter-empty hidden>
+          <p>
+            Keine Beiträge unter „<span data-filter-empty-tag></span>".
+            <button type="button" class="filter-reset" data-filter-reset>
+              Alle anzeigen
+            </button>
+          </p>
+        </div>
+
         {featured && (
           <article
             class="featured-post"
@@ -153,23 +162,54 @@ const TAG_FILTERS = [
 <script>
   // Client-Filter — filtert Cards live nach data-tags. Kein Reload, kein
   // History-Push (Deep-Link koennen wir spaeter nachziehen falls gebraucht).
+  // Zeigt Empty-State wenn Filter 0 sichtbare Cards uebrig laesst.
   const chips = document.querySelectorAll<HTMLButtonElement>('.filter-chip');
   const cards = document.querySelectorAll<HTMLElement>('[data-tags]');
+  const emptyEl = document.querySelector<HTMLElement>('[data-filter-empty]');
+  const emptyTagEl = document.querySelector<HTMLElement>(
+    '[data-filter-empty-tag]'
+  );
+  const resetBtn = document.querySelector<HTMLButtonElement>(
+    '[data-filter-reset]'
+  );
+
+  const setActive = (tag: string) => {
+    chips.forEach((c) => {
+      const isActive = (c.dataset.filter || '') === tag;
+      c.classList.toggle('is-active', isActive);
+    });
+  };
 
   const applyFilter = (tag: string) => {
+    let visibleCount = 0;
     cards.forEach((card) => {
       const tags = (card.dataset.tags || '').split(',').filter(Boolean);
       const match = tag === 'Alle' || tags.includes(tag);
       card.style.display = match ? '' : 'none';
+      if (match) visibleCount++;
     });
+
+    if (emptyEl && emptyTagEl) {
+      if (visibleCount === 0 && tag !== 'Alle') {
+        emptyTagEl.textContent = tag;
+        emptyEl.hidden = false;
+      } else {
+        emptyEl.hidden = true;
+      }
+    }
   };
 
   chips.forEach((chip) => {
     chip.addEventListener('click', () => {
-      chips.forEach((c) => c.classList.remove('is-active'));
-      chip.classList.add('is-active');
-      applyFilter(chip.dataset.filter || 'Alle');
+      const tag = chip.dataset.filter || 'Alle';
+      setActive(tag);
+      applyFilter(tag);
     });
+  });
+
+  resetBtn?.addEventListener('click', () => {
+    setActive('Alle');
+    applyFilter('Alle');
   });
 </script>
 
@@ -442,7 +482,7 @@ const TAG_FILTERS = [
     align-self: flex-start;
   }
 
-  /* === Empty State === */
+  /* === Empty State (nichts im Dataset) === */
   .journal-empty {
     position: relative;
     z-index: 2;
@@ -452,5 +492,44 @@ const TAG_FILTERS = [
     color: rgba(245, 245, 244, 0.6);
     font-family: 'Inter', sans-serif;
     font-size: 1rem;
+  }
+
+  /* === Filter-Empty State (Filter matched 0 posts) ===
+     Erscheint nur wenn User einen Tag klickt zu dem noch kein Beitrag
+     online ist. „Alle anzeigen"-Button resettet auf default. */
+  .journal-filter-empty {
+    position: relative;
+    z-index: 2;
+    max-width: 640px;
+    margin: 40px auto 60px;
+    padding: 24px 28px;
+    text-align: center;
+    background: rgba(15, 15, 18, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    color: rgba(245, 245, 244, 0.75);
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  .journal-filter-empty p {
+    margin: 0;
+  }
+  .filter-reset {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.4);
+    color: rgba(245, 158, 11, 0.95);
+    font: inherit;
+    cursor: pointer;
+    padding-bottom: 1px;
+    transition: color 200ms ease, border-color 200ms ease;
+  }
+  .filter-reset:hover {
+    color: rgba(252, 211, 77, 1);
+    border-color: rgba(252, 211, 77, 1);
   }
 </style>
