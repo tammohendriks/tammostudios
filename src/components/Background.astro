@@ -111,6 +111,9 @@
   @media (prefers-reduced-motion: reduce) {
     .grid-drift {
       animation: none;
+      /* will-change:transform bleibt sonst allokiert — iOS haelt eine
+         dedicated GraphicsLayer fuer nichts. */
+      will-change: auto;
     }
     .spotlight {
       transition: none;
@@ -243,7 +246,17 @@
       raf = requestAnimationFrame(tick);
     }
 
-    tick();
+    // "Halt, don't simplify"-Pattern: unter reduced-motion + touch (iOS LPM,
+     // Android battery-saver) NICHT das rAF-Loop starten. Canvas einmal
+     // statisch rendern (drawFrame(0)) und aus. Hover-capable Desktops mit
+     // System-reduced-motion behalten die volle Animation, weil Desktop-GPU
+     // die Kosten easy schluckt.
+    const haltCanvasLoop = reduceMotion && !isHoverCapable;
+    if (haltCanvasLoop) {
+      drawFrame(0);
+    } else {
+      tick();
+    }
 
     // IntersectionObserver auf die Section: canvas draw pausiert
     // sobald Section 1 komplett offscreen ist. rootMargin: 200px
@@ -256,7 +269,7 @@
           if (entry.isIntersecting) {
             if (!inView) {
               inView = true;
-              if (running && !raf) tick();
+              if (running && !raf && !haltCanvasLoop) tick();
             }
           } else {
             inView = false;
@@ -271,7 +284,7 @@
       if (document.visibilityState === 'visible') {
         if (!running) {
           running = true;
-          if (inView && !raf) tick();
+          if (inView && !raf && !haltCanvasLoop) tick();
         }
       } else {
         running = false;

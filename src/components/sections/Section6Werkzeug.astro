@@ -300,6 +300,11 @@
     const update = () => {
       ticking = false;
       if (!outer) return;
+      // Reduced-motion: init-Block unten pinnt alle Progress-Vars auf 1.
+      // Ohne dieses Early-Return wuerde der erste Scroll-Event die Pins
+      // ueberschreiben und den Widget-Reveal doch animieren — genau der
+      // Correctness-Bug der iOS-LPM-User bisher gelagged hat.
+      if (prefersReducedMotion()) return;
       const rect = outer.getBoundingClientRect();
       // Off-screen early-return: spart 40+ setProperty-Writes pro Frame
       // waehrend User auf anderen Sections scrollt. Selbes Pattern wie
@@ -512,18 +517,23 @@
       window.setTimeout(() => startTyping(tab.typed), 250);
     };
 
-    // rAF-gated scroll listener
-    window.addEventListener(
-      'scroll',
-      () => {
-        if (!ticking) {
-          requestAnimationFrame(update);
-          ticking = true;
-        }
-      },
-      { passive: true }
-    );
-    window.addEventListener('resize', () => requestAnimationFrame(update), { passive: true });
+    // rAF-gated scroll listener — unter reduced-motion NICHT registrieren,
+    // sonst feuern die Listener trotzdem pro Frame (update() early-returned
+    // waere, aber die Listener-Kosten selbst bleiben). Der reduced-motion
+    // init-Block unten setzt den statischen End-Zustand einmalig.
+    if (!prefersReducedMotion()) {
+      window.addEventListener(
+        'scroll',
+        () => {
+          if (!ticking) {
+            requestAnimationFrame(update);
+            ticking = true;
+          }
+        },
+        { passive: true }
+      );
+      window.addEventListener('resize', () => requestAnimationFrame(update), { passive: true });
+    }
 
     // Helper: nach jeder User-Interaktion Cycle-Timer resetten damit
     // der Auto-Cycle nicht mitten in User-Exploration reinfaellt.
