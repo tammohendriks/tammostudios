@@ -19,26 +19,16 @@
 
 @font-face {
   font-family: 'Aileron';
-  src: url('/fonts/aileron/Aileron-BoldItalic.otf') format('opentype');
+  src: url('/fonts/aileron/Aileron-BoldItalic.woff2') format('woff2');
   font-weight: 700;
   font-style: italic;
-  /* optional statt swap: kein Late-Swap-Layout-Shift mehr. Beim
-     ersten Visit fällt der Browser ggf. auf den System-Sans zurück,
-     bei späteren Page-Loads (Cache-Hit) ist der Brand-Font sofort
-     da. Vermeidet das sichtbare Springen von Eyebrow/Headline beim
-     Page-Wechsel. */
   font-display: optional;
 }
 
 @font-face {
   font-family: 'Aileron';
-  src: url('/fonts/aileron/Aileron-BlackItalic.otf') format('opentype');
+  src: url('/fonts/aileron/Aileron-BlackItalic.woff2') format('woff2');
   font-weight: 900;
   font-style: italic;
-  /* optional statt swap: kein Late-Swap-Layout-Shift mehr. Beim
-     ersten Visit fällt der Browser ggf. auf den System-Sans zurück,
-     bei späteren Page-Loads (Cache-Hit) ist der Brand-Font sofort
-     da. Vermeidet das sichtbare Springen von Eyebrow/Headline beim
-     Page-Wechsel. */
   font-display: optional;
 }

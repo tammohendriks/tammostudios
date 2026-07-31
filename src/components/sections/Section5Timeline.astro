@@ -151,6 +151,10 @@ const phases = SECTION4.phases.slice(0, 5);
     const update = () => {
       ticking = false;
       const rect = section.getBoundingClientRect();
+      // Off-screen early-return: spart 20+ setProperty-Writes pro Frame
+      // waehrend User auf anderen Sections scrollt. Selbes Pattern wie
+      // Section3Referenzen.astro:572.
+      if (rect.bottom < 0 || rect.top > window.innerHeight) return;
       const raw = -rect.top / sectionHeight;
       const progress = clamp(raw);
 

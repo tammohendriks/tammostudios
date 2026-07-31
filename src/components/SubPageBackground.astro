@@ -162,8 +162,22 @@ const particles = Array.from({ length: PARTICLE_COUNT }, () => ({
   }
 
   @media (max-width: 768px) {
+    /* Mobile-Perf: filter:blur() ist auf iPhones teuer (Backing-Store-
+       Allokation pro Layer, ~500x500 blurred bitmap). Wir ersetzen den
+       Blur-Look durch weichere Gradient-Stops — visuell nahezu identisch,
+       aber ohne Compositor-Kosten. Zusaetzlich Animation aus (Opacity-
+       Breath auf 3 Layern = weiterhin billig, aber laeuft immer). */
     .subpage-bg-glow {
-      filter: blur(80px);
+      filter: none;
+      will-change: auto;
+      animation: none;
+      background: radial-gradient(
+        circle,
+        rgba(245, 158, 11, 0.10) 0%,
+        rgba(245, 158, 11, 0.04) 40%,
+        transparent 70%
+      );
+      opacity: 0.85;
     }
     .subpage-bg-glow-1 {
       width: 500px;

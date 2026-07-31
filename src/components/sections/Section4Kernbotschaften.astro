@@ -347,6 +347,7 @@ import { SECTION3 } from '../../lib/constants';
     }
 
     function update() {
+      if (!section || !header) return;
       if (reduceMotion) {
         header.style.opacity = '1';
         header.style.transform = 'none';
@@ -355,6 +356,12 @@ import { SECTION3 } from '../../lib/constants';
         }
         return;
       }
+
+      // Off-screen early-return: spart die item-progress-Writes pro Frame
+      // waehrend User auf anderen Sections scrollt. Selbes Pattern wie
+      // Section3Referenzen.astro:572.
+      const rect = section.getBoundingClientRect();
+      if (rect.bottom < 0 || rect.top > window.innerHeight) return;
 
       const progress = getScrollProgress();
 

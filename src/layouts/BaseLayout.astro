@@ -206,6 +206,15 @@ const jsonLdGraph = {
       is:inline
       set:html={JSON.stringify(jsonLdGraph)}
     />
+    {isLanding && (
+      <link
+        rel="preload"
+        href="/logos/logo-full.webp"
+        as="image"
+        type="image/webp"
+        fetchpriority="high"
+      />
+    )}
     <link
       rel="preload"
       href="/fonts/montreal/NeueMontreal-Bold.woff2"
@@ -213,13 +222,15 @@ const jsonLdGraph = {
       type="font/woff2"
       crossorigin
     />
-    <link
-      rel="preload"
-      href="/fonts/aileron/Aileron-BlackItalic.otf"
-      as="font"
-      type="font/otf"
-      crossorigin
-    />
+    {!isLanding && (
+      <link
+        rel="preload"
+        href="/fonts/aileron/Aileron-BlackItalic.woff2"
+        as="font"
+        type="font/woff2"
+        crossorigin
+      />
+    )}
     <script is:inline>
       // Startseite-Reveal-Flag: setzt einmalig pro Session
       // data-startseite-anim="1" auf <html>, sobald der User von der
