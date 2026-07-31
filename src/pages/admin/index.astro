@@ -1,0 +1,44 @@
+---
+/**
+ * Embedded Sanity Studio Mount-Point.
+ *
+ * Diese Seite liefert einen minimalen HTML-Shell + client:only React-Component
+ * das Studio v6 mountet. Studio uebernimmt danach die komplette Route.
+ *
+ * Deep-Links (/admin/desk/post/xyz etc.) funktionieren via vercel.json
+ * rewrite `/admin/(.*)` → `/admin` — der Studio browserRouter parsed
+ * window.location und rendert die passende View.
+ *
+ * Kein <BaseLayout> weil Studio den vollen Viewport braucht und wir keine
+ * TopBar/Footer wollen. noindex weil das kein Content ist der in Google
+ * gehoert.
+ */
+import SanityStudio from '../../components/SanityStudio.tsx';
+---
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Studio · Tammo Studios</title>
+    <style is:global>
+      html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
+      }
+      #sanity-studio-root {
+        height: 100vh;
+        width: 100vw;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="sanity-studio-root">
+      <SanityStudio client:only="react" />
+    </div>
+  </body>
+</html>
