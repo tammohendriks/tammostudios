@@ -86,8 +86,8 @@ export const SECTION4 = {
       label: 'PHASE 02',
       title: 'Ich entwerfe deine Website',
       body:
-        'Erste Entwürfe: Aufbau, Farben, Stil. Wir drehen so lange bis ' +
-        'es deine Marke trifft.',
+        'Erste Entwürfe: Aufbau, Farben, Stil.<br />' +
+        'Wir drehen so lange bis es deine Marke trifft.',
     },
     {
       label: 'PHASE 03',
@@ -129,7 +129,7 @@ export const SECTION4 = {
 export const SECTION5 = {
   eyebrow: 'AM ZIEL',
   headline: 'Bereit für Phase 01?',
-  subtext: 'Du kennst den Weg. Was fehlt, ist dein erstes Wort.',
+  subtext: 'Du kennst den Weg.\nWas fehlt, ist dein erstes Wort.',
   primaryCta: {
     label: 'Erstgespräch anfragen',
     href: 'mailto:tammo@tammostudios.de',
