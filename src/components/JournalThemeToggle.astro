@@ -131,8 +131,11 @@
   }
 
   @media (max-width: 768px) {
+    /* Mobile: TopBar ist ~76px hoch (padding 16 + hamburger 44 + 16).
+       top:90 = 14px unter TopBar-Bottom, keine Ueberlappung. Selber Wert
+       wie .post-back-fixed damit beide auf gleicher Baseline sitzen. */
     .journal-theme-toggle {
-      top: 74px;
+      top: 90px;
       right: 16px;
     }
   }

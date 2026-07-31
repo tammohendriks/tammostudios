@@ -224,8 +224,13 @@ const articleSchema = {
     min-height: 100vh;
   }
   @media (max-width: 768px) {
+    /* Mobile-Padding groesser als vorher (90→140px): TopBar-mobile ist
+       ~76px hoch (16+44+16), fixed Back-Link + Toggle sitzen bei 90px
+       (Bottom ~124px). Post-Header braucht mindestens 140px Top-Padding
+       damit tags/date/H1 NICHT hinter der TopBar oder den fixed-Elements
+       liegen. */
     .post-page {
-      padding: 90px 20px 0;
+      padding: 140px 20px 0;
     }
   }
 
@@ -258,8 +263,10 @@ const articleSchema = {
     border-color: rgba(245, 158, 11, 0.5);
   }
   @media (max-width: 768px) {
+    /* Mobile: TopBar ist ~76px hoch (padding 16 + hamburger 44 + 16).
+       top:90 = 14px unter TopBar-Bottom, keine Ueberlappung mehr. */
     .post-back-fixed {
-      top: 74px;
+      top: 90px;
       left: 16px;
       font-size: 0.8rem;
       padding: 6px 12px;
