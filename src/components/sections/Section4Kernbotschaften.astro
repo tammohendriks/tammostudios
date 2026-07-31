@@ -67,32 +67,23 @@ import { SECTION3 } from '../../lib/constants';
     }
   }
 
-  /* mask-image ersetzt durch radial-gradient direkt im background —
-     kein zweiter Compositor-Pass fuer den Mask-Alpha-Multiply mehr.
-     Visuell identisch: die diagonalen Streifen sind in der Mitte am
-     staerksten sichtbar und faden radial nach aussen aus.
-     iOS Safari GPU-accelerated masks sind fragil, fallback zu CPU-
-     tile-paint auf grossen inset-Flaechen — 300vh Section 4 hat das
-     als sichtbaren Overhead. */
+  /* Diagonale Streifen in Amber statt Weiss — weiss auf dark hatte
+     die Section optisch grau erscheinen lassen. Direkt amber-tinted
+     Streifen halten den BG schwarz und geben subtile Struktur ohne
+     Text-Kontrast zu schmaelern.
+     Kein mask-image / kein blend-mode → Perf-freundlich (paint-once
+     repeating-linear-gradient, kein Compositor-Pass). */
   .section-4-bg {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background-image:
-      radial-gradient(
-        ellipse 80% 70% at center,
-        rgba(255, 255, 255, 0.028) 0%,
-        rgba(255, 255, 255, 0.028) 40%,
-        transparent 90%
-      ),
-      repeating-linear-gradient(
-        45deg,
-        transparent 0px,
-        transparent 39px,
-        rgba(255, 255, 255, 0.025) 39px,
-        rgba(255, 255, 255, 0.025) 40px
-      );
-    background-blend-mode: multiply;
+    background-image: repeating-linear-gradient(
+      45deg,
+      transparent 0px,
+      transparent 39px,
+      rgba(245, 158, 11, 0.05) 39px,
+      rgba(245, 158, 11, 0.05) 40px
+    );
   }
 
   .section-4-sticky {
@@ -139,16 +130,13 @@ import { SECTION3 } from '../../lib/constants';
      FOUC waehrend das Script noch nicht den ersten Tick gemacht hat.
      Eyebrow + Headline sind statische Kinder, styling matcht
      Section 3 (Referenzen) fuer visuelle Kohaerenz. */
-  /* will-change entfernt: transform + opacity werden vom Browser
-     ondemand promoted, permanentes will-change explodiert die
-     Compositor-Layer-Count und kostet mehr VRAM als es bringt —
-     besonders auf iOS Safari mit begrenztem GPU-Layer-Budget. */
   .section-4-header {
     text-align: center;
     max-width: 720px;
     margin: 0 auto;
     opacity: 0;
     transform: translateY(12px);
+    will-change: transform, opacity;
   }
 
   .section-4-eyebrow {
@@ -194,8 +182,7 @@ import { SECTION3 } from '../../lib/constants';
 
   /* Per-Item Cascade: --item-progress 0..1 wird vom Section-Script
      gesetzt. opacity + translateY ableiten — alles über transform
-     und opacity, kein Layout-Trigger, CLS-sicher.
-     will-change entfernt (siehe .section-4-header Kommentar). */
+     und opacity, kein Layout-Trigger, CLS-sicher. */
   .diff-item {
     --item-progress: 0;
     display: flex;
@@ -203,6 +190,7 @@ import { SECTION3 } from '../../lib/constants';
     gap: 16px;
     opacity: var(--item-progress);
     transform: translateY(calc((1 - var(--item-progress)) * 40px));
+    will-change: transform, opacity;
   }
 
   @media (max-width: 768px) {
@@ -211,10 +199,6 @@ import { SECTION3 } from '../../lib/constants';
     }
   }
 
-  /* text-shadow: 60px-blur-Radius war auf 6rem-Glyphen extrem paint-
-     teuer — jedes Char re-rasterized bei jeder opacity-Aenderung im
-     Parent-Layer. Reduziert auf einen einzigen 20px Layer — visuell
-     fast identisch, ~10x cheaper auf iOS Safari. */
   .diff-number {
     font-family: 'Aileron', 'Inter', sans-serif;
     font-weight: 900;
@@ -223,16 +207,9 @@ import { SECTION3 } from '../../lib/constants';
     line-height: 0.9;
     color: rgba(245, 158, 11, 0.85);
     letter-spacing: -0.04em;
-    text-shadow: 0 0 20px rgba(245, 158, 11, 0.22);
-  }
-
-  /* Mobile: text-shadow ganz aus — Ziffern sind bei 2rem klein
-     genug dass der Glow-Effekt kaum sichtbar ist, Paint-Kosten
-     bleiben aber gleich. */
-  @media (max-width: 768px) {
-    .diff-number {
-      text-shadow: none;
-    }
+    text-shadow:
+      0 0 30px rgba(245, 158, 11, 0.25),
+      0 0 60px rgba(245, 158, 11, 0.10);
   }
 
   @media (max-width: 1024px) {

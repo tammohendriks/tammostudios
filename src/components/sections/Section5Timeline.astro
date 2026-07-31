@@ -140,6 +140,13 @@ const phases = SECTION4.phases.slice(0, 5);
     };
     measure();
 
+    // Cached body-bg-Value damit wir nicht auf jedem Frame dataset writen
+    // (dataset-writes triggern Style-Recalc auch wenn Wert identisch).
+    // Initial aus document.body.dataset syncen fuer Deep-Link-Robustheit
+    // (falls user direkt in eine cream Section einsteigt und IO bereits
+    // 'cream' geschrieben hat bevor unser erster update() laeuft).
+    let lastBodyBg = document.body.dataset.currentBg || '';
+
     let ticking = false;
     const update = () => {
       ticking = false;
@@ -147,11 +154,27 @@ const phases = SECTION4.phases.slice(0, 5);
       const raw = -rect.top / sectionHeight;
       const progress = clamp(raw);
 
-      // Horizon-Split (0..0.08)
-      sticky.style.setProperty(
-        '--horizon-progress',
-        mapRange(progress, [0, HORIZON_END]).toFixed(4)
-      );
+      // Horizon-Split (0..0.15) — steuert auch den TopBar-CTA-BG-Switch:
+      // sobald cream Sichtbar wird HINTER der TopBar (~horizon-progress 0.75),
+      // switched Body-Attribut auf "cream". CSS in global.css macht dann
+      // die dark-solid Variante des CTA-Buttons mit 400ms Fade.
+      //
+      // Hysteresis: unterschiedliche Thresholds fuer Rein/Raus damit der
+      // Button beim Rueckscrollen nicht zu frueh auf amber springt bevor
+      // die dark Overlays komplett zurueck sind. Vorwaerts (dark→cream)
+      // bei 0.75; Rueckwaerts (cream→dark) erst bei 0.3 (Overlays fast
+      // komplett wieder geschlossen).
+      const horizonP = mapRange(progress, [0, HORIZON_END]);
+      sticky.style.setProperty('--horizon-progress', horizonP.toFixed(4));
+
+      const nextBodyBg =
+        lastBodyBg === 'cream'
+          ? horizonP > 0.3 ? 'cream' : 'dark'
+          : horizonP > 0.75 ? 'cream' : 'dark';
+      if (nextBodyBg !== lastBodyBg) {
+        document.body.dataset.currentBg = nextBodyBg;
+        lastBodyBg = nextBodyBg;
+      }
 
       // Header-Emerge (0.08..0.14)
       sticky.style.setProperty(

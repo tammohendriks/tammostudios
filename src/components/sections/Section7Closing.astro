@@ -18,13 +18,35 @@ import SiteFooter from '../SiteFooter.astro';
 // Span um "Phase 01?") und CTA-Text ("Lass uns sprechen", matcht
 // /preise-Sprache), beide nicht via einfacher Interpolation abbildbar.
 const { eyebrow, subtext, secondaryEmail } = SECTION5;
+
 ---
 
-<section class="section-6" aria-labelledby="closing-headline">
-  <!-- Cream BG (matcht Section 5 werkstatt-bg #f7f0dd) -->
+<section class="section-6" aria-labelledby="closing-headline" data-section-bg="cream">
+  <!-- Cream Base-BG -->
   <div class="closing-bg" aria-hidden="true"></div>
-  <!-- Blaupausen-Textur (matcht Section 5 werkstatt-blueprint) -->
-  <div class="closing-blueprint" aria-hidden="true"></div>
+  <!-- Sonnenschein: subtile radiale Halo von unten. Basiswaerme, dezent. -->
+  <div class="closing-sunrise" aria-hidden="true"></div>
+  <!-- Aufsteigende Amber-Embers — 14 Glut-Partikel steigen kontinuierlich
+       vom unteren Section-Rand zum oberen. Verschiedene Groessen, Start-
+       X-Positionen, Durations + Delays fuer organischen Aurora-artigen
+       Effekt. Reminisziert Section 2 aurora-drift aber vertikal, matcht
+       das "Sonnen-Aufstieg zum Ziel" Storytelling. -->
+  <div class="closing-embers" aria-hidden="true">
+    <span style="--x:8%;--size:4px;--dur:14s;--delay:-2s;--drift:16px"></span>
+    <span style="--x:16%;--size:6px;--dur:18s;--delay:-8s;--drift:-22px"></span>
+    <span style="--x:24%;--size:3px;--dur:12s;--delay:-4s;--drift:10px"></span>
+    <span style="--x:32%;--size:5px;--dur:16s;--delay:-11s;--drift:-14px"></span>
+    <span style="--x:40%;--size:4px;--dur:15s;--delay:-6s;--drift:18px"></span>
+    <span style="--x:48%;--size:7px;--dur:20s;--delay:-13s;--drift:-8px"></span>
+    <span style="--x:55%;--size:3px;--dur:13s;--delay:-1s;--drift:12px"></span>
+    <span style="--x:62%;--size:5px;--dur:17s;--delay:-9s;--drift:-20px"></span>
+    <span style="--x:70%;--size:4px;--dur:14s;--delay:-3s;--drift:16px"></span>
+    <span style="--x:78%;--size:6px;--dur:19s;--delay:-12s;--drift:-10px"></span>
+    <span style="--x:85%;--size:3px;--dur:13s;--delay:-7s;--drift:14px"></span>
+    <span style="--x:92%;--size:5px;--dur:16s;--delay:-4s;--drift:-18px"></span>
+    <span style="--x:20%;--size:3px;--dur:15s;--delay:-10s;--drift:20px"></span>
+    <span style="--x:74%;--size:4px;--dur:18s;--delay:-5s;--drift:-16px"></span>
+  </div>
 
   <div class="closing">
     <p class="closing-eyebrow" data-reveal>{eyebrow}</p>
@@ -139,43 +161,146 @@ const { eyebrow, subtext, secondaryEmail } = SECTION5;
 </section>
 
 <style>
-  /* Section-Root: mindestens 100dvh, wachsen erlaubt fuer Footer.
-     BG-Layer via absolute-positioned Divs damit Blueprint sauber
-     ueber Cream sitzen kann. Cool Cream #efe8d6 (statt Section 5's
-     warmer #f7f0dd) erzeugt eine subtile Farbabgrenzung — plus
-     amber Top-Hairline als Chapter-Divider fuer klaren visuellen
-     Break beim Sticky-Detach von Section 5. */
+  /* Section-Root: Cool-Sunset Cream — weniger gesaettigt-gelb als der
+     erste Wurf (#f4e2b5), stattdessen ein neutralerer warm-cream Ton
+     der sich klar von S5 (#f7f0dd) und S6 (#f3ecd7) abhebt ohne
+     "yellow-heavy" zu wirken. Chapter-Divider oben: 2px Amber-Horizon
+     fuer klaren Break vom Werkzeug zum Ziel. */
   .section-6 {
     position: relative;
     min-height: 100dvh;
     display: flex;
     flex-direction: column;
-    background: #efe8d6;
+    background: #ecdcbf;
     padding: clamp(100px, 14vh, 160px) 40px 24px;
     isolation: isolate;
-    border-top: 1px solid rgba(245, 158, 11, 0.35);
+  }
+
+  /* Amber-Horizon oben als "Chapter-Divider" zwischen den 3 Cream-
+     Sections. 2px + glow. Fadet an den Kanten aus. */
+  .section-6::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(245, 158, 11, 0.65) 15%,
+      rgba(245, 158, 11, 0.95) 50%,
+      rgba(245, 158, 11, 0.65) 85%,
+      transparent 100%
+    );
+    z-index: 3;
+    pointer-events: none;
   }
 
   .closing-bg {
     position: absolute;
     inset: 0;
-    background: #efe8d6;
+    background: #ecdcbf;
     z-index: 0;
   }
 
-  /* Blaupausen-Textur: gleiches Muster wie Section 5 (32px cross-grid
-     in amber-700 5% Opacity) — visuelle Kontinuitaet ueber die
-     Section-Grenze hinweg. */
-  .closing-blueprint {
+  /* === Sonnenschein: subtile Halo von unten ===================== */
+  .closing-sunrise {
     position: absolute;
     inset: 0;
-    background-image:
-      linear-gradient(to right, rgba(245, 158, 11, 0.05) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(245, 158, 11, 0.05) 1px, transparent 1px);
-    background-size: 32px 32px;
     z-index: 1;
-    opacity: 0.9;
     pointer-events: none;
+    background:
+      radial-gradient(
+        ellipse 90% 55% at 50% 108%,
+        rgba(245, 158, 11, 0.18) 0%,
+        rgba(245, 158, 11, 0.08) 30%,
+        rgba(245, 158, 11, 0.03) 60%,
+        transparent 85%
+      );
+    animation: sunrise-breathe 14s ease-in-out infinite;
+  }
+
+  @keyframes sunrise-breathe {
+    0%, 100% { opacity: 0.75; }
+    50%      { opacity: 1; }
+  }
+
+  /* === Aufsteigende Amber-Embers ==================================
+     14 kleine glow-particles die vom unteren Section-Rand nach oben
+     aufsteigen. Negative animation-delays sorgen dafuer dass beim
+     ersten Frame schon alle Embers verteilt in ihrem Zyklus sind
+     (kein "leerer Start" wo alle unten warten).
+     Composite-only (translate3d + opacity) → Mobile-Perf-freundlich.
+     overflow:hidden am Parent clippt die Embers die aus der Section
+     rausdriften. */
+  .closing-embers {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .closing-embers span {
+    position: absolute;
+    left: var(--x);
+    bottom: -12px;
+    width: var(--size);
+    height: var(--size);
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      rgba(245, 158, 11, 0.85) 0%,
+      rgba(245, 158, 11, 0.35) 40%,
+      transparent 75%
+    );
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.35);
+    animation-name: ember-rise;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-delay: var(--delay);
+    animation-duration: var(--dur);
+    will-change: transform, opacity;
+  }
+
+  @keyframes ember-rise {
+    0% {
+      transform: translate3d(0, 0, 0);
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    88% {
+      opacity: 1;
+    }
+    100% {
+      transform: translate3d(var(--drift, 0px), -110vh, 0);
+      opacity: 0;
+    }
+  }
+
+  /* Mobile: 8 statt 14 Embers, kein box-shadow (glow-simulation
+     ausreichend via radial-gradient background), damit Perf-Impact
+     minimal bleibt. */
+  @media (max-width: 767px) {
+    .closing-embers span:nth-child(n+9) {
+      display: none;
+    }
+    .closing-embers span {
+      box-shadow: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .closing-sunrise {
+      animation: none;
+      opacity: 0.85;
+    }
+    .closing-embers {
+      display: none;
+    }
   }
 
   /* Content Container — zentriert, max-width, wachst flex-1 damit
@@ -206,8 +331,7 @@ const { eyebrow, subtext, secondaryEmail } = SECTION5;
   }
 
   /* HUGE Typographie — der optische Anker der Section neben dem CTA-
-     Block. clamp 3rem → 6rem knallt auf grossen Screens ohne mobile
-     zu ueberwaeltigen. */
+     Block. Charcoal-Text auf warmem Cream. */
   .closing-headline {
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-weight: 700;
@@ -248,9 +372,7 @@ const { eyebrow, subtext, secondaryEmail } = SECTION5;
     filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.35));
   }
 
-  /* Mobile: SVG drop-shadow ist auf iOS Safari software-rasterized
-     und kostet beim Section-Reveal einen Hakler. Auf Cream mit 0.35
-     opacity war der Glow eh subtil — visueller Unterschied minimal. */
+  /* Mobile: SVG drop-shadow ist auf iOS Safari software-rasterized. */
   @media (max-width: 767px) {
     .closing-highlight-underline path {
       filter: none;

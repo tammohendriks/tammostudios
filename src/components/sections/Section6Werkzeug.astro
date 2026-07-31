@@ -1,0 +1,991 @@
+---
+// Section 6 — SO PFLEGST DU SELBST (Blueprint + Live-Typing)
+//
+// Cream Section zwischen Section 5 (Fahrplan) und Section 7 (Closing).
+// Style-Match zu S5/S7: identische Eyebrow-Signatur (Neue Montreal 500,
+// 0.75rem, letter-spacing 0.3em, amber), gleicher 32px Cross-Grid,
+// gleiche statische Amber-Hairline oben als Chapter-Divider, gleiches
+// CTA-Pattern (editorial inline-link mit amber SVG-Arrow).
+//
+// BG #f3ecd7 = Mittelwert S5 (#f7f0dd) und S7 (#efe8d6) — die
+// Werkstattlicht-Abkuehlung bleibt konsistent.
+//
+// Inhalt: eine handgezeichnete Blaupause zeichnet sich beim Scrollen
+// von selbst — Browser-Frame, URL-Bar mit 3 Traffic-Dots (keine URL
+// mehr, laientauglich), Sidebar-Ordner in Alltagssprache (Team,
+// Speisekarte, Öffnungszeiten...), Content-Bereich mit Feldern. In
+// der letzten Scroll-Phase tippt sich im Titel-Feld zeichen-fuer-
+// zeichen ein Wert ein — die Blaupause lebt.
+//
+// Client-Tabs OBEN (prominenter): "Er&Sie · Restaurant", "Samedos ·
+// Gastronomie", "Kirsch · Handwerk". Aktiv = amber Border-Bottom.
+// Nach vollem Scroll rotiert Auto-Cycle alle 6s durch die 3.
+---
+
+<section class="werkzeug" aria-labelledby="werkzeug-headline" data-section-bg="cream">
+  <div class="werkzeug__outer">
+    <div class="werkzeug__sticky">
+      <header class="werkzeug__header">
+        <p class="werkzeug__eyebrow">Dein Studio</p>
+        <h2 id="werkzeug-headline" class="werkzeug__headline">So pflegst du deine Website selbst</h2>
+      </header>
+
+      <figure class="werkzeug__stage">
+
+        <!-- Blueprint SVG. viewBox 0 0 720 440. Alle Paths mit
+             pathLength=1 damit stroke-dashoffset per CSS driven werden
+             kann (jeweils gebunden an einen sub-progress var). -->
+        <svg
+          class="werkzeug__blueprint"
+          viewBox="0 0 720 440"
+          role="img"
+          aria-label="Handgezeichnete Blaupause: Bearbeitungsansicht mit Ordnern in der Seitenleiste und Feldern im Inhaltsbereich, verbunden durch eine Trace-Linie."
+          preserveAspectRatio="xMidYMid meet"
+        >
+          <!-- Millimeter-Guide-Grid (nur sichtbar wenn --p-grid > 0) -->
+          <defs>
+            <pattern id="wz-grid" width="12" height="12" patternUnits="userSpaceOnUse">
+              <path d="M12 0 H0 V12" fill="none" stroke="#f59e0b" stroke-width="0.5" opacity="0.14" />
+            </pattern>
+          </defs>
+          <rect class="wz-grid" x="20" y="40" width="680" height="380" fill="url(#wz-grid)" />
+
+          <!-- 1. Browser-Frame — ein Rechteck als Path fuer Stift-Draw-in -->
+          <path
+            class="wz-path wz-frame"
+            d="M20 40 H700 V420 H20 Z"
+            pathLength="1"
+            fill="none"
+            stroke="#f59e0b"
+            stroke-width="1.25"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+
+          <!-- 2. URL-Bar-Trennlinie + 3 Traffic-Dots (kein URL-Text mehr) -->
+          <path
+            class="wz-path wz-urlbar"
+            d="M20 76 H700"
+            pathLength="1"
+            fill="none"
+            stroke="#f59e0b"
+            stroke-width="1.25"
+            stroke-linecap="round"
+          />
+          <circle class="wz-path wz-dot" cx="36" cy="58" r="3.5" pathLength="1" fill="none" stroke="#f59e0b" stroke-width="1.25" />
+          <circle class="wz-path wz-dot" cx="50" cy="58" r="3.5" pathLength="1" fill="none" stroke="#f59e0b" stroke-width="1.25" />
+          <circle class="wz-path wz-dot" cx="64" cy="58" r="3.5" pathLength="1" fill="none" stroke="#f59e0b" stroke-width="1.25" />
+
+          <!-- Widget-Tabs INNERHALB der URL-Bar-Zone, zwischen den
+               Traffic-Dots (links) und LIVE (rechts). Jede Tab-Gruppe:
+               invisible rect fuer Click-Hitbox + text + amber underline
+               fuer aktiven Tab. Sichtbarkeit gebunden an --p-urlbar
+               (erscheinen mit der URL-Bar). -->
+          <g class="wz-widget-tabs" data-role="widget-tabs">
+            <g class="wz-wtab is-active" data-idx="0">
+              <rect x="192" y="46" width="96" height="24" fill="transparent" pointer-events="all" style="cursor:pointer" />
+              <text class="wz-wtab-text" x="240" y="63" text-anchor="middle">Restaurant</text>
+              <line class="wz-wtab-underline" x1="204" y1="71" x2="276" y2="71" stroke="#f59e0b" stroke-width="1.5" fill="none" />
+            </g>
+            <g class="wz-wtab" data-idx="1">
+              <rect x="290" y="46" width="100" height="24" fill="transparent" pointer-events="all" style="cursor:pointer" />
+              <text class="wz-wtab-text" x="340" y="63" text-anchor="middle">Gastronomie</text>
+              <line class="wz-wtab-underline" x1="302" y1="71" x2="378" y2="71" stroke="#f59e0b" stroke-width="1.5" fill="none" />
+            </g>
+            <g class="wz-wtab" data-idx="2">
+              <rect x="392" y="46" width="96" height="24" fill="transparent" pointer-events="all" style="cursor:pointer" />
+              <text class="wz-wtab-text" x="440" y="63" text-anchor="middle">Handwerk</text>
+              <line class="wz-wtab-underline" x1="410" y1="71" x2="470" y2="71" stroke="#f59e0b" stroke-width="1.5" fill="none" />
+            </g>
+          </g>
+
+          <!-- Live-Indikator oben rechts INNERHALB Frame -->
+          <circle class="wz-live-dot" cx="650" cy="58" r="4" fill="#f59e0b" />
+          <text class="wz-live-label" x="660" y="62">live</text>
+
+          <!-- 3. Sidebar-Column-Divider -->
+          <path
+            class="wz-path wz-sidebar-div"
+            d="M180 76 V420"
+            pathLength="1"
+            fill="none"
+            stroke="#f59e0b"
+            stroke-width="1.25"
+          />
+
+          <!-- 4. Sidebar-Items — 5 Items mit klickbaren Hitboxes (jedes
+               <g> hat transparentes rect fuer Click-Zone + text). Click
+               triggert setSidebarTab() im JS → wechselt aktives Item,
+               Content-H2 und Titel-Value (mit typing animation). -->
+          <g class="wz-sidebar" data-role="sidebar">
+            <g class="wz-side-item" data-side-idx="0">
+              <rect x="20" y="102" width="150" height="26" fill="transparent" pointer-events="all" style="cursor:pointer" />
+              <text class="wz-side-label" style="--i:0" x="42" y="118">Team</text>
+            </g>
+            <g class="wz-side-item" data-side-idx="1">
+              <rect x="20" y="134" width="150" height="26" fill="transparent" pointer-events="all" style="cursor:pointer" />
+              <text class="wz-side-label" style="--i:1" x="42" y="150">Preise</text>
+            </g>
+            <g class="wz-side-item is-active" data-side-idx="2">
+              <rect x="20" y="166" width="150" height="26" fill="transparent" pointer-events="all" style="cursor:pointer" />
+              <text class="wz-side-label is-active" style="--i:2" x="42" y="182" data-role="active-label">
+                <tspan class="wz-arrow" x="30" dy="0">▶</tspan>
+                <tspan x="42" dy="0">Speisekarte</tspan>
+              </text>
+            </g>
+            <g class="wz-side-item" data-side-idx="3">
+              <rect x="20" y="198" width="150" height="26" fill="transparent" pointer-events="all" style="cursor:pointer" />
+              <text class="wz-side-label" style="--i:3" x="42" y="214">Termine</text>
+            </g>
+            <g class="wz-side-item" data-side-idx="4">
+              <rect x="20" y="230" width="150" height="26" fill="transparent" pointer-events="all" style="cursor:pointer" />
+              <text class="wz-side-label" style="--i:4" x="42" y="246">News</text>
+            </g>
+          </g>
+
+          <!-- 5. Content-Pane: H2 + Unterstrich -->
+          <text class="wz-content-h2" data-role="content-h2" x="220" y="120">Speisekarte</text>
+          <path
+            class="wz-path wz-content-underline"
+            d="M220 130 H340"
+            pathLength="1"
+            fill="none"
+            stroke="#f59e0b"
+            stroke-width="1.25"
+          />
+
+          <!-- 6. Feld: TITEL — Label + Input-Rechteck + getippter Text + Cursor -->
+          <text class="wz-field-label" style="--i:0" x="220" y="168">TITEL</text>
+          <path
+            class="wz-path wz-field-box"
+            style="--i:0"
+            d="M220 178 H620 V210 H220 Z"
+            pathLength="1"
+            fill="none"
+            stroke="#f59e0b"
+            stroke-width="1"
+          />
+          <text class="wz-field-value" data-role="typed" x="234" y="200"></text>
+          <rect class="wz-caret" data-role="caret" x="234" y="184" width="2" height="20" fill="#f59e0b" />
+
+          <!-- 7. Feld: BILD (Platzhalter mit Diagonalen) -->
+          <text class="wz-field-label" style="--i:1" x="220" y="240">BILD</text>
+          <path
+            class="wz-path wz-field-box"
+            style="--i:1"
+            d="M220 250 H300 V320 H220 Z M220 250 L300 320 M300 250 L220 320"
+            pathLength="1"
+            fill="none"
+            stroke="#f59e0b"
+            stroke-width="1"
+          />
+
+          <!-- 8. Feld: TEXT (4 Skeleton-Balken) -->
+          <text class="wz-field-label" style="--i:2" x="320" y="240">TEXT</text>
+          <path class="wz-path wz-textbar" style="--i:0" d="M320 258 H600" pathLength="1" fill="none" stroke="#f59e0b" stroke-width="1" />
+          <path class="wz-path wz-textbar" style="--i:1" d="M320 274 H560" pathLength="1" fill="none" stroke="#f59e0b" stroke-width="1" />
+          <path class="wz-path wz-textbar" style="--i:2" d="M320 290 H610" pathLength="1" fill="none" stroke="#f59e0b" stroke-width="1" />
+          <path class="wz-path wz-textbar" style="--i:3" d="M320 306 H460" pathLength="1" fill="none" stroke="#f59e0b" stroke-width="1" />
+
+          <!-- 9. Trace-Line — Signature-Move. Dashed Bezier-Kurve vom aktiven
+               Sidebar-Item zum Content-H2. Zeichnet sich in Phase 0.64-0.74. -->
+          <path
+            class="wz-path wz-trace"
+            d="M158 178 C 190 178, 195 122, 218 120"
+            pathLength="1"
+            fill="none"
+            stroke="#f59e0b"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-dasharray="4 5"
+          />
+        </svg>
+      </figure>
+
+      <a class="werkzeug__cta" href="/studio">
+        <span>So funktioniert dein Studio</span>
+        <svg class="werkzeug__cta-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<script>
+  // === Section 6 Werkzeug — Blueprint Scroll-Choreografie + Client-Cycle ===
+  //
+  // Sub-Progress-Ranges gebunden an CSS custom properties. rAF-gated
+  // Scroll-Listener setzt --p-* auf jeden Frame. CSS macht den Rest via
+  // stroke-dashoffset (SVG Path-Draw-in), opacity, transform.
+  //
+  // In der letzten Scroll-Phase (0.70-0.86): Char-by-Char Typing im
+  // Titel-Feld. Nach vollem Scroll (p>=0.98): Client-Cycle rotiert
+  // automatisch alle 6s durch Er&Sie / Samedos / Kirsch. Tab-Klick
+  // resettet den Cycle-Timer.
+
+  type SidebarTab = { label: string; h2: string; typed: string };
+  type Client = {
+    name: string;
+    branch: string;
+    activeIdx: number;
+    tabs: [SidebarTab, SidebarTab, SidebarTab, SidebarTab, SidebarTab];
+  };
+
+  const CLIENTS: Client[] = [
+    {
+      name: 'Er&Sie',
+      branch: 'Restaurant',
+      activeIdx: 2,
+      tabs: [
+        { label: 'Team',        h2: 'Team',        typed: 'Anna Klein · Küchenchef' },
+        { label: 'Preise',      h2: 'Preise',      typed: '3-Gang-Menu ab 42 €' },
+        { label: 'Speisekarte', h2: 'Speisekarte', typed: 'Weinkarte Frühling 2026' },
+        { label: 'Termine',     h2: 'Termine',     typed: 'Weinabend · 15.03.' },
+        { label: 'News',        h2: 'News',        typed: 'Neue Sommer-Terrasse' },
+      ],
+    },
+    {
+      name: 'Samedos',
+      branch: 'Gastronomie',
+      activeIdx: 3,
+      tabs: [
+        { label: 'Team',           h2: 'Team',           typed: '12 Kollegen · Familie' },
+        { label: 'Preise',         h2: 'Preise',         typed: 'Frühstück ab 6,80 €' },
+        { label: 'Stellen',        h2: 'Stellen',        typed: 'Barista m/w/d · Vollzeit' },
+        { label: 'Öffnungszeiten', h2: 'Öffnungszeiten', typed: 'Mo–Fr 08–18 Uhr' },
+        { label: 'News',           h2: 'News',           typed: 'Neu: Sonntags-Brunch' },
+      ],
+    },
+    {
+      name: 'Kirsch',
+      branch: 'Handwerk',
+      activeIdx: 1,
+      tabs: [
+        { label: 'Leistungen', h2: 'Leistungen', typed: 'Dach · Fassade · Sanierung' },
+        { label: 'Referenzen', h2: 'Referenzen', typed: 'Dach Aachen · 2024' },
+        { label: 'Karriere',   h2: 'Karriere',   typed: 'Dachdecker · Lehrjahr 3' },
+        { label: 'News',       h2: 'News',       typed: 'Winter-Terminplan 2025/26' },
+        { label: 'Kontakt',    h2: 'Kontakt',    typed: 'Werkstatt Aachen · 24/7' },
+      ],
+    },
+  ];
+
+  // Y-Positionen der Sidebar-Items im SVG viewBox (fuer Trace-Line
+  // Berechnung — die dashed Bezier von aktivem Sidebar-Item zum H2).
+  const SIDEBAR_Y = [118, 150, 182, 214, 246];
+
+  const section = document.querySelector<HTMLElement>('.werkzeug');
+  if (section) {
+    const outer = section.querySelector<HTMLElement>('.werkzeug__outer');
+    const sidebarG = section.querySelector<SVGGElement>('[data-role="sidebar"]');
+    const contentH2 = section.querySelector<SVGTextElement>('[data-role="content-h2"]');
+    const typedEl = section.querySelector<SVGTextElement>('[data-role="typed"]');
+    const caretEl = section.querySelector<SVGRectElement>('[data-role="caret"]');
+    const traceEl = section.querySelector<SVGPathElement>('.wz-trace');
+    // Widget-Tabs sind SVG-Gruppen INNERHALB des Blueprints (URL-Bar-Zone).
+    const tabs = Array.from(section.querySelectorAll<SVGGElement>('.wz-wtab'));
+    // Klickbare Sidebar-Items (5 Items pro Client).
+    const sideItems = Array.from(section.querySelectorAll<SVGGElement>('.wz-side-item'));
+
+    let currentIdx = 0;
+    let currentSidebarIdx = CLIENTS[0].activeIdx;
+    let cycleTimer: number | undefined;
+    let typingTimer: number | undefined;
+    let hasTypedInitial = false;
+
+    const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+    const sub = (p: number, a: number, b: number) => clamp((p - a) / (b - a));
+    const prefersReducedMotion = () =>
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      if (!outer) return;
+      const rect = outer.getBoundingClientRect();
+      const range = rect.height - window.innerHeight;
+      if (range <= 0) return;
+      const p = clamp(-rect.top / range);
+
+      const s = section.style;
+      s.setProperty('--p', String(p));
+      s.setProperty('--p-eyebrow', String(sub(p, 0.02, 0.10)));
+      s.setProperty('--p-headline', String(sub(p, 0.06, 0.14)));
+      s.setProperty('--p-tabs', String(sub(p, 0.12, 0.20)));
+      s.setProperty('--p-grid', String(sub(p, 0.18, 0.24)));
+      // Widget-Reveal serialisiert: jedes Element wartet auf Vorgaenger.
+      // Vermeidet "H2/LIVE erscheinen bevor Frame komplett gezeichnet ist"
+      // Bug — jetzt Frame→URLbar→Sidebar→Active→H2→Fields→Type→Live→CTA
+      // ohne signifikanten Overlap.
+      s.setProperty('--p-frame', String(sub(p, 0.22, 0.34)));
+      s.setProperty('--p-urlbar', String(sub(p, 0.32, 0.40)));
+      s.setProperty('--p-side-div', String(sub(p, 0.38, 0.44)));
+      s.setProperty('--p-side-labels', String(sub(p, 0.42, 0.58)));
+      s.setProperty('--p-active', String(sub(p, 0.56, 0.62)));
+      s.setProperty('--p-h2', String(sub(p, 0.60, 0.66)));
+      s.setProperty('--p-fields', String(sub(p, 0.64, 0.74)));
+      s.setProperty('--p-trace', String(sub(p, 0.70, 0.78)));
+      // --p-type: text erscheint NACH fields komplett gezeichnet sind.
+      // Wird per typing animation zeichen-fuer-zeichen befuellt (autonom).
+      s.setProperty('--p-type', String(sub(p, 0.74, 0.82)));
+      s.setProperty('--p-live', String(sub(p, 0.80, 0.86)));
+      s.setProperty('--p-cta', String(sub(p, 0.86, 0.96)));
+
+      // Initial-Typing: startet einmalig sobald das Widget voll auf-
+      // gebaut ist (Fields komplett gezeichnet, --p-type range beginnt).
+      // Danach wird der Text per setClient/setSidebarTab neu getippt.
+      if (!hasTypedInitial && sub(p, 0.74, 0.82) > 0.2 && !prefersReducedMotion()) {
+        hasTypedInitial = true;
+        const initialTab = CLIENTS[currentIdx].tabs[currentSidebarIdx];
+        window.setTimeout(() => startTyping(initialTab.typed), 200);
+      }
+
+      // Client-Cycle
+      if (p >= 0.90 && !cycleTimer && !prefersReducedMotion()) {
+        cycleTimer = window.setInterval(() => {
+          setClient((currentIdx + 1) % CLIENTS.length);
+        }, 6000);
+      }
+      if (p < 0.85 && cycleTimer !== undefined) {
+        window.clearInterval(cycleTimer);
+        cycleTimer = undefined;
+      }
+    };
+
+    // Typing-Animation: char-by-char per setInterval. Autonom, nicht
+    // scroll-gebunden. Cancel/restart bei jedem neuen Aufruf. Cursor
+    // wird pro char gemessen (getComputedTextLength ist safe hier —
+    // 60ms tick, nicht im rAF-hot-path). Bei reduced-motion: Text
+    // sofort komplett rendern, keine Animation.
+    const startTyping = (text: string) => {
+      if (typingTimer !== undefined) {
+        window.clearInterval(typingTimer);
+        typingTimer = undefined;
+      }
+      if (!typedEl) return;
+      if (prefersReducedMotion()) {
+        typedEl.textContent = text;
+        if (caretEl) {
+          try {
+            const w = typedEl.getComputedTextLength();
+            caretEl.setAttribute('x', String(234 + w));
+          } catch {
+            caretEl.setAttribute('x', String(234 + text.length * 7.2));
+          }
+        }
+        return;
+      }
+      typedEl.textContent = '';
+      if (caretEl) caretEl.setAttribute('x', '234');
+      let i = 0;
+      const charDelay = 55;
+      typingTimer = window.setInterval(() => {
+        i++;
+        if (!typedEl) return;
+        typedEl.textContent = text.slice(0, i);
+        if (caretEl) {
+          try {
+            const w = typedEl.getComputedTextLength();
+            caretEl.setAttribute('x', String(234 + w));
+          } catch {
+            caretEl.setAttribute('x', String(234 + i * 7.2));
+          }
+        }
+        if (i >= text.length) {
+          window.clearInterval(typingTimer);
+          typingTimer = undefined;
+        }
+      }, charDelay);
+    };
+
+    const fadeSwap = (el: Element | null, mutate: () => void) => {
+      if (!el) return;
+      const style = (el as HTMLElement | SVGElement).style;
+      style.transition = 'opacity 200ms ease';
+      style.opacity = '0.15';
+      window.setTimeout(() => {
+        mutate();
+        style.opacity = '1';
+      }, 210);
+    };
+
+    // Rendert ein einzelnes Sidebar-Item (aktiv mit Arrow-Tspan +
+     // is-active class, sonst plain text). Wird von setClient (fuer
+     // Label-Wechsel bei Client-Swap) und setSidebarTab (fuer Active-
+     // State-Wechsel innerhalb eines Clients) genutzt.
+    const renderSidebarItem = (item: SVGGElement, i: number, activeIdx: number, tabLabel: string) => {
+      const textEl = item.querySelector<SVGTextElement>('.wz-side-label');
+      if (!textEl) return;
+      const isActive = i === activeIdx;
+      item.classList.toggle('is-active', isActive);
+      textEl.classList.toggle('is-active', isActive);
+      if (isActive) {
+        textEl.setAttribute('data-role', 'active-label');
+        textEl.innerHTML = `<tspan class="wz-arrow" x="30" dy="0">▶</tspan><tspan x="42" dy="0">${tabLabel}</tspan>`;
+      } else {
+        textEl.removeAttribute('data-role');
+        textEl.textContent = tabLabel;
+      }
+    };
+
+    // Trace-Line update: setzt d-Attribute basierend auf aktuellem
+    // aktiven Sidebar-Item (Y-Position via SIDEBAR_Y). Bezier von
+    // aktivem Item (x=158, y=item-y-4) zu Content-H2 (x=218, y=120).
+    const updateTracePosition = (sidebarIdx: number) => {
+      if (!traceEl) return;
+      const y = SIDEBAR_Y[sidebarIdx] - 4;
+      traceEl.setAttribute('d', `M158 ${y} C 190 ${y}, 195 122, 218 120`);
+    };
+
+    // Client-Wechsel (Widget-Tab-Klick Restaurant/Gastronomie/Handwerk
+    // oder Auto-Cycle): kompletter Client-Swap inkl. aller Sidebar-
+    // Labels, Reset auf Default-Active-Tab dieses Clients.
+    const setClient = (idx: number) => {
+      currentIdx = idx;
+      const c = CLIENTS[idx];
+      currentSidebarIdx = c.activeIdx;
+
+      // Sidebar Labels + Active-State komplett neu rendern
+      fadeSwap(sidebarG, () => {
+        sideItems.forEach((item, i) => {
+          renderSidebarItem(item, i, c.activeIdx, c.tabs[i].label);
+        });
+      });
+
+      // Content-H2 swap
+      const activeTab = c.tabs[c.activeIdx];
+      fadeSwap(contentH2, () => {
+        if (contentH2) contentH2.textContent = activeTab.h2;
+      });
+
+      // Trace-Line auf neues aktives Item
+      updateTracePosition(c.activeIdx);
+
+      // Titel-Value: char-by-char TYPING (autonom, unabhaengig vom
+      // Scroll). Wird kurz nach dem Sidebar-Swap gestartet damit die
+      // Reihenfolge visuell natuerlich wirkt.
+      window.setTimeout(() => startTyping(activeTab.typed), 300);
+
+      // Widget-Tab-UI syncen (SVG groups Restaurant/Gastronomie/Handwerk)
+      tabs.forEach((t, i) => {
+        const isActive = i === idx;
+        t.classList.toggle('is-active', isActive);
+      });
+    };
+
+    // Sidebar-Tab-Wechsel INNERHALB des aktuellen Clients:
+    // z.B. Er&Sie → Preise klick → wechselt zu Er&Sie's Preise-tab.
+    // Client bleibt gleich, nur aktives Sidebar-Item + Content aendert sich.
+    const setSidebarTab = (tabIdx: number) => {
+      if (tabIdx === currentSidebarIdx) return; // no-op wenn schon aktiv
+      currentSidebarIdx = tabIdx;
+      const c = CLIENTS[currentIdx];
+      const tab = c.tabs[tabIdx];
+
+      // Sidebar Items: nur active-State flippen (Labels bleiben)
+      sideItems.forEach((item, i) => {
+        renderSidebarItem(item, i, tabIdx, c.tabs[i].label);
+      });
+
+      // Trace-Line auf neues aktives Item (schnell, kein fadeSwap noetig)
+      updateTracePosition(tabIdx);
+
+      // Content-H2 swap
+      fadeSwap(contentH2, () => {
+        if (contentH2) contentH2.textContent = tab.h2;
+      });
+
+      // Titel-Value: neu tippen
+      window.setTimeout(() => startTyping(tab.typed), 250);
+    };
+
+    // rAF-gated scroll listener
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (!ticking) {
+          requestAnimationFrame(update);
+          ticking = true;
+        }
+      },
+      { passive: true }
+    );
+    window.addEventListener('resize', () => requestAnimationFrame(update), { passive: true });
+
+    // Helper: nach jeder User-Interaktion Cycle-Timer resetten damit
+    // der Auto-Cycle nicht mitten in User-Exploration reinfaellt.
+    const resetCycleTimer = () => {
+      if (cycleTimer !== undefined) {
+        window.clearInterval(cycleTimer);
+        cycleTimer = window.setInterval(() => {
+          setClient((currentIdx + 1) % CLIENTS.length);
+        }, 6000);
+      }
+    };
+
+    // Widget-Tab-Klick (Restaurant/Gastronomie/Handwerk): kompletter
+    // Client-Wechsel.
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => {
+        setClient(i);
+        resetCycleTimer();
+      });
+    });
+
+    // Sidebar-Item-Klick (Team/Preise/Speisekarte/etc.): innerhalb
+    // aktuellem Client zum geklickten Tab wechseln. Content-H2 + Titel-
+    // Value + Trace-Line updaten sich passend.
+    sideItems.forEach((item, i) => {
+      item.addEventListener('click', () => {
+        setSidebarTab(i);
+        resetCycleTimer();
+      });
+    });
+
+    // IntersectionObserver: toggelt .in-view Klasse. always-on
+    // Animations (wz-live-dot pulse, wz-caret blink) sind per default
+    // paused; werden nur active wenn Section (mit rootMargin buffer)
+    // sichtbar ist. Spart CPU/GPU wenn User auf S5/S7 verweilt.
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(
+        ([entry]) => {
+          section.classList.toggle('in-view', entry.isIntersecting);
+        },
+        { rootMargin: '200px' }
+      );
+      io.observe(section);
+    } else {
+      // Kein IO-Support (sehr alte browsers): fallback zu always-on
+      section.classList.add('in-view');
+    }
+
+    // Reduced-Motion: pinne alle Progress-Vars auf 1, deaktiviere
+    // Cycle + Typing. Text direkt vollstaendig setzen.
+    if (prefersReducedMotion()) {
+      hasTypedInitial = true;
+      const s = section.style;
+      const keys = [
+        '--p', '--p-eyebrow', '--p-headline',
+        '--p-grid', '--p-frame', '--p-urlbar',
+        '--p-side-div', '--p-side-labels', '--p-active', '--p-h2',
+        '--p-fields', '--p-trace', '--p-type', '--p-live', '--p-cta',
+      ];
+      keys.forEach((k) => s.setProperty(k, '1'));
+      const initialTyped = CLIENTS[0].tabs[CLIENTS[0].activeIdx].typed;
+      if (typedEl) typedEl.textContent = initialTyped;
+      if (caretEl) {
+        try {
+          const w = typedEl?.getComputedTextLength() ?? initialTyped.length * 7.2;
+          caretEl.setAttribute('x', String(234 + w));
+        } catch {
+          caretEl.setAttribute('x', String(234 + initialTyped.length * 7.2));
+        }
+      }
+    } else {
+      update();
+    }
+  }
+</script>
+
+<style>
+  /* === Section-Root ===
+     BG #f3ecd7 = Mittelwert S5 (#f7f0dd) und S7 (#efe8d6) —
+     Werkstattlicht-Abkuehlung bleibt konsistent. Cross-Grid 32px
+     amber @5% (identisch zu S5/S7). Statische Amber-Hairline oben
+     als Chapter-Divider. */
+  .werkzeug {
+    --cream: #f3ecd7;
+    --charcoal: #1a1a1c;
+    --amber: #f59e0b;
+    --amber-deep: #d97706;
+    --body: rgba(26, 26, 28, 0.72);
+    --secondary: rgba(26, 26, 28, 0.55);
+
+    position: relative;
+    background: var(--cream);
+    background-image:
+      linear-gradient(to right, rgba(245, 158, 11, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(245, 158, 11, 0.05) 1px, transparent 1px);
+    background-size: 32px 32px;
+    color: var(--charcoal);
+    font-family: 'Neue Montreal', 'Inter', system-ui, sans-serif;
+    border-top: 1px solid rgba(245, 158, 11, 0.35);
+
+    --p: 0;
+    --p-eyebrow: 0; --p-headline: 0;
+    --p-grid: 0; --p-frame: 0; --p-urlbar: 0;
+    --p-side-div: 0; --p-side-labels: 0; --p-active: 0;
+    --p-h2: 0; --p-fields: 0; --p-trace: 0; --p-type: 0;
+    --p-live: 0; --p-cta: 0;
+  }
+
+  .werkzeug__outer {
+    height: 200vh;
+    position: relative;
+  }
+
+  /* Flex-Column-Layout: robust gegen kleine Viewports.
+     - Header sitzt IMMER am padding-top-Boundary (nicht zentriert)
+     - Widget waechst mit flex:1 in den Middle-Space, shrinkt via
+       max-height:100% wenn Viewport klein
+     - CTA sitzt am Ende (naeh padding-bottom)
+     - overflow:hidden clippt saubere Kanten falls Content overflowt
+
+     Grid war hier das falsche Werkzeug: bei sehr kleinen Viewports
+     kollabierten Track-Sizes und Elemente stapelten sich visuell. */
+  .werkzeug__sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(30px, 5vh, 60px);
+    padding: clamp(120px, 15vh, 160px) 40px clamp(80px, 12vh, 120px);
+    max-width: 1240px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  /* Height-Breakpoint matcht Section 5 — bei niedriger Viewport-Height
+     reduzieren wir padding + gap zusaetzlich. */
+  @media (max-height: 780px) {
+    .werkzeug__sticky {
+      padding-top: 100px;
+      padding-bottom: 60px;
+      gap: 24px;
+    }
+  }
+
+  /* Header-Wrapper (matcht .werkstatt-header aus Section 5):
+     zusammenhaengende Group von Eyebrow + Headline, wird gemeinsam
+     positioniert im auto-Row am Top. */
+  .werkzeug__header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    max-width: 720px;
+  }
+
+  /* === Eyebrow (identisch zu S5 .werkstatt-eyebrow / S7 .closing-eyebrow) === */
+  .werkzeug__eyebrow {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin: 0;
+    opacity: var(--p-eyebrow);
+    transform: translateY(calc((1 - var(--p-eyebrow)) * -6px));
+    transition: opacity 100ms linear, transform 100ms linear;
+  }
+
+  /* === Headline (matcht S5-Skala fuer erklaerende Header) === */
+  .werkzeug__headline {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: var(--charcoal);
+    margin: 0;
+    max-width: 720px;
+    opacity: var(--p-headline);
+    transform: translateY(calc((1 - var(--p-headline)) * 14px));
+    transition: opacity 200ms linear, transform 200ms linear;
+  }
+
+  /* === Stage — Flex-Item mit flex:1 fuellt Middle-Space zwischen
+     Header und CTA. min-height:0 erlaubt shrinken unter Widget-
+     Intrinsic-Height bei kleinen Viewports. overflow:hidden als
+     Safety. */
+  .werkzeug__stage {
+    margin: 0;
+    width: 100%;
+    max-width: 660px;
+    flex: 1 1 0;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* Blueprint SVG — max-width 660 fuer Desktop-Cap, max-height 100%
+     fuer proportionales shrinken bei kleinem Stage. width/height auto
+     laesst SVG viewBox 720:440 Aspect-Ratio steuern. */
+  .werkzeug__blueprint {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+  }
+
+  /* === Widget-Tabs (SVG-Groups in der URL-Bar-Zone) ===
+     Sichtbarkeit gebunden an --p-live — erscheinen SPAETER, synchron
+     mit dem LIVE-Indikator rechts daneben (nicht mehr frueh mit URL-Bar).
+     User erwartet: Widget muss erst voll aufgebaut sein bevor tabs
+     klickbar/sichtbar werden. Aktiver Tab: amber Text + amber Underline. */
+  .wz-widget-tabs {
+    opacity: var(--p-live);
+    transition: opacity 200ms linear;
+  }
+
+  .wz-wtab {
+    cursor: pointer;
+  }
+
+  .wz-wtab-text {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    fill: rgba(26, 26, 28, 0.4);
+    text-transform: uppercase;
+    transition: fill 220ms ease;
+    user-select: none;
+  }
+
+  .wz-wtab:hover .wz-wtab-text {
+    fill: rgba(26, 26, 28, 0.75);
+  }
+
+  .wz-wtab.is-active .wz-wtab-text {
+    fill: var(--amber);
+  }
+
+  .wz-wtab-underline {
+    opacity: 0;
+    transition: opacity 220ms ease;
+  }
+
+  .wz-wtab.is-active .wz-wtab-underline {
+    opacity: 1;
+  }
+
+  /* pathLength=1 pro Path — dasharray:1, dashoffset laufend 1→0 = Draw-in.
+     Jeder Path haengt an einem eigenen --p-* sub-progress. */
+  .wz-path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+
+  .wz-frame           { stroke-dashoffset: calc(1 - var(--p-frame)); }
+  .wz-urlbar, .wz-dot { stroke-dashoffset: calc(1 - var(--p-urlbar)); }
+  .wz-sidebar-div     { stroke-dashoffset: calc(1 - var(--p-side-div)); }
+  .wz-content-underline { stroke-dashoffset: calc(1 - var(--p-h2)); }
+  .wz-trace {
+    stroke-dashoffset: calc(1 - var(--p-trace));
+    opacity: var(--p-trace);
+  }
+
+  .wz-field-box,
+  .wz-textbar {
+    --local: max(0, min(1, calc((var(--p-fields) - var(--i) * 0.08) / 0.35)));
+    stroke-dashoffset: calc(1 - var(--local));
+  }
+
+  .wz-grid { opacity: var(--p-grid); }
+
+  .wz-live-dot {
+    opacity: var(--p-live);
+    transform-origin: 650px 58px;
+    transform-box: view-box;
+    animation: wz-pulse 1.8s ease-in-out infinite;
+    animation-play-state: paused;
+  }
+
+  .werkzeug.in-view .wz-live-dot {
+    animation-play-state: running;
+  }
+
+  .wz-live-label {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 10px;
+    fill: var(--amber);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    opacity: var(--p-live);
+  }
+
+  @keyframes wz-pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50%      { transform: scale(1.35); opacity: 0.55; }
+  }
+
+  .wz-side-label {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    fill: var(--charcoal);
+    --local: max(0, min(1, calc((var(--p-side-labels) - var(--i) * 0.15) / 0.4)));
+    opacity: var(--local);
+    transform: translateX(calc((1 - var(--local)) * -6px));
+    transform-box: fill-box;
+    transition: fill 240ms ease;
+  }
+
+  .wz-side-label.is-active {
+    fill: var(--amber);
+    font-weight: 600;
+    opacity: calc(var(--p-active) * max(0.001, var(--local, 1)));
+  }
+
+  /* Hover-Feedback fuer klickbare Sidebar-Items — subtile Farb-
+     verschiebung damit User sofort merkt: das ist interaktiv. */
+  .wz-side-item {
+    cursor: pointer;
+  }
+
+  .wz-side-item:hover .wz-side-label:not(.is-active) {
+    fill: var(--amber-deep);
+  }
+
+  .wz-arrow {
+    fill: var(--amber);
+    font-size: 9px;
+  }
+
+  .wz-content-h2 {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    fill: var(--charcoal);
+    opacity: var(--p-h2);
+    transform: translateY(calc((1 - var(--p-h2)) * 6px));
+    transform-box: fill-box;
+  }
+
+  .wz-field-label {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    fill: rgba(26, 26, 28, 0.55);
+    --local: max(0, min(1, calc((var(--p-fields) - var(--i) * 0.08) / 0.35)));
+    opacity: var(--local);
+  }
+
+  .wz-field-value {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 14px;
+    fill: var(--charcoal);
+    opacity: var(--p-type);
+  }
+
+  .wz-caret {
+    opacity: calc(var(--p-type) * 0.9);
+    animation: wz-caret-blink 900ms steps(2, jump-none) infinite;
+    animation-play-state: paused;
+  }
+
+  .werkzeug.in-view .wz-caret {
+    animation-play-state: running;
+  }
+
+  @keyframes wz-caret-blink {
+    0%, 49%   { opacity: 0.9; }
+    50%, 100% { opacity: 0.15; }
+  }
+
+  /* === CTA — matcht S7 .closing-cta-link (editorial inline-link) ===
+     Kein margin-top mehr — der 0.6fr Bottom-Breath-Row im Grid Template
+     kuemmert sich um Spacing zwischen CTA und Section-Ende. */
+  .werkzeug__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 0 2px;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid transparent;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: clamp(1.15rem, 1.6vw, 1.4rem);
+    color: var(--charcoal);
+    text-decoration: none;
+    opacity: var(--p-cta);
+    transform: translateY(calc((1 - var(--p-cta)) * 8px));
+    transition: border-color 200ms ease, color 200ms ease, transform 200ms ease, opacity 200ms linear;
+  }
+
+  .werkzeug__cta-arrow {
+    color: var(--amber);
+    transition: transform 200ms ease;
+  }
+
+  .werkzeug__cta:hover,
+  .werkzeug__cta:focus-visible {
+    border-bottom-color: rgba(245, 158, 11, 0.6);
+    color: #000;
+    outline: none;
+  }
+
+  .werkzeug__cta:hover .werkzeug__cta-arrow,
+  .werkzeug__cta:focus-visible .werkzeug__cta-arrow {
+    transform: translateX(4px);
+  }
+
+  .werkzeug__cta:focus-visible {
+    outline: 2px solid rgba(245, 158, 11, 0.5);
+    outline-offset: 6px;
+    border-radius: 2px;
+  }
+
+  /* === Mobile — matcht Section 5 padding: 110px 20px 80px === */
+  @media (max-width: 767px) {
+    .werkzeug__outer {
+      height: 240vh;
+    }
+
+    .werkzeug__sticky {
+      padding: 110px 20px 80px;
+      row-gap: 20px;
+    }
+
+    .werkzeug__header {
+      gap: 10px;
+    }
+
+    .werkzeug__headline {
+      font-size: clamp(1.5rem, 6vw, 2rem);
+    }
+
+    .werkzeug__blueprint {
+      max-width: 100%;
+    }
+
+    .werkzeug__cta {
+      font-size: 1rem;
+    }
+  }
+
+  /* === Reduced-Motion === */
+  @media (prefers-reduced-motion: reduce) {
+    .werkzeug__eyebrow,
+    .werkzeug__headline,
+    .wz-widget-tabs,
+    .wz-wtab-text,
+    .wz-wtab-underline,
+    .wz-path,
+    .wz-side-label,
+    .wz-content-h2,
+    .wz-field-label,
+    .wz-field-value,
+    .werkzeug__cta,
+    .werkzeug__cta-arrow {
+      transition: none !important;
+      filter: none !important;
+      transform: none !important;
+    }
+    .wz-live-dot { animation: none; }
+    .wz-caret { animation: none; opacity: 0.4; }
+  }
+</style>

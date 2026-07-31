@@ -241,30 +241,12 @@ const jsonLdGraph = {
       } catch (e) {}
     </script>
     <script is:inline>
-      // Splash-State VOR dem ersten Paint setzen, damit TopBar (außerhalb
-      // Section1) und Section1-Inhalte gleichzeitig korrekt rendern.
-      // Ohne View Transitions reicht der einmalige Aufruf beim Page-
-      // Parse — bei Sub-Page-Navigationen folgt ein Full-Reload, bei
-      // dem dieser Block erneut läuft.
-      //
-      //   Landing + erstes Mal + keine reduced-motion → data-splash="splash"
-      //                                                  (Section1-Script
-      //                                                  zieht weiter zu
-      //                                                  reveal/ready)
-      //   Alles andere (Sub-Pages, returning visitor, reduced-motion)
-      //                                               → splash-skip
+      // Splash-Intro deaktiviert (User-Wunsch): sofort alles anzeigen,
+      // keine 1.2s-Reveal-Sequence mehr. Alle Hero-Elemente werden per
+      // splash-skip-Class direkt sichtbar. Section1-Script hat einen
+      // splash-skip-Check und tut nichts wenn Class gesetzt ist.
       try {
-        var path = window.location.pathname;
-        var isLanding = path === '/' || path === '/index.html';
-        if (
-          !isLanding ||
-          window.sessionStorage.getItem('ts-splash-seen') === '1' ||
-          window.matchMedia('(prefers-reduced-motion: reduce)').matches
-        ) {
-          document.documentElement.classList.add('splash-skip');
-        } else {
-          document.documentElement.setAttribute('data-splash', 'splash');
-        }
+        document.documentElement.classList.add('splash-skip');
       } catch (e) {}
     </script>
   </head>
@@ -320,6 +302,60 @@ const jsonLdGraph = {
       } else {
         setupReveal();
       }
-    </script>
+
+      // === Section-BG-Aware CTA-Button ===
+      // Setzt body[data-current-bg="cream"|"dark"] basierend auf welche
+      // Section aktuell im Viewport-Mid liegt. Die TopBar-CTA passt sich
+      // per CSS an (dark solid Button auf cream Sections statt amber
+      // pulse). IO mit narrow rootMargin (-45% top/bottom = 10%-Slice in
+      // Viewport-Mitte) triggert nur wenn Section durch die Mitte scrollt.
+      //
+      // Ownership-Trennung mit Section 5:
+      // - IO schreibt NUR 'cream' (nie 'dark') — Section 5's Script owns
+      //   die dark-Transition via horizon-progress Hysteresis, damit der
+      //   Button beim Rueckscrollen NICHT zu frueh amber wird bevor die
+      //   dark-Overlays wieder komplett zurueck sind.
+      // - Exception: bei prefers-reduced-motion laeuft Section 5's Script
+      //   nicht (kein scroll listener) → IO uebernimmt dann auch dark.
+      function setupBgSwitcher() {
+        const creamSections = document.querySelectorAll<HTMLElement>('[data-section-bg="cream"]');
+        if (creamSections.length === 0) return;
+
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const intersectingState = new Map<Element, boolean>();
+        creamSections.forEach((s) => intersectingState.set(s, false));
+
+        const io = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              intersectingState.set(entry.target, entry.isIntersecting);
+            });
+            const anyCreamVisible = Array.from(intersectingState.values()).some((v) => v);
+            if (anyCreamVisible) {
+              document.body.dataset.currentBg = 'cream';
+            } else if (reducedMotion) {
+              // Section 5's Script laeuft in reduced-motion nicht — IO
+              // muss dark selbst schreiben, sonst haengt Body auf 'cream'
+              // fest wenn User zurueckscrollt.
+              document.body.dataset.currentBg = 'dark';
+            }
+            // Sonst: nichts schreiben. Section 5 owns dark via horizon.
+          },
+          { rootMargin: '-45% 0px -45% 0px' }
+        );
+
+        creamSections.forEach((s) => io.observe(s));
+        // Initial: default zu 'dark' (falls Landing gestartet oben)
+        if (!document.body.dataset.currentBg) {
+          document.body.dataset.currentBg = 'dark';
+        }
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupBgSwitcher);
+      } else {
+        setupBgSwitcher();
+      }
+</script>
   </body>
 </html>
