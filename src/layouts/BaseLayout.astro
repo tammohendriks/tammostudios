@@ -26,6 +26,12 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
 const isLanding = Astro.url.pathname === '/' || Astro.url.pathname === '/index.html';
 const initialPage = isLanding ? 'landing' : 'subpage';
 
+// Vertical Landings (/webdesign-gastronomie etc.) sind eigene Photo-Hero-
+// Landings mit eigener Design-Sprache — kein Site-Theme-Toggle darauf.
+// isLanding bleibt fuer JSON-LD/tracking beim /-only Check.
+const isVerticalLanding = /^\/webdesign-/.test(Astro.url.pathname);
+const hideThemeToggle = isLanding || isVerticalLanding;
+
 // LocalBusiness JSON-LD Schema. ProfessionalService (Subtype von
 // LocalBusiness) matched einen Solo-Freelance-Webentwickler besser
 // als das generische LocalBusiness. Google indexiert das + zeigt es
@@ -263,16 +269,18 @@ const jsonLdGraph = {
     </script>
     <script is:inline>
       // Site-Theme (Dark ↔ Light) fruehzeitig setzen um FOUC zu vermeiden.
-      // WIRKT auf allen Sub-Pages ausser Landing. Toggle-Component + CSS
-      // reagieren auf data-site-theme=light auf <html>. Wenn Attribut fehlt
-      // = Dark (default).
+      // WIRKT NICHT auf: Landing (/), Vertical-Landings (/webdesign-*).
+      // Toggle-Component + CSS reagieren auf data-site-theme=light auf <html>.
       //
       // Legacy-Migration: der fruehere Journal-only Toggle hat
       // 'journal-theme' localStorage geschrieben. Wir migrieren einmalig
       // zu 'site-theme' damit User's Preference erhalten bleibt.
       try {
         var path = location.pathname;
-        var isLanding = path === '/' || path === '/index.html';
+        var isLandingPath =
+          path === '/' ||
+          path === '/index.html' ||
+          /^\/webdesign-/.test(path);
 
         // Migration von altem 'journal-theme' → 'site-theme'
         var legacy = localStorage.getItem('journal-theme');
@@ -281,7 +289,7 @@ const jsonLdGraph = {
           localStorage.removeItem('journal-theme');
         }
 
-        if (!isLanding && localStorage.getItem('site-theme') === 'light') {
+        if (!isLandingPath && localStorage.getItem('site-theme') === 'light') {
           document.documentElement.setAttribute('data-site-theme', 'light');
         }
       } catch (e) {}
@@ -290,7 +298,7 @@ const jsonLdGraph = {
   </head>
   <body class="min-h-screen bg-ts-bg text-ts-fg">
     <TopBar />
-    {!isLanding && <SiteThemeToggle />}
+    {!hideThemeToggle && <SiteThemeToggle />}
     <slot />
     <script>
       // Site-weiter Scroll-Reveal: alle [data-reveal] Elemente werden
