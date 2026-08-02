@@ -92,20 +92,27 @@ html[data-site-theme='light'] .journal-page {
   color: var(--theme-text);
 }
 
-/* === Sub-Page Text-Overrides unter Light-Theme ========================
+/* === Sub-Page Overrides unter Light-Theme =============================
    Astro-Scoping: jede Rule in einem Page-`<style>` Block wird bei Compile
    mit einem [data-astro-cid-x] Attribut angereichert → Specificity steigt
    pro Selector-Position um +1 Klasse. Meine ungeslopten Rules aus
    global.css koennen daher NICHT gewinnen ohne !important.
    `!important` ist bei Theme-Systemen die akzeptierte Praxis — dieser
    Block ist der EINZIGE Ort im Repo wo wir es benutzen, und nur fuer
-   Theme-Overrides. Anders geht es nicht ohne jedes Page-CSS zu refaktorn.
+   Theme-Overrides.
 
-   Amber-Akzente bleiben literal (funktionieren beide Themes). TopBar,
-   SiteFooter und /webdesign-* haben eigene Design-Sprachen und sind
-   ausgeschlossen. */
+   Design-Prinzip (nach User-Feedback "einfach all black"):
+   Cards bleiben SOLID DARK auf light theme (magazine-Style: dunkle
+   Islands auf Cream-Page). Text INNERHALB Cards bleibt light (kein
+   Text-Override noetig — Original-Farbe reicht).
+   Text AUSSERHALB Cards (page-level) invertiert auf dark auf Cream.
 
-/* Shared Sub-Page Klassen aus global.css */
+   Amber-Akzente bleiben literal. TopBar, SiteFooter und /webdesign-*
+   sind ausgeschlossen. */
+
+/* === Page-Level Text (AUSSERHALB Cards) → dark auf Cream ============ */
+
+/* Shared Sub-Page Klassen */
 html[data-site-theme='light'] .subpage-hero-title {
   color: var(--theme-text-strong) !important;
 }
@@ -113,25 +120,7 @@ html[data-site-theme='light'] .subpage-hero-subtitle {
   color: var(--theme-text-dim) !important;
 }
 
-/* Generic content typography overrides */
-html[data-site-theme='light'] main {
-  color: var(--theme-text) !important;
-}
-html[data-site-theme='light'] main h1,
-html[data-site-theme='light'] main h2,
-html[data-site-theme='light'] main h3,
-html[data-site-theme='light'] main h4 {
-  color: var(--theme-text-strong) !important;
-}
-html[data-site-theme='light'] main p,
-html[data-site-theme='light'] main li {
-  color: var(--theme-text) !important;
-}
-html[data-site-theme='light'] main strong {
-  color: var(--theme-text-strong) !important;
-}
-
-/* ueber */
+/* ueber — Content-Article ist page-level, keine Cards */
 html[data-site-theme='light'] .ueber-content h2,
 html[data-site-theme='light'] .ueber-content strong,
 html[data-site-theme='light'] .inline-link {
@@ -142,7 +131,7 @@ html[data-site-theme='light'] .close-line {
   color: var(--theme-text-dim) !important;
 }
 
-/* referenzen */
+/* referenzen — Filter-Chips sind page-level (nicht Cards) */
 html[data-site-theme='light'] .ref-filter-chip {
   color: var(--theme-text-dim) !important;
 }
@@ -155,39 +144,31 @@ html[data-site-theme='light'] .ref-filter-chip.is-active {
 html[data-site-theme='light'] .ref-filter-count {
   color: var(--theme-text-dim) !important;
 }
-html[data-site-theme='light'] .ref-card-title {
-  color: var(--theme-text-strong) !important;
-}
 
-/* studio */
+/* studio — Section-Header und Manifest page-level. Feature-Cards
+   haben nur amber-tint (kaum sichtbar), Text darauf auch invertieren */
 html[data-site-theme='light'] .studio-manifest p,
 html[data-site-theme='light'] .studio-section-title,
 html[data-site-theme='light'] .feature-title,
-html[data-site-theme='light'] .shot-client,
 html[data-site-theme='light'] .studio-cta-headline {
   color: var(--theme-text-strong) !important;
 }
 html[data-site-theme='light'] .studio-section-sub,
 html[data-site-theme='light'] .feature-body,
-html[data-site-theme='light'] .shot-branch,
 html[data-site-theme='light'] .studio-cta-sub {
   color: var(--theme-text-dim) !important;
 }
 
-/* preise */
-html[data-site-theme='light'] .preise-intro p,
-html[data-site-theme='light'] .price-amount,
-html[data-site-theme='light'] .price-title {
+/* preise — nur page-level Text-Bloecke (nicht Cards) */
+html[data-site-theme='light'] .preise-intro p {
   color: var(--theme-text-strong) !important;
 }
-html[data-site-theme='light'] .price-sublabel,
-html[data-site-theme='light'] .price-payment {
-  color: var(--theme-text-muted) !important;
+html[data-site-theme='light'] .preise-section h2,
+html[data-site-theme='light'] .preise-section p,
+html[data-site-theme='light'] .preise-section .dash-list li {
+  color: var(--theme-text) !important;
 }
-html[data-site-theme='light'] .dash-list li {
-  color: var(--theme-text-dim) !important;
-}
-html[data-site-theme='light'] .dash-list strong {
+html[data-site-theme='light'] .preise-section h2 {
   color: var(--theme-text-strong) !important;
 }
 html[data-site-theme='light'] .preise-disclaimer,
@@ -195,39 +176,19 @@ html[data-site-theme='light'] .preise-disclaimer p {
   color: var(--theme-text-dim) !important;
 }
 
-/* preisrechner */
-html[data-site-theme='light'] .pr-q-legend,
-html[data-site-theme='light'] .pr-option-title,
-html[data-site-theme='light'] .pr-summary-total,
-html[data-site-theme='light'] .pr-summary-monthly {
+/* preisrechner — Question-Headers page-level */
+html[data-site-theme='light'] .pr-q-legend {
   color: var(--theme-text-strong) !important;
 }
-html[data-site-theme='light'] .pr-hint,
-html[data-site-theme='light'] .pr-option-sub,
-html[data-site-theme='light'] .pr-summary-empty,
-html[data-site-theme='light'] .pr-summary-note,
-html[data-site-theme='light'] .pr-summary-note-inline {
+html[data-site-theme='light'] .pr-hint {
   color: var(--theme-text-muted) !important;
 }
-html[data-site-theme='light'] .pr-summary-lines,
-html[data-site-theme='light'] .pr-summary-lines li {
-  color: var(--theme-text-dim) !important;
-}
-
-/* kontakt */
-html[data-site-theme='light'] .contact-card-value,
-html[data-site-theme='light'] .kontakt-prep-headline {
+html[data-site-theme='light'] .pr-mini-eyebrow,
+html[data-site-theme='light'] .pr-mini-headline {
   color: var(--theme-text-strong) !important;
 }
-html[data-site-theme='light'] .contact-card-label,
-html[data-site-theme='light'] .cal-loading-text {
-  color: var(--theme-text-muted) !important;
-}
-html[data-site-theme='light'] .prep-list-text {
-  color: var(--theme-text-dim) !important;
-}
 
-/* impressum + datenschutz (shared legal-* classes) */
+/* impressum + datenschutz — Legal-Content ist komplett page-level */
 html[data-site-theme='light'] .legal-content h2,
 html[data-site-theme='light'] .legal-content a {
   color: var(--theme-text-strong) !important;
@@ -241,27 +202,17 @@ html[data-site-theme='light'] .legal-stand {
   color: var(--theme-text-muted) !important;
 }
 
-/* journal overview */
-html[data-site-theme='light'] .journal-page,
-html[data-site-theme='light'] .featured-title a,
-html[data-site-theme='light'] .post-card-title {
-  color: var(--theme-text-strong) !important;
-}
-html[data-site-theme='light'] .featured-excerpt,
-html[data-site-theme='light'] .post-card-excerpt {
-  color: var(--theme-text-dim) !important;
-}
-html[data-site-theme='light'] .post-card-date {
-  color: var(--theme-text-muted) !important;
-}
-html[data-site-theme='light'] .journal-filter-empty {
-  color: var(--theme-text-dim) !important;
+/* journal — Container-Text ist page-level */
+html[data-site-theme='light'] .journal-page {
+  color: var(--theme-text) !important;
 }
 
-/* === Card-Backgrounds unter Light-Theme =============================
-   Cards die auf dark einen halbtransparenten dunklen BG haben →
-   auf light theme dark text auf dark card waere unlesbar. Also Cards
-   invertieren zu weissem/cream BG mit dark borders. */
+/* === Cards → SOLID DARK auf light theme =============================
+   Alle Container die auf dark eine card-artige rgba(15,15,18,*) oder
+   linear-gradient rgba(20,20,24,*) BG haben. Wir halten sie SOLID DARK
+   auf light theme — Magazine-Style, dunkle Islands auf Cream.
+   Text INNERHALB dieser Cards bleibt light (Original-Farbe, kein
+   Text-Override noetig). Amber-Akzente + Borders behalten Original. */
 html[data-site-theme='light'] .ref-card,
 html[data-site-theme='light'] .price-card,
 html[data-site-theme='light'] .contact-card,
@@ -269,12 +220,20 @@ html[data-site-theme='light'] .kontakt-prep-card,
 html[data-site-theme='light'] .pr-option-card,
 html[data-site-theme='light'] .pr-summary-card,
 html[data-site-theme='light'] .post-card,
-html[data-site-theme='light'] .journal-filter-empty,
+html[data-site-theme='light'] .featured-post,
 html[data-site-theme='light'] .showcase-summary,
 html[data-site-theme='light'] .showcase-item,
-html[data-site-theme='light'] .preise-disclaimer {
-  background: var(--theme-card-bg) !important;
-  border-color: var(--theme-border) !important;
+html[data-site-theme='light'] .journal-filter-empty,
+html[data-site-theme='light'] .preise-cta,
+html[data-site-theme='light'] .preise-always,
+html[data-site-theme='light'] .preise-pflege,
+html[data-site-theme='light'] .preise-calc-cta,
+html[data-site-theme='light'] .pr-included-list li,
+html[data-site-theme='light'] .pr-excluded-list li,
+html[data-site-theme='light'] .pr-faq-item,
+html[data-site-theme='light'] .pr-cta {
+  background: #0a0a0c !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
 html,
