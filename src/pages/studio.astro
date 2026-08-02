@@ -89,6 +89,7 @@ const steps = [
   <main class="studio-page">
     <SubPageBackground />
 
+    <div class="studio-inner">
     <header class="studio-hero">
       <h1 class="subpage-hero-title">
         So pflegst du deine Website
@@ -201,6 +202,7 @@ const steps = [
         </svg>
       </a>
     </section>
+    </div>
   </main>
 
   <SiteFooter />
@@ -208,12 +210,22 @@ const steps = [
 
 <style>
   /* === Page Root === */
+  /* .studio-page ist jetzt full-width (wie /ueber /referenzen /preise etc.)
+     — SubPageBackground fuellt den Viewport statt in einer 1200er-Box
+     eingesperrt zu sein. Content-max-width kommt via .studio-inner. */
   .studio-page {
     position: relative;
+    background: #050507;
     padding: 140px 40px 100px;
+    min-height: calc(100vh - 200px);
+    overflow: hidden;
+  }
+
+  .studio-inner {
+    position: relative;
+    z-index: 1;
     max-width: 1200px;
     margin: 0 auto;
-    z-index: 1;
   }
 
   @media (max-width: 768px) {
