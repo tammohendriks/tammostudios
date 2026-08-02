@@ -19,7 +19,6 @@
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SiteFooter from '../../components/SiteFooter.astro';
-import JournalThemeToggle from '../../components/JournalThemeToggle.astro';
 import {
   getJournalPosts,
   getJournalPost,
@@ -88,7 +87,6 @@ const articleSchema = {
 
   <main class="post-page">
     <a class="post-back post-back-fixed" href="/journal">← Zum Journal</a>
-    <JournalThemeToggle />
 
     <div class="post-inner">
       <header class="post-header">
@@ -675,86 +673,86 @@ const articleSchema = {
      === Light-Theme (White Mode) Overrides ==============================
      ===================================================================== */
 
-  /* Aktiviert wenn User in JournalThemeToggle auf Light umschaltet.
+  /* Aktiviert wenn User in SiteThemeToggle auf Light umschaltet.
      data-journal-theme wird von BaseLayout's inline-Script auf <html>
      gesetzt (aus localStorage) BEVOR die Page rendert → kein Flash.
      Amber-Akzente bleiben identisch, nur BG + Text invertiert.
      Nav-Elements (Back-Link, Toggle) bleiben dunkle Pills — konsistent
      mit TopBar-Aesthetik. */
 
-  html[data-journal-theme='light'] .post-page {
+  html[data-site-theme='light'] .post-page {
     background: #f8f4ea;
     color: rgba(26, 26, 28, 0.88);
   }
 
-  html[data-journal-theme='light'] .post-h1,
-  html[data-journal-theme='light'] .post-body :global(h2),
-  html[data-journal-theme='light'] .post-body :global(h3) {
+  html[data-site-theme='light'] .post-h1,
+  html[data-site-theme='light'] .post-body :global(h2),
+  html[data-site-theme='light'] .post-body :global(h3) {
     color: #1a1a1c;
   }
 
-  html[data-journal-theme='light'] .post-lede {
+  html[data-site-theme='light'] .post-lede {
     color: rgba(26, 26, 28, 0.75);
   }
 
-  html[data-journal-theme='light'] .post-date {
+  html[data-site-theme='light'] .post-date {
     color: rgba(26, 26, 28, 0.55);
   }
 
-  html[data-journal-theme='light'] .post-body {
+  html[data-site-theme='light'] .post-body {
     color: rgba(26, 26, 28, 0.88);
   }
 
-  html[data-journal-theme='light'] .post-body :global(.inline-code) {
+  html[data-site-theme='light'] .post-body :global(.inline-code) {
     background: rgba(245, 158, 11, 0.14);
     color: #92400e;
   }
 
-  html[data-journal-theme='light'] .post-body :global(.post-code) {
+  html[data-site-theme='light'] .post-body :global(.post-code) {
     background: rgba(0, 0, 0, 0.04);
     border-color: rgba(0, 0, 0, 0.08);
     color: rgba(26, 26, 28, 0.9);
   }
 
-  html[data-journal-theme='light'] .post-body :global(.post-quote) {
+  html[data-site-theme='light'] .post-body :global(.post-quote) {
     color: rgba(26, 26, 28, 0.75);
   }
 
-  html[data-journal-theme='light'] .sidebar-title-toc {
+  html[data-site-theme='light'] .sidebar-title-toc {
     border-top-color: rgba(0, 0, 0, 0.08);
   }
-  html[data-journal-theme='light'] .sidebar-toc-list {
+  html[data-site-theme='light'] .sidebar-toc-list {
     color: rgba(26, 26, 28, 0.5);
   }
-  html[data-journal-theme='light'] .sidebar-toc-list a {
+  html[data-site-theme='light'] .sidebar-toc-list a {
     color: rgba(26, 26, 28, 0.75);
   }
-  html[data-journal-theme='light'] .post-toc-mobile-list {
+  html[data-site-theme='light'] .post-toc-mobile-list {
     color: rgba(26, 26, 28, 0.5);
   }
-  html[data-journal-theme='light'] .post-toc-mobile-list a {
+  html[data-site-theme='light'] .post-toc-mobile-list a {
     color: rgba(26, 26, 28, 0.85);
   }
 
-  html[data-journal-theme='light'] .post-author,
-  html[data-journal-theme='light'] .sidebar-sticky {
+  html[data-site-theme='light'] .post-author,
+  html[data-site-theme='light'] .sidebar-sticky {
     background: rgba(255, 255, 255, 0.7);
     border-color: rgba(0, 0, 0, 0.08);
   }
-  html[data-journal-theme='light'] .post-author-text {
+  html[data-site-theme='light'] .post-author-text {
     color: rgba(26, 26, 28, 0.75);
   }
-  html[data-journal-theme='light'] .sidebar-links li {
+  html[data-site-theme='light'] .sidebar-links li {
     border-color: rgba(0, 0, 0, 0.08);
   }
-  html[data-journal-theme='light'] .sidebar-links a {
+  html[data-site-theme='light'] .sidebar-links a {
     color: rgba(26, 26, 28, 0.85);
   }
 
-  html[data-journal-theme='light'] .post-bottom-cta {
+  html[data-site-theme='light'] .post-bottom-cta {
     border-top-color: rgba(0, 0, 0, 0.08);
   }
-  html[data-journal-theme='light'] .bottom-cta-line {
+  html[data-site-theme='light'] .bottom-cta-line {
     color: rgba(26, 26, 28, 0.88);
   }
 </style>

@@ -29,6 +29,91 @@ html {
   scrollbar-gutter: stable;
 }
 
+/* === Site-Theme Variables (Dark / Light) =============================
+   Wird via data-site-theme='light' auf <html> aktiviert (SiteThemeToggle
+   + BaseLayout inline-script). Landing ist ausgenommen.
+
+   Sub-Pages nutzen diese Variables statt hardcoded rgba(245,245,244,*)
+   oder rgba(255,255,255,*). Amber-Akzente (--color-ts-accent) bleiben in
+   beiden Themes konstant → identische Brand-Praesenz.
+
+   Naming-Convention: --theme-{purpose}. bg = page background, text = body,
+   text-strong = headings, text-dim/muted = secondary/tertiary, card-bg =
+   card/section backgrounds, border = hairlines, code-bg = code blocks.
+   ===================================================================== */
+:root {
+  --theme-bg: #050507;
+  --theme-text: rgba(245, 245, 244, 0.88);
+  --theme-text-strong: #fafaf9;
+  --theme-text-dim: rgba(245, 245, 244, 0.75);
+  --theme-text-muted: rgba(245, 245, 244, 0.55);
+  --theme-card-bg: rgba(15, 15, 18, 0.55);
+  --theme-card-bg-solid: rgba(15, 15, 18, 0.9);
+  --theme-border: rgba(255, 255, 255, 0.08);
+  --theme-border-strong: rgba(255, 255, 255, 0.15);
+  --theme-code-bg: #0a0a0c;
+  --theme-cover-placeholder: #0a0a0c;
+  /* Reader-Serif Body im Journal-Detail behaelt Cream-Text auf Dark */
+}
+
+:root[data-site-theme='light'] {
+  --theme-bg: #f8f4ea; /* warm cream, feels like paper */
+  --theme-text: rgba(26, 26, 28, 0.88);
+  --theme-text-strong: #1a1a1c;
+  --theme-text-dim: rgba(26, 26, 28, 0.75);
+  --theme-text-muted: rgba(26, 26, 28, 0.55);
+  --theme-card-bg: rgba(255, 255, 255, 0.7);
+  --theme-card-bg-solid: rgba(255, 255, 255, 0.92);
+  --theme-border: rgba(0, 0, 0, 0.08);
+  --theme-border-strong: rgba(0, 0, 0, 0.15);
+  --theme-code-bg: rgba(0, 0, 0, 0.04);
+  --theme-cover-placeholder: rgba(0, 0, 0, 0.05);
+}
+
+/* === Site-Theme Subpage Container Inversion ==========================
+   Basis-Overrides: alle Sub-Page-Root-Container invertieren BG + Body-
+   Text auf light theme. Sub-Page-specifische Element-Overrides (Cards,
+   Borders, Muted-Text) leben in den jeweiligen Sub-Page Style-Blocks
+   und werden nach und nach migriert.
+
+   Nur .*-page Selektoren die BaseLayout+Astro exposed hat — landing
+   ist ausgenommen weil data-site-theme dort nie gesetzt wird (siehe
+   BaseLayout inline-script). */
+html[data-site-theme='light'] .ueber-page,
+html[data-site-theme='light'] .referenzen-page,
+html[data-site-theme='light'] .studio-page,
+html[data-site-theme='light'] .preise-page,
+html[data-site-theme='light'] .preisrechner-page,
+html[data-site-theme='light'] .kontakt-page,
+html[data-site-theme='light'] .impressum-page,
+html[data-site-theme='light'] .datenschutz-page,
+html[data-site-theme='light'] .journal-page {
+  background: var(--theme-bg);
+  color: var(--theme-text);
+}
+
+/* Generic content typography overrides: alle Text-Elemente in <main> auf
+   Non-Landing-Pages folgen dem Theme. Landing bekommt kein
+   data-site-theme (BaseLayout inline-script) → hier ausgeschlossen.
+   Sub-Page-specifische Elemente (Cards, Borders, Muted-Text) leben in den
+   jeweiligen Sub-Page Style-Blocks fuer detailliertes Styling. */
+html[data-site-theme='light'] main {
+  color: var(--theme-text);
+}
+html[data-site-theme='light'] main h1,
+html[data-site-theme='light'] main h2,
+html[data-site-theme='light'] main h3,
+html[data-site-theme='light'] main h4 {
+  color: var(--theme-text-strong);
+}
+html[data-site-theme='light'] main p,
+html[data-site-theme='light'] main li {
+  color: var(--theme-text);
+}
+html[data-site-theme='light'] main strong {
+  color: var(--theme-text-strong);
+}
+
 html,
 body {
   /* --color-ts-bg-deep (#050507) statt --color-ts-bg (#0a0a0c) —
