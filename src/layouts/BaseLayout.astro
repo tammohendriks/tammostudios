@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import TopBar from '../components/TopBar.astro';
+import SiteThemeToggle from '../components/SiteThemeToggle.astro';
 import { SITE } from '../lib/constants';
 
 interface Props {
@@ -261,17 +262,27 @@ const jsonLdGraph = {
       } catch (e) {}
     </script>
     <script is:inline>
-      // Journal-Theme (Dark ↔ Light) fruehzeitig setzen um FOUC zu vermeiden.
-      // WIRKT NUR auf einzelnen Beitrag-Seiten (/journal/[slug]) — nicht auf
-      // /journal Overview oder anderen Sub-Pages. Regex verlangt ein
-      // non-empty Segment nach /journal/.
+      // Site-Theme (Dark ↔ Light) fruehzeitig setzen um FOUC zu vermeiden.
+      // WIRKT auf allen Sub-Pages ausser Landing. Toggle-Component + CSS
+      // reagieren auf data-site-theme=light auf <html>. Wenn Attribut fehlt
+      // = Dark (default).
+      //
+      // Legacy-Migration: der fruehere Journal-only Toggle hat
+      // 'journal-theme' localStorage geschrieben. Wir migrieren einmalig
+      // zu 'site-theme' damit User's Preference erhalten bleibt.
       try {
-        var isPostDetail = /^\/journal\/[^\/]+/.test(location.pathname);
-        if (
-          isPostDetail &&
-          localStorage.getItem('journal-theme') === 'light'
-        ) {
-          document.documentElement.setAttribute('data-journal-theme', 'light');
+        var path = location.pathname;
+        var isLanding = path === '/' || path === '/index.html';
+
+        // Migration von altem 'journal-theme' → 'site-theme'
+        var legacy = localStorage.getItem('journal-theme');
+        if (legacy && !localStorage.getItem('site-theme')) {
+          localStorage.setItem('site-theme', legacy);
+          localStorage.removeItem('journal-theme');
+        }
+
+        if (!isLanding && localStorage.getItem('site-theme') === 'light') {
+          document.documentElement.setAttribute('data-site-theme', 'light');
         }
       } catch (e) {}
     </script>
@@ -279,6 +290,7 @@ const jsonLdGraph = {
   </head>
   <body class="min-h-screen bg-ts-bg text-ts-fg">
     <TopBar />
+    {!isLanding && <SiteThemeToggle />}
     <slot />
     <script>
       // Site-weiter Scroll-Reveal: alle [data-reveal] Elemente werden

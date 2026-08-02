@@ -211,4 +211,35 @@ const particles = Array.from({ length: PARTICLE_COUNT }, () => ({
       opacity: var(--opacity);
     }
   }
+
+  /* === Light-Theme Anpassungen ==========================================
+     Aktiv wenn User site-theme auf light schaltet. Grid-Linien wechseln
+     von weiss→schwarz (auf Cream sonst unsichtbar), Amber-Glows werden
+     etwas kraeftiger (0.12→0.18) um auf hellerem BG zu bestehen,
+     Vignette wird zart amber-cream statt schwarz (sonst wirken die
+     Ecken dreckig). Particles bleiben identisch — Amber funktioniert
+     auf beiden Themes. */
+  :global(html[data-site-theme='light']) .subpage-bg-grid {
+    background-image:
+      linear-gradient(to right, rgba(0, 0, 0, 0.045) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.045) 1px, transparent 1px);
+    -webkit-mask-image: radial-gradient(ellipse at 50% 40%, black 10%, transparent 75%);
+    mask-image: radial-gradient(ellipse at 50% 40%, black 10%, transparent 75%);
+  }
+
+  :global(html[data-site-theme='light']) .subpage-bg-glow {
+    background: radial-gradient(
+      circle,
+      rgba(245, 158, 11, 0.22) 0%,
+      transparent 65%
+    );
+  }
+
+  :global(html[data-site-theme='light']) .subpage-bg-vignette {
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(245, 158, 11, 0.05) 100%
+    );
+  }
 </style>
