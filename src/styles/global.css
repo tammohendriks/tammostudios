@@ -104,6 +104,17 @@ html[data-site-theme='light'] .journal-page {
    Specificity als unscoped global.css Regeln.
    ==================================================================== */
 
+/* ---------- SHARED GLOBAL CLASSES (aus global.css selbst) ----------
+   Diese Klassen sind in global.css definiert (oben, ~Zeile 300+) und
+   werden von JEDER Sub-Page verwendet. Per-Page-Audit sieht sie nicht.
+   Manuelle Wartung — bei neuen shared classes hier ergaenzen. */
+html[data-site-theme='light'] .subpage-hero-title {
+  color: var(--theme-text-strong) !important;
+}
+html[data-site-theme='light'] .subpage-hero-subtitle {
+  color: var(--theme-text-dim) !important;
+}
+
 /* ---------- CARD CONTAINERS (solid dark on light theme) ---------- */
 html[data-site-theme='light'] .price-card,
 html[data-site-theme='light'] .always-card,
