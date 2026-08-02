@@ -115,7 +115,10 @@ html[data-site-theme='light'] .subpage-hero-subtitle {
   color: var(--theme-text-dim) !important;
 }
 
-/* ---------- CARD CONTAINERS (solid dark on light theme) ---------- */
+/* ---------- CARD CONTAINERS (paper-cards on light theme) ----------
+   Cards werden zu warmem off-white (#fefdf9) mit subtiler border +
+   soft shadow → paper-on-paper editorial magazine look. Dark mode
+   unveraendert (Cards behalten ihre Original-Farben). */
 html[data-site-theme='light'] .price-card,
 html[data-site-theme='light'] .always-card,
 html[data-site-theme='light'] .pflege-card,
@@ -136,8 +139,175 @@ html[data-site-theme='light'] .prep-list li,
 html[data-site-theme='light'] .featured-post,
 html[data-site-theme='light'] .post-card,
 html[data-site-theme='light'] .journal-filter-empty {
-  background: #0a0a0c !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
+  background: #fefdf9 !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 6px 20px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* ---------- CARD TEXT INVERSIONS (paper-cards) ----------
+   Per-card dark-text children inverted to theme text tokens.
+   Amber-Akzente (eyebrows, icons, links, hover-states, tags) bleiben
+   implicit amber via Original-CSS — hier bewusst NICHT overriden.
+   Enumerated + verified via workflow #m32bvn56 (20 cards, 38 rules). */
+
+/* .price-card (preise) */
+html[data-site-theme='light'] .price-card .price-amount,
+html[data-site-theme='light'] .price-card .dash-list strong {
+  color: var(--theme-text-strong) !important;
+}
+html[data-site-theme='light'] .price-card .dash-list li {
+  color: var(--theme-text) !important;
+}
+html[data-site-theme='light'] .price-card .price-payment {
+  color: var(--theme-text-dim) !important;
+}
+html[data-site-theme='light'] .price-card .price-sublabel {
+  color: var(--theme-text-muted) !important;
+}
+
+/* .always-card (preise) */
+html[data-site-theme='light'] .always-card .always-headline {
+  color: var(--theme-text-strong) !important;
+}
+html[data-site-theme='light'] .always-card .check-list li {
+  color: var(--theme-text) !important;
+}
+
+/* .pflege-card (preise) */
+html[data-site-theme='light'] .pflege-card .pflege-headline,
+html[data-site-theme='light'] .pflege-card .pflege-amount,
+html[data-site-theme='light'] .pflege-card .dash-list strong {
+  color: var(--theme-text-strong) !important;
+}
+html[data-site-theme='light'] .pflege-card .dash-list li {
+  color: var(--theme-text) !important;
+}
+html[data-site-theme='light'] .pflege-card .pflege-tag {
+  color: var(--theme-text-muted) !important;
+}
+
+/* .calc-cta-card (preise) */
+html[data-site-theme='light'] .calc-cta-card .calc-cta-headline {
+  color: var(--theme-text-strong) !important;
+}
+html[data-site-theme='light'] .calc-cta-card .calc-cta-body {
+  color: var(--theme-text-dim) !important;
+}
+
+/* .pr-option-card (preisrechner) */
+html[data-site-theme='light'] .pr-option-card .pr-option-title {
+  color: var(--theme-text-strong) !important;
+}
+html[data-site-theme='light'] .pr-option-card .pr-option-sub {
+  color: var(--theme-text-muted) !important;
+}
+
+/* .pr-summary-card (preisrechner) */
+html[data-site-theme='light'] .pr-summary-card .pr-line-amount,
+html[data-site-theme='light'] .pr-summary-card .pr-total-value {
+  color: var(--theme-text-strong) !important;
+}
+html[data-site-theme='light'] .pr-summary-card .pr-summary-lines li {
+  color: var(--theme-text) !important;
+}
+html[data-site-theme='light'] .pr-summary-card .pr-total-label {
+  color: var(--theme-text-dim) !important;
+}
+html[data-site-theme='light'] .pr-summary-card .pr-summary-empty,
+html[data-site-theme='light'] .pr-summary-card .pr-summary-note {
+  color: var(--theme-text-muted) !important;
+}
+
+/* .pr-check-list li (preisrechner, li = card container) */
+html[data-site-theme='light'] .pr-check-list li {
+  color: var(--theme-text) !important;
+}
+
+/* .pr-excluded-list li (preisrechner) */
+html[data-site-theme='light'] .pr-excluded-list li .pr-excluded-title {
+  color: var(--theme-text-strong) !important;
+}
+html[data-site-theme='light'] .pr-excluded-list li .pr-excluded-text {
+  color: var(--theme-text-dim) !important;
+}
+
+/* .pr-faq-item (preisrechner) */
+html[data-site-theme='light'] .pr-faq-item summary,
+html[data-site-theme='light'] .pr-faq-item .pr-faq-q {
+  color: var(--theme-text-strong) !important;
+}
+html[data-site-theme='light'] .pr-faq-item .pr-faq-a {
+  color: var(--theme-text) !important;
+}
+
+/* .pr-final-inner (preisrechner) */
+html[data-site-theme='light'] .pr-final-inner .pr-final-headline,
+html[data-site-theme='light'] .pr-final-inner .pr-final-link {
+  color: var(--theme-text-strong) !important;
+}
+html[data-site-theme='light'] .pr-final-inner .pr-final-sub {
+  color: var(--theme-text-dim) !important;
+}
+
+/* .showcase-item + .showcase-summary (studio) */
+html[data-site-theme='light'] .showcase-item .shot-client,
+html[data-site-theme='light'] .showcase-summary .shot-client {
+  color: var(--theme-text-strong) !important;
+}
+html[data-site-theme='light'] .showcase-item .shot-tags li,
+html[data-site-theme='light'] .showcase-summary .shot-tags li {
+  color: var(--theme-text-dim) !important;
+}
+
+/* .ref-card (referenzen) */
+html[data-site-theme='light'] .ref-card .ref-card-title {
+  color: var(--theme-text-strong) !important;
+}
+html[data-site-theme='light'] .ref-card .ref-card-subtitle {
+  color: var(--theme-text-dim) !important;
+}
+
+/* .kontakt-cal (kontakt) */
+html[data-site-theme='light'] .kontakt-cal .cal-loading-text {
+  color: var(--theme-text-muted) !important;
+}
+
+/* .contact-card (kontakt) */
+html[data-site-theme='light'] .contact-card .contact-card-value {
+  color: var(--theme-text-strong) !important;
+}
+html[data-site-theme='light'] .contact-card .contact-card-label {
+  color: var(--theme-text-muted) !important;
+}
+
+/* .prep-list li (kontakt) */
+html[data-site-theme='light'] .prep-list li .prep-list-text {
+  color: var(--theme-text) !important;
+}
+
+/* .featured-post (journal overview) */
+html[data-site-theme='light'] .featured-post .featured-title a {
+  color: var(--theme-text-strong) !important;
+}
+html[data-site-theme='light'] .featured-post .featured-excerpt {
+  color: var(--theme-text-dim) !important;
+}
+
+/* .post-card (journal overview) */
+html[data-site-theme='light'] .post-card .post-card-title {
+  color: var(--theme-text-strong) !important;
+}
+html[data-site-theme='light'] .post-card .post-card-excerpt {
+  color: var(--theme-text-dim) !important;
+}
+html[data-site-theme='light'] .post-card .post-card-date {
+  color: var(--theme-text-muted) !important;
+}
+
+/* .journal-filter-empty (journal overview) */
+html[data-site-theme='light'] .journal-filter-empty,
+html[data-site-theme='light'] .journal-filter-empty p {
+  color: var(--theme-text-dim) !important;
 }
 
 /* ---------- /preise ---------- */
