@@ -114,6 +114,148 @@ html[data-site-theme='light'] main strong {
   color: var(--theme-text-strong);
 }
 
+/* === Sub-Page-specifische Text-Overrides ==============================
+   Elemente die eigene explizite `color:` Regeln haben (rgba(245,245,244,*)
+   oder #f5f5f4 / #fafaf9) — CSS-Cascade macht diese Rules staerker als
+   das generische `main {color:...}` Override oben. Daher pro Selector
+   explizit invertieren. Amber-Akzente sind ausgenommen (bleiben in beiden
+   Themes identisch).
+
+   Skip: TopBar, SiteFooter, /webdesign-* Verticals — die haben eigene
+   Design-Sprachen und werden nicht mit umgeschaltet. */
+
+/* ueber */
+html[data-site-theme='light'] .ueber-content h2,
+html[data-site-theme='light'] .ueber-content strong,
+html[data-site-theme='light'] .inline-link {
+  color: var(--theme-text-strong);
+}
+html[data-site-theme='light'] .ueber-content p,
+html[data-site-theme='light'] .close-line {
+  color: var(--theme-text-dim);
+}
+
+/* referenzen */
+html[data-site-theme='light'] .ref-filter-chip {
+  color: var(--theme-text-dim);
+}
+html[data-site-theme='light'] .ref-filter-chip:hover {
+  color: var(--theme-text);
+}
+html[data-site-theme='light'] .ref-filter-chip.is-active {
+  color: var(--theme-text-strong);
+}
+html[data-site-theme='light'] .ref-filter-count {
+  color: var(--theme-text-dim);
+}
+html[data-site-theme='light'] .ref-card-title {
+  color: var(--theme-text-strong);
+}
+
+/* studio */
+html[data-site-theme='light'] .studio-manifest p,
+html[data-site-theme='light'] .studio-section-title,
+html[data-site-theme='light'] .feature-title,
+html[data-site-theme='light'] .shot-client,
+html[data-site-theme='light'] .studio-cta-headline {
+  color: var(--theme-text-strong);
+}
+html[data-site-theme='light'] .studio-section-sub,
+html[data-site-theme='light'] .feature-body,
+html[data-site-theme='light'] .shot-branch,
+html[data-site-theme='light'] .studio-cta-sub {
+  color: var(--theme-text-dim);
+}
+
+/* preise */
+html[data-site-theme='light'] .preise-intro p,
+html[data-site-theme='light'] .price-amount,
+html[data-site-theme='light'] .price-title {
+  color: var(--theme-text-strong);
+}
+html[data-site-theme='light'] .price-sublabel,
+html[data-site-theme='light'] .price-payment {
+  color: var(--theme-text-muted);
+}
+html[data-site-theme='light'] .dash-list li {
+  color: var(--theme-text-dim);
+}
+html[data-site-theme='light'] .dash-list strong {
+  color: var(--theme-text-strong);
+}
+
+/* preisrechner */
+html[data-site-theme='light'] .pr-q-legend,
+html[data-site-theme='light'] .pr-option-title {
+  color: var(--theme-text-strong);
+}
+html[data-site-theme='light'] .pr-hint,
+html[data-site-theme='light'] .pr-option-sub {
+  color: var(--theme-text-muted);
+}
+
+/* kontakt */
+html[data-site-theme='light'] .contact-card-value,
+html[data-site-theme='light'] .kontakt-prep-headline {
+  color: var(--theme-text-strong);
+}
+html[data-site-theme='light'] .contact-card-label,
+html[data-site-theme='light'] .cal-loading-text {
+  color: var(--theme-text-muted);
+}
+html[data-site-theme='light'] .prep-list-text {
+  color: var(--theme-text-dim);
+}
+
+/* impressum + datenschutz (shared legal-* classes) */
+html[data-site-theme='light'] .legal-content h2,
+html[data-site-theme='light'] .legal-content a {
+  color: var(--theme-text-strong);
+}
+html[data-site-theme='light'] .legal-content p,
+html[data-site-theme='light'] .legal-address,
+html[data-site-theme='light'] .legal-list li {
+  color: var(--theme-text-dim);
+}
+html[data-site-theme='light'] .legal-stand {
+  color: var(--theme-text-muted);
+}
+
+/* journal overview */
+html[data-site-theme='light'] .featured-title a,
+html[data-site-theme='light'] .post-card-title {
+  color: var(--theme-text-strong);
+}
+html[data-site-theme='light'] .featured-excerpt,
+html[data-site-theme='light'] .post-card-excerpt {
+  color: var(--theme-text-dim);
+}
+html[data-site-theme='light'] .post-card-date {
+  color: var(--theme-text-muted);
+}
+html[data-site-theme='light'] .journal-filter-empty {
+  color: var(--theme-text-dim);
+}
+
+/* === Card-Backgrounds unter Light-Theme =============================
+   Cards die auf dark einen halbtransparenten dunklen BG haben (typisch
+   rgba(15, 15, 18, 0.4-0.9)) → auf light theme dark text auf dark card
+   waere unlesbar. Also Cards invertieren zu weissem/cream BG mit
+   dark borders. */
+html[data-site-theme='light'] .ref-card,
+html[data-site-theme='light'] .price-card,
+html[data-site-theme='light'] .contact-card,
+html[data-site-theme='light'] .kontakt-prep-card,
+html[data-site-theme='light'] .pr-option-card,
+html[data-site-theme='light'] .pr-summary-card,
+html[data-site-theme='light'] .post-card,
+html[data-site-theme='light'] .journal-filter-empty,
+html[data-site-theme='light'] .showcase-summary,
+html[data-site-theme='light'] .showcase-item {
+  background: var(--theme-card-bg);
+  border-color: var(--theme-border);
+}
+
 html,
 body {
   /* --color-ts-bg-deep (#050507) statt --color-ts-bg (#0a0a0c) —
