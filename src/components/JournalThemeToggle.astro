@@ -85,32 +85,40 @@
     outline-offset: 2px;
   }
 
+  /* Explizite Absolute-Positionen fuer Icons + Thumb statt flex
+     justify-content:space-between — dadurch Thumb-Zentrum landet exakt
+     auf Icon-Zentrum in beiden States. Vorher war Thumb ~1-2px daneben,
+     mobil sichtbar. */
   .journal-theme-track {
     position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    display: block;
     width: 52px;
     height: 22px;
-    padding: 0 6px;
     border-radius: 999px;
+    box-sizing: border-box;
   }
 
   .journal-theme-icon {
-    position: relative;
+    position: absolute;
+    top: 50%;
     z-index: 2;
+    width: 12px;
+    text-align: center;
     font-size: 12px;
     line-height: 1;
     color: rgba(245, 245, 244, 0.7);
     /* iOS rendered Sonne/Mond emojis colorful — disable per CSS */
     font-variant-emoji: text;
+    transform: translateY(-50%);
     transition: color 200ms ease;
   }
+  .journal-theme-icon-moon { left: 4px; }   /* Center: 4 + 6 = 10 */
+  .journal-theme-icon-sun  { left: 36px; }  /* Center: 36 + 6 = 42 */
 
   .journal-theme-thumb {
     position: absolute;
     top: 2px;
-    left: 2px;
+    left: 1px;
     width: 18px;
     height: 18px;
     border-radius: 50%;
@@ -119,9 +127,11 @@
     z-index: 1;
   }
 
-  /* Light-Mode Zustand: Thumb rechts, Sun-Icon aktiv, Moon dim */
+  /* Light-Mode: Thumb um 32px nach rechts → Center bei 42 = Sun-Center.
+     Dark-Zustand: Thumb-Center bei 10 = Moon-Center. Beide Icons sitzen
+     jetzt exakt IN der Kreisscheibe. */
   :global(html[data-journal-theme='light']) .journal-theme-thumb {
-    transform: translateX(30px);
+    transform: translateX(32px);
   }
   :global(html[data-journal-theme='light']) .journal-theme-icon-moon {
     color: rgba(245, 245, 244, 0.4);
