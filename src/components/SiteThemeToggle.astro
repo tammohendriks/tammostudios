@@ -28,8 +28,24 @@
   aria-label="Farbthema umschalten (Dark / Light)"
 >
   <span class="site-theme-track" aria-hidden="true">
-    <span class="site-theme-icon site-theme-icon-moon">☾</span>
-    <span class="site-theme-icon site-theme-icon-sun">☀</span>
+    <span class="site-theme-icon site-theme-icon-moon">
+      <svg viewBox="0 0 12 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <path d="M9.2 7.5A4.5 4.5 0 013.5 1.8a4.5 4.5 0 105.7 5.7z" />
+      </svg>
+    </span>
+    <span class="site-theme-icon site-theme-icon-sun">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="6" cy="6" r="2.2" fill="currentColor" stroke="none" />
+        <line x1="6" y1="0.5" x2="6" y2="2" />
+        <line x1="6" y1="10" x2="6" y2="11.5" />
+        <line x1="0.5" y1="6" x2="2" y2="6" />
+        <line x1="10" y1="6" x2="11.5" y2="6" />
+        <line x1="2.1" y1="2.1" x2="3.15" y2="3.15" />
+        <line x1="8.85" y1="8.85" x2="9.9" y2="9.9" />
+        <line x1="9.9" y1="2.1" x2="8.85" y2="3.15" />
+        <line x1="2.1" y1="9.9" x2="3.15" y2="8.85" />
+      </svg>
+    </span>
     <span class="site-theme-thumb"></span>
   </span>
 </button>
@@ -98,21 +114,28 @@
     box-sizing: border-box;
   }
 
+  /* SVG icons statt emoji — deterministisches Rendering, keine
+     Platform-abhaengigen Glyphen-Metriken. Beide icons sind 12x12,
+     sitzen absolut positioniert, ihr Bounding-Box-Center matched
+     exakt mit dem Thumb-Center in beiden States. */
   .site-theme-icon {
     position: absolute;
     top: 50%;
     z-index: 2;
     width: 12px;
-    text-align: center;
-    font-size: 12px;
-    line-height: 1;
+    height: 12px;
     color: rgba(245, 245, 244, 0.7);
-    font-variant-emoji: text;
     transform: translateY(-50%);
     transition: color 200ms ease;
+    display: block;
   }
-  .site-theme-icon-moon { left: 4px; }
-  .site-theme-icon-sun  { left: 36px; }
+  .site-theme-icon svg {
+    display: block;
+    width: 12px;
+    height: 12px;
+  }
+  .site-theme-icon-moon { left: 4px; }   /* Center: 4 + 6 = 10 */
+  .site-theme-icon-sun  { left: 36px; }  /* Center: 36 + 6 = 42 */
 
   .site-theme-thumb {
     position: absolute;
