@@ -85,45 +85,104 @@ html[data-site-theme='light'] .studio-page,
 html[data-site-theme='light'] .preise-page,
 html[data-site-theme='light'] .preisrechner-page,
 html[data-site-theme='light'] .kontakt-page,
-html[data-site-theme='light'] .impressum-page,
-html[data-site-theme='light'] .datenschutz-page,
+html[data-site-theme='light'] .legal-page,
 html[data-site-theme='light'] .journal-page {
   background: var(--theme-bg);
   color: var(--theme-text);
 }
 
-/* === Sub-Page Overrides unter Light-Theme =============================
-   Astro-Scoping: jede Rule in einem Page-`<style>` Block wird bei Compile
-   mit einem [data-astro-cid-x] Attribut angereichert → Specificity steigt
-   pro Selector-Position um +1 Klasse. Meine ungeslopten Rules aus
-   global.css koennen daher NICHT gewinnen ohne !important.
-   `!important` ist bei Theme-Systemen die akzeptierte Praxis — dieser
-   Block ist der EINZIGE Ort im Repo wo wir es benutzen, und nur fuer
-   Theme-Overrides.
+/* === LIGHT THEME OVERRIDES — SUBPAGES ================================
+   Generated from full DOM/CSS audit of all sub-pages (Workflow #ba382).
 
-   Design-Prinzip (nach User-Feedback "einfach all black"):
-   Cards bleiben SOLID DARK auf light theme (magazine-Style: dunkle
-   Islands auf Cream-Page). Text INNERHALB Cards bleibt light (kein
-   Text-Override noetig — Original-Farbe reicht).
-   Text AUSSERHALB Cards (page-level) invertiert auf dark auf Cream.
+   Regeln:
+   - CARD containers → solid dark #0a0a0c (text INSIDE bleibt light).
+   - PAGE-LEVEL text → invertiert zu --theme-text-* tokens.
+   - INSIDE-CARD text → keine Regel (Original-Light-Farbe reicht).
+   - AMBER-Akzente → keine Regel (identisch in beiden Themes).
 
-   Amber-Akzente bleiben literal. TopBar, SiteFooter und /webdesign-*
-   sind ausgeschlossen. */
+   !important konsequent — Astro's scoped-CSS-Rules haben sonst hoehere
+   Specificity als unscoped global.css Regeln.
+   ==================================================================== */
 
-/* === Page-Level Text (AUSSERHALB Cards) → dark auf Cream ============ */
+/* ---------- CARD CONTAINERS (solid dark on light theme) ---------- */
+html[data-site-theme='light'] .price-card,
+html[data-site-theme='light'] .always-card,
+html[data-site-theme='light'] .pflege-card,
+html[data-site-theme='light'] .calc-cta-card,
+html[data-site-theme='light'] .pr-option-card,
+html[data-site-theme='light'] .pr-summary-card,
+html[data-site-theme='light'] .pr-check-list li,
+html[data-site-theme='light'] .pr-excluded-list li,
+html[data-site-theme='light'] .pr-faq-item,
+html[data-site-theme='light'] .pr-final-inner,
+html[data-site-theme='light'] .showcase-item,
+html[data-site-theme='light'] .showcase-summary,
+html[data-site-theme='light'] .shot-wrap,
+html[data-site-theme='light'] .ref-card,
+html[data-site-theme='light'] .kontakt-cal,
+html[data-site-theme='light'] .contact-card,
+html[data-site-theme='light'] .prep-list li,
+html[data-site-theme='light'] .featured-post,
+html[data-site-theme='light'] .post-card,
+html[data-site-theme='light'] .journal-filter-empty {
+  background: #0a0a0c !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
 
-/* Shared Sub-Page Klassen */
-html[data-site-theme='light'] .subpage-hero-title {
+/* ---------- /preise ---------- */
+html[data-site-theme='light'] .preise-intro p,
+html[data-site-theme='light'] .preise-section h2,
+html[data-site-theme='light'] .preise-section .dash-list strong,
+html[data-site-theme='light'] .preise-intro-punkt {
   color: var(--theme-text-strong) !important;
 }
-html[data-site-theme='light'] .subpage-hero-subtitle {
+html[data-site-theme='light'] .preise-section p,
+html[data-site-theme='light'] .erweiterung-head {
+  color: var(--theme-text) !important;
+}
+html[data-site-theme='light'] .preise-disclaimer p,
+html[data-site-theme='light'] .preise-section .dash-list li {
+  color: var(--theme-text-dim) !important;
+}
+html[data-site-theme='light'] .erweiterung-body,
+html[data-site-theme='light'] .cta-pre {
+  color: var(--theme-text-muted) !important;
+}
+
+/* ---------- /preisrechner ----------
+   Summary-card content (incl. "DEINE GESCHÄTZTEN KOSTEN" + empty state)
+   und .pr-final-inner content (incl. "Klingt fair?") sind bewusst NICHT
+   overriden — sie leben in forced-dark cards und bleiben light-on-dark. */
+html[data-site-theme='light'] .pr-q-legend,
+html[data-site-theme='light'] .pr-mini-headline {
+  color: var(--theme-text-strong) !important;
+}
+html[data-site-theme='light'] .pr-hint {
+  color: var(--theme-text-muted) !important;
+}
+
+/* ---------- /studio ----------
+   .feature-item, .step-item, .studio-cta sind Layout-Wrapper OHNE bg —
+   Kinder brauchen page-level inversion. Fixt den "So gehts weiss auf
+   cream" bug fuer die 3-step section. */
+html[data-site-theme='light'] .studio-manifest p,
+html[data-site-theme='light'] .studio-section-title,
+html[data-site-theme='light'] .feature-title,
+html[data-site-theme='light'] .step-title,
+html[data-site-theme='light'] .studio-cta-headline,
+html[data-site-theme='light'] .studio-cta-link {
+  color: var(--theme-text-strong) !important;
+}
+html[data-site-theme='light'] .studio-section-sub,
+html[data-site-theme='light'] .feature-body,
+html[data-site-theme='light'] .step-body,
+html[data-site-theme='light'] .studio-cta-sub {
   color: var(--theme-text-dim) !important;
 }
 
-/* ueber — Content-Article ist page-level, keine Cards */
+/* ---------- /ueber ---------- */
 html[data-site-theme='light'] .ueber-content h2,
-html[data-site-theme='light'] .ueber-content strong,
-html[data-site-theme='light'] .inline-link {
+html[data-site-theme='light'] .ueber-content strong {
   color: var(--theme-text-strong) !important;
 }
 html[data-site-theme='light'] .ueber-content p,
@@ -131,109 +190,47 @@ html[data-site-theme='light'] .close-line {
   color: var(--theme-text-dim) !important;
 }
 
-/* referenzen — Filter-Chips sind page-level (nicht Cards) */
-html[data-site-theme='light'] .ref-filter-chip {
-  color: var(--theme-text-dim) !important;
+/* ---------- /referenzen ---------- */
+html[data-site-theme='light'] .ref-filter-chip.is-active {
+  color: var(--theme-text-strong) !important;
 }
 html[data-site-theme='light'] .ref-filter-chip:hover {
   color: var(--theme-text) !important;
 }
-html[data-site-theme='light'] .ref-filter-chip.is-active {
-  color: var(--theme-text-strong) !important;
-}
+html[data-site-theme='light'] .ref-filter-chip,
 html[data-site-theme='light'] .ref-filter-count {
   color: var(--theme-text-dim) !important;
 }
 
-/* studio — Section-Header und Manifest page-level. Feature-Cards
-   haben nur amber-tint (kaum sichtbar), Text darauf auch invertieren */
-html[data-site-theme='light'] .studio-manifest p,
-html[data-site-theme='light'] .studio-section-title,
-html[data-site-theme='light'] .feature-title,
-html[data-site-theme='light'] .studio-cta-headline {
+/* ---------- /kontakt ---------- */
+html[data-site-theme='light'] .kontakt-prep-headline {
   color: var(--theme-text-strong) !important;
 }
-html[data-site-theme='light'] .studio-section-sub,
-html[data-site-theme='light'] .feature-body,
-html[data-site-theme='light'] .studio-cta-sub {
+
+/* ---------- /journal ---------- */
+html[data-site-theme='light'] .journal-empty {
   color: var(--theme-text-dim) !important;
 }
 
-/* preise — nur page-level Text-Bloecke (nicht Cards) */
-html[data-site-theme='light'] .preise-intro p {
-  color: var(--theme-text-strong) !important;
-}
-html[data-site-theme='light'] .preise-section h2,
-html[data-site-theme='light'] .preise-section p,
-html[data-site-theme='light'] .preise-section .dash-list li {
-  color: var(--theme-text) !important;
-}
-html[data-site-theme='light'] .preise-section h2 {
-  color: var(--theme-text-strong) !important;
-}
-html[data-site-theme='light'] .preise-disclaimer,
-html[data-site-theme='light'] .preise-disclaimer p {
-  color: var(--theme-text-dim) !important;
-}
-
-/* preisrechner — Question-Headers page-level */
-html[data-site-theme='light'] .pr-q-legend {
-  color: var(--theme-text-strong) !important;
-}
-html[data-site-theme='light'] .pr-hint {
-  color: var(--theme-text-muted) !important;
-}
-html[data-site-theme='light'] .pr-mini-eyebrow,
-html[data-site-theme='light'] .pr-mini-headline {
-  color: var(--theme-text-strong) !important;
-}
-
-/* impressum + datenschutz — Legal-Content ist komplett page-level */
+/* ---------- /impressum & /datenschutz (shared .legal-*) ---------- */
 html[data-site-theme='light'] .legal-content h2,
 html[data-site-theme='light'] .legal-content a {
   color: var(--theme-text-strong) !important;
 }
 html[data-site-theme='light'] .legal-content p,
-html[data-site-theme='light'] .legal-address,
-html[data-site-theme='light'] .legal-list li {
+html[data-site-theme='light'] .legal-list li,
+html[data-site-theme='light'] .legal-address {
   color: var(--theme-text-dim) !important;
 }
 html[data-site-theme='light'] .legal-stand {
   color: var(--theme-text-muted) !important;
 }
 
-/* journal — Container-Text ist page-level */
-html[data-site-theme='light'] .journal-page {
-  color: var(--theme-text) !important;
-}
-
-/* === Cards → SOLID DARK auf light theme =============================
-   Alle Container die auf dark eine card-artige rgba(15,15,18,*) oder
-   linear-gradient rgba(20,20,24,*) BG haben. Wir halten sie SOLID DARK
-   auf light theme — Magazine-Style, dunkle Islands auf Cream.
-   Text INNERHALB dieser Cards bleibt light (Original-Farbe, kein
-   Text-Override noetig). Amber-Akzente + Borders behalten Original. */
-html[data-site-theme='light'] .ref-card,
-html[data-site-theme='light'] .price-card,
-html[data-site-theme='light'] .contact-card,
-html[data-site-theme='light'] .kontakt-prep-card,
-html[data-site-theme='light'] .pr-option-card,
-html[data-site-theme='light'] .pr-summary-card,
-html[data-site-theme='light'] .post-card,
-html[data-site-theme='light'] .featured-post,
-html[data-site-theme='light'] .showcase-summary,
-html[data-site-theme='light'] .showcase-item,
-html[data-site-theme='light'] .journal-filter-empty,
-html[data-site-theme='light'] .preise-cta,
-html[data-site-theme='light'] .preise-always,
-html[data-site-theme='light'] .preise-pflege,
-html[data-site-theme='light'] .preise-calc-cta,
-html[data-site-theme='light'] .pr-included-list li,
-html[data-site-theme='light'] .pr-excluded-list li,
-html[data-site-theme='light'] .pr-faq-item,
-html[data-site-theme='light'] .pr-cta {
-  background: #0a0a0c !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
+/* ---------- SHARED: .inline-link (preise + ueber) ---------- */
+html[data-site-theme='light'] .inline-link,
+html[data-site-theme='light'] .inline-link:hover,
+html[data-site-theme='light'] .inline-link:focus-visible {
+  color: var(--theme-text-strong) !important;
 }
 
 html,
