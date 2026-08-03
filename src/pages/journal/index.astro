@@ -317,6 +317,14 @@ const TAG_FILTERS = [
     .featured-post {
       grid-template-columns: 1fr;
       gap: 24px;
+      /* Cover ist auf Mobile full-bleed am Card-Top, .featured-meta
+         darunter braucht seitliches Padding damit Text nicht direkt am
+         Card-Rand klebt (fuehlt sich sonst gedrueckt an). Uebernimmt das
+         padding-Pattern von .post-card-body:20px. */
+      padding-bottom: 24px;
+    }
+    .featured-meta {
+      padding: 0 20px;
     }
   }
   .featured-cover {
