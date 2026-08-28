@@ -55,8 +55,8 @@ export const SECTION3 = {
       // <strong> hebt die Beträge in Amber hervor; das Section-3
       // Component rendert body via set:html, damit die Tags greifen.
       body:
-        '<strong>1.500 €</strong> für eine Website, ' +
-        '<strong>2.500 €</strong> für aufwändigere Projekte wie ' +
+        '<strong>2.000 €</strong> für eine Website, ' +
+        '<strong>3.000 €</strong> für aufwändigere Projekte wie ' +
         'Online-Shops. Keine versteckten Stundensätze, keine Pakete ' +
         'mit Sternchen.',
       link: { href: '/preise', label: 'Volle Preisliste' },
