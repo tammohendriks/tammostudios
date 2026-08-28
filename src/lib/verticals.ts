@@ -69,7 +69,7 @@ export const VERTICALS: readonly Vertical[] = [
     meta: {
       title: 'Websites für Handwerksbetriebe',
       description:
-        'Handgemachte Websites für Handwerker in Bremen. Ab 1.500 €, in 14 Tagen live. Mit Notdienst-Funktion und mobile-first Design.',
+        'Handgemachte Websites für Handwerker in Bremen. Ab 2.000 €, in 14 Tagen live. Mit Notdienst-Funktion und mobile-first Design.',
     },
     hero: {
       eyebrow: 'WEBSITE FÜR HANDWERK',
@@ -79,7 +79,7 @@ export const VERTICALS: readonly Vertical[] = [
         { text: 'Handfest gebaut.' },
       ],
       subheadline:
-        'Ab 1.500 €. In 14 Tagen live.\nAus Bremen für Handwerker in Norddeutschland.',
+        'Ab 2.000 €. In 14 Tagen live.\nAus Bremen für Handwerker in Norddeutschland.',
       background: {
         image: '/webdesign-landings/hero-handwerk.webp',
         focalPoint: 'center 40%',
@@ -99,7 +99,7 @@ export const VERTICALS: readonly Vertical[] = [
     ],
     pricing: {
       paragraphs: [
-        'Eine Website 1.500 €.\nEin Online-Shop mit Zubehör 2.500 €.\nKeine Stundensätze, keine Sternchen.\nFertig in 14 Tagen.',
+        'Eine Website 2.000 €.\nEin Online-Shop mit Zubehör 3.000 €.\nKeine Stundensätze, keine Sternchen.\nFertig in 14 Tagen.',
         'Für 30 € im Monat übernehme ich Wartung, Sicherheits-Updates und priorisierten Support bei Störungen.\nOptional, monatlich kündbar.',
       ],
     },
@@ -162,7 +162,7 @@ export const VERTICALS: readonly Vertical[] = [
     meta: {
       title: 'Websites für Praxen und Ärzte',
       description:
-        'Handgemachte Websites für Arztpraxen in Bremen. DSGVO-konform, mit Terminanfrage-Funktion, ab 1.500 €.',
+        'Handgemachte Websites für Arztpraxen in Bremen. DSGVO-konform, mit Terminanfrage-Funktion, ab 2.000 €.',
     },
     hero: {
       eyebrow: 'WEBSITE FÜR PRAXEN',
@@ -171,7 +171,7 @@ export const VERTICALS: readonly Vertical[] = [
         { text: 'Praxis-Website.', highlight: true },
         { text: 'Diskret, klar, professionell.' },
       ],
-      subheadline: 'DSGVO-konform. Ab 1.500 €.\nAus Bremen für Praxen in ganz Deutschland.',
+      subheadline: 'DSGVO-konform. Ab 2.000 €.\nAus Bremen für Praxen in ganz Deutschland.',
       background: {
         image: '/webdesign-landings/hero-praxis.webp',
         focalPoint: 'center 35%',
@@ -196,7 +196,7 @@ export const VERTICALS: readonly Vertical[] = [
     ],
     pricing: {
       paragraphs: [
-        'Eine Praxis-Website 1.500 €.\nMit erweiterten Features wie Online-Terminbuchung oder Patientenportal 2.500 € (Grundausstattung).\nAlle Standards inklusive — Datenschutz, Verschlüsselung, DSGVO-Konformität sind Pflicht, nicht Extra.',
+        'Eine Praxis-Website 2.000 €.\nMit erweiterten Features wie Online-Terminbuchung oder Patientenportal 3.000 € (Grundausstattung).\nAlle Standards inklusive — Datenschutz, Verschlüsselung, DSGVO-Konformität sind Pflicht, nicht Extra.',
         'Für 30 € im Monat übernehme ich Wartung, Sicherheits-Updates und priorisierten Support.\nOptional, monatlich kündbar.',
       ],
     },
@@ -258,7 +258,7 @@ export const VERTICALS: readonly Vertical[] = [
     meta: {
       title: 'Websites für Gastronomie',
       description:
-        'Handgemachte Websites für Gastronomiebetriebe in Bremen. Mit Speisekarte, Reservierung, Instagram-Feed, ab 1.500 €.',
+        'Handgemachte Websites für Gastronomiebetriebe in Bremen. Mit Speisekarte, Reservierung, Instagram-Feed, ab 2.000 €.',
     },
     hero: {
       eyebrow: 'WEBSITE FÜR GASTRONOMIE',
@@ -268,7 +268,7 @@ export const VERTICALS: readonly Vertical[] = [
         { text: 'Einzigartig wie' },
         { text: 'dein Laden.' },
       ],
-      subheadline: 'Ab 1.500 €.\nAus Bremen für Gastro in ganz Deutschland.',
+      subheadline: 'Ab 2.000 €.\nAus Bremen für Gastro in ganz Deutschland.',
       background: {
         image: '/webdesign-landings/hero-gastro.webp',
         focalPoint: 'center 45%',
@@ -288,7 +288,7 @@ export const VERTICALS: readonly Vertical[] = [
     ],
     pricing: {
       paragraphs: [
-        'Eine Gastro-Website 1.500 €.\nMit Onlineshop für Merchandise oder Gutscheine 2.500 €.\nSpeisekarte pflegst du selbst — kein Anruf nötig, wenn sich der Wochenteller ändert.',
+        'Eine Gastro-Website 2.000 €.\nMit Onlineshop für Merchandise oder Gutscheine 3.000 €.\nSpeisekarte pflegst du selbst — kein Anruf nötig, wenn sich der Wochenteller ändert.',
         'Für 30 € im Monat übernehme ich Wartung, Sicherheits-Updates und priorisierten Support.\nOptional, monatlich kündbar.',
       ],
     },
