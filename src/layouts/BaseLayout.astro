@@ -6,6 +6,11 @@ import { SITE } from '../lib/constants';
 
 interface Props {
   pageTitle: string;
+  /** Optional: ueberschreibt den gesamten <title> und og:title.
+      Ohne wird pageTitle mit " — Tammo Studios" suffixed. Nutzen fuer
+      SEO-optimierte Titles wo der Brand-Suffix redundant waere
+      (z.B. Homepage — Domain zeigt schon Brand). */
+  title?: string;
   description?: string;
   noindex?: boolean;
   /** Optionales page-spezifisches JSON-LD (z.B. Person auf /ueber),
@@ -13,9 +18,9 @@ interface Props {
   additionalSchema?: Record<string, unknown> | Record<string, unknown>[];
 }
 
-const { pageTitle, description = `${SITE.name} — Webentwicklung aus ${SITE.location}.`, noindex = false, additionalSchema } = Astro.props;
+const { pageTitle, title, description = `${SITE.name} — Webentwicklung aus ${SITE.location}.`, noindex = false, additionalSchema } = Astro.props;
 
-const fullTitle = `${pageTitle} — ${SITE.name}`;
+const fullTitle = title ?? `${pageTitle} — ${SITE.name}`;
 // Default Allow: nur PUBLIC_ALLOW_INDEXING="false" rendert das
 // noindex-Meta-Tag. Dieselbe Inversion wie in src/pages/robots.txt.ts —
 // schützt gegen Env-Var-Fehlkonfiguration in Production. Plus: Pages
