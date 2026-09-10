@@ -5,10 +5,17 @@ import tailwindcss from '@tailwindcss/vite';
 
 import sitemap from '@astrojs/sitemap';
 import react from '@astrojs/react';
+import vercel from '@astrojs/vercel';
 
 // https://astro.build/config
 export default defineConfig({
   site: 'https://tammostudios.de',
+
+  // Vercel-Adapter fuer server-side API-Routes (src/pages/api/*.ts mit
+  // `export const prerender = false`). Alle statischen Pages bleiben
+  // static-prerendered — nur die API-Routes werden zu Serverless-
+  // Functions gebaut. Kein Impact auf Landing/Sub-Page Perf.
+  adapter: vercel(),
 
   // Kanonisch: apex ohne trailing slash (matcht Search-Console-Setup
   // + vercel.json trailingSlash:false). trailingSlash:'never' streicht
