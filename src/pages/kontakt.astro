@@ -55,7 +55,7 @@ const subjectOptions = [
     <header class="kontakt-hero">
       <h1 class="subpage-hero-title">Sprechen wir.</h1>
       <p class="subpage-hero-subtitle text-lines">
-        {'Antwort innerhalb 24 Stunden.\nSchreib mir kurz was du vorhast.'}
+        {'Antwort innerhalb 24 Stunden.\nSchreib mir kurz, was du vorhast.'}
       </p>
     </header>
 
@@ -316,17 +316,30 @@ const subjectOptions = [
   const submitLabel = submitBtn?.querySelector('.form-submit-label') as HTMLElement | null;
   const successEl = document.getElementById('kontakt-success') as HTMLElement | null;
 
-  // Initial-Placeholder setzen (matcht ersten Select-Value)
+  // Textarea VORFUELLEN mit Template (nicht nur als placeholder) — User
+  // kann seine Infos direkt in die eckigen [Klammern] tippen statt
+  // von leerem Feld zu starten. Beim Select-Wechsel wird das Template
+  // ausgetauscht — aber NUR wenn User noch nix editiert hat (value
+  // matched noch das zuletzt gesetzte Template). Sobald User etwas
+  // aendert, bleibt sein Text stehen.
+  //
+  // Referenz-Wert wird in `lastTemplate` gespeichert. Nach jedem Setzen
+  // updaten. Beim Submit werden die Templates NICHT gefiltert — falls
+  // User einfach ohne Editing sendet, kommt der Template-Text mit
+  // [Klammer]-Platzhaltern bei Tammo an, der dann rueckfragen kann.
+  let lastTemplate = '';
   if (subjectSelect && messageArea) {
-    messageArea.placeholder = PLACEHOLDERS[subjectSelect.value] ?? '';
+    lastTemplate = PLACEHOLDERS[subjectSelect.value] ?? '';
+    messageArea.value = lastTemplate;
 
     subjectSelect.addEventListener('change', () => {
       const val = subjectSelect.value;
-      const newPlaceholder = PLACEHOLDERS[val] ?? '';
-      // Nur ueberschreiben wenn Textarea noch leer — sonst User-Input
-      // schuetzen
-      if (messageArea.value.trim() === '') {
-        messageArea.placeholder = newPlaceholder;
+      const newTemplate = PLACEHOLDERS[val] ?? '';
+      // Nur austauschen wenn User das aktuelle Template noch nicht
+      // editiert hat (oder Textarea manuell geleert hat).
+      if (messageArea.value === lastTemplate || messageArea.value.trim() === '') {
+        messageArea.value = newTemplate;
+        lastTemplate = newTemplate;
       }
     });
   }
