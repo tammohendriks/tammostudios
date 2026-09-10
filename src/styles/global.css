@@ -133,7 +133,8 @@ html[data-site-theme='light'] .showcase-item,
 html[data-site-theme='light'] .showcase-summary,
 html[data-site-theme='light'] .shot-wrap,
 html[data-site-theme='light'] .ref-card,
-html[data-site-theme='light'] .kontakt-cal,
+html[data-site-theme='light'] .kontakt-form-section,
+html[data-site-theme='light'] .kontakt-cal-accordion,
 html[data-site-theme='light'] .contact-card,
 html[data-site-theme='light'] .prep-list li,
 html[data-site-theme='light'] .featured-post,
@@ -142,6 +143,57 @@ html[data-site-theme='light'] .journal-filter-empty {
   background: #fefdf9 !important;
   border-color: rgba(0, 0, 0, 0.08) !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 6px 20px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* .kontakt-form-section — Form-Labels + Inputs auf light theme */
+html[data-site-theme='light'] .kontakt-form-section .form-field label {
+  color: var(--theme-text-strong) !important;
+}
+html[data-site-theme='light'] .kontakt-form-section .form-checkbox label {
+  color: var(--theme-text) !important;
+}
+html[data-site-theme='light'] .kontakt-form-section input[type='text'],
+html[data-site-theme='light'] .kontakt-form-section input[type='email'],
+html[data-site-theme='light'] .kontakt-form-section input[type='tel'],
+html[data-site-theme='light'] .kontakt-form-section select,
+html[data-site-theme='light'] .kontakt-form-section textarea {
+  background: rgba(0, 0, 0, 0.04) !important;
+  color: var(--theme-text-strong) !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}
+html[data-site-theme='light'] .kontakt-form-section input::placeholder,
+html[data-site-theme='light'] .kontakt-form-section textarea::placeholder {
+  color: rgba(26, 26, 28, 0.4) !important;
+}
+html[data-site-theme='light'] .kontakt-form-section select {
+  /* Select-Chevron auf light theme dunkler machen (SVG stroke war amber
+     auf dark, bleibt amber = ok; keine Aenderung noetig hier). */
+}
+html[data-site-theme='light'] .form-success-headline {
+  color: var(--theme-text-strong) !important;
+}
+html[data-site-theme='light'] .form-success-body {
+  color: var(--theme-text-dim) !important;
+}
+
+/* .kontakt-cal-accordion — Header-Text auf light theme */
+html[data-site-theme='light'] .kontakt-cal-accordion .cal-accordion-headline {
+  color: var(--theme-text-strong) !important;
+}
+html[data-site-theme='light'] .kontakt-cal-accordion .cal-accordion-sub {
+  color: var(--theme-text-dim) !important;
+}
+html[data-site-theme='light'] .kontakt-cal-accordion .cal-accordion-panel {
+  border-top-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* /impressum + /datenschutz Hero-Title
+   "Datenschutzerklaerung" ist 20 Zeichen — bei clamp(48,8vw,96) auf
+   Desktop ~1000px breit, sprengt .legal-hero max-width:720 → Overflow
+   wird clipped, Titel wirkt links abgeschnitten statt zentriert. Fix:
+   fuer Legal-Pages Cap auf 64px reduzieren damit lange Titel passen. */
+.legal-hero .subpage-hero-title {
+  font-size: clamp(36px, 6vw, 64px);
 }
 
 /* ---------- CARD TEXT INVERSIONS (paper-cards) ----------

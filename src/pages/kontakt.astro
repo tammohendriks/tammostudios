@@ -1,13 +1,20 @@
 ---
-// Dedizierte Kontakt-Seite mit Cal.com-Inline-Embed. Ersetzt das
-// bisherige ContactModal — alle "Erstgespraech anfragen"/"Kontakt"-
-// CTAs site-wide linken jetzt direkt hierher.
-//
-// Struktur:
-//   1. Hero — Headline + kurze Einladung
-//   2. Cal.com Embed — direkter Terminbuchungs-Kalender (dark theme)
-//   3. Alternative Kontakte — Telefon/Email/Instagram-Cards
-//   4. Was im Erstgespraech passiert — 4-Schritte Prep-Info
+/**
+ * Kontakt-Seite mit Kontaktformular (POST /api/kontakt via Resend) und
+ * Cal.com als collapsibles Accordion. Ersetzt das direkt sichtbare
+ * Cal-Widget mit einem Formular als primaerem CTA.
+ *
+ * Struktur:
+ *   1. Hero — Headline + Einladung
+ *   2. Kontaktformular (NEU, primaer)
+ *   3. Alternative Kontakte — Telefon/Email/Instagram-Cards
+ *   4. Cal.com Accordion (NEU — collapsed by default, lazy-loaded)
+ *   5. Was im Erstgespraech passiert — 4-Schritte Prep-Info
+ *
+ * Wichtig: Cal-Init-Script laedt jetzt LAZY nach User-Klick statt on
+ * page load. Spart ~120KB embed.js + iframe cost fuer alle User die
+ * das Formular nutzen (Mehrheit erwartet).
+ */
 
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SubPageBackground from '../components/SubPageBackground.astro';
@@ -20,25 +27,27 @@ const prepSteps = [
   'Wir schauen ob\'s passt',
   'Wenn ja: Angebot innerhalb 24h',
 ];
+
+// Subject-Options — value matched mit API-Route Enum, label wird in
+// UI + in Placeholder-Templates via JS gemapped.
+const subjectOptions = [
+  { value: 'website-projekt', label: 'Website-Projekt' },
+  { value: 'online-shop', label: 'Online-Shop-Projekt' },
+  { value: 'wartung-support', label: 'Wartung / Support' },
+  { value: 'allgemein', label: 'Allgemeine Projektanfrage' },
+  { value: 'anderes', label: 'Anderes' },
+];
 ---
 
 <BaseLayout
   pageTitle="Kontakt"
-  description="30 Minuten Erstgespräch, kostenlos und unverbindlich. Direkt buchen oder per Mail/Telefon melden."
+  description="Kontaktformular, direkte Anfrage oder Termin buchen. Antwort innerhalb 24h — Website 2.000 €, Online-Shop 3.000 €."
 >
-  <!-- Resource-Hints fuer Cal.com — starten DNS-Resolution + TLS-Handshake
-       parallel zum HTML-Parse, drastisch schnelleres Widget-Rendering.
-       preload=script beschleunigt das embed.js-Fetch zusaetzlich. -->
+  <!-- Cal.com Preconnects — starten DNS + TLS parallel zum HTML-Parse
+       damit das erste Widget-Rendering nach Accordion-Open schnell ist.
+       Kein preload=script mehr weil embed.js jetzt lazy geladen wird. -->
   <link rel="preconnect" href="https://app.cal.com" crossorigin />
-  <link rel="preconnect" href="https://cal.com" crossorigin />
-  <link rel="dns-prefetch" href="https://app.cal.com" />
   <link rel="dns-prefetch" href="https://cal.com" />
-  <link
-    rel="preload"
-    href="https://app.cal.com/embed/embed.js"
-    as="script"
-    crossorigin
-  />
 
   <main class="kontakt-page">
     <SubPageBackground />
@@ -46,44 +55,152 @@ const prepSteps = [
     <header class="kontakt-hero">
       <h1 class="subpage-hero-title">Sprechen wir.</h1>
       <p class="subpage-hero-subtitle text-lines">
-        {'30 Minuten, kostenlos, unverbindlich.\nWähl dir einen Slot.'}
+        {'Antwort innerhalb 24 Stunden.\nSchreib mir kurz, was du vorhast.'}
       </p>
     </header>
 
-    <!-- Cal.com Inline Embed —
-         Ziel-Div hat feste ID die im Cal-Init-Script referenziert wird.
-         .cal-loading zeigt einen Skeleton bis Cal rendert. Cal.com-
-         Free-Tier-Branding bleibt sichtbar (steckt im cross-origin
-         iframe, hideBranding braucht Team-Plan). -->
-    <section class="kontakt-cal" data-reveal aria-label="Termin buchen">
-      <div id="my-cal-inline-erstgespraech" class="cal-embed" aria-busy="true">
-        <div class="cal-loading">
-          <div class="cal-loading-dots">
-            <span class="cal-loading-dot"></span>
-            <span class="cal-loading-dot"></span>
-            <span class="cal-loading-dot"></span>
+    <!-- ================================================================
+         KONTAKTFORMULAR (primary CTA)
+         POST → /api/kontakt (siehe src/pages/api/kontakt.ts)
+         ============================================================== -->
+    <section class="kontakt-form-section" data-reveal aria-label="Kontaktformular">
+      <form
+        class="kontakt-form"
+        id="kontakt-form"
+        novalidate
+        autocomplete="on"
+      >
+        <div class="form-row">
+          <div class="form-field">
+            <label for="kontakt-name">Name <span class="req" aria-hidden="true">*</span></label>
+            <input
+              type="text"
+              id="kontakt-name"
+              name="name"
+              required
+              minlength="2"
+              autocomplete="name"
+              placeholder="Max Mustermann"
+            />
           </div>
-          <p class="cal-loading-text">Kalender lädt …</p>
+          <div class="form-field">
+            <label for="kontakt-email">Email <span class="req" aria-hidden="true">*</span></label>
+            <input
+              type="email"
+              id="kontakt-email"
+              name="email"
+              required
+              autocomplete="email"
+              placeholder="max@beispiel.de"
+            />
+          </div>
         </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="kontakt-phone">Telefon <span class="req" aria-hidden="true">*</span></label>
+            <input
+              type="tel"
+              id="kontakt-phone"
+              name="phone"
+              required
+              minlength="6"
+              autocomplete="tel"
+              placeholder="z.B. +49 177 1962704"
+            />
+          </div>
+          <div class="form-field">
+            <label for="kontakt-company">Firmenname <span class="opt">(optional)</span></label>
+            <input
+              type="text"
+              id="kontakt-company"
+              name="company"
+              autocomplete="organization"
+              placeholder="Firma / Betrieb"
+            />
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="kontakt-subject">Anliegen <span class="req" aria-hidden="true">*</span></label>
+          <select id="kontakt-subject" name="subject" required>
+            {subjectOptions.map((opt) => (
+              <option value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label for="kontakt-message">Nachricht <span class="req" aria-hidden="true">*</span></label>
+          <textarea
+            id="kontakt-message"
+            name="message"
+            required
+            minlength="20"
+            rows="8"
+          ></textarea>
+        </div>
+
+        <!-- Honeypot — hidden via CSS, sichtbar fuer Bots. Server-Route
+             checkt: wenn ausgefuellt → 200 zurueck ohne Mail. -->
+        <div class="hp-field" aria-hidden="true">
+          <label for="kontakt-website">Website (bitte nicht ausfuellen)</label>
+          <input
+            type="text"
+            id="kontakt-website"
+            name="website"
+            tabindex="-1"
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="form-field form-checkbox">
+          <input
+            type="checkbox"
+            id="kontakt-datenschutz"
+            name="datenschutz"
+            required
+          />
+          <label for="kontakt-datenschutz">
+            Ich habe die <a href="/datenschutz">Datenschutzerklärung</a>
+            gelesen und akzeptiere die Verarbeitung meiner Anfrage.
+            <span class="req" aria-hidden="true">*</span>
+          </label>
+        </div>
+
+        <div
+          class="form-status"
+          id="kontakt-status"
+          role="status"
+          aria-live="polite"
+          hidden
+        ></div>
+
+        <button type="submit" class="form-submit" id="kontakt-submit">
+          <span class="form-submit-label">Anfrage senden →</span>
+        </button>
+      </form>
+
+      <!-- Success-State wird per JS gefuellt + eingeblendet nach 200. -->
+      <div class="form-success" id="kontakt-success" hidden>
+        <span class="form-success-icon" aria-hidden="true">✓</span>
+        <h2 class="form-success-headline">Danke!</h2>
+        <p class="form-success-body">
+          Ich melde mich innerhalb 24h bei dir. Eine Bestätigungs-Mail
+          ist auch schon in deinem Postfach.
+        </p>
       </div>
     </section>
 
-    <!-- Alternative Kontakte -->
+    <!-- ================================================================
+         Alternative Kontakte
+         ============================================================== -->
     <section class="kontakt-alternatives">
       <p class="kontakt-eyebrow" data-reveal>LIEBER ANDERS?</p>
       <div class="contact-cards">
         <a class="contact-card" data-reveal href={SITE.phoneHref}>
           <span class="contact-card-icon" aria-hidden="true">
-            <svg
-              width="22"
-              height="22"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" />
             </svg>
           </span>
@@ -93,16 +210,7 @@ const prepSteps = [
 
         <a class="contact-card" data-reveal href={`mailto:${SITE.email}`}>
           <span class="contact-card-icon" aria-hidden="true">
-            <svg
-              width="22"
-              height="22"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
               <polyline points="22,6 12,13 2,6" />
             </svg>
@@ -111,24 +219,9 @@ const prepSteps = [
           <span class="contact-card-value">{SITE.email}</span>
         </a>
 
-        <a
-          class="contact-card"
-          data-reveal
-          href="https://www.instagram.com/tammostudios/"
-          target="_blank"
-          rel="noopener noreferrer me"
-        >
+        <a class="contact-card" data-reveal href="https://www.instagram.com/tammostudios/" target="_blank" rel="noopener noreferrer me">
           <span class="contact-card-icon" aria-hidden="true">
-            <svg
-              width="22"
-              height="22"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="3" width="18" height="18" rx="5" ry="5" />
               <circle cx="12" cy="12" r="4" />
               <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
@@ -140,7 +233,46 @@ const prepSteps = [
       </div>
     </section>
 
-    <!-- Was im Erstgespraech passiert — Prep-Info -->
+    <!-- ================================================================
+         Cal.com Accordion — lazy-loaded on first open
+         ============================================================== -->
+    <section class="kontakt-cal-accordion" data-reveal aria-label="Termin direkt buchen">
+      <div class="cal-accordion-header">
+        <p class="cal-accordion-eyebrow">LIEBER DIREKT EINEN TERMIN?</p>
+        <h2 class="cal-accordion-headline">30 Min Erstgespräch buchen</h2>
+        <p class="cal-accordion-sub">
+          Wähl dir einen Slot im Kalender, ohne den Umweg über das
+          Formular.
+        </p>
+        <button
+          type="button"
+          class="cal-accordion-toggle"
+          id="cal-toggle"
+          aria-expanded="false"
+          aria-controls="cal-panel"
+        >
+          <span class="cal-toggle-open">Termin-Kalender öffnen ↓</span>
+          <span class="cal-toggle-close">Kalender einklappen ↑</span>
+        </button>
+      </div>
+
+      <div class="cal-accordion-panel" id="cal-panel" hidden>
+        <div id="my-cal-inline-erstgespraech" class="cal-embed" aria-busy="true">
+          <div class="cal-loading">
+            <div class="cal-loading-dots">
+              <span class="cal-loading-dot"></span>
+              <span class="cal-loading-dot"></span>
+              <span class="cal-loading-dot"></span>
+            </div>
+            <p class="cal-loading-text">Kalender lädt …</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         Was im Erstgespraech passiert — Prep-Info
+         ============================================================== -->
     <section class="kontakt-prep">
       <h2 class="kontakt-prep-headline" data-reveal>Was im Erstgespräch passiert</h2>
       <ol class="prep-list">
@@ -156,58 +288,237 @@ const prepSteps = [
   <SiteFooter />
 </BaseLayout>
 
-<!--
-  Cal.com Inline-Embed Script — 1:1 vom User geliefert.
-  is:inline verhindert Astro's Standard-Bundle-Processing, das die
-  IIFE-Struktur und window.Cal-Queue-Semantik brechen wuerde.
-  Script laeuft NACH dem #my-cal-inline-erstgespraech Div im HTML-Body
-  → DOM-Reihenfolge stellt sicher dass elementOrSelector bereits
-  existiert wenn Cal.ns.erstgespraech("inline", ...) feuert.
--->
+<!-- ==================================================================
+     FORM-CONTROLLER — Reactive Placeholder + Submit-Handler
+     ================================================================== -->
+<script>
+  // Placeholder-Templates pro Anliegen. Wird beim <select>-change auf
+  // das <textarea> gesetzt — aber NUR wenn Textarea noch leer ist,
+  // sonst uebermalen wir User-Input.
+  const PLACEHOLDERS: Record<string, string> = {
+    'website-projekt':
+      'Hallo Tammo, ich brauche eine neue Website für meinen Betrieb [Betriebsart]. Aktuell habe ich [keine Site / eine veraltete Site unter www.beispiel.de]. Wichtig für mich wäre: [z.B. Referenzen, Kontaktformular, mobile Optimierung]. Wann könnten wir sprechen?',
+    'online-shop':
+      'Hallo Tammo, ich plane einen Online-Shop für [Produktkategorie]. Aktuell verkaufe ich [im Ladengeschäft / gar nicht online]. Wichtige Features wären: [z.B. Zahlungsanbieter, Lagerverwaltung, Versand-Abwicklung]. Können wir das kurz besprechen?',
+    'wartung-support':
+      'Hallo Tammo, meine bestehende Website unter [www.beispiel.de] braucht [Aktualisierung / Erweiterung / Bug-Fix]. Konkret geht es um: [kurze Beschreibung]. Wann hast du Zeit?',
+    'allgemein':
+      'Hallo Tammo, ich habe eine Projektanfrage: [kurze Beschreibung deines Vorhabens]. Ich bin mir noch nicht sicher was ich genau brauche, aber [Kontext / Ziel]. Können wir das kurz besprechen?',
+    'anderes':
+      'Hallo Tammo, [dein Anliegen hier]...',
+  };
 
-<!--
-  Loading-Skeleton-Cleanup — versteckt die "Kalender laedt …" Anzeige
-  sobald Cal sein iframe injiziert. Kein Auto-Refresh im Kalender
-  spaeter (Cal handled seinen eigenen State intern).
--->
-<script is:inline>
-  (function () {
-    const target = document.getElementById('my-cal-inline-erstgespraech');
-    if (!target) return;
+  const form = document.getElementById('kontakt-form') as HTMLFormElement | null;
+  const subjectSelect = document.getElementById('kontakt-subject') as HTMLSelectElement | null;
+  const messageArea = document.getElementById('kontakt-message') as HTMLTextAreaElement | null;
+  const statusEl = document.getElementById('kontakt-status') as HTMLElement | null;
+  const submitBtn = document.getElementById('kontakt-submit') as HTMLButtonElement | null;
+  const submitLabel = submitBtn?.querySelector('.form-submit-label') as HTMLElement | null;
+  const successEl = document.getElementById('kontakt-success') as HTMLElement | null;
 
-    const hideLoading = () => {
-      target.setAttribute('aria-busy', 'false');
-      const loading = target.querySelector('.cal-loading');
-      if (loading) loading.style.display = 'none';
-    };
+  // Textarea VORFUELLEN mit Template (nicht nur als placeholder) — User
+  // kann seine Infos direkt in die eckigen [Klammern] tippen statt
+  // von leerem Feld zu starten. Beim Select-Wechsel wird das Template
+  // ausgetauscht — aber NUR wenn User noch nix editiert hat (value
+  // matched noch das zuletzt gesetzte Template). Sobald User etwas
+  // aendert, bleibt sein Text stehen.
+  //
+  // Referenz-Wert wird in `lastTemplate` gespeichert. Nach jedem Setzen
+  // updaten. Beim Submit werden die Templates NICHT gefiltert — falls
+  // User einfach ohne Editing sendet, kommt der Template-Text mit
+  // [Klammer]-Platzhaltern bei Tammo an, der dann rueckfragen kann.
+  let lastTemplate = '';
+  if (subjectSelect && messageArea) {
+    lastTemplate = PLACEHOLDERS[subjectSelect.value] ?? '';
+    messageArea.value = lastTemplate;
 
-    const hideLoadingOnIframe = () => {
-      const iframe = target.querySelector('iframe');
-      if (!iframe) return;
-      if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete') {
-        hideLoading();
-      } else {
-        iframe.addEventListener('load', hideLoading, { once: true });
+    subjectSelect.addEventListener('change', () => {
+      const val = subjectSelect.value;
+      const newTemplate = PLACEHOLDERS[val] ?? '';
+      // Nur austauschen wenn User das aktuelle Template noch nicht
+      // editiert hat (oder Textarea manuell geleert hat).
+      if (messageArea.value === lastTemplate || messageArea.value.trim() === '') {
+        messageArea.value = newTemplate;
+        lastTemplate = newTemplate;
       }
-    };
+    });
+  }
 
-    setTimeout(hideLoadingOnIframe, 500);
-    setTimeout(hideLoadingOnIframe, 2000);
-  })();
-</script>
-<script is:inline>
-  (function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if(typeof namespace === "string"){cal.ns[namespace] = cal.ns[namespace] || api;p(cal.ns[namespace], ar);p(cal, ["initNamespace", namespace]);} else p(cal, ar); return;} p(cal, ar); }; })(window, "https://app.cal.com/embed/embed.js", "init");
-  Cal("init", "erstgespraech", {origin:"https://app.cal.com"});
-  Cal.config = Cal.config || {};
-  Cal.config.forwardQueryParams = true;
+  const setStatus = (msg: string, kind: 'error' | 'info' | '' = '') => {
+    if (!statusEl) return;
+    if (!msg) {
+      statusEl.hidden = true;
+      statusEl.textContent = '';
+      statusEl.dataset.kind = '';
+      return;
+    }
+    statusEl.hidden = false;
+    statusEl.textContent = msg;
+    statusEl.dataset.kind = kind;
+  };
 
-  Cal.ns.erstgespraech("inline", {
-    elementOrSelector:"#my-cal-inline-erstgespraech",
-    config: {"layout":"month_view","useSlotsViewOnSmallScreen":"true","theme":"auto"},
-    calLink: "tammo.studios/erstgespraech",
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!form || !submitBtn || !submitLabel) return;
+
+    // HTML5 validation
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    // Serialize form → JSON
+    const fd = new FormData(form);
+    const payload: Record<string, unknown> = {};
+    fd.forEach((value, key) => {
+      payload[key] = value;
+    });
+    // Checkbox: FormData enthaelt nur checked keys als 'on' — konvertieren
+    payload.datenschutz = (document.getElementById('kontakt-datenschutz') as HTMLInputElement)?.checked;
+
+    // Loading state
+    submitBtn.disabled = true;
+    submitLabel.textContent = 'Wird gesendet …';
+    setStatus('', '');
+
+    try {
+      const res = await fetch('/api/kontakt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = (await res.json()) as { success: boolean; error?: string };
+
+      if (res.ok && data.success) {
+        // Success: Formular ausblenden, Success-State zeigen
+        form.hidden = true;
+        if (successEl) successEl.hidden = false;
+        // Scroll zum Success-Panel damit User Feedback sieht
+        successEl?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        setStatus(
+          data.error ||
+            'Fehler beim Senden. Ruf mich alternativ direkt an: 0177 1962704.',
+          'error'
+        );
+        submitBtn.disabled = false;
+        submitLabel.textContent = 'Anfrage senden →';
+      }
+    } catch (err) {
+      console.error('[kontakt-form] submit error:', err);
+      setStatus(
+        'Fehler beim Senden. Ruf mich alternativ direkt an: 0177 1962704.',
+        'error'
+      );
+      submitBtn.disabled = false;
+      submitLabel.textContent = 'Anfrage senden →';
+    }
   });
+</script>
 
-  Cal.ns.erstgespraech("ui", {"cssVarsPerTheme":{"light":{"cal-brand":"#f59e0b"},"dark":{"cal-brand":"#f59e0b"}},"hideEventTypeDetails":false,"layout":"month_view"});
+<!-- ==================================================================
+     CAL.COM ACCORDION — Lazy-Load auf ersten Klick
+     Cal.com embed.js + iframe werden ERST geladen wenn User das
+     Accordion oeffnet. Spart ~120KB fuer alle User die das Formular
+     nutzen. Nach erstem Load bleibt das Widget aktiv (nicht re-init'd
+     beim erneuten Aufklappen — Cal handled Session-State intern).
+     ================================================================== -->
+<script>
+  const toggleBtn = document.getElementById('cal-toggle') as HTMLButtonElement | null;
+  const panelEl = document.getElementById('cal-panel') as HTMLElement | null;
+  let calLoaded = false;
+
+  const loadCal = () => {
+    if (calLoaded) return;
+    calLoaded = true;
+
+    // Cal.com Init-Snippet — original vom User geliefert. Baut window.Cal
+    // Queue auf, injiziert embed.js, initialisiert Namespace + Inline-Embed.
+    // Muss ohne is:inline-Modifier laufen weil hier bereits in <script>
+    // Astro-scope. IIFE bleibt selbstaendig.
+    (function (C: any, A: string, L: string) {
+      let p = function (a: any, ar: any) { a.q.push(ar); };
+      let d = C.document;
+      C.Cal = C.Cal || function () {
+        let cal = C.Cal;
+        let ar = arguments as any;
+        if (!cal.loaded) {
+          cal.ns = {};
+          cal.q = cal.q || [];
+          d.head.appendChild(d.createElement('script')).src = A;
+          cal.loaded = true;
+        }
+        if (ar[0] === L) {
+          const api: any = function () { p(api, arguments); };
+          const namespace = ar[1];
+          api.q = api.q || [];
+          if (typeof namespace === 'string') {
+            cal.ns[namespace] = cal.ns[namespace] || api;
+            p(cal.ns[namespace], ar);
+            p(cal, ['initNamespace', namespace]);
+          } else {
+            p(cal, ar);
+          }
+          return;
+        }
+        p(cal, ar);
+      };
+    })(window as any, 'https://app.cal.com/embed/embed.js', 'init');
+
+    const CalRef = (window as any).Cal;
+    CalRef('init', 'erstgespraech', { origin: 'https://app.cal.com' });
+    CalRef.config = CalRef.config || {};
+    CalRef.config.forwardQueryParams = true;
+
+    CalRef.ns.erstgespraech('inline', {
+      elementOrSelector: '#my-cal-inline-erstgespraech',
+      config: { layout: 'month_view', useSlotsViewOnSmallScreen: 'true', theme: 'auto' },
+      calLink: 'tammo.studios/erstgespraech',
+    });
+
+    CalRef.ns.erstgespraech('ui', {
+      cssVarsPerTheme: {
+        light: { 'cal-brand': '#f59e0b' },
+        dark: { 'cal-brand': '#f59e0b' },
+      },
+      hideEventTypeDetails: false,
+      layout: 'month_view',
+    });
+
+    // Loading-Skeleton verstecken sobald iframe erscheint
+    const target = document.getElementById('my-cal-inline-erstgespraech');
+    if (target) {
+      const hideLoading = () => {
+        target.setAttribute('aria-busy', 'false');
+        const loading = target.querySelector('.cal-loading') as HTMLElement | null;
+        if (loading) loading.style.display = 'none';
+      };
+      const check = () => {
+        const iframe = target.querySelector('iframe');
+        if (!iframe) return;
+        if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete') {
+          hideLoading();
+        } else {
+          iframe.addEventListener('load', hideLoading, { once: true });
+        }
+      };
+      setTimeout(check, 800);
+      setTimeout(check, 2500);
+    }
+  };
+
+  toggleBtn?.addEventListener('click', () => {
+    if (!panelEl || !toggleBtn) return;
+    const expanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+    if (expanded) {
+      panelEl.hidden = true;
+      toggleBtn.setAttribute('aria-expanded', 'false');
+    } else {
+      panelEl.hidden = false;
+      toggleBtn.setAttribute('aria-expanded', 'true');
+      loadCal();
+    }
+  });
 </script>
 
 <style>
@@ -231,7 +542,7 @@ const prepSteps = [
   .kontakt-hero {
     text-align: center;
     max-width: 720px;
-    margin: 0 auto 72px;
+    margin: 0 auto 60px;
     padding-top: 32px;
     position: relative;
     z-index: 1;
@@ -241,74 +552,257 @@ const prepSteps = [
     margin-bottom: 20px;
   }
 
-  /* === Cal.com Embed Container === */
-  .kontakt-cal {
-    position: relative;
-    margin-bottom: 48px;
+  /* === Kontaktformular === */
+  .kontakt-form-section {
+    margin: 0 auto 72px;
+    max-width: 720px;
+    padding: 32px;
     background: rgba(15, 15, 18, 0.65);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 14px;
-    padding: 20px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28);
   }
 
-  .cal-embed {
-    position: relative;
-    width: 100%;
-    min-height: 640px;
-    height: 100%;
+  @media (max-width: 640px) {
+    .kontakt-form-section {
+      padding: 24px 20px;
+    }
   }
 
-  /* Skeleton-Loader waehrend Cal.com laedt — Dots + Text.
-     Sobald Cal das iframe injiziert, deckt es den Loader ab
-     (iframe kommt visuell drueber). */
-  .cal-loading {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+  .kontakt-form {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    z-index: 0;
-    pointer-events: none;
+    gap: 20px;
   }
 
-  .cal-loading-dots {
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 640px) {
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .form-field {
     display: flex;
+    flex-direction: column;
     gap: 8px;
   }
 
-  .cal-loading-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: rgba(245, 158, 11, 0.6);
-    animation: cal-loading-pulse 1.4s ease-in-out infinite;
-  }
-
-  .cal-loading-dot:nth-child(2) { animation-delay: 0.2s; }
-  .cal-loading-dot:nth-child(3) { animation-delay: 0.4s; }
-
-  .cal-loading-text {
+  .form-field label {
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-size: 0.82rem;
     font-weight: 500;
-    letter-spacing: 0.05em;
-    color: rgba(245, 245, 244, 0.5);
+    letter-spacing: 0.02em;
+    color: rgba(245, 245, 244, 0.85);
+  }
+
+  .form-field label .req {
+    color: rgba(245, 158, 11, 0.95);
+    margin-left: 2px;
+  }
+  .form-field label .opt {
+    color: rgba(245, 245, 244, 0.4);
+    font-weight: 400;
+    margin-left: 4px;
+  }
+
+  .form-field input[type='text'],
+  .form-field input[type='email'],
+  .form-field input[type='tel'],
+  .form-field select,
+  .form-field textarea {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    padding: 12px 14px;
+    background: rgba(10, 10, 12, 0.6);
+    color: #f5f5f4;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 200ms ease, background 200ms ease, box-shadow 200ms ease;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .form-field input:hover,
+  .form-field select:hover,
+  .form-field textarea:hover {
+    border-color: rgba(255, 255, 255, 0.18);
+  }
+
+  .form-field input:focus-visible,
+  .form-field select:focus-visible,
+  .form-field textarea:focus-visible {
+    border-color: rgba(245, 158, 11, 0.6);
+    background: rgba(10, 10, 12, 0.85);
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+  }
+
+  .form-field input::placeholder,
+  .form-field textarea::placeholder {
+    color: rgba(245, 245, 244, 0.35);
+  }
+
+  .form-field textarea {
+    resize: vertical;
+    min-height: 180px;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .form-field select {
+    /* Custom-chevron via SVG-BG damit's mit dem dark theme matched.
+       -webkit-appearance:none oben killed die native chevron. */
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='rgba(245,158,11,0.85)' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 40px;
+    cursor: pointer;
+  }
+
+  /* Honeypot — CSS-only hidden, aber DOM-mässig da fuer Bots */
+  .hp-field {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  /* Datenschutz-Checkbox: horizontal layout, larger click area */
+  .form-checkbox {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 4px 0;
+  }
+
+  .form-checkbox input[type='checkbox'] {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    accent-color: rgba(245, 158, 11, 0.95);
+    cursor: pointer;
+  }
+
+  .form-checkbox label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: rgba(245, 245, 244, 0.75);
+    font-weight: 400;
+    cursor: pointer;
+  }
+
+  .form-checkbox label a {
+    color: rgba(245, 158, 11, 0.95);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .form-checkbox label a:hover {
+    color: rgba(252, 211, 77, 1);
+  }
+
+  /* Status-Message (Fehler) */
+  .form-status {
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  .form-status[data-kind='error'] {
+    background: rgba(220, 38, 38, 0.1);
+    border: 1px solid rgba(220, 38, 38, 0.35);
+    color: rgba(252, 165, 165, 0.95);
+  }
+  .form-status[data-kind='info'] {
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: rgba(252, 211, 77, 0.95);
+  }
+
+  /* Submit-Button */
+  .form-submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 28px;
+    background: rgba(245, 158, 11, 0.95);
+    color: #050507;
+    border: none;
+    border-radius: 999px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    transition: background 200ms ease, transform 200ms ease;
+    align-self: flex-start;
+    margin-top: 4px;
+  }
+
+  .form-submit:hover:not(:disabled) {
+    background: rgba(252, 211, 77, 1);
+    transform: translateY(-1px);
+  }
+
+  .form-submit:disabled {
+    background: rgba(245, 158, 11, 0.4);
+    color: rgba(5, 5, 7, 0.6);
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .form-submit:focus-visible {
+    outline: 2px solid rgba(245, 158, 11, 0.7);
+    outline-offset: 3px;
+  }
+
+  /* Success-Panel — ersetzt Form nach 200 */
+  .form-success {
+    text-align: center;
+    padding: 40px 24px;
+  }
+
+  .form-success-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgba(245, 158, 11, 0.15);
+    color: rgba(245, 158, 11, 0.95);
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0 auto 20px;
+  }
+
+  .form-success-headline {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #fafaf9;
+    margin: 0 0 12px;
+  }
+
+  .form-success-body {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.75);
     margin: 0;
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
   }
-
-  @keyframes cal-loading-pulse {
-    0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
-    40% { opacity: 1; transform: scale(1.2); }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .cal-loading-dot { animation: none; opacity: 0.6; }
-  }
-
 
   /* === Alternative Kontakte === */
   .kontakt-alternatives {
@@ -406,6 +900,146 @@ const prepSteps = [
     color: #f5f5f4;
   }
 
+  /* === Cal-Accordion === */
+  .kontakt-cal-accordion {
+    margin-bottom: 64px;
+    padding: 32px;
+    background: rgba(15, 15, 18, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 14px;
+  }
+
+  @media (max-width: 640px) {
+    .kontakt-cal-accordion {
+      padding: 24px 20px;
+    }
+  }
+
+  .cal-accordion-header {
+    text-align: center;
+  }
+
+  .cal-accordion-eyebrow {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.75rem;
+    letter-spacing: 0.28em;
+    color: rgba(245, 158, 11, 0.85);
+    text-transform: uppercase;
+    margin: 0 0 12px;
+  }
+
+  .cal-accordion-headline {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.35rem, 2.4vw, 1.75rem);
+    line-height: 1.2;
+    color: #f5f5f4;
+    margin: 0 0 12px;
+  }
+
+  .cal-accordion-sub {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.98rem;
+    line-height: 1.5;
+    color: rgba(245, 245, 244, 0.7);
+    margin: 0 0 24px;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .cal-accordion-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    background: transparent;
+    color: rgba(245, 158, 11, 0.95);
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    border-radius: 999px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 200ms ease, border-color 200ms ease, color 200ms ease;
+  }
+
+  .cal-accordion-toggle:hover {
+    background: rgba(245, 158, 11, 0.08);
+    border-color: rgba(245, 158, 11, 0.7);
+    color: rgba(252, 211, 77, 1);
+  }
+
+  .cal-accordion-toggle:focus-visible {
+    outline: 2px solid rgba(245, 158, 11, 0.7);
+    outline-offset: 3px;
+  }
+
+  .cal-toggle-close { display: none; }
+  .cal-accordion-toggle[aria-expanded='true'] .cal-toggle-open { display: none; }
+  .cal-accordion-toggle[aria-expanded='true'] .cal-toggle-close { display: inline; }
+
+  .cal-accordion-panel {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .cal-embed {
+    position: relative;
+    width: 100%;
+    min-height: 640px;
+    height: 100%;
+  }
+
+  .cal-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .cal-loading-dots {
+    display: flex;
+    gap: 8px;
+  }
+
+  .cal-loading-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(245, 158, 11, 0.6);
+    animation: cal-loading-pulse 1.4s ease-in-out infinite;
+  }
+
+  .cal-loading-dot:nth-child(2) { animation-delay: 0.2s; }
+  .cal-loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  .cal-loading-text {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    color: rgba(245, 245, 244, 0.5);
+    margin: 0;
+  }
+
+  @keyframes cal-loading-pulse {
+    0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+    40% { opacity: 1; transform: scale(1.2); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cal-loading-dot { animation: none; opacity: 0.6; }
+  }
+
   /* === Prep-Info === */
   .kontakt-prep {
     text-align: center;
@@ -423,7 +1057,6 @@ const prepSteps = [
     margin: 0 0 32px;
   }
 
-  /* Numbered List — 01/02/03/04 in Amber, matcht Site-Fahrplan-Sprache */
   .prep-list {
     list-style: none;
     padding: 0;
@@ -445,9 +1078,7 @@ const prepSteps = [
     margin-bottom: 10px;
   }
 
-  .prep-list li:last-child {
-    margin-bottom: 0;
-  }
+  .prep-list li:last-child { margin-bottom: 0; }
 
   .prep-list li::before {
     content: counter(prep-counter, decimal-leading-zero);
@@ -468,11 +1099,7 @@ const prepSteps = [
     color: rgba(245, 245, 244, 0.85);
   }
 
-  /* === Enhanced Reveal — kontakt-page-scoped ===
-     Overriden das site-weite data-reveal fuer diese Seite mit einem
-     staerkeren Fade + subtle scale-in. cubic-bezier-Kurve knallt am
-     Anfang, settled sanft (matcht Section-5-Sprache). Global-Handler
-     (BaseLayout) staffelt die Elements weiterhin um 100ms. */
+  /* === Enhanced Reveal — kontakt-page-scoped === */
   .kontakt-page [data-reveal] {
     opacity: 0;
     transform: translateY(32px) scale(0.97);
@@ -497,34 +1124,13 @@ const prepSteps = [
 
   /* === Mobile === */
   @media (max-width: 768px) {
-    .kontakt-page {
-      padding: 100px 16px 60px;
-    }
-
-    .kontakt-hero {
-      margin-bottom: 48px;
-    }
-
-    .kontakt-cal {
-      padding: 12px;
-      margin-bottom: 40px;
-    }
-
-    .cal-embed {
-      min-height: 560px;
-    }
-
-    .kontakt-alternatives {
-      margin-bottom: 48px;
-    }
-
-    .contact-card {
-      padding: 22px 18px 20px;
-    }
-
-    .prep-list li {
-      padding: 14px 16px;
-      gap: 14px;
-    }
+    .kontakt-page { padding: 100px 16px 60px; }
+    .kontakt-hero { margin-bottom: 48px; }
+    .kontakt-form-section { margin-bottom: 56px; }
+    .kontakt-alternatives { margin-bottom: 48px; }
+    .kontakt-cal-accordion { margin-bottom: 48px; }
+    .contact-card { padding: 22px 18px 20px; }
+    .prep-list li { padding: 14px 16px; gap: 14px; }
+    .cal-embed { min-height: 560px; }
   }
 </style>
