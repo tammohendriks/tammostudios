@@ -137,24 +137,24 @@ const buildNotificationHtml = (
 const buildAutoReplyText = (firstName: string): string =>
   [
     `Hi ${firstName},`,
-    '',
-    'danke für deine Anfrage. Ich melde mich innerhalb von 24 Stunden bei dir zurück.',
-    '',
-    'Falls dringend: du erreichst mich auch per WhatsApp unter 0177 1962704.',
-    '',
-    'Liebe Grüße,',
-    'Tammo',
+    'danke für deine Anfrage.',
+    'Ich melde mich innerhalb von 24 Stunden bei dir zurück.',
+    'Falls dringend: du erreichst mich auch per WhatsApp unter:',
+    '0177 1962704.',
   ].join('\n');
 
 const buildAutoReplyHtml = (firstName: string): string => `
 <!doctype html>
 <html lang="de">
-<body style="margin:0;padding:0;background:#f5f5f4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#1a1a1c;line-height:1.6;">
+<body style="margin:0;padding:0;background:#f5f5f4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#1a1a1c;line-height:1.65;">
   <div style="max-width:560px;margin:32px auto;padding:36px 32px;background:#ffffff;border-radius:12px;border:1px solid rgba(0,0,0,0.08);">
-    <p style="font-size:1.05rem;margin:0 0 20px;">Hi ${escapeHtml(firstName)},</p>
-    <p style="font-size:1.05rem;margin:0 0 20px;">danke für deine Anfrage. Ich melde mich innerhalb von 24 Stunden bei dir zurück.</p>
-    <p style="font-size:1.05rem;margin:0 0 28px;">Falls dringend: du erreichst mich auch per WhatsApp unter <a href="https://wa.me/491771962704" style="color:rgba(245,158,11,0.95);text-decoration:none;font-weight:500;">0177 1962704</a>.</p>
-    <p style="font-size:1.05rem;margin:0;">Liebe Grüße,<br /><strong>Tammo</strong></p>
+    <p style="font-size:1.05rem;margin:0;">
+      Hi ${escapeHtml(firstName)},<br />
+      danke für deine Anfrage.<br />
+      Ich melde mich innerhalb von 24 Stunden bei dir zurück.<br />
+      Falls dringend: du erreichst mich auch per WhatsApp unter:<br />
+      <a href="https://wa.me/491771962704" style="color:rgba(245,158,11,0.95);text-decoration:none;font-weight:500;">0177 1962704</a>.
+    </p>
     <div style="margin-top:36px;padding-top:20px;border-top:1px solid rgba(0,0,0,0.08);font-size:0.85rem;color:#6b6b70;">
       Tammo Studios — Freelance-Webdesign aus Bremen<br />
       <a href="https://tammostudios.de" style="color:#6b6b70;text-decoration:underline;">tammostudios.de</a>
