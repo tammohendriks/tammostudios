@@ -71,6 +71,11 @@ export const SECTION3 = {
   ],
 } as const;
 
+// WICHTIG: SECTION4.phases[*].body wird in Section5Timeline.astro als
+// plain-text-Interpolation ({phase.body}) gerendert, NICHT via set:html.
+// KEINE HTML-Tags (<br />, <strong> etc.) in den Body-Strings — die
+// wuerden literal als Text erscheinen. Fuer Line-Breaks stattdessen \n
+// + eine text-lines Utility-Class benutzen (falls in Section5 gebraucht).
 export const SECTION4 = {
   eyebrow: 'DER FAHRPLAN',
   title: 'So entsteht deine Website',
@@ -86,7 +91,7 @@ export const SECTION4 = {
       label: 'PHASE 02',
       title: 'Ich entwerfe deine Website',
       body:
-        'Erste Entwürfe: Aufbau, Farben, Stil.<br />' +
+        'Erste Entwürfe: Aufbau, Farben, Stil. ' +
         'Wir drehen so lange bis es deine Marke trifft.',
     },
     {
