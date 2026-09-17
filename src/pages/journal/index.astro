@@ -36,7 +36,7 @@ const TAG_FILTERS = [
 
 <BaseLayout
   pageTitle="Journal"
-  description="Gedanken über Webdesign, Preise, Prozess. Tammo Studios Journal aus Bremen."
+  description="Ehrliche Beiträge zu Preisen, Prozess, Design und SEO für kleine Unternehmen. Was Handwerker, Praxen und Gastro-Betriebe wirklich für ihre Website brauchen."
 >
   <Fragment slot="head">
     <link
@@ -370,6 +370,10 @@ const TAG_FILTERS = [
     line-height: 1.6;
     color: rgba(245, 245, 244, 0.75);
     margin: 0;
+    /* Respektiert Zeilenumbrueche aus dem Sanity excerpt-Feld — Tammos
+       bewusste Absaetze im Studio landen als visuelle Umbrueche statt
+       zu Spaces normalisiert zu werden. */
+    white-space: pre-line;
   }
   .featured-cta {
     font-family: 'Neue Montreal', 'Inter', sans-serif;
@@ -463,6 +467,10 @@ const TAG_FILTERS = [
     line-height: 1.55;
     color: rgba(245, 245, 244, 0.7);
     margin: 0;
+    /* Respektiert Zeilenumbrueche aus dem Sanity excerpt-Feld. Auf
+       Post-Cards clampen wir zusaetzlich auf 3 Zeilen (webkit-line-clamp),
+       damit lange excerpts nicht die Card-Hoehe sprengen. */
+    white-space: pre-line;
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
