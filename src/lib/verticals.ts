@@ -99,7 +99,7 @@ export const VERTICALS: readonly Vertical[] = [
     ],
     pricing: {
       paragraphs: [
-        'Eine Website 2.000 €.\nEin Online-Shop mit Zubehör 3.000 €.\nKeine Stundensätze, keine Sternchen.\nFertig in 14 Tagen.',
+        'Eine Website 2.000 €.\nEin Online-Shop mit Zubehör 3.000 €.\nEine individuelle Anwendung ist jeweils drin — zum Beispiel ein Angebotsrechner.\nKeine Stundensätze, keine Sternchen. Fertig in 14 Tagen.',
         'Für 30 € im Monat übernehme ich Wartung, Sicherheits-Updates und priorisierten Support bei Störungen.\nOptional, monatlich kündbar.',
       ],
     },
@@ -196,7 +196,7 @@ export const VERTICALS: readonly Vertical[] = [
     ],
     pricing: {
       paragraphs: [
-        'Eine Praxis-Website 2.000 €.\nMit erweiterten Features wie Online-Terminbuchung oder Patientenportal 3.000 € (Grundausstattung).\nAlle Standards inklusive — Datenschutz, Verschlüsselung, DSGVO-Konformität sind Pflicht, nicht Extra.',
+        'Eine Praxis-Website 2.000 €, inklusive einer individuellen Anwendung — etwa einem Anfrageformular, das die Vorsorge-Art direkt mit abfragt.\nMit erweiterten Features wie Online-Terminbuchung oder Patientenportal 3.000 € (Grundausstattung).\nAlle Standards inklusive — Datenschutz, Verschlüsselung, DSGVO-Konformität sind Pflicht, nicht Extra.',
         'Für 30 € im Monat übernehme ich Wartung, Sicherheits-Updates und priorisierten Support.\nOptional, monatlich kündbar.',
       ],
     },
@@ -288,7 +288,7 @@ export const VERTICALS: readonly Vertical[] = [
     ],
     pricing: {
       paragraphs: [
-        'Eine Gastro-Website 2.000 €.\nMit Onlineshop für Merchandise oder Gutscheine 3.000 €.\nSpeisekarte pflegst du selbst — kein Anruf nötig, wenn sich der Wochenteller ändert.',
+        'Eine Gastro-Website 2.000 €, inklusive einer individuellen Anwendung — etwa einer Reservierungsanfrage, die Gruppengröße und Anlass gleich mitnimmt.\nMit Onlineshop für Merchandise oder Gutscheine 3.000 €.\nSpeisekarte pflegst du selbst — kein Anruf nötig, wenn sich der Wochenteller ändert.',
         'Für 30 € im Monat übernehme ich Wartung, Sicherheits-Updates und priorisierten Support.\nOptional, monatlich kündbar.',
       ],
     },

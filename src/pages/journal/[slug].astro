@@ -40,7 +40,12 @@ const { slug } = Astro.params;
 const post: JournalPost | null = slug ? await getJournalPost(slug) : null;
 
 if (!post) {
-  return Astro.redirect('/journal');
+  // 404 statt redirect zu /journal — falls Slug im URL steht aber Post
+  // nicht abrufbar (nicht published, in Zukunft datiert, oder existiert
+  // nicht). getStaticPaths filtert via publishedAt<=now(), also greift
+  // dieser Branch nur bei URL-typos oder direktem Aufruf eines vorher
+  // publizierten + wieder entfernten Slugs.
+  return new Response(null, { status: 404, statusText: 'Not Found' });
 }
 
 const bodyHtml = renderPortableText(post.body);
@@ -142,8 +147,8 @@ const articleSchema = {
             <div class="post-author-text">
               <p>
                 <strong>{author}</strong> — Freelance-Webdeveloper aus Bremen,
-                aktuell auf Reise durch Asien. Baut handgemachte Websites für
-                kleine Unternehmen, eine nach der anderen.
+                aktuell auf Reise durch Asien. Baut handgemachte Websites und
+                die Anwendungen darin, eine nach der anderen.
               </p>
               <a class="post-author-link" href="/ueber">Mehr über mich →</a>
             </div>
@@ -304,6 +309,9 @@ const articleSchema = {
     font-size: 1.15rem;
     line-height: 1.55;
     color: rgba(245, 245, 244, 0.75);
+    /* Respektiert Zeilenumbrueche aus dem Sanity excerpt-Feld — matched
+       das Muster auf /journal (featured-excerpt + post-card-excerpt). */
+    white-space: pre-line;
     margin: 0;
   }
 
