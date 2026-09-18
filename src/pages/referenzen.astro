@@ -453,10 +453,16 @@ const totalCount = REFERENCES.length;
     outline-offset: 4px;
   }
 
-  /* Cross-Link zu passender Vertical Landing Page. Muss auf z-index 3
-     sitzen, damit der Klick vor dem ref-card-trigger (z-index 2)
-     greift — der wuerde sonst das Reference-Modal statt Navigation
-     ausloesen. */
+  /* Cross-Link zu passender Vertical Landing Page. Aussehen kommt aus
+     .cta-link (global.css), die Positionierung bleibt hier: der Link
+     MUSS auf z-index 3 sitzen, damit der Klick vor dem
+     ref-card-trigger (z-index 2) greift — sonst oeffnet sich das
+     Referenz-Modal statt der Landingpage. */
+  .ref-vertical-link {
+    position: relative;
+    z-index: 3;
+    margin-top: 14px;
+  }
 
 
   /* Modal-Styles wurden in src/components/ReferenzModal.astro
