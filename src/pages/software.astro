@@ -94,8 +94,6 @@ const steps = [
       'korrigieren. Am Ende bekommst du alles: Code, Dokumentation, Zugänge.',
   },
 ] as const;
-
-const GAME_URL = 'https://asteroid.tammostudios.de';
 ---
 
 <BaseLayout
@@ -107,7 +105,6 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
     <SubPageBackground />
 
     <header class="software-hero">
-      <p class="software-eyebrow label-tracked">SOFTWARE FÜR KLEINE UNTERNEHMEN</p>
       <h1 class="subpage-hero-title">Websites können mehr als nur da sein.</h1>
       <p class="subpage-hero-subtitle software-hero-sub">
         Custom Web-Applikationen aus Bremen — Anfrage-Formulare mit PDF-Ausgabe,
@@ -133,49 +130,6 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
         Prozessen passen — mit eigenem Frontend, echten Backend-Anbindungen
         und individueller Business-Logik. Als Freelancer, ohne Agentur
         dazwischen.
-      </p>
-    </section>
-
-    <section class="software-demo" aria-labelledby="demo-heading" data-reveal>
-      <h2 id="demo-heading" class="software-section-title">Erst mal ein Beweis</h2>
-      <p class="software-demo-intro">
-        Bevor du liest, was ich für andere gebaut habe, hier etwas, das ich für
-        mich selbst gebaut habe: ein Arcade-Game mit prozeduraler Musik,
-        globalem Leaderboard und mehrstufigem Boss-Kampf. Alles selbst
-        entwickelt, TypeScript und Canvas, kein Framework. Spielbar direkt hier.
-      </p>
-
-      <!-- Click-to-activate: das Spiel faengt Touch-Events ab
-           (preventDefault fuer Steuerung und Zoom-Sperre). Wuerde der
-           iframe sofort interaktiv sein, koennte man auf dem Handy nicht
-           mehr an ihm vorbeiscrollen — jede Wischgeste landete im Spiel.
-           Erst der bewusste Klick uebergibt die Kontrolle. -->
-      <div class="game-frame" data-game-frame>
-        <iframe
-          src={GAME_URL}
-          title="ASTEROID//01 — Arcade-Game, live"
-          allow="fullscreen; autoplay"
-          loading="lazy"
-          class="game-iframe"
-        ></iframe>
-
-        <div class="game-cover" data-game-cover>
-          <p class="game-cover-title">ASTEROID//01</p>
-          <p class="game-cover-sub">SPACE SURVIVAL PROTOCOL</p>
-          <button type="button" class="game-cover-button" data-game-start>
-            Hier spielen
-          </button>
-          <a class="game-cover-link" href={GAME_URL} target="_blank" rel="noopener">
-            oder im Vollbild öffnen ↗
-          </a>
-        </div>
-      </div>
-
-      <p class="software-demo-note">
-        Läuft auf <a href={GAME_URL} target="_blank" rel="noopener">asteroid.tammostudios.de</a>
-        als eigenständige Web-App. Auf dem Handy macht die
-        <a href={GAME_URL} target="_blank" rel="noopener">Vollbild-Version</a>
-        mehr Spaß.
       </p>
     </section>
 
@@ -271,24 +225,6 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
   </main>
 </BaseLayout>
 
-<script>
-  // Uebergibt die Kontrolle an den iframe erst auf bewussten Klick.
-  // Vorher liegt eine Cover-Schicht darueber und der iframe ist fuer
-  // Zeiger-Events transparent, damit Scrollen am Spiel vorbei
-  // funktioniert — auf dem Handy sonst eine Sackgasse.
-  const frame = document.querySelector<HTMLElement>('[data-game-frame]');
-  const cover = frame?.querySelector<HTMLElement>('[data-game-cover]');
-  const startButton = frame?.querySelector<HTMLButtonElement>('[data-game-start]');
-
-  startButton?.addEventListener('click', () => {
-    frame?.setAttribute('data-active', 'true');
-    cover?.setAttribute('hidden', '');
-    // Der iframe bekommt den Fokus, damit Tastatursteuerung sofort
-    // greift statt erst nach einem zweiten Klick ins Spielfeld.
-    frame?.querySelector('iframe')?.focus();
-  });
-</script>
-
 <style>
   /* Site-Konvention fuer Sub-Pages: full-width page-container mit
      140px 40px 80px padding, content darin per max-width zentriert.
@@ -317,9 +253,8 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
   /* ------------------------------------------------------------- hero */
   /* Hero folgt der Sub-Page-Konvention: text-align:center, max-width
      780px, padding-top:32px matched /referenzen /preise /journal /ueber.
-     Eyebrow + CTA + Note bleiben zentriert unter dem Header, damit die
-     Software-Page ihre spezifischen Hero-Elemente behalten kann ohne
-     die Site-Konsistenz zu brechen. */
+     Kein Eyebrow — das hat sonst keine Unterseite. CTA + Note bleiben
+     zentriert unter dem Header. */
   .software-hero {
     position: relative;
     z-index: 1;
@@ -327,12 +262,6 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
     max-width: 780px;
     margin: 0 auto 60px;
     padding-top: 32px;
-  }
-
-  .software-eyebrow {
-    margin: 0 0 clamp(18px, 3vh, 28px);
-    color: rgba(245, 158, 11, 0.9);
-    font-size: 0.72rem;
   }
 
   .software-hero-sub {
@@ -378,127 +307,6 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
     font-size: clamp(1.15rem, 2vw, 1.5rem);
     line-height: 1.55;
     color: rgba(245, 245, 244, 0.82);
-  }
-
-  /* -------------------------------------------------------- live demo */
-
-  .software-demo-intro {
-    max-width: 62ch;
-    margin: 0 0 clamp(28px, 4vh, 40px);
-    font-size: 1.05rem;
-    line-height: 1.6;
-    color: rgba(245, 245, 244, 0.72);
-  }
-
-  .game-frame {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 16 / 10;
-    border: 2px solid #f59e0b;
-    border-radius: 12px;
-    overflow: hidden;
-    background: #0a0a0a;
-    box-shadow: 0 0 48px rgba(245, 158, 11, 0.18);
-  }
-
-  .game-iframe {
-    display: block;
-    width: 100%;
-    height: 100%;
-    border: 0;
-    /* Bis zum Klick nimmt der iframe keine Zeiger-Events an, damit
-       Scrollen ueber ihm hinweg funktioniert. */
-    pointer-events: none;
-  }
-
-  .game-frame[data-active='true'] .game-iframe {
-    pointer-events: auto;
-  }
-
-  .game-cover {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 24px;
-    text-align: center;
-    background: rgba(10, 10, 10, 0.82);
-    backdrop-filter: blur(2px);
-  }
-
-  .game-cover[hidden] {
-    display: none;
-  }
-
-  .game-cover-title {
-    margin: 0;
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-weight: 700;
-    font-size: clamp(1.6rem, 4vw, 2.4rem);
-    letter-spacing: 0.08em;
-    color: rgba(245, 245, 244, 0.96);
-  }
-
-  .game-cover-sub {
-    margin: 0 0 12px;
-    font-size: 0.78rem;
-    letter-spacing: 0.22em;
-    color: rgba(245, 245, 244, 0.45);
-  }
-
-  .game-cover-button {
-    padding: 11px 26px;
-    border-radius: 9999px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: linear-gradient(to bottom, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
-    color: #1a1a1a;
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: transform 240ms ease, box-shadow 240ms ease;
-    box-shadow: 0 0 32px rgba(245, 158, 11, 0.35);
-  }
-
-  .game-cover-button:hover {
-    transform: scale(1.04);
-    box-shadow: 0 0 48px rgba(245, 158, 11, 0.55);
-  }
-
-  .game-cover-button:focus-visible {
-    outline: 2px solid rgba(245, 158, 11, 0.8);
-    outline-offset: 4px;
-  }
-
-  .game-cover-link {
-    color: rgba(245, 245, 244, 0.55);
-    font-size: 0.88rem;
-    text-decoration: none;
-    transition: color 200ms ease;
-  }
-
-  .game-cover-link:hover {
-    color: rgba(245, 158, 11, 0.95);
-  }
-
-  .software-demo-note {
-    margin: 16px 0 0;
-    font-size: 0.9rem;
-    line-height: 1.6;
-    color: rgba(245, 245, 244, 0.5);
-  }
-
-  .software-demo-note a {
-    color: rgba(245, 158, 11, 0.9);
-    text-decoration: none;
-    border-bottom: 1px solid rgba(245, 158, 11, 0.3);
-  }
-
-  .software-demo-note a:hover {
-    border-bottom-color: rgba(245, 158, 11, 0.9);
   }
 
   /* ----------------------------------------------------- client cases */
@@ -701,17 +509,4 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
     }
   }
 
-  @media (max-width: 640px) {
-    /* 16:10 waere auf einem 360px breiten Display nur 225px hoch — zu
-       klein, um irgendetwas zu erkennen. Hochkant bekommt das Spiel
-       ein quadratischeres Fenster. */
-    .game-frame {
-      aspect-ratio: 4 / 5;
-      max-height: 70vh;
-    }
-
-    .software-hero {
-      padding-top: clamp(96px, 14vh, 140px);
-    }
-  }
 </style>

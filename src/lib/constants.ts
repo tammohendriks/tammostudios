@@ -156,6 +156,9 @@ export const SECTION5 = {
       { label: 'Journal',      href: '/journal' },
       { label: 'Preise',       href: '/preise' },
       { label: 'Preisrechner', href: '/preisrechner' },
+      // /labor ist bewusst nicht in der Haupt-Navi: eigene Projekte sind
+      // Glaubwuerdigkeit, kein Angebot. Footer ist der richtige Ort.
+      { label: 'Labor',        href: '/labor' },
     ],
     legalLinks: [
       { label: 'Impressum',   href: '/impressum' },

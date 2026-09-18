@@ -1,0 +1,426 @@
+---
+/**
+ * /labor — Eigene Projekte ohne Auftraggeber.
+ *
+ * Bewusst KEIN Angebot und KEIN Nav-Eintrag: das hier ist
+ * Glaubwuerdigkeit, nicht Conversion. Verlinkt von der Landing
+ * (Game-Section), von /ueber und aus dem Footer.
+ *
+ * Erstes Projekt: ASTEROID//01 (aus /software hierher migriert, wo es
+ * thematisch nicht hingehoerte — dort geht es um Kunden-Anwendungen).
+ *
+ * Skaliert: weitere Experimente werden hier als zusaetzliche
+ * .labor-project Sections angehaengt.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SubPageBackground from '../components/SubPageBackground.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+
+const GAME_URL = 'https://asteroid.tammostudios.de';
+
+const techPoints = [
+  {
+    title: 'Canvas statt Framework',
+    body: 'Kein React, kein Phaser. Rendering, Kollisionen und Game-Loop komplett selbst — 60 Bilder pro Sekunde, auch auf dem Handy.',
+  },
+  {
+    title: 'Prozedurale Musik',
+    body: 'Der Soundtrack ist keine Audiodatei. Die Web Audio API erzeugt ihn zur Laufzeit, passend zur Intensität des Levels.',
+  },
+  {
+    title: 'Globales Leaderboard',
+    body: 'Scores laufen über eine eigene API mit Validierung — damit niemand seinen Highscore per DevTools schreibt.',
+  },
+  {
+    title: 'Mehrstufiger Boss',
+    body: 'Zustandsmaschine mit Phasenwechsel, eigenen Angriffsmustern und Schwachstellen. Der Teil, der am meisten Arbeit gemacht hat.',
+  },
+];
+---
+
+<BaseLayout
+  pageTitle="Labor"
+  title="Labor — eigene Projekte | Tammo Studios"
+  description="Was ich baue, wenn niemand mich beauftragt. ASTEROID//01: Arcade-Game mit Canvas-Rendering, prozeduraler Musik und globalem Leaderboard. Selbst entwickelt, ohne Framework."
+>
+  <main class="labor-page">
+    <SubPageBackground />
+
+    <header class="labor-hero">
+      <h1 class="subpage-hero-title">Labor</h1>
+      <p class="subpage-hero-subtitle text-lines">
+        {'Was ich baue, wenn niemand mich beauftragt.\nHier teste ich Technik, die später in Kundenprojekten landet.'}
+      </p>
+    </header>
+
+    <!-- ================================================================
+         Intro — warum es diese Seite gibt
+         ============================================================== -->
+    <section class="labor-intro" data-reveal>
+      <p>
+        Nicht jedes Projekt braucht einen Auftraggeber. Manche Sachen baue ich,
+        weil ich wissen will, ob ich sie bauen kann. Was dabei rauskommt, ist
+        selten ein Produkt — aber fast immer eine Technik, die später irgendwo
+        in einem Kundenprojekt auftaucht.
+      </p>
+    </section>
+
+    <!-- ================================================================
+         ASTEROID//01
+         ============================================================== -->
+    <section class="labor-project" aria-labelledby="asteroid-heading" data-reveal>
+      <p class="labor-eyebrow">PROJEKT 01</p>
+      <h2 id="asteroid-heading" class="labor-section-title">ASTEROID//01</h2>
+      <p class="labor-project-intro">
+        Ein Arcade-Game im Browser. Kein Framework, kein Game-Engine-Baukasten —
+        TypeScript, Canvas und die Web Audio API. Angefangen als Frage
+        („geht das überhaupt?"), geendet mit Leaderboard und Boss-Kampf.
+        Spielbar direkt hier.
+      </p>
+
+      <!-- Click-to-activate: das Spiel faengt Touch-Events ab
+           (preventDefault fuer Steuerung und Zoom-Sperre). Wuerde der
+           iframe sofort interaktiv sein, koennte man auf dem Handy nicht
+           mehr an ihm vorbeiscrollen — jede Wischgeste landete im Spiel.
+           Erst der bewusste Klick uebergibt die Kontrolle. -->
+      <div class="game-frame" data-game-frame>
+        <iframe
+          src={GAME_URL}
+          title="ASTEROID//01 — Arcade-Game, live"
+          allow="fullscreen; autoplay"
+          loading="lazy"
+          class="game-iframe"
+        ></iframe>
+
+        <div class="game-cover" data-game-cover>
+          <p class="game-cover-title">ASTEROID//01</p>
+          <p class="game-cover-sub">SPACE SURVIVAL PROTOCOL</p>
+          <button type="button" class="game-cover-button" data-game-start>
+            Hier spielen
+          </button>
+          <a class="game-cover-link" href={GAME_URL} target="_blank" rel="noopener">
+            oder im Vollbild öffnen ↗
+          </a>
+        </div>
+      </div>
+
+      <p class="labor-project-note">
+        Läuft auf <a href={GAME_URL} target="_blank" rel="noopener">asteroid.tammostudios.de</a>
+        als eigenständige Web-App. Auf dem Handy macht die
+        <a href={GAME_URL} target="_blank" rel="noopener">Vollbild-Version</a>
+        mehr Spaß.
+      </p>
+    </section>
+
+    <!-- ================================================================
+         Was drinsteckt
+         ============================================================== -->
+    <section class="labor-tech" aria-labelledby="tech-heading" data-reveal>
+      <h2 id="tech-heading" class="labor-section-title">Was drinsteckt</h2>
+      <div class="tech-grid">
+        {techPoints.map((t) => (
+          <div class="tech-item" data-reveal>
+            <h3 class="tech-title">{t.title}</h3>
+            <p class="tech-body">{t.body}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- ================================================================
+         Brücke zurück ins Geschäftliche
+         ============================================================== -->
+    <section class="labor-bridge" data-reveal>
+      <p class="labor-bridge-text">
+        Ein Spiel ist kein Auftrag. Aber die Technik dahinter ist dieselbe, die
+        einen Konfigurator flüssig macht oder einen Rechner in Echtzeit
+        durchrechnen lässt.
+      </p>
+      <a class="cta-inline" href="/software">
+        Was das für deine Website heißt
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+      </a>
+    </section>
+  </main>
+
+  <SiteFooter />
+</BaseLayout>
+
+<script>
+  const frame = document.querySelector<HTMLElement>('[data-game-frame]');
+  const cover = frame?.querySelector<HTMLElement>('[data-game-cover]');
+  const startButton = frame?.querySelector<HTMLButtonElement>('[data-game-start]');
+
+  startButton?.addEventListener('click', () => {
+    frame?.setAttribute('data-active', 'true');
+    cover?.setAttribute('hidden', '');
+    // Der iframe bekommt den Fokus, damit Tastatursteuerung sofort
+    // greift statt erst nach einem zweiten Klick ins Spielfeld.
+    frame?.querySelector('iframe')?.focus();
+  });
+</script>
+
+<style>
+  .labor-page {
+    position: relative;
+    background: #050507;
+    padding: 140px 40px 80px;
+    min-height: calc(100vh - 200px);
+    overflow: hidden;
+  }
+  @media (max-width: 768px) {
+    .labor-page {
+      padding: 100px 20px 60px;
+    }
+  }
+
+  .labor-page > section,
+  .labor-hero {
+    position: relative;
+    z-index: 1;
+    max-width: 880px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .labor-page > section {
+    margin-bottom: 96px;
+  }
+  @media (max-width: 768px) {
+    .labor-page > section {
+      margin-bottom: 72px;
+    }
+  }
+
+  /* === Hero === */
+  .labor-hero {
+    text-align: center;
+    max-width: 780px;
+    margin: 0 auto 80px;
+    padding-top: 32px;
+  }
+
+  /* === Intro === */
+  .labor-intro {
+    max-width: 640px;
+  }
+  .labor-intro p {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.08rem;
+    line-height: 1.7;
+    color: rgba(245, 245, 244, 0.78);
+    margin: 0;
+  }
+
+  /* === Shared === */
+  .labor-eyebrow {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.75rem;
+    letter-spacing: 0.28em;
+    color: rgba(245, 158, 11, 0.85);
+    text-transform: uppercase;
+    margin: 0 0 14px;
+  }
+  .labor-section-title {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.7rem, 3.4vw, 2.5rem);
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    color: #f5f5f4;
+    margin: 0 0 20px;
+  }
+
+  /* === Projekt === */
+  .labor-project-intro {
+    max-width: 62ch;
+    margin: 0 0 clamp(28px, 4vh, 40px);
+    font-family: 'Inter', sans-serif;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.72);
+  }
+
+  .game-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    border: 2px solid #f59e0b;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #0a0a0a;
+    box-shadow: 0 0 48px rgba(245, 158, 11, 0.18);
+  }
+
+  .game-iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    /* Bis zum Klick nimmt der iframe keine Zeiger-Events an, damit
+       Scrollen ueber ihm hinweg funktioniert. */
+    pointer-events: none;
+  }
+
+  .game-frame[data-active='true'] .game-iframe {
+    pointer-events: auto;
+  }
+
+  .game-cover {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 24px;
+    text-align: center;
+    background: rgba(10, 10, 10, 0.82);
+  }
+
+  .game-cover[hidden] {
+    display: none;
+  }
+
+  .game-cover-title {
+    margin: 0;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    letter-spacing: 0.08em;
+    color: rgba(245, 245, 244, 0.96);
+  }
+
+  .game-cover-sub {
+    margin: 0 0 12px;
+    font-size: 0.78rem;
+    letter-spacing: 0.22em;
+    color: rgba(245, 245, 244, 0.45);
+  }
+
+  .game-cover-button {
+    padding: 11px 26px;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: linear-gradient(to bottom, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+    color: #1a1a1a;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 240ms ease, box-shadow 240ms ease;
+    box-shadow: 0 0 32px rgba(245, 158, 11, 0.35);
+  }
+
+  .game-cover-button:hover {
+    transform: scale(1.04);
+    box-shadow: 0 0 48px rgba(245, 158, 11, 0.55);
+  }
+
+  .game-cover-button:focus-visible {
+    outline: 2px solid rgba(245, 158, 11, 0.8);
+    outline-offset: 4px;
+  }
+
+  .game-cover-link {
+    color: rgba(245, 245, 244, 0.55);
+    font-size: 0.88rem;
+    text-decoration: none;
+    transition: color 200ms ease;
+  }
+
+  .game-cover-link:hover {
+    color: rgba(245, 158, 11, 0.95);
+  }
+
+  .labor-project-note {
+    margin: 16px 0 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.5);
+  }
+
+  .labor-project-note a {
+    color: rgba(245, 158, 11, 0.9);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.3);
+  }
+
+  .labor-project-note a:hover {
+    border-bottom-color: rgba(245, 158, 11, 0.9);
+  }
+
+  /* === Tech-Grid === */
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  @media (max-width: 640px) {
+    .tech-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .tech-item {
+    padding: 24px;
+    background: rgba(15, 15, 18, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+  }
+  .tech-title {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.08rem;
+    color: #f5f5f4;
+    margin: 0 0 8px;
+  }
+  .tech-body {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: rgba(245, 245, 244, 0.7);
+    margin: 0;
+  }
+
+  /* === Bridge === */
+  .labor-bridge {
+    max-width: 640px;
+    padding-top: 8px;
+  }
+  .labor-bridge-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.05rem;
+    line-height: 1.65;
+    color: rgba(245, 245, 244, 0.78);
+    margin: 0 0 20px;
+  }
+
+  .cta-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: rgba(245, 158, 11, 0.95);
+    text-decoration: none;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.4);
+    transition: color 200ms ease, border-color 200ms ease;
+  }
+  .cta-inline:hover {
+    color: rgba(252, 211, 77, 1);
+    border-bottom-color: rgba(252, 211, 77, 1);
+  }
+
+  /* === Mobile: Spiel bekommt hochkant ein quadratischeres Fenster === */
+  @media (max-width: 640px) {
+    .game-frame {
+      aspect-ratio: 4 / 5;
+      max-height: 70vh;
+    }
+  }
+</style>
