@@ -297,7 +297,6 @@ html[data-site-theme='light'] .error-secondary {
 
 html[data-site-theme='light'] .preise-software-hint,
 html[data-site-theme='light'] .problems-note,
-html[data-site-theme='light'] .refs-note,
 html[data-site-theme='light'] .ref-preview-sub,
 html[data-site-theme='light'] .cms-examples,
 html[data-site-theme='light'] .case-full,
@@ -316,6 +315,16 @@ html[data-site-theme='light'] .sidebar-links,
 html[data-site-theme='light'] .bottom-cta-line,
 html[data-site-theme='light'] .post-back-fixed {
   color: var(--theme-text-muted) !important;
+}
+
+/* "Zum Journal" ist eine Pille mit eigenem dunklem Hintergrund. Nur die
+   Textfarbe zu invertieren ergab dunkel auf dunkel — Flaeche, Rand und
+   Schatten muessen mit. */
+html[data-site-theme='light'] .post-back-fixed {
+  background: rgba(254, 253, 249, 0.92) !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  color: var(--theme-text-strong) !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08) !important;
 }
 
 /* Preisrechner: der Ring der Auswahl-Punkte war auf helles Weiss

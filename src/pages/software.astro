@@ -332,10 +332,12 @@ const kinds = [
     text-align: center;
     max-width: 780px;
     margin: 0 auto 60px;
-    /* Kein padding-top wie auf den anderen Sub-Pages: die Headline ist
-       hier deutlich laenger und braucht den Platz nach unten, nicht
-       nach oben. */
-    padding-top: 0;
+    /* 32px wie auf jeder anderen Sub-Page. Der Abstand ist nicht
+       optional: der Theme-Umschalter haengt fix auf top:90px und
+       ueberdeckt die Headline sonst. Dass der Hero frueher zu tief
+       wirkte, lag an der dreizeiligen Headline — die ist unten
+       gedeckelt, das reicht als Korrektur. */
+    padding-top: 32px;
   }
 
   /* "Websites koennen mehr als nur da sein." laeuft bei den globalen
