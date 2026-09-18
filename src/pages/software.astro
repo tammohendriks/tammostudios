@@ -1,0 +1,717 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SubPageBackground from '../components/SubPageBackground.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { SITE } from '../lib/constants';
+
+// Client-Cases: dieselben Kunden wie auf /referenzen, hier aber unter
+// dem technischen Blickwinkel — was fuer eine Anwendung wurde gebaut,
+// nicht wie die Website aussieht. Daten bewusst lokal und nicht aus
+// lib/references.ts: das sind andere Felder fuer einen anderen Zweck,
+// und eine gemeinsame Struktur wuerde beide Seiten einschraenken.
+const cases = [
+  {
+    name: 'IBI',
+    full: 'Institut für Betriebsmedizin',
+    branch: 'Betriebsmedizin, Isernhagen',
+    body:
+      'Drei-Pfad-Anfrage-System für Vorsorgen. Unternehmen tragen ' +
+      'Mitarbeitende ein, wählen Untersuchungen per Modal aus, das System ' +
+      'erzeugt automatisch ein PDF und schickt es an die Praxis. Der ' +
+      'Absender bekommt eine Bestätigungs-Mail. Was vorher Telefonate und ' +
+      'manuelle Zuordnung war, läuft jetzt strukturiert.',
+    tags: ['3-Pfad-Formular', 'Auto-PDF', 'Multi-Recipient-Mail'],
+    href: 'https://ibi-doc.de/anfrage',
+  },
+  {
+    name: 'Samedos',
+    full: 'Arbeitsmedizinische Praxis',
+    branch: 'Betriebsmedizin, Bremen',
+    body:
+      'CMS-basierte Preisliste mit Live-PDF-Vorschau. Das Team pflegt ' +
+      'Leistungen und Preise im Studio, Kunden sehen sofort die ' +
+      'aktualisierte PDF-Version — inklusive englischer Übersetzung. Dazu ' +
+      'ein 360°-Rundgang über Google Street View und ein Sprachumschalter ' +
+      'für internationale Kunden.',
+    tags: ['Custom-CMS', 'Live-PDF-Preview', 'Mehrsprachig'],
+    href: 'https://www.samedos.de',
+  },
+  {
+    name: 'WärmePower',
+    full: 'Heizung, Wärmepumpe, Sanitär',
+    branch: 'Handwerk, Bremen',
+    body:
+      'Sechs Fragen zu Wohnfläche, Baujahr, Personen und Warmwasser — ' +
+      'daraus eine Empfehlung: Wärmepumpe, Hybrid oder Gas-Brennwert. Mit ' +
+      'Investitionsrahmen, möglicher BEG-Förderung und Eigenanteil. ' +
+      'WärmePower bekommt das ausgefüllte Formular als Mail und PDF, der ' +
+      'Kunde eine Bestätigung. Zweimal im Monat kommen echte Anfragen ' +
+      'darüber rein.',
+    tags: ['Recommendation-Engine', 'Auto-PDF', 'BEG-Logik'],
+    href: 'https://waermepower.de/heizungsrechner',
+  },
+  {
+    name: 'Kirsch',
+    full: 'Dach & Fassade',
+    branch: 'Dachdecker, Bremen',
+    body:
+      'Investitionsrechner, der zeigt wie viel teurer dasselbe Bauprojekt ' +
+      'in fünf und zehn Jahren wird — auf Basis realer ' +
+      'Baupreis-Entwicklungen. Dazu: wie viel Wertsteigerung eine neue ' +
+      'Dachhülle der Immobilie zurückgibt. Beratung wird damit nachvollziehbar ' +
+      'statt gefühlt.',
+    tags: ['Finanz-Prognose', 'Baupreis-Entwicklung', 'Wertsteigerung'],
+    href: 'https://kirsch-dach-fassade.de/investition',
+  },
+] as const;
+
+const steps = [
+  {
+    number: '01',
+    title: 'Erstgespräch',
+    meta: '30 Minuten, kostenlos',
+    body:
+      'Wir sprechen über deinen Prozess. Was läuft manuell, was könnte ' +
+      'digital laufen? Wo verbrennst du Zeit? Was würde deinen Kunden das ' +
+      'Leben leichter machen? Am Ende hast du eine ehrliche Einschätzung, ' +
+      'ob eine eigene Anwendung für dich Sinn ergibt.',
+  },
+  {
+    number: '02',
+    title: 'Konzeption + Angebot',
+    meta: '48 Stunden',
+    body:
+      'Du bekommst einen konkreten Vorschlag: Featureliste, Timeline, ' +
+      'Preis. Fix, nicht mit Sternchen. Darauf entscheidest du.',
+  },
+  {
+    number: '03',
+    title: 'Entwicklung',
+    meta: '2 bis 6 Wochen',
+    body:
+      'Kein wochenlanges Pixel-Ping-Pong. Ich baue in klaren Iterationen, ' +
+      'du siehst nach jedem Meilenstein was passiert und kannst ' +
+      'korrigieren. Am Ende bekommst du alles: Code, Dokumentation, Zugänge.',
+  },
+] as const;
+
+const GAME_URL = 'https://asteroid.tammostudios.de';
+---
+
+<BaseLayout
+  pageTitle="Software"
+  title="Custom Web Apps aus Bremen — Software statt Website | Tammo Studios"
+  description="Individuelle Web-Anwendungen für kleine Unternehmen: Anfrage-Formulare, Konfiguratoren, CMS-Systeme. Live-Beispiele von IBI, Samedos, WärmePower. Ab 3.500 €."
+>
+  <main class="software-page">
+    <SubPageBackground />
+
+    <header class="software-hero">
+      <p class="software-eyebrow label-tracked">SOFTWARE FÜR KLEINE UNTERNEHMEN</p>
+      <h1 class="subpage-hero-title">Websites können mehr als nur da sein.</h1>
+      <p class="subpage-hero-subtitle software-hero-sub">
+        Custom Web-Applikationen aus Bremen — Anfrage-Formulare mit PDF-Ausgabe,
+        dynamische Preisrechner, mehrsprachige CMS-Systeme. Individuell
+        entwickelt für dein Unternehmen.
+      </p>
+
+      <div class="software-hero-cta">
+        <a class="cta-orbital" href="/kontakt">
+          Erstgespräch anfragen
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12 5 19 12 12 19" />
+          </svg>
+        </a>
+        <p class="software-hero-note">Ab 3.500 € · Konkrete Zahl nach dem Erstgespräch</p>
+      </div>
+    </header>
+
+    <section class="software-positioning" aria-label="Was ich baue" data-reveal>
+      <p>
+        Ich baue keine Templates auf. Ich baue Anwendungen, die zu deinen
+        Prozessen passen — mit eigenem Frontend, echten Backend-Anbindungen
+        und individueller Business-Logik. Als Freelancer, ohne Agentur
+        dazwischen.
+      </p>
+    </section>
+
+    <section class="software-demo" aria-labelledby="demo-heading" data-reveal>
+      <h2 id="demo-heading" class="software-section-title">Erst mal ein Beweis</h2>
+      <p class="software-demo-intro">
+        Bevor du liest, was ich für andere gebaut habe, hier etwas, das ich für
+        mich selbst gebaut habe: ein Arcade-Game mit prozeduraler Musik,
+        globalem Leaderboard und mehrstufigem Boss-Kampf. Alles selbst
+        entwickelt, TypeScript und Canvas, kein Framework. Spielbar direkt hier.
+      </p>
+
+      <!-- Click-to-activate: das Spiel faengt Touch-Events ab
+           (preventDefault fuer Steuerung und Zoom-Sperre). Wuerde der
+           iframe sofort interaktiv sein, koennte man auf dem Handy nicht
+           mehr an ihm vorbeiscrollen — jede Wischgeste landete im Spiel.
+           Erst der bewusste Klick uebergibt die Kontrolle. -->
+      <div class="game-frame" data-game-frame>
+        <iframe
+          src={GAME_URL}
+          title="ASTEROID//01 — Arcade-Game, live"
+          allow="fullscreen; autoplay"
+          loading="lazy"
+          class="game-iframe"
+        ></iframe>
+
+        <div class="game-cover" data-game-cover>
+          <p class="game-cover-title">ASTEROID//01</p>
+          <p class="game-cover-sub">SPACE SURVIVAL PROTOCOL</p>
+          <button type="button" class="game-cover-button" data-game-start>
+            Hier spielen
+          </button>
+          <a class="game-cover-link" href={GAME_URL} target="_blank" rel="noopener">
+            oder im Vollbild öffnen ↗
+          </a>
+        </div>
+      </div>
+
+      <p class="software-demo-note">
+        Läuft auf <a href={GAME_URL} target="_blank" rel="noopener">asteroid.tammostudios.de</a>
+        als eigenständige Web-App. Auf dem Handy macht die
+        <a href={GAME_URL} target="_blank" rel="noopener">Vollbild-Version</a>
+        mehr Spaß.
+      </p>
+    </section>
+
+    <section class="software-cases" aria-labelledby="cases-heading">
+      <h2 id="cases-heading" class="software-section-title" data-reveal>Für Unternehmen gebaut</h2>
+
+      <div class="case-grid">
+        {cases.map((item) => (
+          <article class="case-card" data-reveal>
+            <h3 class="case-name">{item.name}</h3>
+            <p class="case-full">{item.full}</p>
+            <p class="case-branch">{item.branch}</p>
+            <p class="case-body">{item.body}</p>
+
+            <ul class="case-tags">
+              {item.tags.map((tag) => <li class="case-tag">{tag}</li>)}
+            </ul>
+
+            <a class="case-link" href={item.href} target="_blank" rel="noopener">
+              Ansehen
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </a>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="software-process" aria-labelledby="process-heading">
+      <h2 id="process-heading" class="software-section-title" data-reveal>So läuft das ab</h2>
+
+      <div class="process-grid">
+        {steps.map((step) => (
+          <article class="process-step" data-reveal>
+            <p class="process-number">{step.number}</p>
+            <h3 class="process-title">{step.title}</h3>
+            <p class="process-meta">{step.meta}</p>
+            <p class="process-body">{step.body}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="software-pricing" aria-labelledby="pricing-heading" data-reveal>
+      <h2 id="pricing-heading" class="software-section-title">Was das kostet</h2>
+
+      <div class="pricing-body">
+        <p>
+          Eigene Anwendungen fangen bei <strong>3.500 €</strong> an. Das reicht
+          für ein strukturiertes Anfrage-System mit automatischem PDF und
+          Mail-Versand — wie das IBI-Formular oben.
+        </p>
+        <p>
+          Komplexeres — dynamische CMS-Anwendungen, mehrstufige Rechner mit
+          Business-Logik, Systeme mit mehreren Nutzerrollen — liegt zwischen
+          <strong>5.000 €</strong> und <strong>15.000 €</strong>.
+        </p>
+        <p>
+          Was deine Anwendung konkret kostet, sage ich dir nach dem
+          Erstgespräch. Vorher würde ich raten. Und Raten hilft dir nicht.
+        </p>
+      </div>
+
+      <p class="pricing-aside">
+        Für normale Websites siehe <a href="/preise">Preise</a> — 2.000 € für
+        eine Website, 3.000 € für einen Online-Shop. Fixpreis, keine Software.
+      </p>
+    </section>
+
+    <section class="software-closing" aria-labelledby="closing-heading" data-reveal>
+      <h2 id="closing-heading" class="software-section-title">Lass uns sprechen</h2>
+      <p class="closing-text">
+        Beschreib mir kurz, was du im Kopf hast. Ich antworte innerhalb von
+        24 Stunden — ehrlich, ob das mit mir Sinn ergibt oder nicht.
+      </p>
+
+      <a class="cta-orbital" href="/kontakt">
+        Anfrage schicken
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="5" y1="12" x2="19" y2="12" />
+          <polyline points="12 5 19 12 12 19" />
+        </svg>
+      </a>
+
+      <p class="closing-mail">
+        Oder direkt per Mail: <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+      </p>
+    </section>
+
+    <SiteFooter />
+  </main>
+</BaseLayout>
+
+<script>
+  // Uebergibt die Kontrolle an den iframe erst auf bewussten Klick.
+  // Vorher liegt eine Cover-Schicht darueber und der iframe ist fuer
+  // Zeiger-Events transparent, damit Scrollen am Spiel vorbei
+  // funktioniert — auf dem Handy sonst eine Sackgasse.
+  const frame = document.querySelector<HTMLElement>('[data-game-frame]');
+  const cover = frame?.querySelector<HTMLElement>('[data-game-cover]');
+  const startButton = frame?.querySelector<HTMLButtonElement>('[data-game-start]');
+
+  startButton?.addEventListener('click', () => {
+    frame?.setAttribute('data-active', 'true');
+    cover?.setAttribute('hidden', '');
+    // Der iframe bekommt den Fokus, damit Tastatursteuerung sofort
+    // greift statt erst nach einem zweiten Klick ins Spielfeld.
+    frame?.querySelector('iframe')?.focus();
+  });
+</script>
+
+<style>
+  /* Site-Konvention fuer Sub-Pages: full-width page-container mit
+     140px 40px 80px padding, content darin per max-width zentriert.
+     Matched /referenzen /preise /journal /kontakt etc. */
+  .software-page {
+    position: relative;
+    background: #050507;
+    padding: 140px 40px 80px;
+    min-height: calc(100vh - 200px);
+    overflow: hidden;
+  }
+
+  @media (max-width: 768px) {
+    .software-page {
+      padding: 100px 20px 60px;
+    }
+  }
+
+  .software-page > section {
+    max-width: 1080px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ------------------------------------------------------------- hero */
+  /* Hero folgt der Sub-Page-Konvention: text-align:center, max-width
+     780px, padding-top:32px matched /referenzen /preise /journal /ueber.
+     Eyebrow + CTA + Note bleiben zentriert unter dem Header, damit die
+     Software-Page ihre spezifischen Hero-Elemente behalten kann ohne
+     die Site-Konsistenz zu brechen. */
+  .software-hero {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    max-width: 780px;
+    margin: 0 auto 60px;
+    padding-top: 32px;
+  }
+
+  .software-eyebrow {
+    margin: 0 0 clamp(18px, 3vh, 28px);
+    color: rgba(245, 158, 11, 0.9);
+    font-size: 0.72rem;
+  }
+
+  .software-hero-sub {
+    max-width: 62ch;
+    margin-inline: auto;
+  }
+
+  .software-hero-cta {
+    margin-top: clamp(32px, 5vh, 48px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .software-hero-note {
+    margin: 0;
+    color: rgba(245, 245, 244, 0.5);
+    font-size: 0.9rem;
+  }
+
+  /* ------------------------------------------------- section headings */
+
+  .software-section-title {
+    margin: 0 0 clamp(24px, 4vh, 40px);
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.8rem, 3.6vw, 2.6rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: rgba(245, 245, 244, 0.96);
+  }
+
+  .software-page > section {
+    padding-block: clamp(48px, 8vh, 88px);
+  }
+
+  /* ------------------------------------------------------ positioning */
+
+  .software-positioning p {
+    margin: 0;
+    max-width: 58ch;
+    font-size: clamp(1.15rem, 2vw, 1.5rem);
+    line-height: 1.55;
+    color: rgba(245, 245, 244, 0.82);
+  }
+
+  /* -------------------------------------------------------- live demo */
+
+  .software-demo-intro {
+    max-width: 62ch;
+    margin: 0 0 clamp(28px, 4vh, 40px);
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.72);
+  }
+
+  .game-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    border: 2px solid #f59e0b;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #0a0a0a;
+    box-shadow: 0 0 48px rgba(245, 158, 11, 0.18);
+  }
+
+  .game-iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    /* Bis zum Klick nimmt der iframe keine Zeiger-Events an, damit
+       Scrollen ueber ihm hinweg funktioniert. */
+    pointer-events: none;
+  }
+
+  .game-frame[data-active='true'] .game-iframe {
+    pointer-events: auto;
+  }
+
+  .game-cover {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 24px;
+    text-align: center;
+    background: rgba(10, 10, 10, 0.82);
+    backdrop-filter: blur(2px);
+  }
+
+  .game-cover[hidden] {
+    display: none;
+  }
+
+  .game-cover-title {
+    margin: 0;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    letter-spacing: 0.08em;
+    color: rgba(245, 245, 244, 0.96);
+  }
+
+  .game-cover-sub {
+    margin: 0 0 12px;
+    font-size: 0.78rem;
+    letter-spacing: 0.22em;
+    color: rgba(245, 245, 244, 0.45);
+  }
+
+  .game-cover-button {
+    padding: 11px 26px;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: linear-gradient(to bottom, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+    color: #1a1a1a;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 240ms ease, box-shadow 240ms ease;
+    box-shadow: 0 0 32px rgba(245, 158, 11, 0.35);
+  }
+
+  .game-cover-button:hover {
+    transform: scale(1.04);
+    box-shadow: 0 0 48px rgba(245, 158, 11, 0.55);
+  }
+
+  .game-cover-button:focus-visible {
+    outline: 2px solid rgba(245, 158, 11, 0.8);
+    outline-offset: 4px;
+  }
+
+  .game-cover-link {
+    color: rgba(245, 245, 244, 0.55);
+    font-size: 0.88rem;
+    text-decoration: none;
+    transition: color 200ms ease;
+  }
+
+  .game-cover-link:hover {
+    color: rgba(245, 158, 11, 0.95);
+  }
+
+  .software-demo-note {
+    margin: 16px 0 0;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.5);
+  }
+
+  .software-demo-note a {
+    color: rgba(245, 158, 11, 0.9);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.3);
+  }
+
+  .software-demo-note a:hover {
+    border-bottom-color: rgba(245, 158, 11, 0.9);
+  }
+
+  /* ----------------------------------------------------- client cases */
+
+  .case-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(18px, 2.5vw, 26px);
+  }
+
+  .case-card {
+    display: flex;
+    flex-direction: column;
+    padding: clamp(24px, 3vw, 32px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.02);
+    transition: border-color 260ms ease, transform 260ms ease;
+  }
+
+  .case-card:hover {
+    border-color: rgba(245, 158, 11, 0.35);
+    transform: translateY(-2px);
+  }
+
+  .case-name {
+    margin: 0;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: rgba(245, 245, 244, 0.96);
+  }
+
+  .case-full {
+    margin: 2px 0 0;
+    font-size: 0.95rem;
+    color: rgba(245, 245, 244, 0.6);
+  }
+
+  .case-branch {
+    margin: 10px 0 0;
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(245, 158, 11, 0.75);
+  }
+
+  .case-body {
+    margin: 18px 0 0;
+    font-size: 0.98rem;
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.72);
+  }
+
+  .case-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 20px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .case-tag {
+    padding: 5px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 9999px;
+    font-size: 0.74rem;
+    letter-spacing: 0.04em;
+    color: rgba(245, 245, 244, 0.6);
+  }
+
+  .case-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    /* Schiebt den Link an den unteren Rand, damit er in allen Karten
+       einer Reihe auf derselben Linie sitzt. */
+    margin-top: auto;
+    padding-top: 22px;
+    color: rgba(245, 158, 11, 0.9);
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    align-self: flex-start;
+  }
+
+  .case-link svg {
+    transition: transform 240ms ease;
+  }
+
+  .case-link:hover svg {
+    transform: translateX(3px);
+  }
+
+  /* --------------------------------------------------------- process */
+
+  .process-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(20px, 3vw, 34px);
+  }
+
+  .process-number {
+    margin: 0;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 2.2rem;
+    line-height: 1;
+    color: rgba(245, 158, 11, 0.35);
+  }
+
+  .process-title {
+    margin: 12px 0 0;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: rgba(245, 245, 244, 0.96);
+  }
+
+  .process-meta {
+    margin: 4px 0 0;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(245, 245, 244, 0.45);
+  }
+
+  .process-body {
+    margin: 14px 0 0;
+    font-size: 0.98rem;
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.72);
+  }
+
+  /* --------------------------------------------------------- pricing */
+
+  .pricing-body p {
+    max-width: 58ch;
+    margin: 0 0 18px;
+    font-size: clamp(1.02rem, 1.6vw, 1.18rem);
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.8);
+  }
+
+  .pricing-body strong {
+    color: rgba(245, 158, 11, 0.95);
+    font-weight: 600;
+  }
+
+  .pricing-aside {
+    max-width: 58ch;
+    margin: clamp(24px, 4vh, 36px) 0 0;
+    padding-top: 22px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.55);
+  }
+
+  .pricing-aside a,
+  .closing-mail a {
+    color: rgba(245, 158, 11, 0.9);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.3);
+  }
+
+  .pricing-aside a:hover,
+  .closing-mail a:hover {
+    border-bottom-color: rgba(245, 158, 11, 0.9);
+  }
+
+  /* --------------------------------------------------------- closing */
+
+  .software-closing {
+    text-align: center;
+    padding-bottom: clamp(72px, 12vh, 120px);
+  }
+
+  .closing-text {
+    max-width: 52ch;
+    margin: 0 auto clamp(28px, 4vh, 40px);
+    font-size: clamp(1.05rem, 1.8vw, 1.25rem);
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.78);
+  }
+
+  .closing-mail {
+    margin: 20px 0 0;
+    font-size: 0.95rem;
+    color: rgba(245, 245, 244, 0.5);
+  }
+
+  /* ---------------------------------------------------------- mobile */
+
+  @media (max-width: 860px) {
+    .case-grid,
+    .process-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    /* 16:10 waere auf einem 360px breiten Display nur 225px hoch — zu
+       klein, um irgendetwas zu erkennen. Hochkant bekommt das Spiel
+       ein quadratischeres Fenster. */
+    .game-frame {
+      aspect-ratio: 4 / 5;
+      max-height: 70vh;
+    }
+
+    .software-hero {
+      padding-top: clamp(96px, 14vh, 140px);
+    }
+  }
+</style>

@@ -24,14 +24,15 @@ export const SITE = {
 
 export const SITE_LABELS = {
   establishedLine: 'EST. 2026 · BREMEN',
-  serviceLine: 'Individuelle Websites, handgemacht in Bremen.',
+  // NEUE Positionierung ab Sep 2026: nicht mehr Websites-only, sondern
+  // "digitale Handarbeit" — Dachbegriff fuer Websites + Custom-Software.
+  serviceLine: 'Digitale Handarbeit aus Bremen.',
   // \n-Zeilenstruktur: jede Zeile ein eigener Gedanke. Wird via
   // .text-lines Utility-Class (global.css) als sichtbarer Umbruch
   // gerendert. Text innerhalb jeder Zeile wrappt weiterhin normal.
   introText:
-    'Eine Person, eine Handschrift, komplett individuell gebaut.\n' +
-    'Für dich, wenn du online ankommen willst.\n' +
-    'Dort, wo deine Kunden suchen.',
+    'Von Websites bis individuellen Anwendungen.\n' +
+    'Eine Person, eine Handschrift, komplett individuell gebaut.',
   scrollCue: 'SCROLLEN',
 } as const;
 
@@ -146,6 +147,7 @@ export const SECTION5 = {
     navLinks: [
       { label: 'Über',       href: '/ueber' },
       { label: 'Referenzen', href: '/referenzen' },
+      { label: 'Software',   href: '/software' },
       { label: 'Preise',     href: '/preise' },
     ],
     legalLinks: [
@@ -178,6 +180,9 @@ export const SECTION5 = {
 export const NAV_ITEMS = [
   { label: 'Über', href: '/ueber' },
   { label: 'Referenzen', href: '/referenzen' },
+  // Referenzen zeigt was gebaut wurde, Software erklaert was sonst noch
+  // geht — deshalb direkt dahinter, vor dem weicheren Journal-Content.
+  { label: 'Software', href: '/software' },
   { label: 'Journal', href: '/journal' },
   { label: 'Studio', href: '/studio' },
   {
