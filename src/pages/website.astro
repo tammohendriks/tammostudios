@@ -22,6 +22,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SubPageBackground from '../components/SubPageBackground.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import ClosingCta from '../components/ClosingCta.astro';
 import { REFERENCES } from '../lib/references';
 
 /**
@@ -89,7 +90,7 @@ const websiteRefs = REFERENCES.filter((r) =>
         {'Handgemacht in Bremen. Eine individuelle Anwendung ist drin.\nAb 2.000 €, in 14 Tagen live.'}
       </p>
       <div class="website-hero-cta">
-        <a class="cta-inline" href="/kontakt">
+        <a class="cta-link" href="/kontakt">
           Erstgespräch anfragen
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
         </a>
@@ -108,7 +109,7 @@ const websiteRefs = REFERENCES.filter((r) =>
             <h3 class="problem-card-label">{p.label}</h3>
             <p class="problem-card-body">{p.body}</p>
             {p.linkHref && (
-              <a class="problem-card-cta" href={p.linkHref}>
+              <a class="cta-link problem-card-cta" href={p.linkHref}>
                 {p.linkLabel}
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
               </a>
@@ -192,7 +193,7 @@ const websiteRefs = REFERENCES.filter((r) =>
         Sie wird in denselben 14 Tagen mitgebaut. Jede weitere kostet
         500 €.
       </p>
-      <a class="cta-inline" href="/preise">
+      <a class="cta-link" href="/preise">
         Volle Preisübersicht ansehen
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
       </a>
@@ -222,19 +223,13 @@ const websiteRefs = REFERENCES.filter((r) =>
       </p>
     </section>
 
-    <!-- ================================================================
-         7. Final-CTA
-         ============================================================== -->
-    <section class="website-final" data-reveal>
-      <h2 class="website-final-headline">Sprechen wir.</h2>
-      <p class="website-final-body">
-        30 Minuten Erstgespräch, kostenlos, unverbindlich.
-      </p>
-      <a class="cta-orbital" href="/kontakt">
-        Erstgespräch anfragen
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
-      </a>
-    </section>
+    <ClosingCta
+      recommendation={{
+        text: 'Mehr als eine Website im Kopf?',
+        label: 'Zu den individuellen Anwendungen',
+        href: '/software',
+      }}
+    />
   </main>
 
   <SiteFooter />
@@ -345,23 +340,10 @@ const websiteRefs = REFERENCES.filter((r) =>
     margin: 0;
     flex: 1;
   }
+  /* Aussehen aus .cta-link, hier nur die Position in der Karte. */
   .problem-card-cta {
-    display: inline-flex;
     align-self: flex-start;
-    align-items: center;
-    gap: 6px;
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-size: 0.85rem;
-    color: rgba(245, 158, 11, 0.95);
-    text-decoration: none;
     margin-top: 6px;
-    border-bottom: 1px solid rgba(245, 158, 11, 0.3);
-    padding-bottom: 2px;
-    transition: color 200ms ease, border-color 200ms ease;
-  }
-  .problem-card-cta:hover {
-    color: rgba(252, 211, 77, 1);
-    border-bottom-color: rgba(252, 211, 77, 1);
   }
   .problems-note {
     font-family: 'Inter', sans-serif;
@@ -572,22 +554,6 @@ const websiteRefs = REFERENCES.filter((r) =>
   }
 
   /* === Final CTA === */
-  .website-final {
-    text-align: center;
-  }
-  .website-final-headline {
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-weight: 700;
-    font-size: clamp(2rem, 4vw, 2.8rem);
-    color: #f5f5f4;
-    margin: 0 0 12px;
-  }
-  .website-final-body {
-    font-family: 'Inter', sans-serif;
-    font-size: 1.05rem;
-    color: rgba(245, 245, 244, 0.72);
-    margin: 0 0 28px;
-  }
 
   /* === Inline CTA link === */
 </style>

@@ -15,6 +15,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SpaceBackground from '../components/SpaceBackground.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import ClosingCta from '../components/ClosingCta.astro';
 
 const GAME_URL = 'https://asteroid.tammostudios.de';
 
@@ -117,20 +118,13 @@ const techPoints = [
       </div>
     </section>
 
-    <!-- ================================================================
-         Brücke zurück ins Geschäftliche
-         ============================================================== -->
-    <section class="werkstatt-bridge" data-reveal>
-      <p class="werkstatt-bridge-text">
-        Ein Spiel ist kein Auftrag. Aber die Technik dahinter ist dieselbe,
-        die einen Konfigurator flüssig macht oder einen Rechner sofort
-        durchrechnen lässt.
-      </p>
-      <a class="cta-inline" href="/software">
-        Was das für deine Website heißt
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
-      </a>
-    </section>
+    <ClosingCta
+      recommendation={{
+        text: 'Lieber etwas Geschäftliches? Dieselbe Technik, nur mit Auftrag:',
+        label: 'Zu den individuellen Anwendungen',
+        href: '/software',
+      }}
+    />
   </main>
 
   <SiteFooter />
@@ -368,18 +362,6 @@ const techPoints = [
   }
 
   /* === Bridge === */
-  .werkstatt-bridge {
-    max-width: 640px;
-    padding-top: 8px;
-  }
-  .werkstatt-bridge-text {
-    font-family: 'Inter', sans-serif;
-    font-size: 1.05rem;
-    line-height: 1.65;
-    color: rgba(245, 245, 244, 0.78);
-    margin: 0 0 20px;
-  }
-
 
   /* === Mobile: Spiel bekommt hochkant ein quadratischeres Fenster === */
   @media (max-width: 640px) {

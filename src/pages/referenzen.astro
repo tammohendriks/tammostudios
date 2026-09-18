@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import SubPageBackground from '../components/SubPageBackground.astro';
 import ReferenzModal from '../components/ReferenzModal.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import ClosingCta from '../components/ClosingCta.astro';
 import { REFERENCES } from '../lib/references';
 import { VERTICAL_LINK_BY_CATEGORY } from '../lib/verticals';
 
@@ -125,11 +126,13 @@ const totalCount = REFERENCES.length;
       ))}
     </section>
 
-    <p class="ref-software-hint" data-reveal>
-      Hinter einigen dieser Projekte steckt mehr als eine Website:
-      Anfrage-Systeme, Rechner, eigene CMS-Anwendungen. <br class="hidden sm:inline" />
-      <a href="/software">Mehr zur technischen Umsetzung</a>.
-    </p>
+    <ClosingCta
+      recommendation={{
+        text: 'Hinter einigen dieser Projekte steckt mehr als eine Website:',
+        label: 'Anfrage-Systeme, Rechner, eigene Anwendungen',
+        href: '/software',
+      }}
+    />
 
     <ReferenzModal />
   </main>
@@ -484,24 +487,7 @@ const totalCount = REFERENCES.length;
   /* Ein Satz unter dem Grid statt einer Zeile pro Karte — die Karten
      sind visuell dicht genug, und der Hinweis gilt ohnehin nur fuer
      einen Teil von ihnen. */
-  .ref-software-hint {
-    max-width: 52ch;
-    margin: clamp(40px, 6vh, 64px) auto 0;
-    text-align: center;
-    font-size: 0.92rem;
-    line-height: 1.6;
-    color: rgba(245, 245, 244, 0.45);
-  }
 
-  .ref-software-hint a {
-    color: rgba(245, 158, 11, 0.85);
-    text-decoration: none;
-    border-bottom: 1px solid rgba(245, 158, 11, 0.3);
-  }
-
-  .ref-software-hint a:hover {
-    border-bottom-color: rgba(245, 158, 11, 0.85);
-  }
 </style>
 
 <!-- Modal-Script lebt in src/components/ReferenzModal.astro -->

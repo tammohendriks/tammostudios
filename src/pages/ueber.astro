@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SubPageBackground from '../components/SubPageBackground.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import ClosingCta from '../components/ClosingCta.astro';
 import { SITE } from '../lib/constants';
 
 // Standalone Person-Schema fuer /ueber. @id matcht die founder-
@@ -133,7 +134,7 @@ const personSchema = {
           Anfrageformular, das mitdenkt. Keine versteckten
           Stundensätze, keine Pakete mit Sternchen.
         </p>
-        <a class="inline-link" href="/preise">
+        <a class="cta-link" href="/preise">
           <span>Volle Preisübersicht ansehen</span>
           <svg
             width="14"
@@ -167,30 +168,13 @@ const personSchema = {
         </p>
       </section>
 
-      <section class="ueber-close" data-reveal>
-        <p class="close-line">
-          Wenn das nach deinem Stil klingt: schreib mir.
-        </p>
-        <a
-          class="inline-link inline-link-cta"
-          href="/kontakt"
-        >
-          <span>Kontakt aufnehmen</span>
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M5 12h14M13 6l6 6-6 6" />
-          </svg>
-        </a>
-      </section>
+      <ClosingCta
+        recommendation={{
+          text: 'Sehen, was dabei rauskommt?',
+          label: 'Zu den Referenzen',
+          href: '/referenzen',
+        }}
+      />
     </article>
   </main>
 
@@ -427,24 +411,6 @@ const personSchema = {
   }
 
   /* Schluss-Block: bewusst leiser Ausstieg, leichtes Trennluft nach oben */
-  .ueber-close {
-    margin-top: 80px;
-    padding-top: 40px;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
-  }
-
-  .close-line {
-    margin: 0 0 12px;
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-size: clamp(1.1rem, 1.3vw, 1.2rem);
-    line-height: 1.55;
-    color: rgba(245, 245, 244, 0.85);
-  }
-
-  .inline-link-cta {
-    font-size: 1.05rem;
-    font-weight: 500;
-  }
 
   /* Footer-Styles leben jetzt in SiteFooter.astro (Component-scoped). */
 </style>

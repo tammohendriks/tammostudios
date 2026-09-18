@@ -464,7 +464,11 @@ const { eyebrow, subtext, secondaryEmail } = SECTION5;
     z-index: 2;
     list-style: none;
     padding: 0;
-    margin: clamp(24px, 5vh, 48px) auto 32px;
+    /* War clamp(24px, 5vh, 48px) — zusammen mit dem freien Raum, den
+       .closing als flex:1 verteilt, stand zwischen Mail-Zeile und
+       Zusagen eine Luecke. Die Sectionhoehe bleibt unveraendert, der
+       Platz wandert nur nach oben. */
+    margin: clamp(8px, 1.5vh, 16px) auto 32px;
     display: flex;
     justify-content: center;
     flex-wrap: wrap;

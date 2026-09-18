@@ -1,0 +1,154 @@
+---
+// Einheitlicher Abschluss-Block fuer alle Sub-Pages.
+//
+// Vorher hatte jede Seite ihre eigene Abschluss-Section: mal mit
+// Ueberschrift und Absatz, mal mit fettem Knopf, mal mit angehaengtem
+// Zusatzhinweis. Das hier ist ueberall dasselbe, in dieser Reihenfolge:
+//
+//   1. "Lass uns sprechen" als dezenter CTA
+//   2. Mail-Adresse als Alternative
+//   3. Eine thematisch passende Empfehlung auf eine andere Seite
+//   4. Die drei Zusagen, wie am Fuss der Startseite
+//
+// Die Empfehlung ist der einzige Teil, der sich pro Seite unterscheidet
+// — sie haelt den roten Faden zwischen den Bereichen.
+import { SITE } from '../lib/constants';
+
+interface Props {
+  /** Weiterfuehrender Hinweis, z.B. { text: 'Wissen wollen, wie weit das geht?', label: 'In die Werkstatt schauen', href: '/werkstatt' } */
+  recommendation?: { text: string; label: string; href: string };
+}
+
+const { recommendation } = Astro.props;
+
+const trust = [
+  {
+    label: 'Antwort < 24 h',
+    path: '<circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 15 14" />',
+  },
+  {
+    label: 'Erstgespräch gratis',
+    path: '<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />',
+  },
+  {
+    label: 'DE & EN',
+    path:
+      '<circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" />' +
+      '<path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />',
+  },
+];
+---
+
+<section class="closing-cta" aria-label="Kontakt aufnehmen" data-reveal>
+  <a class="cta-link cta-link-lg" href="/kontakt">
+    Lass uns sprechen
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M5 12h14M13 6l6 6-6 6" />
+    </svg>
+  </a>
+
+  <p class="closing-cta-mail">
+    Oder direkt: <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+  </p>
+
+  {recommendation && (
+    <p class="closing-cta-rec">
+      {recommendation.text}{' '}
+      <a href={recommendation.href}>{recommendation.label}</a>
+    </p>
+  )}
+
+  <ul class="closing-cta-trust" aria-label="Was du erwarten kannst">
+    {trust.map((t) => (
+      <li>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={t.path} />
+        <span>{t.label}</span>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .closing-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+    padding-top: clamp(32px, 5vh, 56px);
+    padding-bottom: clamp(56px, 9vh, 96px);
+  }
+
+  .closing-cta-mail {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    color: rgba(245, 245, 244, 0.55);
+  }
+
+  .closing-cta-mail a {
+    color: rgba(245, 158, 11, 0.9);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.3);
+  }
+
+  .closing-cta-mail a:hover {
+    border-bottom-color: rgba(245, 158, 11, 0.9);
+  }
+
+  .closing-cta-rec {
+    margin: 6px 0 0;
+    max-width: 52ch;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.5);
+  }
+
+  .closing-cta-rec a {
+    color: rgba(245, 158, 11, 0.9);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.3);
+  }
+
+  .closing-cta-rec a:hover {
+    border-bottom-color: rgba(245, 158, 11, 0.9);
+  }
+
+  /* Die drei Zusagen, gleiche Signatur wie am Fuss der Startseite */
+  .closing-cta-trust {
+    list-style: none;
+    padding: 0;
+    margin: clamp(18px, 3vh, 28px) 0 0;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px 40px;
+    max-width: 720px;
+  }
+
+  .closing-cta-trust li {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.82rem;
+    letter-spacing: 0.02em;
+    color: rgba(245, 245, 244, 0.68);
+  }
+
+  .closing-cta-trust svg {
+    color: #f59e0b;
+    flex-shrink: 0;
+  }
+
+  :global(html[data-site-theme='light']) .closing-cta-mail,
+  :global(html[data-site-theme='light']) .closing-cta-rec {
+    color: var(--theme-text-muted);
+  }
+
+  :global(html[data-site-theme='light']) .closing-cta-trust li {
+    color: var(--theme-text-dim);
+  }
+</style>

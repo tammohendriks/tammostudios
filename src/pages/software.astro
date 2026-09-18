@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SubPageBackground from '../components/SubPageBackground.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import ClosingCta from '../components/ClosingCta.astro';
 import { SITE } from '../lib/constants';
 
 // Client-Cases: dieselben Kunden wie auf /referenzen, hier aber unter
@@ -146,7 +147,7 @@ const kinds = [
       </p>
 
       <div class="software-hero-cta">
-        <a class="cta-inline" href="/kontakt">
+        <a class="cta-link" href="/kontakt">
           Erstgespräch anfragen
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
         </a>
@@ -197,7 +198,7 @@ const kinds = [
               {item.tags.map((tag) => <li class="case-tag">{tag}</li>)}
             </ul>
 
-            <a class="case-link" href={item.href} target="_blank" rel="noopener">
+            <a class="cta-link case-link" href={item.href} target="_blank" rel="noopener">
               Ansehen
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <line x1="5" y1="12" x2="19" y2="12" />
@@ -277,29 +278,13 @@ const kinds = [
       </p>
     </section>
 
-    <section class="software-closing" aria-labelledby="closing-heading" data-reveal>
-      <h2 id="closing-heading" class="software-section-title">Lass uns sprechen</h2>
-      <p class="closing-text">
-        Beschreib mir kurz, was du im Kopf hast. Ich antworte innerhalb von
-        24 Stunden, ehrlich auch dann, wenn es mit mir keinen Sinn ergibt.
-      </p>
-
-      <a class="cta-orbital" href="/kontakt">
-        Anfrage schicken
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <line x1="5" y1="12" x2="19" y2="12" />
-          <polyline points="12 5 19 12 12 19" />
-        </svg>
-      </a>
-
-      <p class="closing-mail">
-        Oder direkt per Mail: <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
-      </p>
-      <p class="closing-mail">
-        Wissen wollen, wie weit das technisch geht?
-        <a href="/werkstatt">In die Werkstatt schauen</a>.
-      </p>
-    </section>
+    <ClosingCta
+      recommendation={{
+        text: 'Wissen wollen, wie weit das technisch geht?',
+        label: 'In die Werkstatt schauen',
+        href: '/werkstatt',
+      }}
+    />
 
   </main>
 
@@ -514,27 +499,13 @@ const kinds = [
     color: rgba(245, 245, 244, 0.6);
   }
 
+  /* Aussehen kommt aus .cta-link (global.css). Hier bleibt nur, was
+     die Position in der Karte betrifft: der Link sitzt am unteren Rand,
+     damit er in allen Karten einer Reihe auf derselben Linie liegt. */
   .case-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    /* Schiebt den Link an den unteren Rand, damit er in allen Karten
-       einer Reihe auf derselben Linie sitzt. */
     margin-top: auto;
     padding-top: 22px;
-    color: rgba(245, 158, 11, 0.9);
-    font-weight: 600;
-    font-size: 0.95rem;
-    text-decoration: none;
     align-self: flex-start;
-  }
-
-  .case-link svg {
-    transition: transform 240ms ease;
-  }
-
-  .case-link:hover svg {
-    transform: translateX(3px);
   }
 
   /* ------------------------------------------- groesser als website */
@@ -633,37 +604,14 @@ const kinds = [
     color: rgba(245, 245, 244, 0.55);
   }
 
-  .pricing-aside a,
-  .closing-mail a {
+  .pricing-aside a {
     color: rgba(245, 158, 11, 0.9);
     text-decoration: none;
     border-bottom: 1px solid rgba(245, 158, 11, 0.3);
   }
 
-  .pricing-aside a:hover,
-  .closing-mail a:hover {
+  .pricing-aside a:hover {
     border-bottom-color: rgba(245, 158, 11, 0.9);
-  }
-
-  /* --------------------------------------------------------- closing */
-
-  .software-closing {
-    text-align: center;
-    padding-bottom: clamp(72px, 12vh, 120px);
-  }
-
-  .closing-text {
-    max-width: 52ch;
-    margin: 0 auto clamp(28px, 4vh, 40px);
-    font-size: clamp(1.05rem, 1.8vw, 1.25rem);
-    line-height: 1.6;
-    color: rgba(245, 245, 244, 0.78);
-  }
-
-  .closing-mail {
-    margin: 20px 0 0;
-    font-size: 0.95rem;
-    color: rgba(245, 245, 244, 0.5);
   }
 
   /* ---------------------------------------------------------- mobile */

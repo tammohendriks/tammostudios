@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SubPageBackground from '../components/SubPageBackground.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import ClosingCta from '../components/ClosingCta.astro';
 
 // Inline-SVG für Häkchen — kleiner amber-umrandeter Kreis mit
 // amber Häkchen innen. Wird in der "Immer dabei"-Liste pro Item
@@ -90,7 +91,7 @@ const alwaysIncludedItems = [
         <p class="calc-cta-body">
           In 3 Fragen zum genauen Preis für dein Vorhaben.
         </p>
-        <a class="calc-cta-link" href="/preisrechner">
+        <a class="cta-link" href="/preisrechner">
           <span>Preisrechner öffnen</span>
           <svg
             width="16"
@@ -190,33 +191,13 @@ const alwaysIncludedItems = [
       </p>
     </section>
 
-    <section class="preise-cta" data-reveal>
-      <p class="cta-pre">Klingt fair?</p>
-      <a
-        class="inline-link inline-link-cta"
-        href="/kontakt"
-      >
-        <span>Lass uns sprechen</span>
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <path d="M5 12h14M13 6l6 6-6 6" />
-        </svg>
-      </a>
-
-      <p class="preise-software-hint">
-        Was eine „individuelle Anwendung" konkret sein kann, steht mit
-        Beispielen auf <a href="/software">Software</a>.
-      </p>
-    </section>
+    <ClosingCta
+      recommendation={{
+        text: 'Unsicher, was du brauchst?',
+        label: 'Paket im Preisrechner zusammenstellen',
+        href: '/preisrechner',
+      }}
+    />
   </main>
 
   <SiteFooter />
@@ -659,21 +640,6 @@ const alwaysIncludedItems = [
   }
 
   /* === CTA-Schluss: leiser, kein Pill === */
-  .preise-cta {
-    position: relative;
-    z-index: 1;
-    text-align: center;
-    max-width: 720px;
-    margin: 0 auto;
-    padding: 32px 0 16px;
-  }
-
-  .cta-pre {
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-size: 0.95rem;
-    color: rgba(245, 245, 244, 0.55);
-    margin: 0 0 16px;
-  }
 
   /* Inline-Link mit amber Pfeil — funktioniert auf <a> und
      <button> identisch (Browser-Default-Reset auf .inline-link
@@ -764,66 +730,14 @@ const alwaysIncludedItems = [
     margin: 0 0 20px;
   }
 
-  .calc-cta-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    color: rgba(245, 158, 11, 0.95);
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-weight: 600;
-    font-size: 1rem;
-    text-decoration: none;
-    border-bottom: 1px solid rgba(245, 158, 11, 0.4);
-    padding-bottom: 2px;
-    transition: color 200ms ease, border-color 200ms ease;
-  }
-
-  .calc-cta-link:hover,
-  .calc-cta-link:focus-visible {
-    color: #fbbf24;
-    border-color: rgba(245, 158, 11, 0.8);
-    outline: none;
-  }
-
-  .calc-cta-link svg {
-    transition: transform 200ms ease;
-  }
-
-  .calc-cta-link:hover svg,
-  .calc-cta-link:focus-visible svg {
-    transform: translateX(3px);
-  }
-
   @media (max-width: 640px) {
     .calc-cta-card {
       padding: 24px 22px 20px;
     }
   }
 
-  .inline-link-cta {
-    font-size: clamp(1.15rem, 1.6vw, 1.35rem);
-    font-weight: 600;
-  }
-
   /* Querverweis auf /software: bewusst leise unter dem Haupt-CTA — die
      Preisseite verkauft Websites, Software ist der Seitenpfad. */
-  .preise-software-hint {
-    max-width: 46ch;
-    margin: clamp(28px, 5vh, 44px) auto 0;
-    font-size: 0.92rem;
-    line-height: 1.6;
-    color: rgba(245, 245, 244, 0.45);
-  }
-
-  .preise-software-hint a {
-    color: rgba(245, 158, 11, 0.85);
-    text-decoration: none;
-    border-bottom: 1px solid rgba(245, 158, 11, 0.3);
-  }
-
-  .preise-software-hint a:hover {
-    border-bottom-color: rgba(245, 158, 11, 0.85);
-  }
 
   /* Footer-Styles leben jetzt in SiteFooter.astro (Component-scoped). */
 </style>
