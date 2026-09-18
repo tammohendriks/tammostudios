@@ -2,6 +2,16 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
   "trailingSlash": false,
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    }
+  ],
   "rewrites": [
     {
       "source": "/admin/:path*",
@@ -30,6 +40,16 @@
     {
       "source": "/gastro",
       "destination": "/webdesign-gastronomie",
+      "statusCode": 301
+    },
+    {
+      "source": "/studio",
+      "destination": "/website#cms",
+      "statusCode": 301
+    },
+    {
+      "source": "/websites",
+      "destination": "/website",
       "statusCode": 301
     }
   ]

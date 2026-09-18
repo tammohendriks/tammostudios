@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SubPageBackground from '../components/SubPageBackground.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import ClosingCta from '../components/ClosingCta.astro';
 import { SITE } from '../lib/constants';
 
 // Standalone Person-Schema fuer /ueber. @id matcht die founder-
@@ -21,7 +22,7 @@ const personSchema = {
     'handgemacht, ohne Templates, mit klaren Fixpreisen.',
   worksFor: { '@id': `${SITE.url}/#business` },
   url: `${SITE.url}/ueber`,
-  image: `${SITE.url}/tammo-foto.png`,
+  image: `${SITE.url}/tammo-foto.webp`,
   sameAs: ['https://www.instagram.com/tammostudios/'],
   knowsAbout: [
     'Webentwicklung',
@@ -46,7 +47,8 @@ const personSchema = {
 
 <BaseLayout
   pageTitle="Über mich"
-  description="Tammo Hendriks, 25, aus Bremen. Webdeveloper mit Marketing-Background. Tammo Studios baut Websites, die zu dir passen, nicht zu einem Template."
+  title="Tammo Hendriks — Webentwickler aus Bremen | Tammo Studios"
+  description="Tammo Hendriks, 25, aus Bremen. Webentwickler mit Marketing-Hintergrund. Baut Websites und die Anwendungen darin, ohne Agentur dazwischen."
   additionalSchema={personSchema}
 >
   <main class="ueber-page">
@@ -58,7 +60,7 @@ const personSchema = {
         <p class="subpage-hero-subtitle text-lines">{
           '25 Jahre alt, aus Bremen — aktuell auf Reise durch Asien.\n' +
           'Freelance-Webdeveloper mit Marketing-Background.\n' +
-          'Ich baue handgemachte Websites für kleine Unternehmen. ' +
+          'Ich baue handgemachte Websites und die Anwendungen darin. ' +
           'Eine nach der anderen.'
         }</p>
       </div>
@@ -128,10 +130,12 @@ const personSchema = {
         <h2>Was es kostet</h2>
         <p>
           Eine Website kostet <strong>2.000 €</strong>. Ein
-          Online-Shop <strong>3.000 €</strong>. Keine versteckten
+          Online-Shop <strong>3.000 €</strong>. In beiden ist eine
+          individuelle Anwendung enthalten — ein Preisrechner, ein
+          Anfrageformular, das mitdenkt. Keine versteckten
           Stundensätze, keine Pakete mit Sternchen.
         </p>
-        <a class="inline-link" href="/preise">
+        <a class="cta-link" href="/preise">
           <span>Volle Preisübersicht ansehen</span>
           <svg
             width="14"
@@ -157,20 +161,16 @@ const personSchema = {
           Und der Grund, warum ich das hier so aufgebaut habe,
           wie ich's aufgebaut habe.
         </p>
-      </section>
-
-      <section class="ueber-close" data-reveal>
-        <p class="close-line">
-          Wenn das nach deinem Stil klingt: schreib mir.
+        <p>
+          Manchmal baue ich auch einfach Sachen, die kein Kunde bestellt
+          hat. Zuletzt ein Arcade-Spiel mit Musik, die im Browser entsteht,
+          und einer weltweiten Bestenliste.
         </p>
-        <a
-          class="inline-link inline-link-cta"
-          href="/kontakt"
-        >
-          <span>Kontakt aufnehmen</span>
+        <a class="cta-link" href="/werkstatt">
+          <span>In der Werkstatt spielen</span>
           <svg
-            width="16"
-            height="16"
+            width="14"
+            height="14"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -183,6 +183,14 @@ const personSchema = {
           </svg>
         </a>
       </section>
+
+      <ClosingCta
+        recommendation={{
+          text: 'Sehen, was dabei rauskommt?',
+          label: 'Zu den Referenzen',
+          href: '/referenzen',
+        }}
+      />
     </article>
   </main>
 
@@ -419,24 +427,6 @@ const personSchema = {
   }
 
   /* Schluss-Block: bewusst leiser Ausstieg, leichtes Trennluft nach oben */
-  .ueber-close {
-    margin-top: 80px;
-    padding-top: 40px;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
-  }
-
-  .close-line {
-    margin: 0 0 12px;
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-size: clamp(1.1rem, 1.3vw, 1.2rem);
-    line-height: 1.55;
-    color: rgba(245, 245, 244, 0.85);
-  }
-
-  .inline-link-cta {
-    font-size: 1.05rem;
-    font-weight: 500;
-  }
 
   /* Footer-Styles leben jetzt in SiteFooter.astro (Component-scoped). */
 </style>

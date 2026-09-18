@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import SubPageBackground from '../components/SubPageBackground.astro';
 import ReferenzModal from '../components/ReferenzModal.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import ClosingCta from '../components/ClosingCta.astro';
 import { REFERENCES } from '../lib/references';
 import { VERTICAL_LINK_BY_CATEGORY } from '../lib/verticals';
 
@@ -24,12 +25,13 @@ const totalCount = REFERENCES.length;
 
 <BaseLayout
   pageTitle="Referenzen"
-  description="Eine kleine Auswahl der Sites, die ich zuletzt für Unternehmen gebaut habe, von der Praxis bis zur Kneipe. Jede Site ein Original, kein Template-Recycling."
+  title="Referenzen: Websites aus Bremen | Tammo Studios"
+  description="Websites, die ich zuletzt gebaut habe: Arztpraxis, Betriebsmedizin, Dachdecker, Heizungsbau, Eckkneipe. Jede ein Original, keine Vorlage."
 >
   <main class="referenzen-page">
     <SubPageBackground />
     <header class="ref-hero">
-      <h1 class="subpage-hero-title">Referenzen</h1>
+      <h1 class="subpage-hero-title">Referenzen.</h1>
       <p class="subpage-hero-subtitle ref-description text-lines">
         {'Eine kleine Auswahl der Sites, die ich zuletzt für Unternehmen gebaut habe.\nVon der Praxis bis zur Kneipe.'}
       </p>
@@ -106,11 +108,12 @@ const totalCount = REFERENCES.length;
             </div>
             {VERTICAL_LINK_BY_CATEGORY[ref.category] && (
               <a
-                class="ref-vertical-link"
+                class="cta-link ref-vertical-link"
                 href={`/${VERTICAL_LINK_BY_CATEGORY[ref.category].slug}`}
                 aria-label={`Mehr zu ${VERTICAL_LINK_BY_CATEGORY[ref.category].label}`}
               >
-                Mehr zu {VERTICAL_LINK_BY_CATEGORY[ref.category].label} →
+                Mehr zu {VERTICAL_LINK_BY_CATEGORY[ref.category].label}
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
               </a>
             )}
           </div>
@@ -124,6 +127,15 @@ const totalCount = REFERENCES.length;
         </article>
       ))}
     </section>
+
+    <ClosingCta
+      headline="Überzeugt?"
+      recommendation={{
+        text: 'Hinter einigen dieser Projekte steckt mehr als eine Website: Anfrage-Systeme, Rechner, eigene Anwendungen.',
+        label: 'Mehr zur technischen Umsetzung',
+        href: '/software',
+      }}
+    />
 
     <ReferenzModal />
   </main>
@@ -442,38 +454,28 @@ const totalCount = REFERENCES.length;
     outline-offset: 4px;
   }
 
-  /* Cross-Link zu passender Vertical Landing Page. Muss auf z-index 3
-     sitzen, damit der Klick vor dem ref-card-trigger (z-index 2)
-     greift — der wuerde sonst das Reference-Modal statt Navigation
-     ausloesen. */
+  /* Cross-Link zu passender Vertical Landing Page. Aussehen kommt aus
+     .cta-link (global.css), die Positionierung bleibt hier: der Link
+     MUSS auf z-index 3 sitzen, damit der Klick vor dem
+     ref-card-trigger (z-index 2) greift — sonst oeffnet sich das
+     Referenz-Modal statt der Landingpage. */
   .ref-vertical-link {
-    display: inline-block;
     position: relative;
     z-index: 3;
     margin-top: 14px;
-    color: rgba(245, 158, 11, 0.85);
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-size: 0.82rem;
-    font-weight: 500;
-    letter-spacing: 0.02em;
-    text-decoration: none;
-    border-bottom: 1px solid rgba(245, 158, 11, 0.28);
-    padding-bottom: 1px;
-    transition: color 200ms ease, border-color 200ms ease;
   }
 
-  .ref-vertical-link:hover,
-  .ref-vertical-link:focus-visible {
-    color: #fbbf24;
-    border-color: rgba(245, 158, 11, 0.7);
-    outline: none;
-  }
 
   /* Modal-Styles wurden in src/components/ReferenzModal.astro
      ausgelagert — Component ist auf beiden Pages einsetzbar
      (/referenzen + Landing-Teaser). */
 
   /* Footer-Styles leben jetzt in SiteFooter.astro (Component-scoped). */
+
+  /* Ein Satz unter dem Grid statt einer Zeile pro Karte — die Karten
+     sind visuell dicht genug, und der Hinweis gilt ohnehin nur fuer
+     einen Teil von ihnen. */
+
 </style>
 
 <!-- Modal-Script lebt in src/components/ReferenzModal.astro -->

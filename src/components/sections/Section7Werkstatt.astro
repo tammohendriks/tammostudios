@@ -1,0 +1,532 @@
+---
+// Section 7 — AUS DER WERKSTATT (Spielplatz)
+//
+// Folgt der Scroll-Choreografie der uebrigen Landing-Sections: ein
+// .outer-Runway von 220vh, darin ein .sticky-Kind das 100dvh lang
+// gepinnt bleibt. Ein Scroll-Listener rechnet den Fortschritt in --p um,
+// daraus werden die Stufen abgeleitet. Erst wenn alles steht, gibt die
+// Section den Scroll wieder frei — gleiches Prinzip wie S6 Werkzeug.
+//
+// Inhalt: das Arcade-Spiel selbst, direkt spielbar. Die Section bleibt
+// cream (#efe4cb, Mittelwert der Nachbarn S6/S7), der Spiel-Rahmen ist
+// der einzige dunkle Block — wie ein Automat, der in einer hellen
+// Werkstatt steht.
+//
+// Kein Verkaufsargument, kein Angebots-Versprechen: der Auftragspfad
+// laeuft ueber /software. Hier geht es nur darum zu zeigen, dass neben
+// den Websites auch Sachen aus Spass entstehen.
+
+import SpaceBackground from '../SpaceBackground.astro';
+
+const GAME_URL = 'https://asteroid.tammostudios.de';
+---
+
+<section class="spielplatz" aria-labelledby="spielplatz-headline" data-section-bg="cream">
+  <div class="spielplatz__outer">
+    <div class="spielplatz__sticky">
+      <SpaceBackground tone="light" intensity={0.5} />
+
+      <div class="spielplatz__inner">
+      <header class="spielplatz__header">
+        <p class="spielplatz__eyebrow">Aus der Werkstatt</p>
+        <h2 id="spielplatz-headline" class="spielplatz__headline">
+          Und manchmal baue ich einfach, worauf ich Lust habe.
+        </h2>
+      </header>
+
+      <!-- Der iframe bleibt bis zum bewussten Klick fuer Zeiger-Events
+           unsichtbar. In einer gepinnten Section ist das doppelt wichtig:
+           faenge das Spiel die Wischgeste ab, kaeme man weder vorwaerts
+           noch zurueck. Der Beenden-Knopf gibt die Kontrolle jederzeit
+           wieder her. -->
+      <figure class="spielplatz__cabinet" data-game-frame>
+        <iframe
+          src={GAME_URL}
+          title="ASTEROID//01 — Arcade-Spiel, spielbar"
+          allow="fullscreen; autoplay"
+          loading="lazy"
+          class="spielplatz__iframe"
+        ></iframe>
+
+        <figcaption class="spielplatz__cover" data-game-cover>
+          <p class="spielplatz__cover-title">ASTEROID//01</p>
+          <p class="spielplatz__cover-sub">Ein Nachmittagsprojekt, das ausgeufert ist</p>
+          <button type="button" class="spielplatz__play" data-game-start>
+            Hier spielen
+          </button>
+        </figcaption>
+
+        <button type="button" class="spielplatz__stop" data-game-stop hidden>
+          Pausieren &amp; weiterscrollen
+        </button>
+      </figure>
+
+      <a class="spielplatz__cta" href="/werkstatt">
+        <span>Was sonst noch in der Werkstatt liegt</span>
+        <svg class="spielplatz__cta-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Quelle steht am iframe selbst, damit Frontmatter und Client-Script
+  // nicht auseinanderlaufen koennen.
+  const GAME_SRC =
+    document.querySelector<HTMLIFrameElement>('.spielplatz__iframe')?.src ?? '';
+
+  const section = document.querySelector<HTMLElement>('.spielplatz');
+
+  if (section) {
+    const outer = section.querySelector<HTMLElement>('.spielplatz__outer');
+    const frame = section.querySelector<HTMLElement>('[data-game-frame]');
+    const cover = section.querySelector<HTMLElement>('[data-game-cover]');
+    const startButton = section.querySelector<HTMLButtonElement>('[data-game-start]');
+    const stopButton = section.querySelector<HTMLButtonElement>('[data-game-stop]');
+
+    const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+    const sub = (p: number, a: number, b: number) => clamp((p - a) / (b - a));
+    const prefersReducedMotion = () =>
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let ticking = false;
+
+    const update = () => {
+      ticking = false;
+      if (!outer) return;
+      // Bei reduzierter Bewegung stehen alle Stufen unten auf 1 — der
+      // erste Scroll darf das nicht wieder ueberschreiben.
+      if (prefersReducedMotion()) return;
+
+      const rect = outer.getBoundingClientRect();
+      // Ausserhalb des Sichtfelds sparen wir uns die Schreibzugriffe,
+      // gleiches Muster wie in Section6Werkzeug.
+      if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+
+      const range = rect.height - window.innerHeight;
+      if (range <= 0) return;
+      const p = clamp(-rect.top / range);
+
+      const s = section.style;
+      s.setProperty('--p', String(p));
+      s.setProperty('--p-bg', String(sub(p, 0.02, 0.22)));
+      s.setProperty('--p-eyebrow', String(sub(p, 0.03, 0.13)));
+      s.setProperty('--p-headline', String(sub(p, 0.09, 0.23)));
+      s.setProperty('--p-cabinet', String(sub(p, 0.20, 0.46)));
+      s.setProperty('--p-cta', String(sub(p, 0.52, 0.68)));
+    };
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    };
+
+    const pinAll = () => {
+      const s = section.style;
+      for (const k of ['--p', '--p-bg', '--p-eyebrow', '--p-headline', '--p-cabinet', '--p-cta']) {
+        s.setProperty(k, '1');
+      }
+    };
+
+    if (prefersReducedMotion()) pinAll();
+    else update();
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+
+    // --- Spiel aktivieren / pausieren ---------------------------------
+    //
+    // Beim Pausieren muss die Musik aufhoeren. Ein iframe von einem
+    // fremden Origin laesst sich von aussen aber nicht stummschalten,
+    // das geht nur mit Mithilfe des Spiels. Also: Befehl hinschicken und
+    // auf die Bestaetigung warten. Kommt keine, kennt diese
+    // Spielversion den Befehl noch nicht — dann wird der iframe neu
+    // geladen. Laut ist er danach auf keinen Fall mehr.
+    const iframe = frame?.querySelector('iframe') ?? null;
+    const gameOrigin = new URL(GAME_SRC, location.href).origin;
+    let gameSpeaksOurLanguage = false;
+    let ackTimer: number | undefined;
+
+    window.addEventListener('message', (event) => {
+      if (event.origin !== gameOrigin) return;
+      const data = event.data as { source?: string; action?: string } | null;
+      if (data?.source === 'asteroid-01' && data.action === 'ack') {
+        gameSpeaksOurLanguage = true;
+        window.clearTimeout(ackTimer);
+      }
+    });
+
+    const tellGame = (action: 'suspend-audio' | 'resume-audio') => {
+      iframe?.contentWindow?.postMessage(
+        { source: 'tammostudios', action },
+        gameOrigin
+      );
+    };
+
+    const silenceGame = () => {
+      tellGame('suspend-audio');
+      if (gameSpeaksOurLanguage) return;
+      // Kein Handshake bekannt: kurz auf die Bestaetigung warten, sonst
+      // den iframe neu laden. Der Spielstand geht dabei verloren, Ruhe
+      // ist hier aber wichtiger als ein geretteter Punktestand.
+      window.clearTimeout(ackTimer);
+      ackTimer = window.setTimeout(() => {
+        if (gameSpeaksOurLanguage || !iframe) return;
+        iframe.src = GAME_SRC;
+      }, 250);
+    };
+
+    const setActive = (active: boolean) => {
+      frame?.toggleAttribute('data-active', active);
+      cover?.toggleAttribute('hidden', active);
+      stopButton?.toggleAttribute('hidden', !active);
+      if (active) tellGame('resume-audio');
+      else silenceGame();
+    };
+
+    startButton?.addEventListener('click', () => {
+      setActive(true);
+      // Fokus in den iframe, damit die Tastatursteuerung sofort greift
+      // statt erst nach einem zweiten Klick ins Spielfeld.
+      iframe?.focus();
+      // Nach der ersten Runde heisst es nicht mehr "Hier spielen".
+      if (startButton) startButton.textContent = 'Weiterspielen';
+    });
+
+    stopButton?.addEventListener('click', () => {
+      setActive(false);
+      startButton?.focus();
+    });
+
+    // Escape pausiert ebenfalls — wer im Spiel feststeckt, greift eher
+    // zur Tastatur als zu einem Knopf am Rand.
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && frame?.hasAttribute('data-active')) setActive(false);
+    });
+  }
+</script>
+
+<style>
+  .spielplatz {
+    /* #efe4cb liegt zwischen S6 (#f3ecd7) und dem Closing (#ecdcbf),
+       damit die Cream-Reihe zum Seitenende ungebrochen abkuehlt. Das
+       Weltall laeuft in der hellen Palette darueber, zurueckgenommen —
+       hinter dem Automaten darf es dem Spiel nicht die Schau stehlen. */
+    --cream: #efe4cb;
+    --charcoal: #1a1a1c;
+    --amber: #f59e0b;
+    --body: rgba(26, 26, 28, 0.72);
+
+    --p: 0;
+    --p-bg: 0;
+    --p-eyebrow: 0;
+    --p-headline: 0;
+    --p-cabinet: 0;
+    --p-cta: 0;
+
+    position: relative;
+    background: var(--cream);
+  }
+
+  /* Amber-Hairline oben als Kapitel-Trenner — gleiche Signatur wie S5/S6/S7 */
+  .spielplatz::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      transparent,
+      rgba(245, 158, 11, 0.35) 20%,
+      rgba(245, 158, 11, 0.35) 80%,
+      transparent
+    );
+    z-index: 2;
+  }
+
+  /* Runway: 220vh Scrollweg, davon 100vh gepinnt. */
+  .spielplatz__outer {
+    height: 220vh;
+    position: relative;
+  }
+
+  /* Masse 1:1 von .werkzeug__sticky uebernommen — dadurch sitzt der
+     Header hier auf exakt derselben Hoehe wie in den Nachbar-Sections,
+     und der CTA bekommt unten wieder Luft. Flex statt Grid aus dem
+     gleichen Grund wie dort: Grid-Tracks kollabieren auf kleinen
+     Viewports. */
+  /* Sticky laeuft ueber die volle Breite, damit das Weltall bis an die
+     Fensterkanten reicht. Die 1240px-Begrenzung sitzt eine Ebene tiefer
+     — lag sie hier, endete das Canvas mittendrin und links und rechts
+     blieb ein Streifen Section-Creme stehen. */
+  .spielplatz__sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  .spielplatz__inner {
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(30px, 5vh, 60px);
+    padding: clamp(120px, 15vh, 160px) 40px clamp(80px, 12vh, 120px);
+    max-width: 1240px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    text-align: center;
+  }
+
+  @media (max-height: 780px) {
+    .spielplatz__inner {
+      padding-top: 100px;
+      padding-bottom: 60px;
+      gap: 24px;
+    }
+  }
+
+  /* Das Weltall blendet mit dem Scrollen ein, statt beim Erreichen der
+     Section schon in vollem Gang zu sein. Schleierfarbe = Section-Creme
+     (#efe4cb), sonst setzt sich der Schleier als eigener Ton ab. */
+  .spielplatz :global(.space-bg) {
+    --veil-rgb: 239, 228, 203;
+    opacity: var(--p-bg);
+  }
+
+  /* Inhalt ueber das Canvas heben */
+  .spielplatz__header,
+  .spielplatz__cabinet,
+  .spielplatz__cta {
+    position: relative;
+    z-index: 1;
+  }
+
+  .spielplatz__header {
+    text-align: center;
+    max-width: 760px;
+  }
+
+  .spielplatz__eyebrow {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin: 0 0 16px;
+    opacity: var(--p-eyebrow);
+    transform: translateY(calc((1 - var(--p-eyebrow)) * -6px));
+  }
+
+  .spielplatz__headline {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.6rem, 3.2vw, 2.6rem);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: var(--charcoal);
+    margin: 0;
+    opacity: var(--p-headline);
+    transform: translateY(calc((1 - var(--p-headline)) * 14px));
+  }
+
+  /* === Der Automat ===
+     Einziger dunkler Block auf Cream. Faehrt beim Scrollen leicht hoch
+     und nimmt an Glut zu, statt nur einzublenden. */
+  .spielplatz__cabinet {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: 100%;
+    aspect-ratio: 16 / 10;
+    max-width: 100%;
+    margin: 0;
+    border: 2px solid var(--amber);
+    border-radius: 12px;
+    overflow: hidden;
+    background: #0a0a0a;
+    opacity: var(--p-cabinet);
+    transform: translateY(calc((1 - var(--p-cabinet)) * 26px))
+      scale(calc(0.96 + 0.04 * var(--p-cabinet)));
+    box-shadow: 0 0 calc(56px * var(--p-cabinet)) rgba(245, 158, 11, calc(0.3 * var(--p-cabinet))),
+      0 18px 50px rgba(26, 26, 28, calc(0.18 * var(--p-cabinet)));
+  }
+
+  .spielplatz__iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    /* Bis zum Klick gehen alle Zeiger-Events an der Seite vorbei — sonst
+       waere die gepinnte Section eine Sackgasse. */
+    pointer-events: none;
+  }
+
+  .spielplatz__cabinet[data-active] .spielplatz__iframe {
+    pointer-events: auto;
+  }
+
+  .spielplatz__cover {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 24px;
+    text-align: center;
+    background: rgba(10, 10, 10, 0.82);
+  }
+
+  .spielplatz__cover[hidden] {
+    display: none;
+  }
+
+  .spielplatz__cover-title {
+    margin: 0;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.5rem, 3.6vw, 2.2rem);
+    letter-spacing: 0.08em;
+    color: rgba(245, 245, 244, 0.96);
+  }
+
+  .spielplatz__cover-sub {
+    margin: 0 0 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    color: rgba(245, 245, 244, 0.5);
+  }
+
+  .spielplatz__play {
+    padding: 11px 26px;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: linear-gradient(to bottom, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+    color: #1a1a1a;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 240ms ease, box-shadow 240ms ease;
+    box-shadow: 0 0 32px rgba(245, 158, 11, 0.35);
+  }
+
+  .spielplatz__play:hover {
+    transform: scale(1.04);
+    box-shadow: 0 0 48px rgba(245, 158, 11, 0.55);
+  }
+
+  .spielplatz__play:focus-visible {
+    outline: 2px solid rgba(245, 158, 11, 0.8);
+    outline-offset: 4px;
+  }
+
+  /* Ausstieg aus dem laufenden Spiel — sitzt im Rahmen oben rechts,
+     damit man ihn nicht suchen muss. */
+  .spielplatz__stop {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+    padding: 7px 14px;
+    border-radius: 9999px;
+    border: 1px solid rgba(245, 158, 11, 0.45);
+    background: rgba(10, 10, 10, 0.75);
+    color: rgba(245, 245, 244, 0.9);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: background-color 200ms ease, border-color 200ms ease;
+  }
+
+  .spielplatz__stop[hidden] {
+    display: none;
+  }
+
+  .spielplatz__stop:hover {
+    background: rgba(10, 10, 10, 0.92);
+    border-color: rgba(245, 158, 11, 0.9);
+  }
+
+  .spielplatz__stop:focus-visible {
+    outline: 2px solid rgba(245, 158, 11, 0.8);
+    outline-offset: 3px;
+  }
+
+  /* === CTA — matcht S6/S7 editorial inline-link === */
+  .spielplatz__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 0 2px;
+    border-bottom: 1px solid transparent;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: clamp(1rem, 1.5vw, 1.3rem);
+    color: var(--charcoal);
+    text-decoration: none;
+    opacity: var(--p-cta);
+    transform: translateY(calc((1 - var(--p-cta)) * 8px));
+    transition: border-color 200ms ease, color 200ms ease;
+  }
+
+  .spielplatz__cta-arrow {
+    color: var(--amber);
+    transition: transform 200ms ease;
+  }
+
+  .spielplatz__cta:hover,
+  .spielplatz__cta:focus-visible {
+    border-bottom-color: rgba(245, 158, 11, 0.6);
+    color: #000;
+    outline: none;
+  }
+
+  .spielplatz__cta:hover .spielplatz__cta-arrow,
+  .spielplatz__cta:focus-visible .spielplatz__cta-arrow {
+    transform: translateX(4px);
+  }
+
+  .spielplatz__cta:focus-visible {
+    outline: 2px solid rgba(245, 158, 11, 0.5);
+    outline-offset: 6px;
+    border-radius: 2px;
+  }
+
+  /* Hochkant ist 16:10 zu flach, um etwas zu erkennen — der Automat
+     bekommt dort ein steileres Fenster und die Breite als Leitmass. */
+  @media (max-width: 767px) {
+    .spielplatz__outer {
+      height: 200vh;
+    }
+    .spielplatz__inner {
+      padding: clamp(100px, 13vh, 130px) 20px clamp(56px, 8vh, 80px);
+      gap: 20px;
+    }
+    .spielplatz__cabinet {
+      width: 100%;
+      aspect-ratio: 4 / 5;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .spielplatz__eyebrow,
+    .spielplatz__headline,
+    .spielplatz__cabinet,
+    .spielplatz__cta {
+      transform: none;
+    }
+  }
+</style>

@@ -99,7 +99,7 @@ export const VERTICALS: readonly Vertical[] = [
     ],
     pricing: {
       paragraphs: [
-        'Eine Website 2.000 €.\nEin Online-Shop mit Zubehör 3.000 €.\nKeine Stundensätze, keine Sternchen.\nFertig in 14 Tagen.',
+        'Eine Website 2.000 €.\nEin Online-Shop mit Zubehör 3.000 €.\nEine individuelle Anwendung ist jeweils drin — zum Beispiel ein Angebotsrechner.\nKeine Stundensätze, keine Sternchen. Fertig in 14 Tagen.',
         'Für 30 € im Monat übernehme ich Wartung, Sicherheits-Updates und priorisierten Support bei Störungen.\nOptional, monatlich kündbar.',
       ],
     },
@@ -160,9 +160,15 @@ export const VERTICALS: readonly Vertical[] = [
     slug: 'praxis',
     pageSlug: 'webdesign-praxis',
     meta: {
-      title: 'Websites für Praxen und Ärzte',
+      // Der Praxis-Themenkreis ist die staerkste sichtbare Nachfrage
+      // (43 Impressionen auf "praxis website inhalte", "arzt homepage
+      // richtlinien", "praxis website vertrauen", "praxis website
+      // dsgvo"). Titel und Description nehmen die Woerter deshalb auf.
+      title: 'Website für Arztpraxen: DSGVO-konform',
       description:
-        'Handgemachte Websites für Arztpraxen in Bremen. DSGVO-konform, mit Terminanfrage-Funktion, ab 2.000 €.',
+        'Handgemachte Websites für Arztpraxen in Bremen: DSGVO-konform, ' +
+        'mit Terminanfrage, Team-Vorstellung und Öffnungszeiten. Ab ' +
+        '2.000 €, Referenzen: Samedos und IBI.',
     },
     hero: {
       eyebrow: 'WEBSITE FÜR PRAXEN',
@@ -196,7 +202,7 @@ export const VERTICALS: readonly Vertical[] = [
     ],
     pricing: {
       paragraphs: [
-        'Eine Praxis-Website 2.000 €.\nMit erweiterten Features wie Online-Terminbuchung oder Patientenportal 3.000 € (Grundausstattung).\nAlle Standards inklusive — Datenschutz, Verschlüsselung, DSGVO-Konformität sind Pflicht, nicht Extra.',
+        'Eine Praxis-Website 2.000 €, inklusive einer individuellen Anwendung — etwa einem Anfrageformular, das die Vorsorge-Art direkt mit abfragt.\nMit erweiterten Features wie Online-Terminbuchung oder Patientenportal 3.000 € (Grundausstattung).\nAlle Standards inklusive — Datenschutz, Verschlüsselung, DSGVO-Konformität sind Pflicht, nicht Extra.',
         'Für 30 € im Monat übernehme ich Wartung, Sicherheits-Updates und priorisierten Support.\nOptional, monatlich kündbar.',
       ],
     },
@@ -258,7 +264,9 @@ export const VERTICALS: readonly Vertical[] = [
     meta: {
       title: 'Websites für Gastronomie',
       description:
-        'Handgemachte Websites für Gastronomiebetriebe in Bremen. Mit Speisekarte, Reservierung, Instagram-Feed, ab 2.000 €.',
+        'Handgemachte Websites für Restaurants, Cafés und Kneipen in ' +
+        'Bremen: Speisekarte selbst pflegen, Reservierungsanfrage, ' +
+        'Instagram-Feed. Ab 2.000 €.',
     },
     hero: {
       eyebrow: 'WEBSITE FÜR GASTRONOMIE',
@@ -288,7 +296,7 @@ export const VERTICALS: readonly Vertical[] = [
     ],
     pricing: {
       paragraphs: [
-        'Eine Gastro-Website 2.000 €.\nMit Onlineshop für Merchandise oder Gutscheine 3.000 €.\nSpeisekarte pflegst du selbst — kein Anruf nötig, wenn sich der Wochenteller ändert.',
+        'Eine Gastro-Website 2.000 €, inklusive einer individuellen Anwendung — etwa einer Reservierungsanfrage, die Gruppengröße und Anlass gleich mitnimmt.\nMit Onlineshop für Merchandise oder Gutscheine 3.000 €.\nSpeisekarte pflegst du selbst — kein Anruf nötig, wenn sich der Wochenteller ändert.',
         'Für 30 € im Monat übernehme ich Wartung, Sicherheits-Updates und priorisierten Support.\nOptional, monatlich kündbar.',
       ],
     },

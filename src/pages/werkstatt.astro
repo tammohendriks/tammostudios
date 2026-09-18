@@ -1,0 +1,358 @@
+---
+/**
+ * /werkstatt — Eigene Projekte ohne Auftraggeber.
+ *
+ * Bewusst KEIN Angebot und KEIN Nav-Eintrag: das hier ist
+ * Glaubwuerdigkeit, nicht Conversion. Verlinkt von der Landing
+ * (Game-Section), von /ueber und aus dem Footer.
+ *
+ * Erstes Projekt: ASTEROID//01 (aus /software hierher migriert, wo es
+ * thematisch nicht hingehoerte — dort geht es um Kunden-Anwendungen).
+ *
+ * Skaliert: weitere Experimente werden hier als zusaetzliche
+ * .werkstatt-project Sections angehaengt.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SpaceBackground from '../components/SpaceBackground.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import ClosingCta from '../components/ClosingCta.astro';
+
+const GAME_URL = 'https://asteroid.tammostudios.de';
+
+// Bewusst ohne englische Fachbegriffe — die ganze Seite ist auf Deutsch.
+// Falls spaeter eine englische Fassung kommt, duerfen die Originalbegriffe
+// dort wieder rein.
+const techPoints = [
+  {
+    title: 'Spielmechanik von Hand',
+    body: 'Die Pixel-Grafiken sind fertig zugekauft, alles andere nicht. Steuerung, Kollisionen, Gegnerverhalten und die Ablaufschleife stecken komplett selbst drin, mit 60 Bildern pro Sekunde auch auf dem Handy.',
+  },
+  {
+    title: 'Musik, die es vorher nicht gab',
+    body: 'Die Musik ist keine fertige Datei. Sie entsteht im Browser, während du spielst, und zieht an, je enger es wird.',
+  },
+  {
+    title: 'Weltweite Bestenliste',
+    body: 'Die Punktestände laufen über eine eigene Schnittstelle mit Prüfung, damit sich niemand seinen Rekord einfach selbst einträgt.',
+  },
+  {
+    title: 'Endgegner in mehreren Phasen',
+    body: 'Wechselnde Angriffsmuster, eigene Schwachstellen, ein Verhalten das sich anpasst. Der Teil, der am meisten Arbeit gemacht hat.',
+  },
+];
+---
+
+<BaseLayout
+  pageTitle="Werkstatt"
+  title="Werkstatt: eigene Projekte & Spiele | Tammo Studios"
+  description="Eigene Projekte ohne Auftraggeber, gebaut in Bremen: ASTEROID//01, ein Arcade-Spiel im Browser mit erzeugter Musik und weltweiter Bestenliste."
+>
+  <main class="werkstatt-page">
+    <SpaceBackground />
+
+    <header class="werkstatt-hero">
+      <h1 class="subpage-hero-title">Werkstatt.</h1>
+      <p class="subpage-hero-subtitle text-lines">
+        {'Mein Spielplatz für Ideen, die nichts mit Websites zu tun haben.\nViel Spaß beim Erkunden.'}
+      </p>
+    </header>
+
+    <!-- ================================================================
+         ASTEROID//01
+         ============================================================== -->
+    <section class="werkstatt-project" aria-labelledby="asteroid-heading" data-reveal>
+      <p class="werkstatt-eyebrow">PROJEKT 01</p>
+      <h2 id="asteroid-heading" class="werkstatt-section-title">ASTEROID//01</h2>
+      <p class="werkstatt-project-intro">
+        Ein Arcade-Spiel, das direkt im Browser läuft. <br class="hidden sm:inline" />
+        Angefangen als Frage („geht das überhaupt?"), geendet mit weltweiter
+        Bestenliste und Endgegner. Spielbar direkt hier.
+      </p>
+
+      <!-- Click-to-activate: das Spiel faengt Touch-Events ab
+           (preventDefault fuer Steuerung und Zoom-Sperre). Wuerde der
+           iframe sofort interaktiv sein, koennte man auf dem Handy nicht
+           mehr an ihm vorbeiscrollen — jede Wischgeste landete im Spiel.
+           Erst der bewusste Klick uebergibt die Kontrolle. -->
+      <div class="game-frame" data-game-frame>
+        <iframe
+          src={GAME_URL}
+          title="ASTEROID//01 — Arcade-Spiel, spielbar"
+          allow="fullscreen; autoplay"
+          loading="lazy"
+          class="game-iframe"
+        ></iframe>
+
+        <div class="game-cover" data-game-cover>
+          <p class="game-cover-title">ASTEROID//01</p>
+          <p class="game-cover-sub">SPACE SURVIVAL PROTOCOL</p>
+          <button type="button" class="game-cover-button" data-game-start>
+            Hier spielen
+          </button>
+        </div>
+      </div>
+
+      <p class="werkstatt-project-note">
+        Läuft auf <a href={GAME_URL} target="_blank" rel="noopener">asteroid.tammostudios.de</a>
+        als eigenständige Anwendung.
+      </p>
+    </section>
+
+    <!-- ================================================================
+         Was drinsteckt
+         ============================================================== -->
+    <section class="werkstatt-tech" aria-labelledby="tech-heading" data-reveal>
+      <h2 id="tech-heading" class="werkstatt-section-title">Was drinsteckt</h2>
+      <div class="tech-grid">
+        {techPoints.map((t) => (
+          <div class="tech-item" data-reveal>
+            <h3 class="tech-title">{t.title}</h3>
+            <p class="tech-body">{t.body}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <ClosingCta
+      headline="Überzeugt?"
+      recommendation={{
+        text: 'Lieber etwas Geschäftliches? Dieselbe Technik, nur mit Auftrag:',
+        label: 'Zu den individuellen Anwendungen',
+        href: '/software',
+      }}
+    />
+  </main>
+
+  <SiteFooter />
+</BaseLayout>
+
+<script>
+  const frame = document.querySelector<HTMLElement>('[data-game-frame]');
+  const cover = frame?.querySelector<HTMLElement>('[data-game-cover]');
+  const startButton = frame?.querySelector<HTMLButtonElement>('[data-game-start]');
+
+  startButton?.addEventListener('click', () => {
+    frame?.setAttribute('data-active', 'true');
+    cover?.setAttribute('hidden', '');
+    // Der iframe bekommt den Fokus, damit Tastatursteuerung sofort
+    // greift statt erst nach einem zweiten Klick ins Spielfeld.
+    frame?.querySelector('iframe')?.focus();
+  });
+</script>
+
+<style>
+  .werkstatt-page {
+    position: relative;
+    background: #050507;
+    padding: 140px 40px 80px;
+    min-height: calc(100vh - 200px);
+    overflow: hidden;
+  }
+  @media (max-width: 768px) {
+    .werkstatt-page {
+      padding: 100px 20px 60px;
+    }
+  }
+
+  .werkstatt-page > section,
+  .werkstatt-hero {
+    position: relative;
+    z-index: 1;
+    max-width: 880px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .werkstatt-page > section {
+    margin-bottom: 64px;
+    /* Site-Konvention: Section-Text zentriert, Karten-Inhalte bleiben
+       linksbuendig (siehe .tech-item). */
+    text-align: center;
+  }
+  @media (max-width: 768px) {
+    .werkstatt-page > section {
+      margin-bottom: 48px;
+    }
+  }
+
+  /* === Hero === */
+  .werkstatt-hero {
+    text-align: center;
+    max-width: 780px;
+    margin: 0 auto 56px;
+    padding-top: 32px;
+  }
+
+  /* === Shared === */
+  .werkstatt-eyebrow {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.75rem;
+    letter-spacing: 0.28em;
+    color: rgba(245, 158, 11, 0.85);
+    text-transform: uppercase;
+    margin: 0 0 14px;
+  }
+  .werkstatt-section-title {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.7rem, 3.4vw, 2.5rem);
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    color: #f5f5f4;
+    margin: 0 0 20px;
+  }
+
+  /* === Projekt === */
+  .werkstatt-project-intro {
+    max-width: 62ch;
+    margin: 0 auto clamp(28px, 4vh, 40px);
+    font-family: 'Inter', sans-serif;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.72);
+  }
+
+  .game-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    border: 2px solid #f59e0b;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #0a0a0a;
+    box-shadow: 0 0 48px rgba(245, 158, 11, 0.18);
+  }
+
+  .game-iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    /* Bis zum Klick nimmt der iframe keine Zeiger-Events an, damit
+       Scrollen ueber ihm hinweg funktioniert. */
+    pointer-events: none;
+  }
+
+  .game-frame[data-active='true'] .game-iframe {
+    pointer-events: auto;
+  }
+
+  .game-cover {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 24px;
+    text-align: center;
+    background: rgba(10, 10, 10, 0.82);
+  }
+
+  .game-cover[hidden] {
+    display: none;
+  }
+
+  .game-cover-title {
+    margin: 0;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    letter-spacing: 0.08em;
+    color: rgba(245, 245, 244, 0.96);
+  }
+
+  .game-cover-sub {
+    margin: 0 0 12px;
+    font-size: 0.78rem;
+    letter-spacing: 0.22em;
+    color: rgba(245, 245, 244, 0.45);
+  }
+
+  .game-cover-button {
+    padding: 11px 26px;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: linear-gradient(to bottom, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+    color: #1a1a1a;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 240ms ease, box-shadow 240ms ease;
+    box-shadow: 0 0 32px rgba(245, 158, 11, 0.35);
+  }
+
+  .game-cover-button:hover {
+    transform: scale(1.04);
+    box-shadow: 0 0 48px rgba(245, 158, 11, 0.55);
+  }
+
+  .game-cover-button:focus-visible {
+    outline: 2px solid rgba(245, 158, 11, 0.8);
+    outline-offset: 4px;
+  }
+
+  .werkstatt-project-note {
+    margin: 16px 0 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.5);
+  }
+
+  .werkstatt-project-note a {
+    color: rgba(245, 158, 11, 0.9);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.3);
+  }
+
+  .werkstatt-project-note a:hover {
+    border-bottom-color: rgba(245, 158, 11, 0.9);
+  }
+
+  /* === Tech-Grid === */
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  @media (max-width: 640px) {
+    .tech-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .tech-item {
+    padding: 24px;
+    text-align: left;
+    background: rgba(15, 15, 18, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+  }
+  .tech-title {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.08rem;
+    color: #f5f5f4;
+    margin: 0 0 8px;
+  }
+  .tech-body {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: rgba(245, 245, 244, 0.7);
+    margin: 0;
+  }
+
+  /* === Bridge === */
+
+  /* === Mobile: Spiel bekommt hochkant ein quadratischeres Fenster === */
+  @media (max-width: 640px) {
+    .game-frame {
+      aspect-ratio: 4 / 5;
+      max-height: 70vh;
+    }
+  }
+</style>

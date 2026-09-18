@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SubPageBackground from '../components/SubPageBackground.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import ClosingCta from '../components/ClosingCta.astro';
 
 // Inline-SVG für Häkchen — kleiner amber-umrandeter Kreis mit
 // amber Häkchen innen. Wird in der "Immer dabei"-Liste pro Item
@@ -24,7 +25,8 @@ const alwaysIncludedItems = [
 
 <BaseLayout
   pageTitle="Preise"
-  description="Eine Website kostet 2.000 €, ein Online-Shop 3.000 €. Klare Preise, ohne Sternchen, ohne versteckte Stundensätze. Bug-Fixes nach Launch inklusive."
+  title="Website-Preise: 2.000 € fix, Shop 3.000 € | Tammo Studios"
+  description="Eine Website kostet 2.000 €, ein Online-Shop 3.000 €, jeweils inklusive einer individuellen Anwendung. Ohne Sternchen, ohne versteckte Stundensätze."
 >
   <main class="preise-page">
     <SubPageBackground />
@@ -37,12 +39,9 @@ const alwaysIncludedItems = [
     <section class="preise-intro" aria-label="Preise auf einen Blick" data-reveal>
       <p>Eine Website kostet <strong>2.000 €</strong>.</p>
       <p>Ein Online-Shop kostet <strong>3.000 €</strong>.</p>
+      <p>Eine individuelle Anwendung ist jeweils dabei.</p>
       <p class="preise-intro-punkt">Punkt.</p>
     </section>
-
-    <aside class="preise-disclaimer" data-reveal>
-      <p>Stand heute. Faire Einstiegspreise. Sie werden steigen.<br />Wer jetzt loslegt, bleibt bei den Konditionen.</p>
-    </aside>
 
     <section class="preise-cards" aria-label="Pakete">
       <article class="price-card" data-reveal>
@@ -53,6 +52,7 @@ const alwaysIncludedItems = [
         <ul class="dash-list">
           <li>Eigenes Design, auf dich zugeschnitten</li>
           <li>Eigenes CMS, das du selbst pflegst</li>
+          <li>Eine individuelle Anwendung deiner Wahl</li>
           <li>Mobile- &amp; Desktop-optimiert</li>
           <li>Schnell, sauber im SEO, DSGVO-konform</li>
         </ul>
@@ -92,7 +92,7 @@ const alwaysIncludedItems = [
         <p class="calc-cta-body">
           In 3 Fragen zum genauen Preis für dein Vorhaben.
         </p>
-        <a class="calc-cta-link" href="/preisrechner">
+        <a class="cta-link" href="/preisrechner">
           <span>Preisrechner öffnen</span>
           <svg
             width="16"
@@ -132,16 +132,27 @@ const alwaysIncludedItems = [
       <ul class="dash-list erweiterungen-list">
         <li>
           <span class="erweiterung-head">
-            Individuelle Anwendungen — <strong>ab 500 €</strong>
+            Jede weitere Anwendung: <strong>500 €</strong>
           </span>
           <span class="erweiterung-body">
-            Förderrechner, ausfüllbare PDF-Formulare, KI-Chatbots,
-            Buchungs-Tools. Aufwand immer individuell kalkuliert.
+            Die erste ist im Paketpreis enthalten und wird innerhalb der
+            14 Tage mit umgesetzt. Förderrechner, ausfüllbare
+            PDF-Formulare, Konfiguratoren, KI-Chatbots, Buchungs-Tools.
+            Jede weitere zum selben Fixpreis.
           </span>
         </li>
         <li>
           <span class="erweiterung-head">
-            Stundensatz — <strong>50 €/h</strong>
+            Eigene App oder größeres System: <strong>individuell</strong>
+          </span>
+          <span class="erweiterung-body">
+            Sobald es über eine Website hinausgeht, wäre ein Listenpreis
+            geraten. Nach dem Erstgespräch bekommst du eine feste Zahl.
+          </span>
+        </li>
+        <li>
+          <span class="erweiterung-head">
+            Stundensatz: <strong>50 €/h</strong>
           </span>
           <span class="erweiterung-body">
             Für alles, was klar abgegrenzt und kleiner ist.
@@ -181,28 +192,13 @@ const alwaysIncludedItems = [
       </p>
     </section>
 
-    <section class="preise-cta" data-reveal>
-      <p class="cta-pre">Klingt fair?</p>
-      <a
-        class="inline-link inline-link-cta"
-        href="/kontakt"
-      >
-        <span>Lass uns sprechen</span>
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <path d="M5 12h14M13 6l6 6-6 6" />
-        </svg>
-      </a>
-    </section>
+    <ClosingCta
+      recommendation={{
+        text: 'Unsicher, was du brauchst?',
+        label: 'Paket im Preisrechner zusammenstellen',
+        href: '/preisrechner',
+      }}
+    />
   </main>
 
   <SiteFooter />
@@ -244,7 +240,9 @@ const alwaysIncludedItems = [
     position: relative;
     z-index: 1;
     max-width: 720px;
-    margin: 0 auto 96px;
+    /* 48px statt 96px: der Disclaimer, fuer den der grosse Abstand
+       gedacht war, sitzt hier nicht mehr. */
+    margin: 0 auto 48px;
     text-align: center;
   }
 
@@ -266,46 +264,6 @@ const alwaysIncludedItems = [
   .preise-intro strong {
     color: rgba(245, 158, 11, 1);
     font-weight: 700;
-  }
-
-  /* === Disclaimer direkt unter dem Preis-Callout. Bewusst leise:
-     italic, gedämpftes Weiß, schmale max-width. Dünne amber Linie
-     darüber wirkt als visueller Anker zwischen Callout und
-     Disclaimer ohne laute Trennung. */
-  .preise-disclaimer {
-    position: relative;
-    z-index: 1;
-    max-width: 580px;
-    margin: 56px auto 96px;
-    text-align: center;
-  }
-
-  .preise-disclaimer::before {
-    content: '';
-    display: block;
-    width: 60px;
-    height: 1px;
-    background: rgba(245, 158, 11, 0.3);
-    margin: 0 auto 28px;
-  }
-
-  .preise-disclaimer p {
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-style: italic;
-    font-weight: 400;
-    font-size: clamp(1rem, 1.4vw, 1.2rem);
-    line-height: 1.6;
-    color: #d4d4d8;
-    margin: 0;
-  }
-
-  @media (max-width: 768px) {
-    .preise-disclaimer {
-      margin: 40px auto 72px;
-    }
-    .preise-disclaimer p {
-      font-size: 0.95rem;
-    }
   }
 
   /* === Zwei Hauptkarten === */
@@ -683,21 +641,6 @@ const alwaysIncludedItems = [
   }
 
   /* === CTA-Schluss: leiser, kein Pill === */
-  .preise-cta {
-    position: relative;
-    z-index: 1;
-    text-align: center;
-    max-width: 720px;
-    margin: 0 auto;
-    padding: 32px 0 16px;
-  }
-
-  .cta-pre {
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-size: 0.95rem;
-    color: rgba(245, 245, 244, 0.55);
-    margin: 0 0 16px;
-  }
 
   /* Inline-Link mit amber Pfeil — funktioniert auf <a> und
      <button> identisch (Browser-Default-Reset auf .inline-link
@@ -788,46 +731,14 @@ const alwaysIncludedItems = [
     margin: 0 0 20px;
   }
 
-  .calc-cta-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    color: rgba(245, 158, 11, 0.95);
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-weight: 600;
-    font-size: 1rem;
-    text-decoration: none;
-    border-bottom: 1px solid rgba(245, 158, 11, 0.4);
-    padding-bottom: 2px;
-    transition: color 200ms ease, border-color 200ms ease;
-  }
-
-  .calc-cta-link:hover,
-  .calc-cta-link:focus-visible {
-    color: #fbbf24;
-    border-color: rgba(245, 158, 11, 0.8);
-    outline: none;
-  }
-
-  .calc-cta-link svg {
-    transition: transform 200ms ease;
-  }
-
-  .calc-cta-link:hover svg,
-  .calc-cta-link:focus-visible svg {
-    transform: translateX(3px);
-  }
-
   @media (max-width: 640px) {
     .calc-cta-card {
       padding: 24px 22px 20px;
     }
   }
 
-  .inline-link-cta {
-    font-size: clamp(1.15rem, 1.6vw, 1.35rem);
-    font-weight: 600;
-  }
+  /* Querverweis auf /software: bewusst leise unter dem Haupt-CTA — die
+     Preisseite verkauft Websites, Software ist der Seitenpfad. */
 
   /* Footer-Styles leben jetzt in SiteFooter.astro (Component-scoped). */
 </style>

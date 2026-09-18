@@ -81,12 +81,21 @@ html {
    BaseLayout inline-script). */
 html[data-site-theme='light'] .ueber-page,
 html[data-site-theme='light'] .referenzen-page,
-html[data-site-theme='light'] .studio-page,
+html[data-site-theme='light'] .website-page,
+html[data-site-theme='light'] .software-page,
+html[data-site-theme='light'] .werkstatt-page,
 html[data-site-theme='light'] .preise-page,
 html[data-site-theme='light'] .preisrechner-page,
 html[data-site-theme='light'] .kontakt-page,
 html[data-site-theme='light'] .legal-page,
-html[data-site-theme='light'] .journal-page {
+html[data-site-theme='light'] .journal-page,
+/* Der Theme-Umschalter wird auf JEDER Seite gerendert (BaseLayout hat
+   zwar ein hideThemeToggle-Flag, das aber nirgends gesetzt ist). Diese
+   drei fehlten hier und blieben deshalb dunkel, waehrend der Rest der
+   Seite umschaltete. */
+html[data-site-theme='light'] .vertical-page,
+html[data-site-theme='light'] .post-page,
+html[data-site-theme='light'] .error-page {
   background: var(--theme-bg);
   color: var(--theme-text);
 }
@@ -95,9 +104,11 @@ html[data-site-theme='light'] .journal-page {
    Generated from full DOM/CSS audit of all sub-pages (Workflow #ba382).
 
    Regeln:
-   - CARD containers → solid dark #0a0a0c (text INSIDE bleibt light).
+   - CARD containers → warmes off-white #fefdf9 (paper-on-paper).
    - PAGE-LEVEL text → invertiert zu --theme-text-* tokens.
-   - INSIDE-CARD text → keine Regel (Original-Light-Farbe reicht).
+   - INSIDE-CARD text → ebenfalls invertiert, pro Card weiter unten.
+     (Frueher blieb er hell — das galt fuer dunkle Cards und ist seit
+     der Umstellung auf paper-cards falsch.)
    - AMBER-Akzente → keine Regel (identisch in beiden Themes).
 
    !important konsequent — Astro's scoped-CSS-Rules haben sonst hoehere
@@ -113,6 +124,74 @@ html[data-site-theme='light'] .subpage-hero-title {
 }
 html[data-site-theme='light'] .subpage-hero-subtitle {
   color: var(--theme-text-dim) !important;
+}
+
+/* === Der eine dezente CTA der Sub-Pages ==============================
+   Vorbild ist der "Ansehen"-Link in den Case-Karten auf /software:
+   halbfett, 0.95rem, Pfeil direkt hinter dem Wort. Vorher lagen hier
+   vier Varianten nebeneinander (.cta-inline, .inline-link,
+   .calc-cta-link, .case-link) — das ist jetzt alles diese Klasse.
+
+   Dunkel: Text und Pfeil in Amber, wie bisher in den Case-Karten.
+   Hell:   Text schlicht schwarz, nur der Pfeil bleibt Amber. Beim
+           Hover kommt die Amber-Unterkante dazu.
+   ==================================================================== */
+.cta-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Neue Montreal', 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1.3;
+  color: rgba(245, 158, 11, 0.95);
+  text-decoration: none;
+  /* Ohne das rutscht der Pfeil bei umbrechendem Text neben die zweite
+     Zeile statt direkt hinter das letzte Wort. */
+  white-space: nowrap;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+  transition: color 200ms ease, border-color 200ms ease;
+}
+
+.cta-link svg {
+  flex: 0 0 auto;
+  color: rgba(245, 158, 11, 0.95);
+  transition: transform 240ms ease;
+}
+
+.cta-link:hover,
+.cta-link:focus-visible {
+  color: rgba(252, 211, 77, 1);
+  border-bottom-color: rgba(252, 211, 77, 0.9);
+  outline: none;
+}
+
+.cta-link:hover svg,
+.cta-link:focus-visible svg {
+  transform: translateX(3px);
+}
+
+.cta-link:focus-visible {
+  outline: 2px solid rgba(245, 158, 11, 0.6);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+/* Etwas groesser, wo der Link allein steht statt in einer Karte. */
+.cta-link-lg {
+  font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+  gap: 8px;
+}
+
+html[data-site-theme='light'] .cta-link {
+  color: var(--theme-text-strong);
+}
+
+html[data-site-theme='light'] .cta-link:hover,
+html[data-site-theme='light'] .cta-link:focus-visible {
+  color: var(--theme-text-strong);
+  border-bottom-color: rgba(245, 158, 11, 0.9);
 }
 
 /* ---------- CARD CONTAINERS (paper-cards on light theme) ----------
@@ -139,10 +218,133 @@ html[data-site-theme='light'] .contact-card,
 html[data-site-theme='light'] .prep-list li,
 html[data-site-theme='light'] .featured-post,
 html[data-site-theme='light'] .post-card,
-html[data-site-theme='light'] .journal-filter-empty {
+html[data-site-theme='light'] .journal-filter-empty,
+/* /website, /software, /werkstatt */
+html[data-site-theme='light'] .problem-card,
+html[data-site-theme='light'] .feature-item,
+html[data-site-theme='light'] .ref-preview,
+html[data-site-theme='light'] .case-card,
+html[data-site-theme='light'] .tech-item,
+html[data-site-theme='light'] .v-faq-item,
+html[data-site-theme='light'] .v-case-card,
+html[data-site-theme='light'] .post-author,
+html[data-site-theme='light'] .post-body pre {
   background: #fefdf9 !important;
   border-color: rgba(0, 0, 0, 0.08) !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 6px 20px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* ---------- /website /software /werkstatt — Text-Inversion ----------
+   Die drei Angebots-/Werkstatt-Seiten sind nach dem Audit (#ba382)
+   entstanden und muessen hier von Hand gepflegt werden. Gleiche
+   Regel wie oben: Page-Level-Text invertiert, Amber-Akzente nicht. */
+html[data-site-theme='light'] .website-section-title,
+html[data-site-theme='light'] .website-final-headline,
+html[data-site-theme='light'] .software-section-title,
+html[data-site-theme='light'] .werkstatt-section-title,
+html[data-site-theme='light'] .problem-card-label,
+html[data-site-theme='light'] .feature-title,
+html[data-site-theme='light'] .ref-preview-title,
+html[data-site-theme='light'] .case-name,
+html[data-site-theme='light'] .tech-title,
+html[data-site-theme='light'] .kind-title,
+html[data-site-theme='light'] .process-title,
+html[data-site-theme='light'] .closing-text,
+/* /webdesign-*, Journal-Artikel, 404 */
+html[data-site-theme='light'] .v-hero-title,
+html[data-site-theme='light'] .v-section-headline,
+html[data-site-theme='light'] .v-final-headline,
+html[data-site-theme='light'] .post-h1,
+html[data-site-theme='light'] .featured-title,
+html[data-site-theme='light'] .post-card-title,
+html[data-site-theme='light'] .pflege-closing {
+  color: var(--theme-text-strong) !important;
+}
+
+html[data-site-theme='light'] .website-final-body,
+html[data-site-theme='light'] .software-positioning p,
+html[data-site-theme='light'] .cms-body p,
+html[data-site-theme='light'] .cms-list li,
+html[data-site-theme='light'] .werkstatt-bridge-text,
+html[data-site-theme='light'] .werkstatt-project-intro,
+html[data-site-theme='light'] .problem-card-body,
+html[data-site-theme='light'] .feature-body,
+html[data-site-theme='light'] .case-body,
+html[data-site-theme='light'] .tech-body,
+html[data-site-theme='light'] .kind-body,
+html[data-site-theme='light'] .process-body,
+html[data-site-theme='light'] .pricing-body p,
+html[data-site-theme='light'] .bigger-body p,
+html[data-site-theme='light'] .preise-inklusive,
+html[data-site-theme='light'] .preise-label,
+html[data-site-theme='light'] .v-hero-subtitle,
+html[data-site-theme='light'] .v-intro p,
+html[data-site-theme='light'] .v-check-list li,
+html[data-site-theme='light'] .v-pricing-body p,
+html[data-site-theme='light'] .v-case-body p,
+html[data-site-theme='light'] .v-faq-a,
+html[data-site-theme='light'] .v-final-sub,
+html[data-site-theme='light'] .post-lede,
+html[data-site-theme='light'] .post-body,
+html[data-site-theme='light'] .post-body p,
+html[data-site-theme='light'] .post-body li,
+html[data-site-theme='light'] .post-author-text p,
+html[data-site-theme='light'] .featured-excerpt,
+html[data-site-theme='light'] .post-card-excerpt,
+html[data-site-theme='light'] .error-secondary {
+  color: var(--theme-text-dim) !important;
+}
+
+html[data-site-theme='light'] .preise-software-hint,
+html[data-site-theme='light'] .problems-note,
+html[data-site-theme='light'] .ref-preview-sub,
+html[data-site-theme='light'] .cms-examples,
+html[data-site-theme='light'] .case-full,
+html[data-site-theme='light'] .software-hero-note,
+html[data-site-theme='light'] .process-meta,
+html[data-site-theme='light'] .pricing-aside,
+html[data-site-theme='light'] .bigger-proof,
+html[data-site-theme='light'] .werkstatt-project-note,
+html[data-site-theme='light'] .closing-mail,
+html[data-site-theme='light'] .ref-software-hint,
+html[data-site-theme='light'] .post-date,
+html[data-site-theme='light'] .post-card-date,
+html[data-site-theme='light'] .sidebar-toc-list,
+html[data-site-theme='light'] .post-toc-mobile-list,
+html[data-site-theme='light'] .sidebar-links,
+html[data-site-theme='light'] .bottom-cta-line,
+html[data-site-theme='light'] .post-back-fixed {
+  color: var(--theme-text-muted) !important;
+}
+
+/* "Zum Journal" ist eine Pille mit eigenem dunklem Hintergrund. Nur die
+   Textfarbe zu invertieren ergab dunkel auf dunkel — Flaeche, Rand und
+   Schatten muessen mit. */
+html[data-site-theme='light'] .post-back-fixed {
+  background: rgba(254, 253, 249, 0.92) !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  color: var(--theme-text-strong) !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Preisrechner: der Ring der Auswahl-Punkte war auf helles Weiss
+   gesetzt und damit auf Papier unsichtbar. */
+html[data-site-theme='light'] .pr-option-radio {
+  border-color: rgba(26, 26, 28, 0.35) !important;
+}
+
+/* Case-Tags + CMS-Beispiel-Chips: dunkle Pills auf Cream wirken zu
+   hart, stattdessen leichte Tint-Fuellung mit dunklem Text. */
+html[data-site-theme='light'] .case-tag {
+  background: rgba(0, 0, 0, 0.05) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  color: var(--theme-text-dim) !important;
+}
+
+/* Vorschaubild-Rahmen der Referenz-Cards auf /websites */
+html[data-site-theme='light'] .ref-preview-image {
+  background: rgba(0, 0, 0, 0.04) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
 }
 
 /* .kontakt-form-section — Form-Labels + Inputs auf light theme */
