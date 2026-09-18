@@ -199,11 +199,13 @@ export const NAV_ITEMS = [
     children: [
       { label: 'Website', href: '/website' },
       { label: 'Software', href: '/software' },
+      // Preise direkt hinter Website/Software: die drei gehoeren zum
+      // Auftrags-Thema und sollen als Block lesbar sein.
+      { label: 'Preise', href: '/preise' },
       // Werkstatt ist kein Auftragsangebot, steht hier aber trotzdem:
       // sie zeigt die Bandbreite und stuetzt den App-/Spiele-Teil auf
       // /software. Die Seite selbst macht den Unterschied klar.
       { label: 'Werkstatt', href: '/werkstatt' },
-      { label: 'Preise', href: '/preise' },
     ],
   },
   { label: 'Referenzen', href: '/referenzen' },

@@ -41,10 +41,6 @@ const alwaysIncludedItems = [
       <p class="preise-intro-punkt">Punkt.</p>
     </section>
 
-    <aside class="preise-disclaimer" data-reveal>
-      <p>Stand heute. Faire Einstiegspreise. Sie werden steigen.<br />Wer jetzt loslegt, bleibt bei den Konditionen.</p>
-    </aside>
-
     <section class="preise-cards" aria-label="Pakete">
       <article class="price-card" data-reveal>
         <p class="price-eyebrow">EINE WEBSITE</p>
@@ -137,9 +133,10 @@ const alwaysIncludedItems = [
             Jede weitere Anwendung — <strong>500 €</strong>
           </span>
           <span class="erweiterung-body">
-            Die erste ist im Paketpreis enthalten. Förderrechner,
-            ausfüllbare PDF-Formulare, Konfiguratoren, KI-Chatbots,
-            Buchungs-Tools — jede weitere zum selben Fixpreis.
+            Die erste ist im Paketpreis enthalten und wird innerhalb der
+            14 Tage mit umgesetzt. Förderrechner, ausfüllbare
+            PDF-Formulare, Konfiguratoren, KI-Chatbots, Buchungs-Tools —
+            jede weitere zum selben Fixpreis.
           </span>
         </li>
         <li>
@@ -262,7 +259,9 @@ const alwaysIncludedItems = [
     position: relative;
     z-index: 1;
     max-width: 720px;
-    margin: 0 auto 96px;
+    /* 48px statt 96px: der Disclaimer, fuer den der grosse Abstand
+       gedacht war, sitzt hier nicht mehr. */
+    margin: 0 auto 48px;
     text-align: center;
   }
 
@@ -284,46 +283,6 @@ const alwaysIncludedItems = [
   .preise-intro strong {
     color: rgba(245, 158, 11, 1);
     font-weight: 700;
-  }
-
-  /* === Disclaimer direkt unter dem Preis-Callout. Bewusst leise:
-     italic, gedämpftes Weiß, schmale max-width. Dünne amber Linie
-     darüber wirkt als visueller Anker zwischen Callout und
-     Disclaimer ohne laute Trennung. */
-  .preise-disclaimer {
-    position: relative;
-    z-index: 1;
-    max-width: 580px;
-    margin: 56px auto 96px;
-    text-align: center;
-  }
-
-  .preise-disclaimer::before {
-    content: '';
-    display: block;
-    width: 60px;
-    height: 1px;
-    background: rgba(245, 158, 11, 0.3);
-    margin: 0 auto 28px;
-  }
-
-  .preise-disclaimer p {
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-style: italic;
-    font-weight: 400;
-    font-size: clamp(1rem, 1.4vw, 1.2rem);
-    line-height: 1.6;
-    color: #d4d4d8;
-    margin: 0;
-  }
-
-  @media (max-width: 768px) {
-    .preise-disclaimer {
-      margin: 40px auto 72px;
-    }
-    .preise-disclaimer p {
-      font-size: 0.95rem;
-    }
   }
 
   /* === Zwei Hauptkarten === */
