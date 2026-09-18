@@ -26,6 +26,7 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
     <div class="spielplatz__sticky">
       <SpaceBackground tone="light" intensity={0.5} />
 
+      <div class="spielplatz__inner">
       <header class="spielplatz__header">
         <p class="spielplatz__eyebrow">Aus der Werkstatt</p>
         <h2 id="spielplatz-headline" class="spielplatz__headline">
@@ -66,6 +67,7 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
           <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </a>
+      </div>
     </div>
   </div>
 </section>
@@ -110,6 +112,7 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
 
       const s = section.style;
       s.setProperty('--p', String(p));
+      s.setProperty('--p-bg', String(sub(p, 0.02, 0.22)));
       s.setProperty('--p-eyebrow', String(sub(p, 0.03, 0.13)));
       s.setProperty('--p-headline', String(sub(p, 0.09, 0.23)));
       s.setProperty('--p-cabinet', String(sub(p, 0.20, 0.46)));
@@ -124,7 +127,7 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
 
     const pinAll = () => {
       const s = section.style;
-      for (const k of ['--p', '--p-eyebrow', '--p-headline', '--p-cabinet', '--p-cta']) {
+      for (const k of ['--p', '--p-bg', '--p-eyebrow', '--p-headline', '--p-cabinet', '--p-cta']) {
         s.setProperty(k, '1');
       }
     };
@@ -219,6 +222,7 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
     --body: rgba(26, 26, 28, 0.72);
 
     --p: 0;
+    --p-bg: 0;
     --p-eyebrow: 0;
     --p-headline: 0;
     --p-cabinet: 0;
@@ -257,11 +261,22 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
      und der CTA bekommt unten wieder Luft. Flex statt Grid aus dem
      gleichen Grund wie dort: Grid-Tracks kollabieren auf kleinen
      Viewports. */
+  /* Sticky laeuft ueber die volle Breite, damit das Weltall bis an die
+     Fensterkanten reicht. Die 1240px-Begrenzung sitzt eine Ebene tiefer
+     — lag sie hier, endete das Canvas mittendrin und links und rechts
+     blieb ein Streifen Section-Creme stehen. */
   .spielplatz__sticky {
     position: sticky;
     top: 0;
     height: 100vh;
     height: 100dvh;
+    overflow: hidden;
+  }
+
+  .spielplatz__inner {
+    position: relative;
+    z-index: 1;
+    height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -271,15 +286,22 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
     margin: 0 auto;
     box-sizing: border-box;
     text-align: center;
-    overflow: hidden;
   }
 
   @media (max-height: 780px) {
-    .spielplatz__sticky {
+    .spielplatz__inner {
       padding-top: 100px;
       padding-bottom: 60px;
       gap: 24px;
     }
+  }
+
+  /* Das Weltall blendet mit dem Scrollen ein, statt beim Erreichen der
+     Section schon in vollem Gang zu sein. Schleierfarbe = Section-Creme
+     (#efe4cb), sonst setzt sich der Schleier als eigener Ton ab. */
+  .spielplatz :global(.space-bg) {
+    --veil-rgb: 239, 228, 203;
+    opacity: var(--p-bg);
   }
 
   /* Inhalt ueber das Canvas heben */
@@ -489,7 +511,7 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
     .spielplatz__outer {
       height: 200vh;
     }
-    .spielplatz__sticky {
+    .spielplatz__inner {
       padding: clamp(100px, 13vh, 130px) 20px clamp(56px, 8vh, 80px);
       gap: 20px;
     }

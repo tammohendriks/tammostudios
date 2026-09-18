@@ -86,12 +86,14 @@ const steps = [
   {
     number: '03',
     title: 'Entwicklung',
-    meta: '2 bis 6 Wochen',
+    // Bewusst keine Wochenzahl: wie lange etwas dauert, weiss man erst,
+    // wenn klar ist was es koennen soll. Die feste Zahl kommt in 02.
+    meta: 'Termin steht im Angebot',
     body:
       'Kein wochenlanges Hin und Her an Details. Ich baue in klaren ' +
       'Schritten, du siehst nach jedem Abschnitt was passiert und kannst ' +
-      'korrigieren. Am Ende bekommst du alles: den Quellcode, eine ' +
-      'Anleitung, sämtliche Zugänge.',
+      'korrigieren. Zum Schluss bekommst du deine Zugänge, eine Anleitung ' +
+      'und eine Einweisung.',
   },
 ] as const;
 
@@ -155,12 +157,13 @@ const kinds = [
     <section class="software-positioning" aria-label="Was ich baue" data-reveal>
       <p>
         Die meisten Websites hören auf, wo es interessant wird: bei
-        „Formular abgeschickt". Rechnen, ein Dokument erzeugen, an die
-        richtige Stelle schicken: das läuft dann wieder per Telefon.
+        „Formular abgeschickt". <br class="hidden sm:inline" />
+        Rechnen, ein Dokument erzeugen, an die richtige Stelle schicken: <br class="hidden sm:inline" />
+        das läuft dann wieder per Telefon.
       </p>
       <p>
-        Genau der Teil ist mein Handwerk. Keine fertige Vorlage, kein
-        zugekauftes Modul, sondern deine Abläufe als Grundlage.
+        Genau der Teil ist mein Handwerk. Keine fertige Vorlage. <br class="hidden sm:inline" />
+        Kein zugekauftes Modul, sondern deine Abläufe als Grundlage.
       </p>
     </section>
 
@@ -222,8 +225,8 @@ const kinds = [
           Rollen. Eine App. Oder ein Spiel.
         </p>
         <p>
-          Das baue ich auch, nur eben nicht zum Listenpreis. Eine Zahl vor
-          dem ersten Gespräch wäre geraten.
+          Das baue ich auch, nur eben nicht zum Listenpreis. <br class="hidden sm:inline" />
+          Eine Zahl vor dem ersten Gespräch wäre geraten.
         </p>
       </div>
       <p class="bigger-proof">
@@ -254,10 +257,11 @@ const kinds = [
       <div class="pricing-body">
         <p>
           <strong>2.000 €</strong> für eine Website, <strong>3.000 €</strong>
-          für einen Online-Shop. Eine Anwendung deiner Wahl ist dabei, ohne
-          Aufpreis und ohne längere Bauzeit: sie entsteht in denselben
-          <strong>14 Tagen</strong>. Jede weitere kostet
-          <strong>500 €</strong>.
+          für einen Online-Shop. <br class="hidden sm:inline" />
+          Eine Anwendung deiner Wahl ist dabei, ohne Aufpreis und ohne
+          längere Bauzeit: <br class="hidden sm:inline" />
+          sie entsteht in denselben <strong>14 Tagen</strong>. Jede weitere
+          kostet <strong>500 €</strong>.
         </p>
         <p>
           Geht es über eine Website hinaus, etwa eine eigene App, nenne ich

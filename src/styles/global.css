@@ -137,6 +137,12 @@ html[data-site-theme='light'] /* Minimaler CTA der Sub-Pages: Textlink mit Amber
   padding: 8px 0;
   border-bottom: 1px solid rgba(245, 158, 11, 0.4);
   transition: color 200ms ease, border-color 200ms ease;
+  /* Ohne das rutscht der Pfeil bei umbrechendem Text neben die zweite
+     Zeile statt direkt hinter das letzte Wort. */
+  white-space: nowrap;
+}
+.cta-inline svg {
+  flex: 0 0 auto;
 }
 .cta-inline:hover {
   color: rgba(252, 211, 77, 1);
