@@ -194,6 +194,12 @@ import { SECTION3 } from '../../lib/constants';
   }
 
   @media (max-width: 768px) {
+    /* Gestapelt hat jeder Block seine eigene Hoehe, margin-top:auto
+       haette dort keine Wirkung — padding zurueckdrehen. */
+    .diff-link {
+      padding-top: 8px;
+    }
+
     .diff-item {
       gap: 8px;
     }
@@ -277,7 +283,12 @@ import { SECTION3 } from '../../lib/constants';
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    margin-top: 16px;
+    /* Schiebt den Verweis an den unteren Rand. Die drei Spalten sind im
+       Grid gleich hoch, aber unterschiedlich lang beschrieben — ohne das
+       haengt der Link des kuerzesten Blocks weiter oben als die anderen.
+       Gleiches Mittel wie bei .case-link auf /software. */
+    margin-top: auto;
+    padding-top: 16px;
     color: #f5f5f4;
     text-decoration: none;
     font-family: 'Neue Montreal', 'Inter', sans-serif;
