@@ -6,10 +6,13 @@
 // Zusatzhinweis. Das hier ist ueberall dasselbe, in dieser Reihenfolge:
 //
 //   1. "Klingt fair?" als Ueberschrift
-//   2. "Lass uns sprechen" als dezenter CTA
-//   3. Mail-Adresse als Alternative
+//   2. Der naechste Schritt in einem Satz
+//   3. "Lass uns sprechen" als dezenter CTA
 //   4. Eine thematisch passende Empfehlung auf eine andere Seite
 //   5. Die drei Zusagen, wie am Fuss der Startseite
+//
+// Ohne Mailadresse: die steht im Footer und haette den Block nur
+// verlaengert.
 //
 // Alles in einer abgesetzten Karte — uebernommen vom Abschluss des
 // Preisrechners, der das Muster vorgegeben hat. Die Landing behaelt
@@ -17,8 +20,6 @@
 //
 // Die Empfehlung ist der einzige Teil, der sich pro Seite unterscheidet
 // und haelt den roten Faden zwischen den Bereichen.
-import { SITE } from '../lib/constants';
-
 interface Props {
   /** Weiterfuehrender Hinweis, z.B. { text: 'Wissen wollen, wie weit das geht?', label: 'In die Werkstatt schauen', href: '/werkstatt' } */
   recommendation?: { text: string; label: string; href: string };
@@ -48,16 +49,17 @@ const trust = [
   <div class="closing-cta-card">
     <h2 class="closing-cta-headline">Klingt fair?</h2>
 
+    <p class="closing-cta-sub">
+      Nächster Schritt:<br />
+      30 Min Erstgespräch, kostenlos und unverbindlich.
+    </p>
+
     <a class="cta-link cta-link-lg" href="/kontakt">
       Lass uns sprechen
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M5 12h14M13 6l6 6-6 6" />
       </svg>
     </a>
-
-    <p class="closing-cta-mail">
-      Oder direkt: <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
-    </p>
 
     {recommendation && (
       <p class="closing-cta-rec">
@@ -95,13 +97,18 @@ const trust = [
     text-align: center;
     gap: 14px;
     padding: clamp(40px, 6vw, 56px) clamp(22px, 4vw, 32px);
+    /* Die Vorlage vom Preisrechner lag mit rgba(20,20,24,.5) nur sieben
+       Helligkeitsstufen ueber dem Seitengrund und war als Karte nicht zu
+       erkennen. Hellere Fuellung, deutlicherer Rand, dazu ein Schatten
+       der sie von der Seite abhebt. */
     background: linear-gradient(
       180deg,
-      rgba(20, 20, 24, 0.5) 0%,
-      rgba(15, 15, 18, 0.5) 100%
+      rgba(30, 30, 36, 0.92) 0%,
+      rgba(19, 19, 23, 0.92) 100%
     );
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 16px;
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
   }
 
   .closing-cta-headline {
@@ -114,21 +121,13 @@ const trust = [
     margin: 0 0 2px;
   }
 
-  .closing-cta-mail {
-    margin: 0;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.95rem;
-    color: rgba(245, 245, 244, 0.55);
-  }
-
-  .closing-cta-mail a {
-    color: rgba(245, 158, 11, 0.9);
-    text-decoration: none;
-    border-bottom: 1px solid rgba(245, 158, 11, 0.3);
-  }
-
-  .closing-cta-mail a:hover {
-    border-bottom-color: rgba(245, 158, 11, 0.9);
+  .closing-cta-sub {
+    margin: 0 0 4px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: clamp(0.98rem, 1.4vw, 1.1rem);
+    line-height: 1.5;
+    color: rgba(245, 245, 244, 0.7);
   }
 
   .closing-cta-rec {
@@ -140,11 +139,16 @@ const trust = [
     color: rgba(245, 245, 244, 0.5);
   }
 
-  /* Eigene Zeile, damit der Linktext nicht mitten drin umbricht. */
+  /* Eigene Zeile, damit der Linktext nicht mitten drin umbricht.
+     Halbfett wie die uebrigen Verweise, sonst verschwindet er neben
+     dem Fliesstext darueber. */
   .closing-cta-rec a {
     display: block;
-    margin-top: 2px;
-    color: rgba(245, 158, 11, 0.9);
+    margin-top: 4px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: rgba(245, 158, 11, 0.95);
     text-decoration: none;
   }
 
@@ -195,7 +199,10 @@ const trust = [
     color: var(--theme-text-strong);
   }
 
-  :global(html[data-site-theme='light']) .closing-cta-mail,
+  :global(html[data-site-theme='light']) .closing-cta-sub {
+    color: var(--theme-text-dim);
+  }
+
   :global(html[data-site-theme='light']) .closing-cta-rec {
     color: var(--theme-text-muted);
   }
