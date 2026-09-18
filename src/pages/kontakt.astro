@@ -44,11 +44,14 @@ const subjectOptions = [
   title="Kontakt — Webentwickler aus Bremen | Tammo Studios"
   description="Anfrage, Rückruf oder 30-Minuten-Erstgespräch, Antwort innerhalb von 24 Stunden. Website 2.000 €, Online-Shop 3.000 €, aus Bremen und von Hand gebaut."
 >
-  <!-- Cal.com Preconnects — starten DNS + TLS parallel zum HTML-Parse
-       damit das erste Widget-Rendering nach Accordion-Open schnell ist.
-       Kein preload=script mehr weil embed.js jetzt lazy geladen wird. -->
-  <link rel="preconnect" href="https://app.cal.com" crossorigin />
-  <link rel="dns-prefetch" href="https://cal.com" />
+  <!-- KEINE Preconnects auf Cal.com.
+       Sie starteten DNS + TLS schon beim Parsen der Seite, also bevor
+       jemand das Accordion oeffnet. Damit ging die IP jedes Besuchers
+       ohne Einwilligung an Cal.com in die USA — waehrend die
+       Datenschutzerklaerung sagte, es werde nichts von Dritten geladen.
+       embed.js wird ohnehin erst im Klick-Handler nachgeladen
+       (loadCal, weiter unten); die Preconnects sparten nur einen
+       Handshake und haben das nicht wert. -->
 
   <main class="kontakt-page">
     <SubPageBackground />
