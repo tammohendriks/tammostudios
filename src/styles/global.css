@@ -318,6 +318,12 @@ html[data-site-theme='light'] .post-back-fixed {
   color: var(--theme-text-muted) !important;
 }
 
+/* Preisrechner: der Ring der Auswahl-Punkte war auf helles Weiss
+   gesetzt und damit auf Papier unsichtbar. */
+html[data-site-theme='light'] .pr-option-radio {
+  border-color: rgba(26, 26, 28, 0.35) !important;
+}
+
 /* Case-Tags + CMS-Beispiel-Chips: dunkle Pills auf Cream wirken zu
    hart, stattdessen leichte Tint-Fuellung mit dunklem Text. */
 html[data-site-theme='light'] .case-tag {
