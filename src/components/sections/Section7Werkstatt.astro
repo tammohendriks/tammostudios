@@ -16,12 +16,16 @@
 // laeuft ueber /software. Hier geht es nur darum zu zeigen, dass neben
 // den Websites auch Sachen aus Spass entstehen.
 
+import SpaceBackground from '../SpaceBackground.astro';
+
 const GAME_URL = 'https://asteroid.tammostudios.de';
 ---
 
 <section class="spielplatz" aria-labelledby="spielplatz-headline" data-section-bg="cream">
   <div class="spielplatz__outer">
     <div class="spielplatz__sticky">
+      <SpaceBackground tone="light" intensity={0.5} />
+
       <header class="spielplatz__header">
         <p class="spielplatz__eyebrow">Aus der Werkstatt</p>
         <h2 id="spielplatz-headline" class="spielplatz__headline">
@@ -206,7 +210,9 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
 <style>
   .spielplatz {
     /* #efe4cb liegt zwischen S6 (#f3ecd7) und dem Closing (#ecdcbf),
-       damit die Cream-Reihe zum Seitenende ungebrochen abkuehlt. */
+       damit die Cream-Reihe zum Seitenende ungebrochen abkuehlt. Das
+       Weltall laeuft in der hellen Palette darueber, zurueckgenommen —
+       hinter dem Automaten darf es dem Spiel nicht die Schau stehlen. */
     --cream: #efe4cb;
     --charcoal: #1a1a1c;
     --amber: #f59e0b;
@@ -220,10 +226,6 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
 
     position: relative;
     background: var(--cream);
-    background-image:
-      linear-gradient(to right, rgba(245, 158, 11, 0.05) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(245, 158, 11, 0.05) 1px, transparent 1px);
-    background-size: 32px 32px;
   }
 
   /* Amber-Hairline oben als Kapitel-Trenner — gleiche Signatur wie S5/S6/S7 */
@@ -250,19 +252,42 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
     position: relative;
   }
 
+  /* Masse 1:1 von .werkzeug__sticky uebernommen — dadurch sitzt der
+     Header hier auf exakt derselben Hoehe wie in den Nachbar-Sections,
+     und der CTA bekommt unten wieder Luft. Flex statt Grid aus dem
+     gleichen Grund wie dort: Grid-Tracks kollabieren auf kleinen
+     Viewports. */
   .spielplatz__sticky {
     position: sticky;
     top: 0;
     height: 100vh;
     height: 100dvh;
-    display: grid;
-    grid-template-rows: auto minmax(0, 1fr) auto;
-    justify-items: center;
-    gap: clamp(18px, 3vh, 32px);
-    /* Die Nav-Pille schwebt fixiert ueber der Seite; ohne diesen
-       Abstand liegt der Eyebrow darunter. */
-    padding: clamp(120px, 16vh, 168px) 40px clamp(40px, 6vh, 72px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(30px, 5vh, 60px);
+    padding: clamp(120px, 15vh, 160px) 40px clamp(80px, 12vh, 120px);
+    max-width: 1240px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    text-align: center;
     overflow: hidden;
+  }
+
+  @media (max-height: 780px) {
+    .spielplatz__sticky {
+      padding-top: 100px;
+      padding-bottom: 60px;
+      gap: 24px;
+    }
+  }
+
+  /* Inhalt ueber das Canvas heben */
+  .spielplatz__header,
+  .spielplatz__cabinet,
+  .spielplatz__cta {
+    position: relative;
+    z-index: 1;
   }
 
   .spielplatz__header {
@@ -298,8 +323,9 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
      Einziger dunkler Block auf Cream. Faehrt beim Scrollen leicht hoch
      und nimmt an Glut zu, statt nur einzublenden. */
   .spielplatz__cabinet {
-    position: relative;
-    height: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: 100%;
     aspect-ratio: 16 / 10;
     max-width: 100%;
     margin: 0;
@@ -464,23 +490,12 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
       height: 200vh;
     }
     .spielplatz__sticky {
-      padding: clamp(104px, 14vh, 132px) 20px clamp(32px, 5vh, 56px);
-      gap: 16px;
+      padding: clamp(100px, 13vh, 130px) 20px clamp(56px, 8vh, 80px);
+      gap: 20px;
     }
     .spielplatz__cabinet {
-      height: auto;
       width: 100%;
-      max-height: 100%;
       aspect-ratio: 4 / 5;
-      align-self: center;
-    }
-  }
-
-  /* Kurze Fenster: Automat darf schrumpfen statt den CTA rauszudruecken */
-  @media (min-width: 768px) and (max-height: 720px) {
-    .spielplatz__sticky {
-      padding-top: 104px;
-      gap: 14px;
     }
   }
 

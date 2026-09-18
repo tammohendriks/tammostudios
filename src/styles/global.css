@@ -122,7 +122,28 @@ html[data-site-theme='light'] .error-page {
 html[data-site-theme='light'] .subpage-hero-title {
   color: var(--theme-text-strong) !important;
 }
-html[data-site-theme='light'] .subpage-hero-subtitle {
+html[data-site-theme='light'] /* Minimaler CTA der Sub-Pages: Textlink mit Amber-Unterkante statt
+   Button. Lag dreimal identisch in Page-Style-Bloecken (/website,
+   /werkstatt, /software), deshalb hier einmal zentral. */
+.cta-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Neue Montreal', 'Inter', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: rgba(245, 158, 11, 0.95);
+  text-decoration: none;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(245, 158, 11, 0.4);
+  transition: color 200ms ease, border-color 200ms ease;
+}
+.cta-inline:hover {
+  color: rgba(252, 211, 77, 1);
+  border-bottom-color: rgba(252, 211, 77, 1);
+}
+
+.subpage-hero-subtitle {
   color: var(--theme-text-dim) !important;
 }
 

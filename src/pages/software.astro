@@ -19,7 +19,7 @@ const cases = [
       'Unternehmen tragen Mitarbeitende ein, wählen die Untersuchungen ' +
       'aus, daraus entsteht automatisch ein PDF, das direkt in der Praxis ' +
       'landet. Der Absender bekommt eine Bestätigung. Die ganze Seite ' +
-      'schaltet außerdem auf Englisch um — für internationale Belegschaften.',
+      'schaltet außerdem auf Englisch um, für internationale Belegschaften.',
     tags: ['Formular mit drei Wegen', 'PDF automatisch', 'Deutsch / Englisch'],
     href: 'https://ibi-doc.de/anfrage',
   },
@@ -28,8 +28,8 @@ const cases = [
     full: 'Arbeitsmedizinische Praxis',
     branch: 'Betriebsmedizin, Bremen',
     body:
-      'Ein 360°-Rundgang durch die Praxis, direkt auf der Seite begehbar — ' +
-      'wer zur Vorsorge kommt, weiß vorher, wo er landet. Dazu eine ' +
+      'Ein 360°-Rundgang durch die Praxis, direkt auf der Seite begehbar. ' +
+      'Wer zur Vorsorge kommt, weiß vorher, wo er landet. Dazu eine ' +
       'vollständige englische Fassung der Seite auf Knopfdruck, ohne ' +
       'zweite Website und ohne doppelte Pflege.',
     tags: ['360°-Rundgang', 'Deutsch / Englisch', 'Eigenes Redaktionssystem'],
@@ -40,8 +40,8 @@ const cases = [
     full: 'Heizung, Wärmepumpe, Sanitär',
     branch: 'Handwerk, Bremen',
     body:
-      'Sechs Fragen zu Wohnfläche, Baujahr, Personen und Warmwasser — ' +
-      'daraus eine Empfehlung: Wärmepumpe, Hybrid oder Gas-Brennwert. Mit ' +
+      'Sechs Fragen zu Wohnfläche, Baujahr, Personen und Warmwasser. ' +
+      'Daraus eine Empfehlung: Wärmepumpe, Hybrid oder Gas-Brennwert. Mit ' +
       'Investitionsrahmen, möglicher BEG-Förderung und Eigenanteil. ' +
       'WärmePower bekommt das ausgefüllte Formular als Mail und PDF, der ' +
       'Kunde eine Bestätigung. Zweimal im Monat kommen echte Anfragen ' +
@@ -55,7 +55,7 @@ const cases = [
     branch: 'Dachdecker, Bremen',
     body:
       'Investitionsrechner, der zeigt wie viel teurer dasselbe Bauprojekt ' +
-      'in fünf und zehn Jahren wird — auf Basis realer ' +
+      'in fünf und zehn Jahren wird, auf Basis realer ' +
       'Baupreis-Entwicklungen. Dazu: wie viel Wertsteigerung eine neue ' +
       'Dachhülle der Immobilie zurückgibt. Beratung wird damit nachvollziehbar ' +
       'statt gefühlt.',
@@ -70,10 +70,9 @@ const steps = [
     title: 'Erstgespräch',
     meta: '30 Minuten, kostenlos',
     body:
-      'Wir sprechen über deinen Ablauf. Was läuft von Hand, was könnte ' +
-      'digital laufen? Wo verbrennst du Zeit? Was würde deinen Kunden das ' +
-      'Leben leichter machen? Am Ende hast du eine ehrliche Einschätzung, ' +
-      'ob eine eigene Anwendung für dich Sinn ergibt.',
+      'Wir sprechen über deinen Ablauf. Was läuft von Hand, wo verbrennst ' +
+      'du Zeit? Am Ende weißt du, ob sich eine eigene Anwendung für dich ' +
+      'lohnt.',
   },
   {
     number: '02',
@@ -104,28 +103,27 @@ const kinds = [
   {
     title: 'Rechner',
     body:
-      'Der Besucher gibt ein paar Eckdaten ein und bekommt eine Zahl, mit ' +
-      'der er etwas anfangen kann: eine Empfehlung, einen Investitionsrahmen, ' +
-      'eine Förderhöhe.',
+      'Ein paar Eckdaten rein, eine brauchbare Zahl raus: eine Empfehlung, ' +
+      'ein Investitionsrahmen, eine Förderhöhe.',
   },
   {
     title: 'Anfrageformulare, die mitdenken',
     body:
       'Nicht „Name, Mail, Nachricht". Sondern Formulare, die je nach Antwort ' +
-      'anders weitergehen und am Ende ein fertiges PDF bei dir im Postfach ' +
-      'liegen haben.',
+      'anders weitergehen und dir am Ende ein fertiges PDF ins Postfach ' +
+      'legen.',
   },
   {
     title: 'Konfiguratoren',
     body:
-      'Leistungen, Varianten, Optionen — zusammenklickbar, mit Preis oder ' +
+      'Leistungen, Varianten, Optionen: zusammenklickbar, mit Preis oder ' +
       'Zusammenfassung am Ende. Spart das erste Klärungs-Telefonat.',
   },
   {
     title: 'Inhalte, die sich selbst ausgeben',
     body:
-      'Du pflegst deine Inhalte einmal, und daraus entstehen automatisch Seite, ' +
-      'PDF und Übersetzung. Keine drei Dateien, die auseinanderlaufen.',
+      'Einmal gepflegt, und daraus entstehen Seite, PDF und Übersetzung. ' +
+      'Keine drei Dateien, die auseinanderlaufen.',
   },
 ] as const;
 ---
@@ -133,7 +131,7 @@ const kinds = [
 <BaseLayout
   pageTitle="Software"
   title="App- & Software-Entwicklung aus Bremen | Tammo Studios"
-  description="Software-Entwicklung aus Bremen: Preisrechner, Konfiguratoren, mitdenkende Anfrageformulare — und eigene Apps. Eine individuelle Anwendung ist im Website-Preis enthalten, Größeres nach Erstgespräch."
+  description="Software-Entwicklung aus Bremen: Preisrechner, Konfiguratoren, mitdenkende Anfrageformulare, eigene Apps. Eine individuelle Anwendung ist im Website-Preis enthalten, Größeres nach Erstgespräch."
 >
   <main class="software-page">
     <SubPageBackground />
@@ -142,17 +140,13 @@ const kinds = [
       <h1 class="subpage-hero-title">Websites können mehr als nur da sein.</h1>
       <p class="subpage-hero-subtitle software-hero-sub">
         Preisrechner, mitdenkende Anfrageformulare, Konfiguratoren,
-        automatische PDFs. Individuell entwickelt — und eine davon ist im
-        Website-Preis schon drin.
+        automatische PDFs. Eine davon ist im Website-Preis schon drin.
       </p>
 
       <div class="software-hero-cta">
-        <a class="cta-orbital" href="/kontakt">
+        <a class="cta-inline" href="/kontakt">
           Erstgespräch anfragen
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <line x1="5" y1="12" x2="19" y2="12" />
-            <polyline points="12 5 19 12 12 19" />
-          </svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
         </a>
         <p class="software-hero-note">Eine Anwendung inklusive · jede weitere 500 €</p>
       </div>
@@ -161,15 +155,12 @@ const kinds = [
     <section class="software-positioning" aria-label="Was ich baue" data-reveal>
       <p>
         Die meisten Websites hören auf, wo es interessant wird: bei
-        „Kontaktformular abgeschickt". Alles danach — die richtigen Fragen
-        stellen, rechnen, ein Dokument erzeugen, an die richtige Stelle
-        schicken — passiert dann wieder per Telefon und Zuruf.
+        „Formular abgeschickt". Rechnen, ein Dokument erzeugen, an die
+        richtige Stelle schicken: das läuft dann wieder per Telefon.
       </p>
       <p>
-        Genau dieser Teil ist mein eigentliches Handwerk. Keine fertige
-        Vorlage, kein zugekauftes Modul: eigene Oberfläche, echte Anbindung
-        an das, was dahinter rechnet, und deine Abläufe als Grundlage. Von
-        mir gebaut, ohne Agentur dazwischen.
+        Genau der Teil ist mein Handwerk. Keine fertige Vorlage, kein
+        zugekauftes Modul, sondern deine Abläufe als Grundlage.
       </p>
     </section>
 
@@ -228,20 +219,17 @@ const kinds = [
         <p>
           Manches passt nicht mehr in eine Website. Eine Anwendung, die
           deine Mitarbeiter täglich benutzen. Ein System mit mehreren
-          Rollen und Rechten. Eine App. Oder ein Spiel.
+          Rollen. Eine App. Oder ein Spiel.
         </p>
         <p>
-          Das baue ich auch — nur eben nicht zum Listenpreis. Wie lange so
-          etwas dauert, hängt komplett am Umfang, und eine Zahl vor dem
-          ersten Gespräch wäre geraten. Nach dem Erstgespräch bekommst du
-          eine feste.
+          Das baue ich auch, nur eben nicht zum Listenpreis. Eine Zahl vor
+          dem ersten Gespräch wäre geraten.
         </p>
       </div>
       <p class="bigger-proof">
-        Wie tief das technisch geht, kannst du dir ansehen statt es mir zu
-        glauben: In der <a href="/werkstatt">Werkstatt</a> liegt ein Spiel,
-        das ich ohne Auftrag von Grund auf gebaut habe. Spielbar direkt im
-        Browser.
+        Wie tief das geht, kannst du dir ansehen statt es mir zu glauben:
+        In der <a href="/werkstatt">Werkstatt</a> liegt ein Spiel, das ich
+        ohne Auftrag gebaut habe. Spielbar direkt im Browser.
       </p>
     </section>
 
@@ -265,27 +253,16 @@ const kinds = [
 
       <div class="pricing-body">
         <p>
-          Eine individuelle Anwendung ist im Website-Preis bereits enthalten.
           <strong>2.000 €</strong> für eine Website, <strong>3.000 €</strong>
-          für einen Online-Shop — jeweils inklusive einer Anwendung deiner
-          Wahl. Ein Rechner, ein mitdenkendes Anfrageformular, ein
-          Konfigurator.
+          für einen Online-Shop. Eine Anwendung deiner Wahl ist dabei, ohne
+          Aufpreis und ohne längere Bauzeit: sie entsteht in denselben
+          <strong>14 Tagen</strong>. Jede weitere kostet
+          <strong>500 €</strong>.
         </p>
         <p>
-          Sie verlängert die Bauzeit nicht: die Anwendung entsteht
-          innerhalb derselben <strong>14 Tage</strong> wie die Website.
-          Wie lange sie genau braucht, hängt davon ab was sie können soll
-          — bisher hat es immer in den Zeitraum gepasst.
-        </p>
-        <p>
-          Brauchst du mehr davon, kostet jede weitere
-          <strong>500 €</strong>. Auch das ist ein Fixpreis, kein Stundensatz.
-        </p>
-        <p>
-          Wird es größer als eine Website — eine eigene App, ein System mit
-          mehreren Nutzerrollen, etwas das über deine Seite hinausgeht —
-          nenne ich vorher bewusst keine Zahl. Das hängt zu sehr am Umfang.
-          Nach dem Erstgespräch bekommst du eine feste.
+          Geht es über eine Website hinaus, etwa eine eigene App, nenne ich
+          vorher keine Zahl. Das hängt zu sehr am Umfang. Nach dem
+          Erstgespräch bekommst du eine feste.
         </p>
       </div>
 
@@ -300,7 +277,7 @@ const kinds = [
       <h2 id="closing-heading" class="software-section-title">Lass uns sprechen</h2>
       <p class="closing-text">
         Beschreib mir kurz, was du im Kopf hast. Ich antworte innerhalb von
-        24 Stunden — ehrlich, ob das mit mir Sinn ergibt oder nicht.
+        24 Stunden, ehrlich auch dann, wenn es mit mir keinen Sinn ergibt.
       </p>
 
       <a class="cta-orbital" href="/kontakt">
@@ -412,7 +389,9 @@ const kinds = [
   }
 
   .software-page > section {
-    padding-block: clamp(48px, 8vh, 88px);
+    /* War clamp(48px, 8vh, 88px) — zusammen mit den kuerzeren Texten
+       stand die Seite sonst zu weit auseinander. */
+    padding-block: clamp(28px, 4.5vh, 52px);
   }
 
   /* ------------------------------------------------------ positioning */

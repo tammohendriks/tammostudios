@@ -1,0 +1,480 @@
+---
+// Animiertes Weltall auf einem Canvas — Sternenfeld, trudelnde
+// Meteoriten und zwei Schiffs-Parteien, die sich gegenseitig abschiessen.
+//
+// Benutzt dieselben Kenney-Sprites (CC0) wie ASTEROID//01, damit
+// Hintergrund und Spiel aus derselben Welt kommen. Liegt auf
+// /werkstatt und hinter der Spielplatz-Section der Startseite.
+//
+// Ein einziges Canvas statt vieler DOM-Knoten. Der Loop schlaeft, wenn
+// das Tab im Hintergrund ist oder die Section ausserhalb des
+// Sichtfelds liegt, und bei prefers-reduced-motion wird genau ein
+// Standbild gezeichnet.
+//
+// Props:
+//   tone       'auto' folgt dem Theme-Umschalter (Sub-Pages),
+//              'light' erzwingt die helle Palette (Landing-Teaser, der
+//              immer auf Cremegrund sitzt).
+//   intensity  1 = volle Packung, kleiner = ruhiger. Hinter dem
+//              spielbaren Automaten soll der Hintergrund nicht mit dem
+//              Spiel selbst konkurrieren.
+interface Props {
+  tone?: 'auto' | 'light' | 'dark';
+  intensity?: number;
+}
+const { tone = 'auto', intensity = 1 } = Astro.props;
+---
+
+<div class="space-bg" data-tone={tone} data-intensity={String(intensity)} aria-hidden="true">
+  <canvas class="space-bg-canvas" data-space-canvas></canvas>
+  <div class="space-bg-veil"></div>
+</div>
+
+<script>
+  const root = document.querySelector<HTMLElement>('.space-bg');
+  const canvas = root?.querySelector<HTMLCanvasElement>('[data-space-canvas]');
+  const ctx = canvas?.getContext('2d');
+
+  if (root && canvas && ctx) {
+    const AMBER = '245, 158, 11';
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    // Auf Cremegrund braucht alles andere Farben: weisse Sterne waeren
+    // unsichtbar, und die Sprites muessen zuruecktreten statt zu
+    // leuchten.
+    const PALETTE = {
+      dark:  { star: '245, 245, 244', starAlpha: 1,    sprite: 1,    rock: 0.62, foe: '239, 68, 68' },
+      light: { star: '26, 26, 28',    starAlpha: 0.55, sprite: 0.72, rock: 0.4,  foe: '190, 45, 45' },
+    };
+
+    const forcedTone = root.dataset.tone;
+    const isLight = () =>
+      forcedTone === 'light' ||
+      (forcedTone !== 'dark' &&
+        document.documentElement.dataset.siteTheme === 'light');
+    let pal = PALETTE.dark;
+    const syncPalette = () => {
+      pal = isLight() ? PALETTE.light : PALETTE.dark;
+    };
+
+    const SPRITES = {
+      allies: ['playerShip1_orange', 'playerShip2_blue', 'playerShip3_green'].map(
+        (n) => `/sprites/ships/${n}.png`
+      ),
+      foes: ['enemyRed1', 'enemyRed3', 'enemyRed5'].map(
+        (n) => `/sprites/enemies/${n}.png`
+      ),
+      rocks: [
+        'meteorGrey_big1', 'meteorGrey_big3', 'meteorGrey_med1',
+        'meteorGrey_small1', 'meteorBrown_small1', 'meteorBrown_tiny1',
+      ].map((n) => `/sprites/meteors/${n}.png`),
+    };
+
+    const images = new Map<string, HTMLImageElement>();
+    const load = (src: string) =>
+      new Promise<void>((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          images.set(src, img);
+          resolve();
+        };
+        // Ein fehlendes Sprite darf den Hintergrund nicht aufhalten —
+        // dann fehlt eben ein Schiffstyp.
+        img.onerror = () => resolve();
+        img.src = src;
+      });
+
+    let w = 0;
+    let h = 0;
+
+    const rand = (a: number, b: number) => a + Math.random() * (b - a);
+    const pick = <T,>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
+
+    type Star = { x: number; y: number; r: number; a: number; vy: number };
+    type Rock = {
+      x: number; y: number; vx: number; vy: number;
+      angle: number; spin: number; scale: number; src: string; hp: number;
+    };
+    type Ship = {
+      x: number; y: number; vx: number; vy: number;
+      src: string; scale: number; side: 'ally' | 'foe';
+      cooldown: number; wobble: number; phase: number;
+    };
+    type Shot = { x: number; y: number; vx: number; vy: number; side: 'ally' | 'foe'; life: number };
+    type Spark = { x: number; y: number; vx: number; vy: number; life: number; max: number; hue: string };
+
+    let stars: Star[] = [];
+    let rocks: Rock[] = [];
+    let ships: Ship[] = [];
+    let shots: Shot[] = [];
+    let sparks: Spark[] = [];
+
+    const spawnRock = (offscreen = false): Rock => ({
+      x: offscreen ? rand(0, w) : rand(0, w),
+      y: offscreen ? rand(-200, -40) : rand(0, h),
+      vx: rand(-0.22, 0.22),
+      vy: rand(0.12, 0.4),
+      angle: rand(0, Math.PI * 2),
+      spin: rand(-0.012, 0.012),
+      scale: rand(0.35, 0.85),
+      src: pick(SPRITES.rocks),
+      hp: 1,
+    });
+
+    // Verbuendete fliegen nach rechts, Gegner nach links — so treffen
+    // sie sich zwangslaeufig in der Mitte.
+    const spawnShip = (side: 'ally' | 'foe'): Ship => {
+      const toRight = side === 'ally';
+      const speed = rand(0.9, 1.9);
+      return {
+        x: toRight ? rand(-220, -60) : w + rand(60, 220),
+        y: rand(h * 0.1, h * 0.9),
+        vx: toRight ? speed : -speed,
+        vy: 0,
+        src: pick(side === 'ally' ? SPRITES.allies : SPRITES.foes),
+        scale: rand(0.3, 0.5),
+        side,
+        cooldown: rand(400, 1600),
+        wobble: rand(0.15, 0.5),
+        phase: rand(0, Math.PI * 2),
+      };
+    };
+
+    const burst = (x: number, y: number, n: number, hue: string) => {
+      for (let i = 0; i < n; i++) {
+        const a = rand(0, Math.PI * 2);
+        const sp = rand(0.6, 3.4);
+        const max = rand(320, 760);
+        sparks.push({
+          x, y,
+          vx: Math.cos(a) * sp,
+          vy: Math.sin(a) * sp,
+          life: max, max, hue,
+        });
+      }
+    };
+
+    const build = () => {
+      const area = w * h;
+      const density = Number(root.dataset.intensity || 1);
+
+      stars = Array.from({ length: Math.round(Math.min(260, area / 6000) * density) }, () => ({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: rand(0.4, 1.6),
+        a: rand(0.2, 0.8),
+        vy: rand(0.02, 0.12),
+      }));
+
+      rocks = Array.from(
+        { length: Math.max(3, Math.min(9, Math.round((area / 150000) * density))) },
+        () => spawnRock()
+      );
+
+      const shipCount = Math.max(2, Math.min(4, Math.round((area / 260000) * density)));
+      ships = [];
+      for (let i = 0; i < shipCount; i++) {
+        ships.push(spawnShip('ally'));
+        ships.push(spawnShip('foe'));
+      }
+      shots = [];
+      sparks = [];
+    };
+
+    const resize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const rect = canvas.getBoundingClientRect();
+      w = rect.width;
+      h = rect.height;
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      build();
+    };
+
+    const drawSprite = (src: string, x: number, y: number, angle: number, scale: number, alpha = 1) => {
+      const img = images.get(src);
+      if (!img) return;
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.translate(x, y);
+      ctx.rotate(angle);
+      ctx.drawImage(img, (-img.width * scale) / 2, (-img.height * scale) / 2, img.width * scale, img.height * scale);
+      ctx.restore();
+    };
+
+    const hit = (ax: number, ay: number, bx: number, by: number, r: number) => {
+      const dx = ax - bx;
+      const dy = ay - by;
+      return dx * dx + dy * dy < r * r;
+    };
+
+    const step = (dt: number, ms: number) => {
+      // --- Sterne ---
+      for (const s of stars) {
+        s.y += s.vy * dt;
+        if (s.y > h + 2) {
+          s.y = -2;
+          s.x = Math.random() * w;
+        }
+      }
+
+      // --- Meteoriten ---
+      for (let i = rocks.length - 1; i >= 0; i--) {
+        const r = rocks[i];
+        r.x += r.vx * dt;
+        r.y += r.vy * dt;
+        r.angle += r.spin * dt;
+        if (r.y > h + 140 || r.x < -160 || r.x > w + 160) rocks[i] = spawnRock(true);
+      }
+
+      // --- Schiffe ---
+      for (let i = ships.length - 1; i >= 0; i--) {
+        const s = ships[i];
+        s.phase += 0.012 * dt;
+        s.x += s.vx * dt;
+        s.y += Math.sin(s.phase) * s.wobble * dt;
+
+        if (s.x < -280 || s.x > w + 280) {
+          ships[i] = spawnShip(s.side);
+          continue;
+        }
+
+        s.cooldown -= ms;
+        if (s.cooldown <= 0 && s.x > -20 && s.x < w + 20) {
+          s.cooldown = rand(700, 2200);
+          const dir = s.vx > 0 ? 1 : -1;
+          shots.push({
+            x: s.x + dir * 22,
+            y: s.y,
+            vx: dir * 7,
+            vy: rand(-0.35, 0.35),
+            side: s.side,
+            life: 2600,
+          });
+        }
+      }
+
+      // --- Schuesse ---
+      for (let i = shots.length - 1; i >= 0; i--) {
+        const p = shots[i];
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.life -= ms;
+        if (p.life <= 0 || p.x < -40 || p.x > w + 40) {
+          shots.splice(i, 1);
+          continue;
+        }
+
+        let consumed = false;
+
+        // Gegnerische Schiffe
+        for (let j = ships.length - 1; j >= 0; j--) {
+          const s = ships[j];
+          if (s.side === p.side) continue;
+          if (hit(p.x, p.y, s.x, s.y, 26)) {
+            burst(s.x, s.y, 16, AMBER);
+            ships[j] = spawnShip(s.side);
+            consumed = true;
+            break;
+          }
+        }
+
+        // Meteoriten zerbrechen
+        if (!consumed) {
+          for (let j = rocks.length - 1; j >= 0; j--) {
+            const r = rocks[j];
+            if (hit(p.x, p.y, r.x, r.y, 34 * r.scale + 8)) {
+              burst(r.x, r.y, 10, 'star');
+              rocks[j] = spawnRock(true);
+              consumed = true;
+              break;
+            }
+          }
+        }
+
+        if (consumed) shots.splice(i, 1);
+      }
+
+      // --- Funken ---
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        const f = sparks[i];
+        f.x += f.vx * dt;
+        f.y += f.vy * dt;
+        f.vx *= 0.98;
+        f.vy *= 0.98;
+        f.life -= ms;
+        if (f.life <= 0) sparks.splice(i, 1);
+      }
+    };
+
+    const render = () => {
+      ctx.clearRect(0, 0, w, h);
+
+      for (const s of stars) {
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${pal.star}, ${s.a * pal.starAlpha})`;
+        ctx.fill();
+      }
+
+      for (const r of rocks) drawSprite(r.src, r.x, r.y, r.angle, r.scale, pal.rock);
+
+      for (const s of ships) {
+        // Kenney-Schiffe zeigen nach oben, deshalb +90 Grad auf den
+        // Flugwinkel.
+        const angle = Math.atan2(s.vy, s.vx) + Math.PI / 2;
+        drawSprite(s.src, s.x, s.y, angle, s.scale, pal.sprite);
+      }
+
+      for (const p of shots) {
+        const tint =
+          p.side === 'ally' ? `rgba(${AMBER}, 0.95)` : `rgba(${pal.foe}, 0.95)`;
+        ctx.save();
+        ctx.strokeStyle = tint;
+        ctx.lineWidth = 2.4;
+        ctx.lineCap = 'round';
+        ctx.shadowColor = tint;
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(p.x - p.vx * 2.4, p.y - p.vy * 2.4);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      for (const f of sparks) {
+        const t = f.life / f.max;
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, 1.6 * t + 0.4, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${f.hue === 'star' ? pal.star : f.hue}, ${t})`;
+        ctx.fill();
+      }
+    };
+
+    let last = 0;
+    let raf = 0;
+    let running = false;
+    let onScreen = true;
+
+    const frame = (now: number) => {
+      if (!running) return;
+      const ms = last ? Math.min(now - last, 50) : 16.67;
+      last = now;
+      step(ms / 16.67, ms);
+      render();
+      raf = requestAnimationFrame(frame);
+    };
+
+    const start = () => {
+      if (running || reduced.matches || !onScreen || document.hidden) return;
+      running = true;
+      last = 0;
+      raf = requestAnimationFrame(frame);
+    };
+
+    const stop = () => {
+      running = false;
+      cancelAnimationFrame(raf);
+    };
+
+    const still = () => {
+      stop();
+      render();
+    };
+
+    Promise.all(
+      [...SPRITES.allies, ...SPRITES.foes, ...SPRITES.rocks].map(load)
+    ).then(() => {
+      syncPalette();
+      resize();
+      if (reduced.matches) still();
+      else start();
+    });
+
+    window.addEventListener('resize', () => {
+      resize();
+      if (reduced.matches) still();
+    });
+
+    reduced.addEventListener('change', () => (reduced.matches ? still() : start()));
+
+    // Der Theme-Umschalter setzt data-site-theme auf <html>; ohne das
+    // hier bliebe der Hintergrund in der alten Palette stehen.
+    if (forcedTone === 'auto' || !forcedTone) {
+      new MutationObserver(() => {
+        syncPalette();
+        if (!running) render();
+      }).observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['data-site-theme'],
+      });
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stop();
+      else start();
+    });
+
+    // Ausserhalb des Sichtfelds braucht niemand 60 Bilder pro Sekunde.
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(
+        ([entry]) => {
+          onScreen = entry.isIntersecting;
+          if (onScreen) start();
+          else stop();
+        },
+        { rootMargin: '120px' }
+      ).observe(root);
+    }
+  }
+</script>
+
+<style>
+  /* Kein eigener Grund: die Section darunter bestimmt die Farbe, damit
+     derselbe Hintergrund auf #050507 und auf Creme funktioniert. */
+  .space-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .space-bg-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  /* Nimmt dem Geschehen hinter dem Text genug Kontrast, damit man noch
+     lesen kann — ohne die Raender abzudunkeln, wo das Spektakel sitzt. */
+  .space-bg-veil {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(
+        ellipse 70% 50% at 50% 42%,
+        rgba(5, 5, 7, 0.82) 0%,
+        rgba(5, 5, 7, 0.45) 55%,
+        transparent 100%
+      ),
+      linear-gradient(to bottom, rgba(5, 5, 7, 0.5) 0%, transparent 22%, transparent 78%, rgba(5, 5, 7, 0.7) 100%);
+  }
+
+  /* Heller Schleier — gleiche Funktion, umgekehrte Richtung: er hellt
+     hinter dem Text auf statt abzudunkeln. */
+  .space-bg[data-tone='light'] .space-bg-veil,
+  :global(html[data-site-theme='light']) .space-bg[data-tone='auto'] .space-bg-veil {
+    background:
+      radial-gradient(
+        ellipse 70% 50% at 50% 42%,
+        rgba(248, 244, 234, 0.9) 0%,
+        rgba(248, 244, 234, 0.55) 55%,
+        transparent 100%
+      ),
+      linear-gradient(to bottom, rgba(248, 244, 234, 0.6) 0%, transparent 22%, transparent 78%, rgba(248, 244, 234, 0.75) 100%);
+  }
+</style>

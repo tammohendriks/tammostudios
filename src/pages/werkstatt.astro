@@ -13,7 +13,7 @@
  * .werkstatt-project Sections angehaengt.
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
-import WerkstattBackground from '../components/WerkstattBackground.astro';
+import SpaceBackground from '../components/SpaceBackground.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 
 const GAME_URL = 'https://asteroid.tammostudios.de';
@@ -24,15 +24,15 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
 const techPoints = [
   {
     title: 'Spielmechanik von Hand',
-    body: 'Die Pixel-Grafiken sind fertig zugekauft — alles andere nicht. Steuerung, Kollisionen, Gegnerverhalten und die Ablaufschleife stecken komplett selbst drin, mit 60 Bildern pro Sekunde auch auf dem Handy.',
+    body: 'Die Pixel-Grafiken sind fertig zugekauft, alles andere nicht. Steuerung, Kollisionen, Gegnerverhalten und die Ablaufschleife stecken komplett selbst drin, mit 60 Bildern pro Sekunde auch auf dem Handy.',
   },
   {
     title: 'Musik, die es vorher nicht gab',
-    body: 'Die Musik ist keine fertige Datei. Sie entsteht im Browser, während du spielst — und zieht an, je enger es wird.',
+    body: 'Die Musik ist keine fertige Datei. Sie entsteht im Browser, während du spielst, und zieht an, je enger es wird.',
   },
   {
     title: 'Weltweite Bestenliste',
-    body: 'Die Punktestände laufen über eine eigene Schnittstelle mit Prüfung — damit sich niemand seinen Rekord einfach selbst einträgt.',
+    body: 'Die Punktestände laufen über eine eigene Schnittstelle mit Prüfung, damit sich niemand seinen Rekord einfach selbst einträgt.',
   },
   {
     title: 'Endgegner in mehreren Phasen',
@@ -47,7 +47,7 @@ const techPoints = [
   description="Eigene Projekte ohne Auftraggeber. ASTEROID//01: Arcade-Spiel im Browser mit erzeugter Musik, weltweiter Bestenliste und mehrstufigem Endgegner — komplett selbst entwickelt in Bremen."
 >
   <main class="werkstatt-page">
-    <WerkstattBackground />
+    <SpaceBackground />
 
     <header class="werkstatt-hero">
       <h1 class="subpage-hero-title">Werkstatt.</h1>
@@ -380,23 +380,6 @@ const techPoints = [
     margin: 0 0 20px;
   }
 
-  .cta-inline {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: rgba(245, 158, 11, 0.95);
-    text-decoration: none;
-    padding: 8px 0;
-    border-bottom: 1px solid rgba(245, 158, 11, 0.4);
-    transition: color 200ms ease, border-color 200ms ease;
-  }
-  .cta-inline:hover {
-    color: rgba(252, 211, 77, 1);
-    border-bottom-color: rgba(252, 211, 77, 1);
-  }
 
   /* === Mobile: Spiel bekommt hochkant ein quadratischeres Fenster === */
   @media (max-width: 640px) {

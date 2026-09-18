@@ -36,7 +36,7 @@ const problems = [
   {
     label: 'Gefunden werden',
     body:
-      'Wer dich googelt, muss dich finden — und zwar vor dem Wettbewerb. ' +
+      'Wer dich googelt, muss dich finden, und zwar vor dem Wettbewerb. ' +
       'Saubere Technik, strukturierte Daten, schnelle Ladezeiten. Das ist ' +
       'eingebaut, nicht nachgerüstet.',
   },
@@ -61,7 +61,7 @@ const problems = [
 
 const features = [
   { title: 'Handgemacht', body: 'Kein Wix, kein Squarespace. Astro + Tailwind + eigener Code, sauber auf deinen Betrieb geschnitten.' },
-  { title: 'Eigenes CMS', body: 'Du pflegst Inhalte selbst. Texte, Bilder, Preise, Öffnungszeiten — in 30 Sekunden aktualisiert.' },
+  { title: 'Eigenes CMS', body: 'Du pflegst Inhalte selbst. Texte, Bilder, Preise, Öffnungszeiten, in 30 Sekunden aktualisiert.' },
   { title: 'Mobile-first', body: '60% deiner Besucher kommen vom Handy. Deine Seite ist dort genauso schnell wie am Desktop.' },
   { title: 'SEO-Basis', body: 'Google-Ready aus dem Karton: strukturierte Daten, saubere URLs, schnelle Ladezeiten.' },
   { title: 'DSGVO-konform', body: 'EU-Hosting, korrekte Cookie-Handhabung, Impressum + Datenschutz strukturiert.' },
@@ -118,8 +118,8 @@ const websiteRefs = REFERENCES.filter((r) =>
       </div>
       <p class="problems-note">
         Gebaut für Arztpraxen, Betriebsmedizin, Dachdecker, Heizungsbau,
-        Gastronomie, Spedition. Die Branche war noch nie das Problem —
-        <a href="/referenzen">sieh dir an, was daraus wurde</a>.
+        Gastronomie, Spedition. Die Branche war noch nie das Problem.
+        <a href="/referenzen">Sieh dir an, was daraus wurde</a>.
       </p>
     </section>
 
@@ -187,10 +187,10 @@ const websiteRefs = REFERENCES.filter((r) =>
         </div>
       </div>
       <p class="preise-inklusive">
-        In beiden Preisen ist eine individuelle Anwendung enthalten — ein
+        In beiden Preisen ist eine individuelle Anwendung enthalten: ein
         Preisrechner, ein durchdachtes Anfrageformular, ein Konfigurator.
-        Sie wird innerhalb derselben 14 Tage mitgebaut. Jede weitere
-        kostet 500 €.
+        Sie wird in denselben 14 Tagen mitgebaut. Jede weitere kostet
+        500 €.
       </p>
       <a class="cta-inline" href="/preise">
         Volle Preisübersicht ansehen
@@ -590,21 +590,4 @@ const websiteRefs = REFERENCES.filter((r) =>
   }
 
   /* === Inline CTA link === */
-  .cta-inline {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: rgba(245, 158, 11, 0.95);
-    text-decoration: none;
-    padding: 8px 0;
-    border-bottom: 1px solid rgba(245, 158, 11, 0.4);
-    transition: color 200ms ease, border-color 200ms ease;
-  }
-  .cta-inline:hover {
-    color: rgba(252, 211, 77, 1);
-    border-bottom-color: rgba(252, 211, 77, 1);
-  }
 </style>
