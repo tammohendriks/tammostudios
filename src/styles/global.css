@@ -81,7 +81,9 @@ html {
    BaseLayout inline-script). */
 html[data-site-theme='light'] .ueber-page,
 html[data-site-theme='light'] .referenzen-page,
-html[data-site-theme='light'] .studio-page,
+html[data-site-theme='light'] .websites-page,
+html[data-site-theme='light'] .software-page,
+html[data-site-theme='light'] .labor-page,
 html[data-site-theme='light'] .preise-page,
 html[data-site-theme='light'] .preisrechner-page,
 html[data-site-theme='light'] .kontakt-page,
@@ -139,10 +141,81 @@ html[data-site-theme='light'] .contact-card,
 html[data-site-theme='light'] .prep-list li,
 html[data-site-theme='light'] .featured-post,
 html[data-site-theme='light'] .post-card,
-html[data-site-theme='light'] .journal-filter-empty {
+html[data-site-theme='light'] .journal-filter-empty,
+/* /websites, /software, /labor */
+html[data-site-theme='light'] .problem-card,
+html[data-site-theme='light'] .feature-item,
+html[data-site-theme='light'] .ref-preview,
+html[data-site-theme='light'] .case-card,
+html[data-site-theme='light'] .tech-item {
   background: #fefdf9 !important;
   border-color: rgba(0, 0, 0, 0.08) !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 6px 20px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* ---------- /websites /software /labor — Text-Inversion ----------
+   Die drei Angebots-/Labor-Seiten sind nach dem Audit (#ba382)
+   entstanden und muessen hier von Hand gepflegt werden. Gleiche
+   Regel wie oben: Page-Level-Text invertiert, Amber-Akzente nicht. */
+html[data-site-theme='light'] .websites-section-title,
+html[data-site-theme='light'] .websites-final-headline,
+html[data-site-theme='light'] .software-section-title,
+html[data-site-theme='light'] .labor-section-title,
+html[data-site-theme='light'] .problem-card-label,
+html[data-site-theme='light'] .feature-title,
+html[data-site-theme='light'] .ref-preview-title,
+html[data-site-theme='light'] .case-name,
+html[data-site-theme='light'] .tech-title,
+html[data-site-theme='light'] .kind-title,
+html[data-site-theme='light'] .process-title,
+html[data-site-theme='light'] .closing-text {
+  color: var(--theme-text-strong) !important;
+}
+
+html[data-site-theme='light'] .websites-final-body,
+html[data-site-theme='light'] .software-positioning p,
+html[data-site-theme='light'] .cms-body p,
+html[data-site-theme='light'] .cms-list li,
+html[data-site-theme='light'] .labor-intro p,
+html[data-site-theme='light'] .labor-bridge-text,
+html[data-site-theme='light'] .labor-project-intro,
+html[data-site-theme='light'] .problem-card-body,
+html[data-site-theme='light'] .feature-body,
+html[data-site-theme='light'] .case-body,
+html[data-site-theme='light'] .tech-body,
+html[data-site-theme='light'] .kind-body,
+html[data-site-theme='light'] .process-body,
+html[data-site-theme='light'] .pricing-body p,
+html[data-site-theme='light'] .preise-inklusive,
+html[data-site-theme='light'] .preise-label {
+  color: var(--theme-text-dim) !important;
+}
+
+html[data-site-theme='light'] .problems-note,
+html[data-site-theme='light'] .refs-note,
+html[data-site-theme='light'] .ref-preview-sub,
+html[data-site-theme='light'] .cms-examples,
+html[data-site-theme='light'] .case-full,
+html[data-site-theme='light'] .software-hero-note,
+html[data-site-theme='light'] .process-meta,
+html[data-site-theme='light'] .pricing-aside,
+html[data-site-theme='light'] .labor-project-note,
+html[data-site-theme='light'] .closing-mail {
+  color: var(--theme-text-muted) !important;
+}
+
+/* Case-Tags + CMS-Beispiel-Chips: dunkle Pills auf Cream wirken zu
+   hart, stattdessen leichte Tint-Fuellung mit dunklem Text. */
+html[data-site-theme='light'] .case-tag {
+  background: rgba(0, 0, 0, 0.05) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  color: var(--theme-text-dim) !important;
+}
+
+/* Vorschaubild-Rahmen der Referenz-Cards auf /websites */
+html[data-site-theme='light'] .ref-preview-image {
+  background: rgba(0, 0, 0, 0.04) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
 }
 
 /* .kontakt-form-section — Form-Labels + Inputs auf light theme */

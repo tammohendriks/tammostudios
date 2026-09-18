@@ -94,12 +94,45 @@ const steps = [
       'korrigieren. Am Ende bekommst du alles: Code, Dokumentation, Zugänge.',
   },
 ] as const;
+
+// Was im Alltag unter "eine individuelle Anwendung" faellt. Steht
+// bewusst VOR den Cases: erst die Kategorie greifbar machen, dann die
+// vier konkreten Umsetzungen zeigen. Ohne das liest sich die Case-Liste
+// wie vier Einzelfaelle statt wie ein Angebot.
+const kinds = [
+  {
+    title: 'Rechner',
+    body:
+      'Der Besucher gibt ein paar Eckdaten ein und bekommt eine Zahl, mit ' +
+      'der er etwas anfangen kann: eine Empfehlung, einen Investitionsrahmen, ' +
+      'eine Förderhöhe.',
+  },
+  {
+    title: 'Anfrageformulare, die mitdenken',
+    body:
+      'Nicht „Name, Mail, Nachricht". Sondern Formulare, die je nach Antwort ' +
+      'anders weitergehen und am Ende ein fertiges PDF bei dir im Postfach ' +
+      'liegen haben.',
+  },
+  {
+    title: 'Konfiguratoren',
+    body:
+      'Leistungen, Varianten, Optionen — zusammenklickbar, mit Preis oder ' +
+      'Zusammenfassung am Ende. Spart das erste Klärungs-Telefonat.',
+  },
+  {
+    title: 'Inhalte, die sich selbst ausgeben',
+    body:
+      'Du pflegst einmal im CMS, und daraus entstehen automatisch Seite, ' +
+      'PDF und Übersetzung. Keine drei Dateien, die auseinanderlaufen.',
+  },
+] as const;
 ---
 
 <BaseLayout
   pageTitle="Software"
-  title="Custom Web Apps aus Bremen — Software statt Website | Tammo Studios"
-  description="Individuelle Web-Anwendungen für kleine Unternehmen: Anfrage-Formulare, Konfiguratoren, CMS-Systeme. Live-Beispiele von IBI, Samedos, WärmePower. Ab 3.500 €."
+  title="Individuelle Web-Anwendungen aus Bremen | Tammo Studios"
+  description="Preisrechner, mitdenkende Anfrageformulare, Konfiguratoren, Auto-PDF. Eine individuelle Anwendung ist im Website-Preis enthalten. Live-Beispiele von IBI, Samedos, WärmePower und Kirsch."
 >
   <main class="software-page">
     <SubPageBackground />
@@ -107,9 +140,9 @@ const steps = [
     <header class="software-hero">
       <h1 class="subpage-hero-title">Websites können mehr als nur da sein.</h1>
       <p class="subpage-hero-subtitle software-hero-sub">
-        Custom Web-Applikationen aus Bremen — Anfrage-Formulare mit PDF-Ausgabe,
-        dynamische Preisrechner, mehrsprachige CMS-Systeme. Individuell
-        entwickelt für dein Unternehmen.
+        Preisrechner, mitdenkende Anfrageformulare, Konfiguratoren,
+        automatische PDFs. Individuell entwickelt — und eine davon ist im
+        Website-Preis schon drin.
       </p>
 
       <div class="software-hero-cta">
@@ -120,21 +153,41 @@ const steps = [
             <polyline points="12 5 19 12 12 19" />
           </svg>
         </a>
-        <p class="software-hero-note">Ab 3.500 € · Konkrete Zahl nach dem Erstgespräch</p>
+        <p class="software-hero-note">Eine Anwendung inklusive · jede weitere 500 €</p>
       </div>
     </header>
 
     <section class="software-positioning" aria-label="Was ich baue" data-reveal>
       <p>
-        Ich baue keine Templates auf. Ich baue Anwendungen, die zu deinen
-        Prozessen passen — mit eigenem Frontend, echten Backend-Anbindungen
-        und individueller Business-Logik. Als Freelancer, ohne Agentur
-        dazwischen.
+        Die meisten Websites hören auf, wo es interessant wird: bei
+        „Kontaktformular abgeschickt". Alles danach — die richtigen Fragen
+        stellen, rechnen, ein Dokument erzeugen, an die richtige Stelle
+        schicken — passiert dann wieder per Telefon und Zuruf.
+      </p>
+      <p>
+        Genau dieser Teil ist mein eigentliches Handwerk. Kein Plugin, kein
+        Template: eigenes Frontend, echte Backend-Anbindung, deine
+        Geschäftslogik. Als Freelancer, ohne Agentur dazwischen.
       </p>
     </section>
 
+    <!-- ================================================================
+         Was eine "Anwendung" ueberhaupt ist — Kategorie vor Beispielen
+         ============================================================== -->
+    <section class="software-kinds" aria-labelledby="kinds-heading" data-reveal>
+      <h2 id="kinds-heading" class="software-section-title">Was damit gemeint ist</h2>
+      <div class="kinds-grid">
+        {kinds.map((k) => (
+          <article class="kind-item" data-reveal>
+            <h3 class="kind-title">{k.title}</h3>
+            <p class="kind-body">{k.body}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
     <section class="software-cases" aria-labelledby="cases-heading">
-      <h2 id="cases-heading" class="software-section-title" data-reveal>Für Unternehmen gebaut</h2>
+      <h2 id="cases-heading" class="software-section-title" data-reveal>Vier, die live sind</h2>
 
       <div class="case-grid">
         {cases.map((item) => (
@@ -180,24 +233,28 @@ const steps = [
 
       <div class="pricing-body">
         <p>
-          Eigene Anwendungen fangen bei <strong>3.500 €</strong> an. Das reicht
-          für ein strukturiertes Anfrage-System mit automatischem PDF und
-          Mail-Versand — wie das IBI-Formular oben.
+          Eine individuelle Anwendung ist im Website-Preis bereits enthalten.
+          <strong>2.000 €</strong> für eine Website, <strong>3.000 €</strong>
+          für einen Online-Shop — jeweils inklusive einer Anwendung deiner
+          Wahl. Ein Rechner, ein mitdenkendes Anfrageformular, ein
+          Konfigurator.
         </p>
         <p>
-          Komplexeres — dynamische CMS-Anwendungen, mehrstufige Rechner mit
-          Business-Logik, Systeme mit mehreren Nutzerrollen — liegt zwischen
-          <strong>5.000 €</strong> und <strong>15.000 €</strong>.
+          Brauchst du mehr davon, kostet jede weitere
+          <strong>500 €</strong>. Auch das ist ein Fixpreis, kein Stundensatz.
         </p>
         <p>
-          Was deine Anwendung konkret kostet, sage ich dir nach dem
-          Erstgespräch. Vorher würde ich raten. Und Raten hilft dir nicht.
+          Wird es größer als eine Website — eine eigene App, ein System mit
+          mehreren Nutzerrollen, etwas das über deine Seite hinausgeht —
+          nenne ich vorher bewusst keine Zahl. Das hängt zu sehr am Umfang.
+          Nach dem Erstgespräch bekommst du eine feste.
         </p>
       </div>
 
       <p class="pricing-aside">
-        Für normale Websites siehe <a href="/preise">Preise</a> — 2.000 € für
-        eine Website, 3.000 € für einen Online-Shop. Fixpreis, keine Software.
+        Alles im Detail auf der <a href="/preise">Preisseite</a>, oder du
+        stellst dir dein Paket direkt im
+        <a href="/preisrechner">Preisrechner</a> zusammen.
       </p>
     </section>
 
@@ -218,6 +275,10 @@ const steps = [
 
       <p class="closing-mail">
         Oder direkt per Mail: <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+      </p>
+      <p class="closing-mail">
+        Wissen wollen, wie weit das technisch geht?
+        <a href="/labor">Ins Labor schauen</a>.
       </p>
     </section>
 
@@ -307,6 +368,40 @@ const steps = [
     font-size: clamp(1.15rem, 2vw, 1.5rem);
     line-height: 1.55;
     color: rgba(245, 245, 244, 0.82);
+  }
+
+  /* ------------------------------------------------ was gemeint ist */
+
+  .kinds-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  @media (max-width: 640px) {
+    .kinds-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .kind-item {
+    padding-left: 18px;
+    border-left: 2px solid rgba(245, 158, 11, 0.35);
+  }
+
+  .kind-title {
+    margin: 0 0 8px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #f5f5f4;
+  }
+
+  .kind-body {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.7);
   }
 
   /* ----------------------------------------------------- client cases */

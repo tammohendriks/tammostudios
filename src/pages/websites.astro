@@ -7,8 +7,10 @@
  *
  * Struktur:
  *   1. Hero (subpage-Konvention: centered, 780px, padding-top 32px)
- *   2. Fuer wen ich baue — 3 Vertical-Cards (Handwerk/Praxis/Gastro)
- *      verlinkt auf /webdesign-{handwerk|praxis|gastronomie} Deep-Landings
+ *   2. Problem-Framing — 3 Cards (Gefunden werden / Anfragen statt
+ *      Anrufe / Selbst aktuell halten). Ersetzt die frueheren
+ *      Branchen-Cards; /webdesign-* bleiben als SEO-Landings bestehen,
+ *      sind hier aber nicht mehr die Sortierlogik.
  *   3. Du pflegst selbst (id="cms") — CMS-Autonomie USP (aus /studio migriert)
  *   4. Was du bekommst — Feature-Liste
  *   5. Was kostet's — kompakter Preis-Verweis auf /preise
@@ -22,21 +24,38 @@ import SubPageBackground from '../components/SubPageBackground.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import { REFERENCES } from '../lib/references';
 
-const verticals = [
+/**
+ * Problem-Framing statt Branchen-Gruppierung.
+ *
+ * Vorher standen hier drei Vertical-Cards (Handwerk/Praxis/Gastro). Das
+ * hat die Seite kuenstlich verengt — gebaut wird fuer alles, zuletzt
+ * z.B. fuer eine Spedition. Die /webdesign-* Deep-Landings bleiben als
+ * SEO-Einstiege bestehen, sind hier aber nicht mehr die Sortierlogik.
+ */
+const problems = [
   {
-    label: 'Handwerk',
-    href: '/webdesign-handwerk',
-    body: 'Handwerker, Bauunternehmen, Handwerksbetriebe — Websites mit Notdienst-Funktion, Referenz-Projekten, Kontaktformular.',
+    label: 'Gefunden werden',
+    body:
+      'Wer dich googelt, muss dich finden — und zwar vor dem Wettbewerb. ' +
+      'Saubere Technik, strukturierte Daten, schnelle Ladezeiten. Das ist ' +
+      'eingebaut, nicht nachgerüstet.',
   },
   {
-    label: 'Praxen',
-    href: '/webdesign-praxis',
-    body: 'Arzt- und Zahnarztpraxen — DSGVO-konform, mit Terminanfrage und ruhigem Vertrauens-Design.',
+    label: 'Anfragen statt Anrufe',
+    body:
+      'Ein Formular, das die richtigen Fragen stellt, spart dir das ' +
+      'Telefonat. Bei Bedarf mit Preisrechner, Konfigurator oder ' +
+      'PDF-Ausgabe.',
+    linkHref: '/software',
+    linkLabel: 'Wie weit das geht',
   },
   {
-    label: 'Gastronomie',
-    href: '/webdesign-gastronomie',
-    body: 'Restaurants, Cafés, Kneipen — mit Speisekarte, Reservierung, Öffnungszeiten die du selbst pflegst.',
+    label: 'Selbst aktuell halten',
+    body:
+      'Öffnungszeiten, Preise, neue Referenzen, ein Stellenangebot. Du ' +
+      'änderst das selbst, in 30 Sekunden, ohne Ticket und ohne mich.',
+    linkHref: '#cms',
+    linkLabel: 'Wie das aussieht',
   },
 ];
 
@@ -58,8 +77,8 @@ const websiteRefs = REFERENCES.filter((r) =>
 
 <BaseLayout
   pageTitle="Websites"
-  title="Websites für kleine Unternehmen — handgemacht in Bremen | Tammo Studios"
-  description="Individuelle Websites für Handwerk, Praxen, Gastronomie und mehr. Handgemacht in Bremen, eigenes CMS, ab 2.000 €, in 14 Tagen live."
+  title="Individuelle Websites — handgemacht in Bremen | Tammo Studios"
+  description="Individuelle Websites, handgemacht in Bremen. Eigenes CMS zum Selbstpflegen, eine individuelle Anwendung inklusive, ab 2.000 € und in 14 Tagen live."
 >
   <main class="websites-page">
     <SubPageBackground />
@@ -67,7 +86,7 @@ const websiteRefs = REFERENCES.filter((r) =>
     <header class="websites-hero">
       <h1 class="subpage-hero-title">Websites für dein Unternehmen</h1>
       <p class="subpage-hero-subtitle text-lines">
-        {'Handgemacht in Bremen. Für Handwerk, Praxen, Gastronomie und mehr.\nAb 2.000 €, in 14 Tagen live.'}
+        {'Handgemacht in Bremen. Eine individuelle Anwendung ist drin.\nAb 2.000 €, in 14 Tagen live.'}
       </p>
       <div class="websites-hero-cta">
         <a class="cta-inline" href="/kontakt">
@@ -78,25 +97,29 @@ const websiteRefs = REFERENCES.filter((r) =>
     </header>
 
     <!-- ================================================================
-         2. Fuer wen ich baue — 3 Vertical-Cards
+         2. Problem-Framing — wofuer eine Website da ist
          ============================================================== -->
-    <section class="websites-verticals" data-reveal aria-labelledby="verticals-heading">
-      <p class="websites-eyebrow">FÜR WEN ICH BAUE</p>
-      <h2 id="verticals-heading" class="websites-section-title">Drei Schwerpunkte, alle mit Erfahrung</h2>
-      <div class="verticals-grid">
-        {verticals.map((v) => (
-          <a class="vertical-card" href={v.href} data-reveal>
-            <h3 class="vertical-card-label">{v.label}</h3>
-            <p class="vertical-card-body">{v.body}</p>
-            <span class="vertical-card-cta">
-              Zur {v.label}-Seite
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
-            </span>
-          </a>
+    <section class="websites-problems" data-reveal aria-labelledby="problems-heading">
+      <p class="websites-eyebrow">WOFÜR DAS GANZE</p>
+      <h2 id="problems-heading" class="websites-section-title">Drei Probleme, immer die gleichen.</h2>
+      <div class="problems-grid">
+        {problems.map((p) => (
+          <article class="problem-card" data-reveal>
+            <h3 class="problem-card-label">{p.label}</h3>
+            <p class="problem-card-body">{p.body}</p>
+            {p.linkHref && (
+              <a class="problem-card-cta" href={p.linkHref}>
+                {p.linkLabel}
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+              </a>
+            )}
+          </article>
         ))}
       </div>
-      <p class="verticals-note">
-        Deine Branche nicht dabei? <a href="/kontakt">Sprich mich an</a> — ich baue auch für andere.
+      <p class="problems-note">
+        Gebaut für Arztpraxen, Betriebsmedizin, Dachdecker, Heizungsbau,
+        Gastronomie, Spedition. Die Branche war noch nie das Problem —
+        <a href="/referenzen">sieh dir an, was daraus wurde</a>.
       </p>
     </section>
 
@@ -163,6 +186,11 @@ const websiteRefs = REFERENCES.filter((r) =>
           <p class="preise-label">Online-Shop</p>
         </div>
       </div>
+      <p class="preise-inklusive">
+        In beiden Preisen ist eine individuelle Anwendung enthalten — ein
+        Preisrechner, ein durchdachtes Anfrageformular, ein Konfigurator.
+        Jede weitere kostet 500 €.
+      </p>
       <a class="cta-inline" href="/preise">
         Volle Preisübersicht ansehen
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
@@ -273,22 +301,25 @@ const websiteRefs = REFERENCES.filter((r) =>
     }
   }
 
-  /* === Verticals === */
-  .websites-verticals {
+  /* === Problem-Framing === */
+  .websites-problems {
     text-align: center;
   }
-  .verticals-grid {
+  .problems-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
     margin-bottom: 24px;
   }
   @media (max-width: 768px) {
-    .verticals-grid {
+    .problems-grid {
       grid-template-columns: 1fr;
     }
   }
-  .vertical-card {
+  /* Karten sind hier bewusst KEINE Links mehr (vorher Vertical-Cards,
+     ganzflaechig klickbar). Deshalb kein Hover-Lift auf der Karte —
+     nur der optionale CTA darin reagiert. */
+  .problem-card {
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -297,31 +328,15 @@ const websiteRefs = REFERENCES.filter((r) =>
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 12px;
     text-align: left;
-    text-decoration: none;
-    transition:
-      border-color 240ms ease,
-      background-color 240ms ease,
-      transform 240ms ease;
   }
-  .vertical-card:hover,
-  .vertical-card:focus-visible {
-    border-color: rgba(245, 158, 11, 0.4);
-    background: rgba(20, 20, 24, 0.75);
-    transform: translateY(-3px);
-    outline: none;
-  }
-  .vertical-card:focus-visible {
-    outline: 2px solid rgba(245, 158, 11, 0.7);
-    outline-offset: 3px;
-  }
-  .vertical-card-label {
+  .problem-card-label {
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-weight: 700;
     font-size: 1.35rem;
     color: #f5f5f4;
     margin: 0;
   }
-  .vertical-card-body {
+  .problem-card-body {
     font-family: 'Inter', sans-serif;
     font-size: 0.92rem;
     line-height: 1.55;
@@ -329,22 +344,31 @@ const websiteRefs = REFERENCES.filter((r) =>
     margin: 0;
     flex: 1;
   }
-  .vertical-card-cta {
+  .problem-card-cta {
     display: inline-flex;
+    align-self: flex-start;
     align-items: center;
     gap: 6px;
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-size: 0.85rem;
     color: rgba(245, 158, 11, 0.95);
+    text-decoration: none;
     margin-top: 6px;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.3);
+    padding-bottom: 2px;
+    transition: color 200ms ease, border-color 200ms ease;
   }
-  .verticals-note {
+  .problem-card-cta:hover {
+    color: rgba(252, 211, 77, 1);
+    border-bottom-color: rgba(252, 211, 77, 1);
+  }
+  .problems-note {
     font-family: 'Inter', sans-serif;
     font-size: 0.95rem;
     color: rgba(245, 245, 244, 0.6);
     margin: 0;
   }
-  .verticals-note a {
+  .problems-note a {
     color: rgba(245, 158, 11, 0.95);
     text-decoration: underline;
     text-underline-offset: 3px;
@@ -440,11 +464,19 @@ const websiteRefs = REFERENCES.filter((r) =>
   .websites-preise {
     text-align: center;
   }
+  .preise-inklusive {
+    max-width: 56ch;
+    margin: 0 auto 32px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.98rem;
+    line-height: 1.65;
+    color: rgba(245, 245, 244, 0.68);
+  }
   .preise-cards {
     display: flex;
     justify-content: center;
     gap: 40px;
-    margin-bottom: 32px;
+    margin-bottom: 24px;
     flex-wrap: wrap;
   }
   .preise-item {
