@@ -57,9 +57,9 @@ export const SECTION3 = {
       // Component rendert body via set:html, damit die Tags greifen.
       body:
         '<strong>2.000 €</strong> für eine Website, ' +
-        '<strong>3.000 €</strong> für aufwändigere Projekte wie ' +
-        'Online-Shops. Keine versteckten Stundensätze, keine Pakete ' +
-        'mit Sternchen.',
+        '<strong>3.000 €</strong> für einen Online-Shop — eine ' +
+        'individuelle Anwendung ist jeweils enthalten. Keine versteckten ' +
+        'Stundensätze, keine Pakete mit Sternchen.',
       link: { href: '/preise', label: 'Volle Preisliste' },
     },
     {

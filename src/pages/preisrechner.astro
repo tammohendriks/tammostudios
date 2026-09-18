@@ -113,14 +113,18 @@ const priceFaq = [
             <span class="pr-q-num">02</span>
             <span class="pr-q-text">Brauchst du individuelle Anwendungen?</span>
           </legend>
-          <p class="pr-hint">Förderrechner, KI-Chatbots, Buchungs-Tools, ausfüllbare PDF-Formulare</p>
+          <p class="pr-hint">
+            Eine ist im Paketpreis enthalten — Förderrechner, Konfigurator,
+            mitdenkendes Anfrageformular, KI-Chatbot, Buchungs-Tool.
+          </p>
           <div class="pr-options">
             <label class="pr-option">
               <input type="radio" name="apps" value="none" />
               <span class="pr-option-card">
                 <span class="pr-option-radio" aria-hidden="true"></span>
                 <span class="pr-option-body">
-                  <span class="pr-option-title">Nein</span>
+                  <span class="pr-option-title">Erstmal nicht</span>
+                  <span class="pr-option-sub">Lässt sich jederzeit nachrüsten</span>
                 </span>
               </span>
             </label>
@@ -131,7 +135,7 @@ const priceFaq = [
                 <span class="pr-option-body">
                   <span class="pr-option-title">Ja, eine</span>
                 </span>
-                <span class="pr-option-price">+ 500 €</span>
+                <span class="pr-option-price">inklusive</span>
               </span>
             </label>
             <label class="pr-option">
@@ -140,9 +144,9 @@ const priceFaq = [
                 <span class="pr-option-radio" aria-hidden="true"></span>
                 <span class="pr-option-body">
                   <span class="pr-option-title">Ja, mehrere</span>
-                  <span class="pr-option-sub">Endpreis individuell im Gespräch</span>
+                  <span class="pr-option-sub">Die erste inklusive, jede weitere 500 €</span>
                 </span>
-                <span class="pr-option-price">Startpreis + 500 €</span>
+                <span class="pr-option-price">+ 500 €</span>
               </span>
             </label>
           </div>
@@ -201,7 +205,8 @@ const priceFaq = [
 
             <!-- Multiple-Apps-Note (nur wenn apps=multiple) -->
             <p class="pr-summary-note-inline" data-summary-multiple-note hidden>
-              Endpreis für weitere Anwendungen individuell im Gespräch.
+              Gerechnet mit einer zusätzlichen Anwendung. Wie viele es am
+              Ende werden, klären wir im Gespräch — je weitere 500 €.
             </p>
 
             <!-- Monatlich (nur wenn pflege=yes) -->
@@ -332,16 +337,21 @@ const priceFaq = [
     pflege: null,
   };
 
+  // Preismodell ab Sep 2026: die ERSTE individuelle Anwendung steckt
+  // bereits im Basispreis. 'one' kostet deshalb 0 und wird als Zeile mit
+  // "inklusive" statt mit einem Betrag ausgegeben. 'multiple' rechnet
+  // eine zusaetzliche mit 500 — wie viele es wirklich werden, klaert das
+  // Gespraech (siehe multipleNote).
   const PRICES = {
     basis: { website: 2000, shop: 3000 },
-    apps: { none: 0, one: 500, multiple: 500 },
+    apps: { none: 0, one: 0, multiple: 500 },
   } as const;
 
   const LABELS = {
     basis: { website: 'Website', shop: 'Online-Shop' },
     apps: {
       one: 'Individuelle Anwendung',
-      multiple: 'Individuelle Anwendungen',
+      multiple: 'Weitere Anwendung',
     },
   } as const;
 
@@ -392,13 +402,16 @@ const priceFaq = [
       });
     }
 
-    // Line-Items rendern
+    // Line-Items rendern. 0 € bekommt "inklusive" statt "0 €" — das ist
+    // die enthaltene erste Anwendung, und ein ausgeschriebener Nullbetrag
+    // laesst sie wie einen Fehler aussehen.
     if ($lines) {
       $lines.innerHTML = items
-        .map(
-          (item) =>
-            `<li><span class="pr-line-label">${item.label}</span><span class="pr-line-amount">${euroFormat.format(item.amount)}</span></li>`
-        )
+        .map((item) => {
+          const amount =
+            item.amount === 0 ? 'inklusive' : euroFormat.format(item.amount);
+          return `<li><span class="pr-line-label">${item.label}</span><span class="pr-line-amount">${amount}</span></li>`;
+        })
         .join('');
     }
 

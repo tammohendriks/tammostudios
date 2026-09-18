@@ -24,7 +24,7 @@ const alwaysIncludedItems = [
 
 <BaseLayout
   pageTitle="Preise"
-  description="Eine Website kostet 2.000 €, ein Online-Shop 3.000 €. Klare Preise, ohne Sternchen, ohne versteckte Stundensätze. Bug-Fixes nach Launch inklusive."
+  description="Eine Website kostet 2.000 €, ein Online-Shop 3.000 € — jeweils inklusive einer individuellen Anwendung. Klare Preise, ohne Sternchen, ohne versteckte Stundensätze."
 >
   <main class="preise-page">
     <SubPageBackground />
@@ -37,6 +37,7 @@ const alwaysIncludedItems = [
     <section class="preise-intro" aria-label="Preise auf einen Blick" data-reveal>
       <p>Eine Website kostet <strong>2.000 €</strong>.</p>
       <p>Ein Online-Shop kostet <strong>3.000 €</strong>.</p>
+      <p>Eine individuelle Anwendung ist jeweils dabei.</p>
       <p class="preise-intro-punkt">Punkt.</p>
     </section>
 
@@ -53,6 +54,7 @@ const alwaysIncludedItems = [
         <ul class="dash-list">
           <li>Eigenes Design, auf dich zugeschnitten</li>
           <li>Eigenes CMS, das du selbst pflegst</li>
+          <li>Eine individuelle Anwendung deiner Wahl</li>
           <li>Mobile- &amp; Desktop-optimiert</li>
           <li>Schnell, sauber im SEO, DSGVO-konform</li>
         </ul>
@@ -132,11 +134,21 @@ const alwaysIncludedItems = [
       <ul class="dash-list erweiterungen-list">
         <li>
           <span class="erweiterung-head">
-            Individuelle Anwendungen — <strong>ab 500 €</strong>
+            Jede weitere Anwendung — <strong>500 €</strong>
           </span>
           <span class="erweiterung-body">
-            Förderrechner, ausfüllbare PDF-Formulare, KI-Chatbots,
-            Buchungs-Tools. Aufwand immer individuell kalkuliert.
+            Die erste ist im Paketpreis enthalten. Förderrechner,
+            ausfüllbare PDF-Formulare, Konfiguratoren, KI-Chatbots,
+            Buchungs-Tools — jede weitere zum selben Fixpreis.
+          </span>
+        </li>
+        <li>
+          <span class="erweiterung-head">
+            Eigene App oder größeres System — <strong>individuell</strong>
+          </span>
+          <span class="erweiterung-body">
+            Sobald es über eine Website hinausgeht, wäre ein Listenpreis
+            geraten. Nach dem Erstgespräch bekommst du eine feste Zahl.
           </span>
         </li>
         <li>
@@ -202,6 +214,12 @@ const alwaysIncludedItems = [
           <path d="M5 12h14M13 6l6 6-6 6" />
         </svg>
       </a>
+
+      <p class="preise-software-hint">
+        Was eine „individuelle Anwendung" konkret sein kann — Rechner,
+        mitdenkende Anfrageformulare, Konfiguratoren — steht mit
+        Live-Beispielen auf <a href="/software">Software</a>.
+      </p>
     </section>
   </main>
 
@@ -827,6 +845,26 @@ const alwaysIncludedItems = [
   .inline-link-cta {
     font-size: clamp(1.15rem, 1.6vw, 1.35rem);
     font-weight: 600;
+  }
+
+  /* Querverweis auf /software: bewusst leise unter dem Haupt-CTA — die
+     Preisseite verkauft Websites, Software ist der Seitenpfad. */
+  .preise-software-hint {
+    max-width: 46ch;
+    margin: clamp(28px, 5vh, 44px) auto 0;
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.45);
+  }
+
+  .preise-software-hint a {
+    color: rgba(245, 158, 11, 0.85);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.3);
+  }
+
+  .preise-software-hint a:hover {
+    border-bottom-color: rgba(245, 158, 11, 0.85);
   }
 
   /* Footer-Styles leben jetzt in SiteFooter.astro (Component-scoped). */

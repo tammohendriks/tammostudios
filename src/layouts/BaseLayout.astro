@@ -101,8 +101,9 @@ const businessSchema: Record<string, unknown> = {
           '@type': 'Service',
           name: 'Individuelle Website',
           description:
-            'Eigenes Design, eigenes CMS, Mobile- & Desktop-optimiert, ' +
-            'schnell + sauber im SEO, DSGVO-konform. Einmalig, fix.',
+            'Eigenes Design, eigenes CMS, eine individuelle Anwendung ' +
+            'inklusive, Mobile- & Desktop-optimiert, schnell + sauber im ' +
+            'SEO, DSGVO-konform. Einmalig, fix.',
           provider: { '@id': BUSINESS_ID },
         },
       },
@@ -119,6 +120,22 @@ const businessSchema: Record<string, unknown> = {
             'Alles aus "Eine Website" plus voller Shop mit Warenkorb & ' +
             'Checkout, Zahlungsanbieter-Integration, Produkte & ' +
             'Bestellungen im CMS.',
+          provider: { '@id': BUSINESS_ID },
+        },
+      },
+      {
+        '@type': 'Offer',
+        priceCurrency: 'EUR',
+        price: '500',
+        availability: 'https://schema.org/InStock',
+        url: `${SITE.url}/software`,
+        itemOffered: {
+          '@type': 'Service',
+          name: 'Weitere individuelle Anwendung',
+          description:
+            'Preisrechner, Konfigurator, mitdenkendes Anfrageformular mit ' +
+            'PDF-Ausgabe. Die erste Anwendung ist im Website- oder ' +
+            'Shop-Preis enthalten, jede weitere kostet 500 €.',
           provider: { '@id': BUSINESS_ID },
         },
       },
