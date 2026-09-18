@@ -98,6 +98,7 @@ export const SECTION4 = {
       body:
         'Kostenloses Erstgespräch. Du erzählst was du brauchst, ich höre ' +
         'zu. Am Ende weißt du was es kostet und wie\'s weitergeht.',
+      link: { label: 'Was es kostet', href: '/preise' },
     },
     {
       label: 'PHASE 02',
@@ -105,16 +106,17 @@ export const SECTION4 = {
       body:
         'Erste Entwürfe: Aufbau, Farben, Stil. ' +
         'Wir drehen so lange bis es deine Marke trifft.',
+      link: { label: 'Fertige Arbeiten ansehen', href: '/referenzen' },
     },
     {
       label: 'PHASE 03',
       title: 'Ich baue sie',
       body:
-        'Aus dem Entwurf wird die echte Website, mit deinen Texten ' +
-        'und Bildern. Plus ein eigener Bereich, in dem du ' +
-        'Öffnungszeiten, Bilder oder Texte später selbst änderst, ' +
-        'so ausführlich wie du willst.',
-      link: { label: 'Was kostet was?', href: '/preise' },
+        'Aus dem Entwurf wird die echte Website, mit deinen Texten und ' +
+        'Bildern. Hier entsteht auch deine individuelle Anwendung, der ' +
+        'Rechner oder das Formular. Plus ein eigener Bereich, in dem du ' +
+        'Texte und Bilder später selbst änderst.',
+      link: { label: 'Was sie können kann', href: '/software' },
     },
     {
       label: 'PHASE 04',
@@ -131,6 +133,10 @@ export const SECTION4 = {
         'wie du selbst weiterarbeiten kannst. Ohne mich jedes Mal ' +
         'anrufen zu müssen.',
     },
+    // ACHTUNG: Phase 06 wird NICHT gerendert. Section5Timeline nimmt
+    // nur phases.slice(0, 5) — der Abschluss-Moment lebt stattdessen in
+    // Section7Closing ("Bereit fuer Phase 01?"). Aenderungen hier sind
+    // ohne Wirkung, solange das so bleibt.
     {
       label: 'PHASE 06',
       title: 'Und jetzt du',
