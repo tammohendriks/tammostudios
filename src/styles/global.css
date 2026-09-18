@@ -122,7 +122,11 @@ html[data-site-theme='light'] .error-page {
 html[data-site-theme='light'] .subpage-hero-title {
   color: var(--theme-text-strong) !important;
 }
-html[data-site-theme='light'] /* === Der eine dezente CTA der Sub-Pages ==============================
+html[data-site-theme='light'] .subpage-hero-subtitle {
+  color: var(--theme-text-dim) !important;
+}
+
+/* === Der eine dezente CTA der Sub-Pages ==============================
    Vorbild ist der "Ansehen"-Link in den Case-Karten auf /software:
    halbfett, 0.95rem, Pfeil direkt hinter dem Wort. Vorher lagen hier
    vier Varianten nebeneinander (.cta-inline, .inline-link,
@@ -188,10 +192,6 @@ html[data-site-theme='light'] .cta-link:hover,
 html[data-site-theme='light'] .cta-link:focus-visible {
   color: var(--theme-text-strong);
   border-bottom-color: rgba(245, 158, 11, 0.9);
-}
-
-.subpage-hero-subtitle {
-  color: var(--theme-text-dim) !important;
 }
 
 /* ---------- CARD CONTAINERS (paper-cards on light theme) ----------
