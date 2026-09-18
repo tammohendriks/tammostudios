@@ -144,11 +144,18 @@ export const SECTION5 = {
   footer: {
     brand: 'EST. 2026 · BREMEN',
     copyright: '© 2026 Tammo Studios',
+    // Footer haelt Deep-Links auf ALLE Angebots-Bereiche (auch die
+     // aus dem Nav-Dropdown), plus Preisrechner den's im Header nicht
+     // mehr gibt. Journal/Ueber runden ab. Bewusst flach — Footer soll
+     // scannable sein, nicht die Nav dupliziert.
     navLinks: [
-      { label: 'Über',       href: '/ueber' },
-      { label: 'Referenzen', href: '/referenzen' },
-      { label: 'Software',   href: '/software' },
-      { label: 'Preise',     href: '/preise' },
+      { label: 'Über',         href: '/ueber' },
+      { label: 'Websites',     href: '/websites' },
+      { label: 'Software',     href: '/software' },
+      { label: 'Referenzen',   href: '/referenzen' },
+      { label: 'Journal',      href: '/journal' },
+      { label: 'Preise',       href: '/preise' },
+      { label: 'Preisrechner', href: '/preisrechner' },
     ],
     legalLinks: [
       { label: 'Impressum',   href: '/impressum' },
@@ -177,22 +184,25 @@ export const SECTION5 = {
 // NAV_ITEMS: optionales children-Array macht ein Nav-Item zum
 // Dropdown-Container. TopBar rendered dann Chevron + Dropdown-Menu
 // (Desktop) bzw. Accordion (Mobile).
+// NAV_ITEMS: neue Struktur (Sep 2026) reflektiert erweitertes Angebot
+// Websites + Software unter einem "Angebot"-Dropdown zusammengefasst.
+// Studio-Page abgeschafft (Content migriert nach /websites#cms), daher
+// nicht mehr in der Nav. Preisrechner nur noch ueber /preise erreichbar
+// (dort verlinkt) — Nav bleibt schlank.
 export const NAV_ITEMS = [
   { label: 'Über', href: '/ueber' },
-  { label: 'Referenzen', href: '/referenzen' },
-  // Referenzen zeigt was gebaut wurde, Software erklaert was sonst noch
-  // geht — deshalb direkt dahinter, vor dem weicheren Journal-Content.
-  { label: 'Software', href: '/software' },
-  { label: 'Journal', href: '/journal' },
-  { label: 'Studio', href: '/studio' },
   {
-    label: 'Preise',
-    href: '/preise',
+    label: 'Angebot',
+    // Parent-Klick geht auf Websites-Uebersicht (haeufigster CTA-Path)
+    href: '/websites',
     children: [
+      { label: 'Websites', href: '/websites' },
+      { label: 'Software', href: '/software' },
       { label: 'Preise', href: '/preise' },
-      { label: 'Preisrechner', href: '/preisrechner' },
     ],
   },
+  { label: 'Referenzen', href: '/referenzen' },
+  { label: 'Journal', href: '/journal' },
 ] as const;
 
 export const CTA = {
