@@ -88,7 +88,14 @@ html[data-site-theme='light'] .preise-page,
 html[data-site-theme='light'] .preisrechner-page,
 html[data-site-theme='light'] .kontakt-page,
 html[data-site-theme='light'] .legal-page,
-html[data-site-theme='light'] .journal-page {
+html[data-site-theme='light'] .journal-page,
+/* Der Theme-Umschalter wird auf JEDER Seite gerendert (BaseLayout hat
+   zwar ein hideThemeToggle-Flag, das aber nirgends gesetzt ist). Diese
+   drei fehlten hier und blieben deshalb dunkel, waehrend der Rest der
+   Seite umschaltete. */
+html[data-site-theme='light'] .vertical-page,
+html[data-site-theme='light'] .post-page,
+html[data-site-theme='light'] .error-page {
   background: var(--theme-bg);
   color: var(--theme-text);
 }
@@ -149,7 +156,11 @@ html[data-site-theme='light'] .problem-card,
 html[data-site-theme='light'] .feature-item,
 html[data-site-theme='light'] .ref-preview,
 html[data-site-theme='light'] .case-card,
-html[data-site-theme='light'] .tech-item {
+html[data-site-theme='light'] .tech-item,
+html[data-site-theme='light'] .v-faq-item,
+html[data-site-theme='light'] .v-case-card,
+html[data-site-theme='light'] .post-author,
+html[data-site-theme='light'] .post-body pre {
   background: #fefdf9 !important;
   border-color: rgba(0, 0, 0, 0.08) !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 6px 20px rgba(0, 0, 0, 0.05) !important;
@@ -170,7 +181,15 @@ html[data-site-theme='light'] .case-name,
 html[data-site-theme='light'] .tech-title,
 html[data-site-theme='light'] .kind-title,
 html[data-site-theme='light'] .process-title,
-html[data-site-theme='light'] .closing-text {
+html[data-site-theme='light'] .closing-text,
+/* /webdesign-*, Journal-Artikel, 404 */
+html[data-site-theme='light'] .v-hero-title,
+html[data-site-theme='light'] .v-section-headline,
+html[data-site-theme='light'] .v-final-headline,
+html[data-site-theme='light'] .post-h1,
+html[data-site-theme='light'] .featured-title,
+html[data-site-theme='light'] .post-card-title,
+html[data-site-theme='light'] .pflege-closing {
   color: var(--theme-text-strong) !important;
 }
 
@@ -189,7 +208,22 @@ html[data-site-theme='light'] .process-body,
 html[data-site-theme='light'] .pricing-body p,
 html[data-site-theme='light'] .bigger-body p,
 html[data-site-theme='light'] .preise-inklusive,
-html[data-site-theme='light'] .preise-label {
+html[data-site-theme='light'] .preise-label,
+html[data-site-theme='light'] .v-hero-subtitle,
+html[data-site-theme='light'] .v-intro p,
+html[data-site-theme='light'] .v-check-list li,
+html[data-site-theme='light'] .v-pricing-body p,
+html[data-site-theme='light'] .v-case-body p,
+html[data-site-theme='light'] .v-faq-a,
+html[data-site-theme='light'] .v-final-sub,
+html[data-site-theme='light'] .post-lede,
+html[data-site-theme='light'] .post-body,
+html[data-site-theme='light'] .post-body p,
+html[data-site-theme='light'] .post-body li,
+html[data-site-theme='light'] .post-author-text p,
+html[data-site-theme='light'] .featured-excerpt,
+html[data-site-theme='light'] .post-card-excerpt,
+html[data-site-theme='light'] .error-secondary {
   color: var(--theme-text-dim) !important;
 }
 
@@ -204,7 +238,15 @@ html[data-site-theme='light'] .process-meta,
 html[data-site-theme='light'] .pricing-aside,
 html[data-site-theme='light'] .bigger-proof,
 html[data-site-theme='light'] .werkstatt-project-note,
-html[data-site-theme='light'] .closing-mail {
+html[data-site-theme='light'] .closing-mail,
+html[data-site-theme='light'] .ref-software-hint,
+html[data-site-theme='light'] .post-date,
+html[data-site-theme='light'] .post-card-date,
+html[data-site-theme='light'] .sidebar-toc-list,
+html[data-site-theme='light'] .post-toc-mobile-list,
+html[data-site-theme='light'] .sidebar-links,
+html[data-site-theme='light'] .bottom-cta-line,
+html[data-site-theme='light'] .post-back-fixed {
   color: var(--theme-text-muted) !important;
 }
 

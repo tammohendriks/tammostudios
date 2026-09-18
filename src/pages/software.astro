@@ -366,7 +366,18 @@ const kinds = [
     text-align: center;
     max-width: 780px;
     margin: 0 auto 60px;
-    padding-top: 32px;
+    /* Kein padding-top wie auf den anderen Sub-Pages: die Headline ist
+       hier deutlich laenger und braucht den Platz nach unten, nicht
+       nach oben. */
+    padding-top: 0;
+  }
+
+  /* "Websites koennen mehr als nur da sein." laeuft bei den globalen
+     96px auf drei Zeilen und schiebt den Hero optisch nach unten.
+     Gedeckelt liest sich der Satz als ein Block — gleiches Mittel wie
+     auf den Rechtsseiten. */
+  .software-hero .subpage-hero-title {
+    font-size: clamp(36px, 5.6vw, 64px);
   }
 
   .software-hero-sub {

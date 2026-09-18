@@ -27,10 +27,6 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
         <h2 id="spielplatz-headline" class="spielplatz__headline">
           Und manchmal baue ich einfach, worauf ich Lust habe.
         </h2>
-        <p class="spielplatz__sub">
-          Kein Kunde, kein Briefing, kein Abgabetermin. Eins davon steht hier —
-          spiel ruhig.
-        </p>
       </header>
 
       <!-- Der iframe bleibt bis zum bewussten Klick fuer Zeiger-Events
@@ -56,7 +52,7 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
         </figcaption>
 
         <button type="button" class="spielplatz__stop" data-game-stop hidden>
-          Beenden &amp; weiterscrollen
+          Pausieren &amp; weiterscrollen
         </button>
       </figure>
 
@@ -71,6 +67,11 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
 </section>
 
 <script>
+  // Quelle steht am iframe selbst, damit Frontmatter und Client-Script
+  // nicht auseinanderlaufen koennen.
+  const GAME_SRC =
+    document.querySelector<HTMLIFrameElement>('.spielplatz__iframe')?.src ?? '';
+
   const section = document.querySelector<HTMLElement>('.spielplatz');
 
   if (section) {
@@ -107,8 +108,7 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
       s.setProperty('--p', String(p));
       s.setProperty('--p-eyebrow', String(sub(p, 0.03, 0.13)));
       s.setProperty('--p-headline', String(sub(p, 0.09, 0.23)));
-      s.setProperty('--p-sub', String(sub(p, 0.19, 0.33)));
-      s.setProperty('--p-cabinet', String(sub(p, 0.28, 0.52)));
+      s.setProperty('--p-cabinet', String(sub(p, 0.20, 0.46)));
       s.setProperty('--p-cta', String(sub(p, 0.52, 0.68)));
     };
 
@@ -120,7 +120,7 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
 
     const pinAll = () => {
       const s = section.style;
-      for (const k of ['--p', '--p-eyebrow', '--p-headline', '--p-sub', '--p-cabinet', '--p-cta']) {
+      for (const k of ['--p', '--p-eyebrow', '--p-headline', '--p-cabinet', '--p-cta']) {
         s.setProperty(k, '1');
       }
     };
@@ -131,18 +131,63 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll, { passive: true });
 
-    // --- Spiel aktivieren / beenden -----------------------------------
+    // --- Spiel aktivieren / pausieren ---------------------------------
+    //
+    // Beim Pausieren muss die Musik aufhoeren. Ein iframe von einem
+    // fremden Origin laesst sich von aussen aber nicht stummschalten,
+    // das geht nur mit Mithilfe des Spiels. Also: Befehl hinschicken und
+    // auf die Bestaetigung warten. Kommt keine, kennt diese
+    // Spielversion den Befehl noch nicht — dann wird der iframe neu
+    // geladen. Laut ist er danach auf keinen Fall mehr.
+    const iframe = frame?.querySelector('iframe') ?? null;
+    const gameOrigin = new URL(GAME_SRC, location.href).origin;
+    let gameSpeaksOurLanguage = false;
+    let ackTimer: number | undefined;
+
+    window.addEventListener('message', (event) => {
+      if (event.origin !== gameOrigin) return;
+      const data = event.data as { source?: string; action?: string } | null;
+      if (data?.source === 'asteroid-01' && data.action === 'ack') {
+        gameSpeaksOurLanguage = true;
+        window.clearTimeout(ackTimer);
+      }
+    });
+
+    const tellGame = (action: 'suspend-audio' | 'resume-audio') => {
+      iframe?.contentWindow?.postMessage(
+        { source: 'tammostudios', action },
+        gameOrigin
+      );
+    };
+
+    const silenceGame = () => {
+      tellGame('suspend-audio');
+      if (gameSpeaksOurLanguage) return;
+      // Kein Handshake bekannt: kurz auf die Bestaetigung warten, sonst
+      // den iframe neu laden. Der Spielstand geht dabei verloren, Ruhe
+      // ist hier aber wichtiger als ein geretteter Punktestand.
+      window.clearTimeout(ackTimer);
+      ackTimer = window.setTimeout(() => {
+        if (gameSpeaksOurLanguage || !iframe) return;
+        iframe.src = GAME_SRC;
+      }, 250);
+    };
+
     const setActive = (active: boolean) => {
       frame?.toggleAttribute('data-active', active);
       cover?.toggleAttribute('hidden', active);
       stopButton?.toggleAttribute('hidden', !active);
+      if (active) tellGame('resume-audio');
+      else silenceGame();
     };
 
     startButton?.addEventListener('click', () => {
       setActive(true);
       // Fokus in den iframe, damit die Tastatursteuerung sofort greift
       // statt erst nach einem zweiten Klick ins Spielfeld.
-      frame?.querySelector('iframe')?.focus();
+      iframe?.focus();
+      // Nach der ersten Runde heisst es nicht mehr "Hier spielen".
+      if (startButton) startButton.textContent = 'Weiterspielen';
     });
 
     stopButton?.addEventListener('click', () => {
@@ -150,7 +195,7 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
       startButton?.focus();
     });
 
-    // Escape beendet ebenfalls — wer im Spiel feststeckt, greift eher
+    // Escape pausiert ebenfalls — wer im Spiel feststeckt, greift eher
     // zur Tastatur als zu einem Knopf am Rand.
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && frame?.hasAttribute('data-active')) setActive(false);
@@ -170,7 +215,6 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
     --p: 0;
     --p-eyebrow: 0;
     --p-headline: 0;
-    --p-sub: 0;
     --p-cabinet: 0;
     --p-cta: 0;
 
@@ -215,7 +259,9 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
     grid-template-rows: auto minmax(0, 1fr) auto;
     justify-items: center;
     gap: clamp(18px, 3vh, 32px);
-    padding: clamp(60px, 9vh, 96px) 40px clamp(40px, 6vh, 72px);
+    /* Die Nav-Pille schwebt fixiert ueber der Seite; ohne diesen
+       Abstand liegt der Eyebrow darunter. */
+    padding: clamp(120px, 16vh, 168px) 40px clamp(40px, 6vh, 72px);
     overflow: hidden;
   }
 
@@ -243,19 +289,9 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
     letter-spacing: -0.02em;
     line-height: 1.1;
     color: var(--charcoal);
-    margin: 0 0 14px;
+    margin: 0;
     opacity: var(--p-headline);
     transform: translateY(calc((1 - var(--p-headline)) * 14px));
-  }
-
-  .spielplatz__sub {
-    font-family: 'Inter', sans-serif;
-    font-size: clamp(0.95rem, 1.4vw, 1.1rem);
-    line-height: 1.6;
-    color: var(--body);
-    margin: 0;
-    opacity: var(--p-sub);
-    transform: translateY(calc((1 - var(--p-sub)) * 10px));
   }
 
   /* === Der Automat ===
@@ -428,7 +464,7 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
       height: 200vh;
     }
     .spielplatz__sticky {
-      padding: clamp(48px, 8vh, 80px) 20px clamp(32px, 5vh, 56px);
+      padding: clamp(104px, 14vh, 132px) 20px clamp(32px, 5vh, 56px);
       gap: 16px;
     }
     .spielplatz__cabinet {
@@ -443,7 +479,7 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
   /* Kurze Fenster: Automat darf schrumpfen statt den CTA rauszudruecken */
   @media (min-width: 768px) and (max-height: 720px) {
     .spielplatz__sticky {
-      padding-top: 48px;
+      padding-top: 104px;
       gap: 14px;
     }
   }
@@ -451,7 +487,6 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
   @media (prefers-reduced-motion: reduce) {
     .spielplatz__eyebrow,
     .spielplatz__headline,
-    .spielplatz__sub,
     .spielplatz__cabinet,
     .spielplatz__cta {
       transform: none;

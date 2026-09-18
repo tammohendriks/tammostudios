@@ -31,7 +31,7 @@ export const SITE_LABELS = {
   // .text-lines Utility-Class (global.css) als sichtbarer Umbruch
   // gerendert. Text innerhalb jeder Zeile wrappt weiterhin normal.
   introText:
-    'Von Websites bis individuellen Anwendungen.\n' +
+    'Von Websites bis zu individuellen Anwendungen.\n' +
     'Eine Person, eine Handschrift, komplett individuell gebaut.',
   scrollCue: 'SCROLLEN',
 } as const;
@@ -144,19 +144,21 @@ export const SECTION5 = {
   footer: {
     brand: 'EST. 2026 · BREMEN',
     copyright: '© 2026 Tammo Studios',
-    // Footer haelt Deep-Links auf ALLE Angebots-Bereiche (auch die
-     // aus dem Nav-Dropdown), plus Preisrechner den's im Header nicht
-     // mehr gibt. Journal/Ueber runden ab. Bewusst flach — Footer soll
-     // scannable sein, nicht die Nav dupliziert.
+    // Reihenfolge spiegelt bewusst die Navi-Leiste, damit beide gleich
+    // gelesen werden. Flach, ohne Verschachtelung.
+    //
+    // Preisrechner steht hier nicht mehr — er ist ueber /preise
+    // verlinkt und war im Footer der einzige Eintrag ohne Entsprechung
+    // in der Navi.
     navLinks: [
+      { label: 'Startseite',   href: '/' },
       { label: 'Über',         href: '/ueber' },
-      { label: 'Website',      href: '/website' },
+      { label: 'Angebot',      href: '/website' },
       { label: 'Software',     href: '/software' },
+      { label: 'Preise',       href: '/preise' },
+      { label: 'Werkstatt',    href: '/werkstatt' },
       { label: 'Referenzen',   href: '/referenzen' },
       { label: 'Journal',      href: '/journal' },
-      { label: 'Preise',       href: '/preise' },
-      { label: 'Preisrechner', href: '/preisrechner' },
-      { label: 'Werkstatt',    href: '/werkstatt' },
     ],
     legalLinks: [
       { label: 'Impressum',   href: '/impressum' },
