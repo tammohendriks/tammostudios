@@ -160,9 +160,15 @@ export const VERTICALS: readonly Vertical[] = [
     slug: 'praxis',
     pageSlug: 'webdesign-praxis',
     meta: {
-      title: 'Websites für Praxen und Ärzte',
+      // Der Praxis-Themenkreis ist die staerkste sichtbare Nachfrage
+      // (43 Impressionen auf "praxis website inhalte", "arzt homepage
+      // richtlinien", "praxis website vertrauen", "praxis website
+      // dsgvo"). Titel und Description nehmen die Woerter deshalb auf.
+      title: 'Website für Arztpraxen: DSGVO-konform',
       description:
-        'Handgemachte Websites für Arztpraxen in Bremen. DSGVO-konform, mit Terminanfrage-Funktion, ab 2.000 €.',
+        'Handgemachte Websites für Arztpraxen in Bremen: DSGVO-konform, ' +
+        'mit Terminanfrage, Team-Vorstellung und Öffnungszeiten. Ab ' +
+        '2.000 €, Referenzen: Samedos und IBI.',
     },
     hero: {
       eyebrow: 'WEBSITE FÜR PRAXEN',
@@ -258,7 +264,9 @@ export const VERTICALS: readonly Vertical[] = [
     meta: {
       title: 'Websites für Gastronomie',
       description:
-        'Handgemachte Websites für Gastronomiebetriebe in Bremen. Mit Speisekarte, Reservierung, Instagram-Feed, ab 2.000 €.',
+        'Handgemachte Websites für Restaurants, Cafés und Kneipen in ' +
+        'Bremen: Speisekarte selbst pflegen, Reservierungsanfrage, ' +
+        'Instagram-Feed. Ab 2.000 €.',
     },
     hero: {
       eyebrow: 'WEBSITE FÜR GASTRONOMIE',
