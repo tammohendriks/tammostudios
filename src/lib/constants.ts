@@ -40,34 +40,45 @@ export const SECTION2 = {
   boomHeadline: 'Präzision bis ins letzte Pixel.',
 } as const;
 
+// Jeder Block schlaegt eine andere Alternative: Baukasten, andere
+// Webdesigner, Agentur. Frueher zielten "Klare Preise" und "Zwei Wochen"
+// beide auf die Agentur, waehrend die individuelle Anwendung — heute das
+// eigentliche Unterscheidungsmerkmal — gar nicht vorkam.
+//
+// Die drei Links bilden zusammen das Rueckgrat der Seite:
+// Referenzen (Beweis), Software (Moeglichkeiten), Preise (Bedingungen).
+//
+// body wird in Section4Kernbotschaften via set:html gerendert, <strong>
+// hebt darin die Betraege in Amber hervor.
 export const SECTION3 = {
   eyebrow: 'WARUM TAMMO STUDIOS',
   items: [
     {
       number: '01',
-      title: 'Modernes Design, kein Template',
+      title: 'Ein Original, kein Baukasten',
       body:
-        'Jede Website ist ein Original. Keine Themes, keine kopierten ' +
-        'Layouts.<br class="sm:hidden" /> Visuals, die nur zu dir passen.',
+        'Kein Theme, keine Vorlage. Deine Seite entsteht von Grund auf: ' +
+        'Aufbau, Farben, Typografie auf deinen Betrieb geschnitten. Am ' +
+        'Ende sieht sie nach dir aus, nicht nach dem Anbieter.',
+      link: { href: '/referenzen', label: 'Referenzen ansehen' },
     },
     {
       number: '02',
-      title: 'Klare Preise',
-      // <strong> hebt die Beträge in Amber hervor; das Section-3
-      // Component rendert body via set:html, damit die Tags greifen.
+      title: 'Sie kann mehr als dastehen',
       body:
-        '<strong>2.000 €</strong> für eine Website, ' +
-        '<strong>3.000 €</strong> für einen Online-Shop — eine ' +
-        'individuelle Anwendung ist jeweils enthalten. Keine versteckten ' +
-        'Stundensätze, keine Pakete mit Sternchen.',
-      link: { href: '/preise', label: 'Volle Preisliste' },
+        'Ein Preisrechner, ein Anfrageformular das mitdenkt, ein ' +
+        'Konfigurator. Eine individuelle Anwendung ist im Preis enthalten, ' +
+        'ohne Aufpreis und ohne längere Bauzeit.',
+      link: { href: '/software', label: 'Was möglich ist' },
     },
     {
       number: '03',
-      title: 'Zwei Wochen, eine Website',
+      title: 'Fester Preis, fester Termin',
       body:
-        'Vom Erstgespräch bis zur Live-Schaltung in maximal 14 Tagen.' +
-        '<br class="sm:hidden" /> Klare Deadlines, klare Ergebnisse.',
+        '<strong>2.000 €</strong> für eine Website, <strong>3.000 €</strong> ' +
+        'für einen Online-Shop. In maximal 14 Tagen live. Keine ' +
+        'Stundensätze, keine Nachträge, keine Pakete mit Sternchen.',
+      link: { href: '/preise', label: 'Volle Preisliste' },
     },
   ],
 } as const;
