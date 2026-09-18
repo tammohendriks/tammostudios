@@ -1,0 +1,577 @@
+---
+/**
+ * /websites — Uebersichts-Landingpage fuer "Websites" als Angebots-
+ * Bereich. Ersetzt die aufgegebene /studio Marketing-Seite (deren
+ * CMS-USP-Content in Section "Du pflegst selbst" gemergt wurde) und
+ * ist Ziel-URL fuer den Nav-Dropdown "Angebot → Websites".
+ *
+ * Struktur:
+ *   1. Hero (subpage-Konvention: centered, 780px, padding-top 32px)
+ *   2. Fuer wen ich baue — 3 Vertical-Cards (Handwerk/Praxis/Gastro)
+ *      verlinkt auf /webdesign-{handwerk|praxis|gastronomie} Deep-Landings
+ *   3. Du pflegst selbst (id="cms") — CMS-Autonomie USP (aus /studio migriert)
+ *   4. Was du bekommst — Feature-Liste
+ *   5. Was kostet's — kompakter Preis-Verweis auf /preise
+ *   6. Aus der Praxis — 3 Referenz-Cards, Link zu /referenzen
+ *   7. Final-CTA — Erstgespraech
+ *
+ * /studio Route wird via vercel.json rewrite → /websites#cms redirected.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SubPageBackground from '../components/SubPageBackground.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { REFERENCES } from '../lib/references';
+
+const verticals = [
+  {
+    label: 'Handwerk',
+    href: '/webdesign-handwerk',
+    body: 'Handwerker, Bauunternehmen, Handwerksbetriebe — Websites mit Notdienst-Funktion, Referenz-Projekten, Kontaktformular.',
+  },
+  {
+    label: 'Praxen',
+    href: '/webdesign-praxis',
+    body: 'Arzt- und Zahnarztpraxen — DSGVO-konform, mit Terminanfrage und ruhigem Vertrauens-Design.',
+  },
+  {
+    label: 'Gastronomie',
+    href: '/webdesign-gastronomie',
+    body: 'Restaurants, Cafés, Kneipen — mit Speisekarte, Reservierung, Öffnungszeiten die du selbst pflegst.',
+  },
+];
+
+const features = [
+  { title: 'Handgemacht', body: 'Kein Wix, kein Squarespace. Astro + Tailwind + eigener Code, sauber auf deinen Betrieb geschnitten.' },
+  { title: 'Eigenes CMS', body: 'Du pflegst Inhalte selbst. Texte, Bilder, Preise, Öffnungszeiten — in 30 Sekunden aktualisiert.' },
+  { title: 'Mobile-first', body: '60% deiner Besucher kommen vom Handy. Deine Seite ist dort genauso schnell wie am Desktop.' },
+  { title: 'SEO-Basis', body: 'Google-Ready aus dem Karton: strukturierte Daten, saubere URLs, schnelle Ladezeiten.' },
+  { title: 'DSGVO-konform', body: 'EU-Hosting, korrekte Cookie-Handhabung, Impressum + Datenschutz strukturiert.' },
+  { title: 'In 14 Tagen live', body: 'Vom Erstgespräch bis zur Live-Schaltung in maximal zwei Wochen. Meistens schneller.' },
+];
+
+// Website-Referenzen fuer die "Aus der Praxis" Section — nur die 3
+// visuell staerksten Cases. Keine Duplikate mit Software-Page.
+const websiteRefs = REFERENCES.filter((r) =>
+  ['samedos', 'er-und-sie', 'kirsch-dach-fassade'].includes(r.slug)
+);
+---
+
+<BaseLayout
+  pageTitle="Websites"
+  title="Websites für kleine Unternehmen — handgemacht in Bremen | Tammo Studios"
+  description="Individuelle Websites für Handwerk, Praxen, Gastronomie und mehr. Handgemacht in Bremen, eigenes CMS, ab 2.000 €, in 14 Tagen live."
+>
+  <main class="websites-page">
+    <SubPageBackground />
+
+    <header class="websites-hero">
+      <h1 class="subpage-hero-title">Websites für dein Unternehmen</h1>
+      <p class="subpage-hero-subtitle text-lines">
+        {'Handgemacht in Bremen. Für Handwerk, Praxen, Gastronomie und mehr.\nAb 2.000 €, in 14 Tagen live.'}
+      </p>
+      <div class="websites-hero-cta">
+        <a class="cta-inline" href="/kontakt">
+          Erstgespräch anfragen
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+        </a>
+      </div>
+    </header>
+
+    <!-- ================================================================
+         2. Fuer wen ich baue — 3 Vertical-Cards
+         ============================================================== -->
+    <section class="websites-verticals" data-reveal aria-labelledby="verticals-heading">
+      <p class="websites-eyebrow">FÜR WEN ICH BAUE</p>
+      <h2 id="verticals-heading" class="websites-section-title">Drei Schwerpunkte, alle mit Erfahrung</h2>
+      <div class="verticals-grid">
+        {verticals.map((v) => (
+          <a class="vertical-card" href={v.href} data-reveal>
+            <h3 class="vertical-card-label">{v.label}</h3>
+            <p class="vertical-card-body">{v.body}</p>
+            <span class="vertical-card-cta">
+              Zur {v.label}-Seite
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+            </span>
+          </a>
+        ))}
+      </div>
+      <p class="verticals-note">
+        Deine Branche nicht dabei? <a href="/kontakt">Sprich mich an</a> — ich baue auch für andere.
+      </p>
+    </section>
+
+    <!-- ================================================================
+         3. Du pflegst selbst — CMS-Autonomie (id="cms" fuer /studio Redirect)
+         ============================================================== -->
+    <section id="cms" class="websites-cms" data-reveal aria-labelledby="cms-heading">
+      <p class="websites-eyebrow">DU PFLEGST SELBST</p>
+      <h2 id="cms-heading" class="websites-section-title">Kein Anruf beim Entwickler.</h2>
+      <div class="cms-body">
+        <p>
+          Deine Website wird von mir gebaut, nicht in Wix zusammengeklickt.
+          Trotzdem änderst du Texte, Preise und Bilder selbst — über ein
+          klares CMS-Studio, das ich für dich einrichte.
+        </p>
+        <p>
+          Kein Anruf beim Entwickler. Kein 30-Minuten-Ticket für eine
+          Preisänderung. Du hast die volle Kontrolle über deinen Content,
+          ich sorge dafür dass das Fundament technisch sauber bleibt.
+        </p>
+        <ul class="cms-list">
+          <li>Texte, Bilder und Preise ohne technisches Know-how</li>
+          <li>Live-Vorschau bevor du speicherst</li>
+          <li>Neue Team-Mitglieder, neue Öffnungszeiten, neue Preise in 30 Sekunden angepasst</li>
+          <li>Bei Fragen: ich bin per Mail oder WhatsApp erreichbar</li>
+        </ul>
+        <p class="cms-examples">
+          <strong>Beispiele:</strong> Bei Samedos änderst du die Preise → das PDF
+          auf der Website aktualisiert sich automatisch. Bei IBI werden neue
+          Team-Mitglieder in Minuten hinzugefügt.
+        </p>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         4. Was du bekommst — Feature-Liste
+         ============================================================== -->
+    <section class="websites-features" data-reveal aria-labelledby="features-heading">
+      <p class="websites-eyebrow">WAS DU BEKOMMST</p>
+      <h2 id="features-heading" class="websites-section-title">Alles was eine Website 2026 braucht</h2>
+      <div class="features-grid">
+        {features.map((f) => (
+          <div class="feature-item" data-reveal>
+            <h3 class="feature-title">{f.title}</h3>
+            <p class="feature-body">{f.body}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- ================================================================
+         5. Was kostet's — Preis-Verweis
+         ============================================================== -->
+    <section class="websites-preise" data-reveal aria-labelledby="preise-heading">
+      <p class="websites-eyebrow">WAS KOSTET'S</p>
+      <h2 id="preise-heading" class="websites-section-title">Fixpreise, ohne Sternchen</h2>
+      <div class="preise-cards">
+        <div class="preise-item">
+          <p class="preise-amount">2.000 €</p>
+          <p class="preise-label">Eine Website</p>
+        </div>
+        <div class="preise-item">
+          <p class="preise-amount">3.000 €</p>
+          <p class="preise-label">Online-Shop</p>
+        </div>
+      </div>
+      <a class="cta-inline" href="/preise">
+        Volle Preisübersicht ansehen
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+      </a>
+    </section>
+
+    <!-- ================================================================
+         6. Aus der Praxis — 3 Referenz-Cards
+         ============================================================== -->
+    <section class="websites-refs" data-reveal aria-labelledby="refs-heading">
+      <p class="websites-eyebrow">AUS DER PRAXIS</p>
+      <h2 id="refs-heading" class="websites-section-title">Kunden, die schon live sind</h2>
+      <div class="refs-grid">
+        {websiteRefs.map((r) => (
+          <a class="ref-preview" href={r.url} target="_blank" rel="noopener noreferrer">
+            <div class="ref-preview-image">
+              <img src={r.preview} alt={`Vorschau: ${r.title}`} loading="lazy" />
+            </div>
+            <div class="ref-preview-body">
+              <h3 class="ref-preview-title">{r.title}</h3>
+              <p class="ref-preview-sub">{r.subtitle}</p>
+            </div>
+          </a>
+        ))}
+      </div>
+      <p class="refs-note">
+        <a href="/referenzen">Alle Referenzen ansehen →</a>
+      </p>
+    </section>
+
+    <!-- ================================================================
+         7. Final-CTA
+         ============================================================== -->
+    <section class="websites-final" data-reveal>
+      <h2 class="websites-final-headline">Sprechen wir.</h2>
+      <p class="websites-final-body">
+        30 Minuten Erstgespräch, kostenlos, unverbindlich.
+      </p>
+      <a class="cta-orbital" href="/kontakt">
+        Erstgespräch anfragen
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+      </a>
+    </section>
+  </main>
+
+  <SiteFooter />
+</BaseLayout>
+
+<style>
+  .websites-page {
+    position: relative;
+    background: #050507;
+    padding: 140px 40px 80px;
+    min-height: calc(100vh - 200px);
+    overflow: hidden;
+  }
+  @media (max-width: 768px) {
+    .websites-page {
+      padding: 100px 20px 60px;
+    }
+  }
+
+  .websites-page > section,
+  .websites-hero {
+    position: relative;
+    z-index: 1;
+    max-width: 960px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* === Hero (subpage convention) === */
+  .websites-hero {
+    text-align: center;
+    max-width: 780px;
+    margin: 0 auto 96px;
+    padding-top: 32px;
+  }
+  .websites-hero-cta {
+    margin-top: 28px;
+  }
+
+  /* === Shared section styling === */
+  .websites-eyebrow {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.75rem;
+    letter-spacing: 0.28em;
+    color: rgba(245, 158, 11, 0.85);
+    text-transform: uppercase;
+    margin: 0 0 16px;
+  }
+  .websites-section-title {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: #f5f5f4;
+    margin: 0 0 32px;
+  }
+  .websites-page > section {
+    margin-bottom: 96px;
+  }
+  @media (max-width: 768px) {
+    .websites-page > section {
+      margin-bottom: 72px;
+    }
+  }
+
+  /* === Verticals === */
+  .websites-verticals {
+    text-align: center;
+  }
+  .verticals-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 768px) {
+    .verticals-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .vertical-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 28px 22px;
+    background: rgba(15, 15, 18, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    text-align: left;
+    text-decoration: none;
+    transition:
+      border-color 240ms ease,
+      background-color 240ms ease,
+      transform 240ms ease;
+  }
+  .vertical-card:hover,
+  .vertical-card:focus-visible {
+    border-color: rgba(245, 158, 11, 0.4);
+    background: rgba(20, 20, 24, 0.75);
+    transform: translateY(-3px);
+    outline: none;
+  }
+  .vertical-card:focus-visible {
+    outline: 2px solid rgba(245, 158, 11, 0.7);
+    outline-offset: 3px;
+  }
+  .vertical-card-label {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.35rem;
+    color: #f5f5f4;
+    margin: 0;
+  }
+  .vertical-card-body {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: rgba(245, 245, 244, 0.72);
+    margin: 0;
+    flex: 1;
+  }
+  .vertical-card-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.85rem;
+    color: rgba(245, 158, 11, 0.95);
+    margin-top: 6px;
+  }
+  .verticals-note {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    color: rgba(245, 245, 244, 0.6);
+    margin: 0;
+  }
+  .verticals-note a {
+    color: rgba(245, 158, 11, 0.95);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* === CMS Section (id="cms" — scroll target from /studio redirect) === */
+  .websites-cms {
+    scroll-margin-top: 100px;
+    text-align: center;
+  }
+  .cms-body {
+    max-width: 640px;
+    margin: 0 auto;
+    text-align: left;
+  }
+  .cms-body p {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.02rem;
+    line-height: 1.65;
+    color: rgba(245, 245, 244, 0.82);
+    margin: 0 0 20px;
+  }
+  .cms-list {
+    list-style: none;
+    padding: 0;
+    margin: 24px 0;
+  }
+  .cms-list li {
+    position: relative;
+    padding-left: 24px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.98rem;
+    line-height: 1.55;
+    color: rgba(245, 245, 244, 0.85);
+    margin-bottom: 12px;
+  }
+  .cms-list li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: rgba(245, 158, 11, 0.85);
+    font-weight: 600;
+  }
+  .cms-examples {
+    padding: 20px;
+    background: rgba(245, 158, 11, 0.06);
+    border-left: 3px solid rgba(245, 158, 11, 0.5);
+    border-radius: 6px;
+    font-size: 0.95rem !important;
+    color: rgba(245, 245, 244, 0.75) !important;
+  }
+  .cms-examples strong {
+    color: rgba(245, 158, 11, 0.95);
+  }
+
+  /* === Features === */
+  .websites-features {
+    text-align: center;
+  }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    text-align: left;
+  }
+  @media (max-width: 640px) {
+    .features-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .feature-item {
+    padding: 24px;
+    background: rgba(15, 15, 18, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+  }
+  .feature-title {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #f5f5f4;
+    margin: 0 0 8px;
+  }
+  .feature-body {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: rgba(245, 245, 244, 0.7);
+    margin: 0;
+  }
+
+  /* === Preise === */
+  .websites-preise {
+    text-align: center;
+  }
+  .preise-cards {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+  .preise-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .preise-amount {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    color: rgba(245, 158, 11, 0.95);
+    margin: 0;
+  }
+  .preise-label {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(245, 245, 244, 0.65);
+    margin: 0;
+  }
+
+  /* === Refs === */
+  .websites-refs {
+    text-align: center;
+  }
+  .refs-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 768px) {
+    .refs-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .ref-preview {
+    display: flex;
+    flex-direction: column;
+    background: rgba(15, 15, 18, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    overflow: hidden;
+    text-decoration: none;
+    transition:
+      border-color 240ms ease,
+      transform 240ms ease;
+  }
+  .ref-preview:hover {
+    border-color: rgba(245, 158, 11, 0.4);
+    transform: translateY(-3px);
+  }
+  .ref-preview-image {
+    aspect-ratio: 4 / 3;
+    background: rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+  }
+  .ref-preview-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .ref-preview-body {
+    padding: 16px 18px;
+    text-align: left;
+  }
+  .ref-preview-title {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #f5f5f4;
+    margin: 0 0 4px;
+  }
+  .ref-preview-sub {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    color: rgba(245, 245, 244, 0.6);
+    margin: 0;
+  }
+  .refs-note {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+  }
+  .refs-note a {
+    color: rgba(245, 158, 11, 0.95);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* === Final CTA === */
+  .websites-final {
+    text-align: center;
+  }
+  .websites-final-headline {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    color: #f5f5f4;
+    margin: 0 0 12px;
+  }
+  .websites-final-body {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.05rem;
+    color: rgba(245, 245, 244, 0.72);
+    margin: 0 0 28px;
+  }
+
+  /* === Inline CTA link === */
+  .cta-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: rgba(245, 158, 11, 0.95);
+    text-decoration: none;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.4);
+    transition: color 200ms ease, border-color 200ms ease;
+  }
+  .cta-inline:hover {
+    color: rgba(252, 211, 77, 1);
+    border-bottom-color: rgba(252, 211, 77, 1);
+  }
+</style>
