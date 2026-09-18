@@ -88,6 +88,9 @@ export const SECTION3 = {
 // KEINE HTML-Tags (<br />, <strong> etc.) in den Body-Strings — die
 // wuerden literal als Text erscheinen. Fuer Line-Breaks stattdessen \n
 // + eine text-lines Utility-Class benutzen (falls in Section5 gebraucht).
+// Fuenf Phasen. Der Abschluss-Moment ("Und jetzt du") lebt in
+// Section7Closing als "Bereit fuer Phase 01?" — eine sechste Phase hier
+// wuerde von Section5Timeline ohnehin abgeschnitten.
 export const SECTION4 = {
   eyebrow: 'DER FAHRPLAN',
   title: 'So entsteht deine Website',
@@ -132,19 +135,6 @@ export const SECTION4 = {
         'Live-Schaltung auf deine Domain. Plus 30 Minuten Einweisung, ' +
         'wie du selbst weiterarbeiten kannst. Ohne mich jedes Mal ' +
         'anrufen zu müssen.',
-    },
-    // ACHTUNG: Phase 06 wird NICHT gerendert. Section5Timeline nimmt
-    // nur phases.slice(0, 5) — der Abschluss-Moment lebt stattdessen in
-    // Section7Closing ("Bereit fuer Phase 01?"). Aenderungen hier sind
-    // ohne Wirkung, solange das so bleibt.
-    {
-      label: 'PHASE 06',
-      title: 'Und jetzt du',
-      body:
-        'Du kennst den Weg. Wenn er sich richtig anfühlt: schreib ' +
-        'mir. Dann nehmen wir uns 30 Minuten Zeit für dein ' +
-        'Projekt. Kostenlos und ohne Verpflichtung.',
-      link: { label: 'Erstgespräch anfragen', href: '/kontakt' },
     },
   ],
 } as const;

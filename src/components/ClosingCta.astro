@@ -5,7 +5,7 @@
 // Ueberschrift und Absatz, mal mit fettem Knopf, mal mit angehaengtem
 // Zusatzhinweis. Das hier ist ueberall dasselbe, in dieser Reihenfolge:
 //
-//   1. "Klingt fair?" als Ueberschrift
+//   1. Ueberschrift ("Klingt fair?" bzw. "Ueberzeugt?", siehe Props)
 //   2. Der naechste Schritt in einem Satz
 //   3. "Lass uns sprechen" als dezenter CTA
 //   4. Eine thematisch passende Empfehlung auf eine andere Seite
@@ -21,11 +21,18 @@
 // Die Empfehlung ist der einzige Teil, der sich pro Seite unterscheidet
 // und haelt den roten Faden zwischen den Bereichen.
 interface Props {
+  /**
+   * Ueberschrift der Karte. Regel: Seiten, auf denen ein Preis steht,
+   * bekommen "Klingt fair?" (Standard). Seiten, die stattdessen Arbeit
+   * zeigen — /werkstatt, /referenzen — bekommen "Ueberzeugt?", weil
+   * sich dort kein "fair" auf irgendetwas beziehen wuerde.
+   */
+  headline?: string;
   /** Weiterfuehrender Hinweis, z.B. { text: 'Wissen wollen, wie weit das geht?', label: 'In die Werkstatt schauen', href: '/werkstatt' } */
   recommendation?: { text: string; label: string; href: string };
 }
 
-const { recommendation } = Astro.props;
+const { headline = 'Klingt fair?', recommendation } = Astro.props;
 
 const trust = [
   {
@@ -47,7 +54,7 @@ const trust = [
 
 <section class="closing-cta" aria-label="Kontakt aufnehmen" data-reveal>
   <div class="closing-cta-card">
-    <h2 class="closing-cta-headline">Klingt fair?</h2>
+    <h2 class="closing-cta-headline">{headline}</h2>
 
     <p class="closing-cta-sub">
       Nächster Schritt:<br />

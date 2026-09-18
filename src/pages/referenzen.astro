@@ -107,11 +107,12 @@ const totalCount = REFERENCES.length;
             </div>
             {VERTICAL_LINK_BY_CATEGORY[ref.category] && (
               <a
-                class="ref-vertical-link"
+                class="cta-link ref-vertical-link"
                 href={`/${VERTICAL_LINK_BY_CATEGORY[ref.category].slug}`}
                 aria-label={`Mehr zu ${VERTICAL_LINK_BY_CATEGORY[ref.category].label}`}
               >
-                Mehr zu {VERTICAL_LINK_BY_CATEGORY[ref.category].label} →
+                Mehr zu {VERTICAL_LINK_BY_CATEGORY[ref.category].label}
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
               </a>
             )}
           </div>
@@ -127,6 +128,7 @@ const totalCount = REFERENCES.length;
     </section>
 
     <ClosingCta
+      headline="Überzeugt?"
       recommendation={{
         text: 'Hinter einigen dieser Projekte steckt mehr als eine Website: Anfrage-Systeme, Rechner, eigene Anwendungen.',
         label: 'Mehr zur technischen Umsetzung',
@@ -455,28 +457,7 @@ const totalCount = REFERENCES.length;
      sitzen, damit der Klick vor dem ref-card-trigger (z-index 2)
      greift — der wuerde sonst das Reference-Modal statt Navigation
      ausloesen. */
-  .ref-vertical-link {
-    display: inline-block;
-    position: relative;
-    z-index: 3;
-    margin-top: 14px;
-    color: rgba(245, 158, 11, 0.85);
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-size: 0.82rem;
-    font-weight: 500;
-    letter-spacing: 0.02em;
-    text-decoration: none;
-    border-bottom: 1px solid rgba(245, 158, 11, 0.28);
-    padding-bottom: 1px;
-    transition: color 200ms ease, border-color 200ms ease;
-  }
 
-  .ref-vertical-link:hover,
-  .ref-vertical-link:focus-visible {
-    color: #fbbf24;
-    border-color: rgba(245, 158, 11, 0.7);
-    outline: none;
-  }
 
   /* Modal-Styles wurden in src/components/ReferenzModal.astro
      ausgelagert — Component ist auf beiden Pages einsetzbar

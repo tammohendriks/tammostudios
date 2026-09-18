@@ -580,6 +580,62 @@ function itemIsActive(item: NavItem): boolean {
     }
   }
 
+  /* === Heller Modus =================================================
+     Die Navi-Pille selbst bleibt dunkel: sie liegt mit 55% Deckkraft
+     ueber der Seite und funktioniert auf beiden Untergruenden. Das
+     Dropdown und das Mobile-Menue sind dagegen mit 98% praktisch
+     deckendes Schwarz und stehen auf hellem Grund wie ein Fremdkoerper.
+     Beide bekommen deshalb eine helle Flaeche mit dunkler Schrift. */
+  :global(html[data-site-theme='light']) .nav-dropdown {
+    background: rgba(254, 253, 249, 0.98);
+    border-color: rgba(0, 0, 0, 0.1);
+    box-shadow:
+      0 12px 40px rgba(0, 0, 0, 0.14),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+
+  :global(html[data-site-theme='light']) .nav-dropdown-item {
+    color: rgba(26, 26, 28, 0.82);
+  }
+
+  :global(html[data-site-theme='light']) .nav-dropdown-item:hover,
+  :global(html[data-site-theme='light']) .nav-dropdown-item:focus-visible {
+    color: rgba(26, 26, 28, 1);
+  }
+
+  :global(html[data-site-theme='light']) .mobile-menu {
+    background: rgba(248, 244, 234, 0.98);
+  }
+
+  :global(html[data-site-theme='light']) .mobile-link,
+  :global(html[data-site-theme='light']) .mobile-expand,
+  :global(html[data-site-theme='light']) .mobile-sub-link {
+    color: rgba(26, 26, 28, 0.88);
+  }
+
+  :global(html[data-site-theme='light']) .mobile-link[aria-current='page'],
+  :global(html[data-site-theme='light']) .mobile-expand[aria-expanded='true'] {
+    color: rgba(217, 119, 6, 1);
+  }
+
+  :global(html[data-site-theme='light']) .mobile-sub {
+    border-top-color: rgba(0, 0, 0, 0.1);
+  }
+
+  /* Nur solange das Menue offen ist: geschlossen bleibt die Leiste
+     dunkel wie im dunklen Modus, das ist so gewollt. */
+  :global(html[data-site-theme='light'][data-menu-open]) .label-tracked,
+  :global(html[data-site-theme='light'][data-menu-open]) .hamburger {
+    background: rgba(254, 253, 249, 0.96);
+    border-color: rgba(0, 0, 0, 0.12);
+    color: rgba(26, 26, 28, 0.88);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  :global(html[data-site-theme='light'][data-menu-open]) .hamburger span {
+    background: rgba(26, 26, 28, 0.88);
+  }
+
   /* Mobile menu overlay — kein backdrop-filter: Full-Screen-Blur
      (100vw × 100vh) auf iOS Safari freezed den Menu-Open-Anim um
      100-200ms. Opakerer Background (0.98) kompensiert visuell. */
@@ -731,12 +787,17 @@ function itemIsActive(item: NavItem): boolean {
       toggle.setAttribute('aria-expanded', 'true');
       toggle.setAttribute('aria-label', 'Menü schließen');
       document.body.style.overflow = 'hidden';
+      // Der Header liegt ueber dem Menue. Im hellen Modus muessen seine
+      // dunklen Elemente mit umschalten, sonst schweben sie schwarz auf
+      // der hellen Flaeche.
+      document.documentElement.setAttribute('data-menu-open', '');
     };
     const close = () => {
       menu.setAttribute('hidden', '');
       toggle.setAttribute('aria-expanded', 'false');
       toggle.setAttribute('aria-label', 'Menü öffnen');
       document.body.style.overflow = '';
+      document.documentElement.removeAttribute('data-menu-open');
     };
 
     toggle.addEventListener('click', () => {

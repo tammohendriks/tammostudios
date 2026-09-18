@@ -132,7 +132,7 @@ const heroFocalPoint = vertical.hero.background.focalPoint ?? 'center center';
         <div class="v-pricing-body">
           {vertical.pricing.paragraphs.map((p) => <p class="text-lines">{p}</p>)}
         </div>
-        <a class="v-inline-link" href="/preise">Volle Preisliste ansehen →</a>
+        <a class="cta-link" href="/preise">Volle Preisliste ansehen <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg></a>
       </article>
     </section>
 
@@ -144,8 +144,9 @@ const heroFocalPoint = vertical.hero.background.focalPoint ?? 'center center';
           {vertical.caseStudy.paragraphs.map((p) => <p class="text-lines">{p}</p>)}
           <div class="v-case-links">
             {vertical.caseStudy.references.map((ref) => (
-              <a class="v-inline-link" href={ref.url} target="_blank" rel="noopener noreferrer">
-                {ref.linkLabel} →
+              <a class="cta-link" href={ref.url} target="_blank" rel="noopener noreferrer">
+                {ref.linkLabel}
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
               </a>
             ))}
           </div>
@@ -454,25 +455,6 @@ const heroFocalPoint = vertical.hero.background.focalPoint ?? 'center center';
     margin: 0;
   }
 
-  .v-inline-link {
-    display: inline-block;
-    color: rgba(245, 158, 11, 0.95);
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-weight: 500;
-    font-size: 0.95rem;
-    letter-spacing: 0.01em;
-    text-decoration: none;
-    border-bottom: 1px solid rgba(245, 158, 11, 0.3);
-    padding-bottom: 1px;
-    transition: color 200ms ease, border-color 200ms ease;
-  }
-
-  .v-inline-link:hover,
-  .v-inline-link:focus-visible {
-    color: #fbbf24;
-    border-color: rgba(245, 158, 11, 0.7);
-    outline: none;
-  }
 
   /* === CASE STUDY === */
   .v-case {

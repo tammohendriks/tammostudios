@@ -120,8 +120,11 @@ const websiteRefs = REFERENCES.filter((r) =>
       <p class="problems-note">
         Gebaut für Arztpraxen, Betriebsmedizin, Dachdecker, Heizungsbau,
         Gastronomie, Spedition. Die Branche war noch nie das Problem.
-        <a href="/referenzen">Sieh dir an, was daraus wurde</a>.
       </p>
+      <a class="cta-link problems-note-cta" href="/referenzen">
+        Sieh dir an, was daraus wurde
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+      </a>
     </section>
 
     <!-- ================================================================
@@ -218,9 +221,10 @@ const websiteRefs = REFERENCES.filter((r) =>
           </a>
         ))}
       </div>
-      <p class="refs-note">
-        <a href="/referenzen">Alle Referenzen ansehen →</a>
-      </p>
+      <a class="cta-link refs-note" href="/referenzen">
+        Alle Referenzen ansehen
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+      </a>
     </section>
 
     <ClosingCta
@@ -349,12 +353,13 @@ const websiteRefs = REFERENCES.filter((r) =>
     font-family: 'Inter', sans-serif;
     font-size: 0.95rem;
     color: rgba(245, 245, 244, 0.6);
-    margin: 0;
+    margin: 0 0 14px;
   }
-  .problems-note a {
-    color: rgba(245, 158, 11, 0.95);
-    text-decoration: underline;
-    text-underline-offset: 3px;
+
+  /* Aussehen aus .cta-link (global.css), hier nur die Position. */
+  .problems-note-cta,
+  .refs-note {
+    margin-top: 4px;
   }
 
   /* === CMS Section (id="cms" — scroll target from /studio redirect) === */
@@ -542,15 +547,6 @@ const websiteRefs = REFERENCES.filter((r) =>
     font-size: 0.85rem;
     color: rgba(245, 245, 244, 0.6);
     margin: 0;
-  }
-  .refs-note {
-    font-family: 'Inter', sans-serif;
-    margin: 0;
-  }
-  .refs-note a {
-    color: rgba(245, 158, 11, 0.95);
-    text-decoration: underline;
-    text-underline-offset: 3px;
   }
 
   /* === Final CTA === */

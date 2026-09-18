@@ -89,17 +89,12 @@ const techPoints = [
           <button type="button" class="game-cover-button" data-game-start>
             Hier spielen
           </button>
-          <a class="game-cover-link" href={GAME_URL} target="_blank" rel="noopener">
-            oder im Vollbild öffnen ↗
-          </a>
         </div>
       </div>
 
       <p class="werkstatt-project-note">
         Läuft auf <a href={GAME_URL} target="_blank" rel="noopener">asteroid.tammostudios.de</a>
-        als eigenständige Anwendung. Auf dem Handy macht die
-        <a href={GAME_URL} target="_blank" rel="noopener">Vollbild-Version</a>
-        mehr Spaß.
+        als eigenständige Anwendung.
       </p>
     </section>
 
@@ -119,6 +114,7 @@ const techPoints = [
     </section>
 
     <ClosingCta
+      headline="Überzeugt?"
       recommendation={{
         text: 'Lieber etwas Geschäftliches? Dieselbe Technik, nur mit Auftrag:',
         label: 'Zu den individuellen Anwendungen',
@@ -297,17 +293,6 @@ const techPoints = [
   .game-cover-button:focus-visible {
     outline: 2px solid rgba(245, 158, 11, 0.8);
     outline-offset: 4px;
-  }
-
-  .game-cover-link {
-    color: rgba(245, 245, 244, 0.55);
-    font-size: 0.88rem;
-    text-decoration: none;
-    transition: color 200ms ease;
-  }
-
-  .game-cover-link:hover {
-    color: rgba(245, 158, 11, 0.95);
   }
 
   .werkstatt-project-note {
