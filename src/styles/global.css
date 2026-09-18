@@ -81,7 +81,7 @@ html {
    BaseLayout inline-script). */
 html[data-site-theme='light'] .ueber-page,
 html[data-site-theme='light'] .referenzen-page,
-html[data-site-theme='light'] .websites-page,
+html[data-site-theme='light'] .website-page,
 html[data-site-theme='light'] .software-page,
 html[data-site-theme='light'] .labor-page,
 html[data-site-theme='light'] .preise-page,
@@ -97,9 +97,11 @@ html[data-site-theme='light'] .journal-page {
    Generated from full DOM/CSS audit of all sub-pages (Workflow #ba382).
 
    Regeln:
-   - CARD containers → solid dark #0a0a0c (text INSIDE bleibt light).
+   - CARD containers → warmes off-white #fefdf9 (paper-on-paper).
    - PAGE-LEVEL text → invertiert zu --theme-text-* tokens.
-   - INSIDE-CARD text → keine Regel (Original-Light-Farbe reicht).
+   - INSIDE-CARD text → ebenfalls invertiert, pro Card weiter unten.
+     (Frueher blieb er hell — das galt fuer dunkle Cards und ist seit
+     der Umstellung auf paper-cards falsch.)
    - AMBER-Akzente → keine Regel (identisch in beiden Themes).
 
    !important konsequent — Astro's scoped-CSS-Rules haben sonst hoehere
@@ -157,8 +159,8 @@ html[data-site-theme='light'] .tech-item {
    Die drei Angebots-/Labor-Seiten sind nach dem Audit (#ba382)
    entstanden und muessen hier von Hand gepflegt werden. Gleiche
    Regel wie oben: Page-Level-Text invertiert, Amber-Akzente nicht. */
-html[data-site-theme='light'] .websites-section-title,
-html[data-site-theme='light'] .websites-final-headline,
+html[data-site-theme='light'] .website-section-title,
+html[data-site-theme='light'] .website-final-headline,
 html[data-site-theme='light'] .software-section-title,
 html[data-site-theme='light'] .labor-section-title,
 html[data-site-theme='light'] .problem-card-label,
@@ -172,7 +174,7 @@ html[data-site-theme='light'] .closing-text {
   color: var(--theme-text-strong) !important;
 }
 
-html[data-site-theme='light'] .websites-final-body,
+html[data-site-theme='light'] .website-final-body,
 html[data-site-theme='light'] .software-positioning p,
 html[data-site-theme='light'] .cms-body p,
 html[data-site-theme='light'] .cms-list li,
@@ -191,6 +193,7 @@ html[data-site-theme='light'] .preise-label {
   color: var(--theme-text-dim) !important;
 }
 
+html[data-site-theme='light'] .preise-software-hint,
 html[data-site-theme='light'] .problems-note,
 html[data-site-theme='light'] .refs-note,
 html[data-site-theme='light'] .ref-preview-sub,

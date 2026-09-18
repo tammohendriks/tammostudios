@@ -150,7 +150,7 @@ export const SECTION5 = {
      // scannable sein, nicht die Nav dupliziert.
     navLinks: [
       { label: 'Über',         href: '/ueber' },
-      { label: 'Websites',     href: '/websites' },
+      { label: 'Website',      href: '/website' },
       { label: 'Software',     href: '/software' },
       { label: 'Referenzen',   href: '/referenzen' },
       { label: 'Journal',      href: '/journal' },
@@ -189,7 +189,7 @@ export const SECTION5 = {
 // (Desktop) bzw. Accordion (Mobile).
 // NAV_ITEMS: neue Struktur (Sep 2026) reflektiert erweitertes Angebot
 // Websites + Software unter einem "Angebot"-Dropdown zusammengefasst.
-// Studio-Page abgeschafft (Content migriert nach /websites#cms), daher
+// Studio-Page abgeschafft (Content migriert nach /website#cms), daher
 // nicht mehr in der Nav. Preisrechner nur noch ueber /preise erreichbar
 // (dort verlinkt) — Nav bleibt schlank.
 export const NAV_ITEMS = [
@@ -197,9 +197,9 @@ export const NAV_ITEMS = [
   {
     label: 'Angebot',
     // Parent-Klick geht auf Websites-Uebersicht (haeufigster CTA-Path)
-    href: '/websites',
+    href: '/website',
     children: [
-      { label: 'Websites', href: '/websites' },
+      { label: 'Website', href: '/website' },
       { label: 'Software', href: '/software' },
       { label: 'Preise', href: '/preise' },
     ],

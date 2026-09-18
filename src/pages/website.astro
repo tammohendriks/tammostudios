@@ -1,9 +1,9 @@
 ---
 /**
- * /websites — Uebersichts-Landingpage fuer "Websites" als Angebots-
+ * /website — Uebersichts-Landingpage fuer "Website" als Angebots-
  * Bereich. Ersetzt die aufgegebene /studio Marketing-Seite (deren
  * CMS-USP-Content in Section "Du pflegst selbst" gemergt wurde) und
- * ist Ziel-URL fuer den Nav-Dropdown "Angebot → Websites".
+ * ist Ziel-URL fuer den Nav-Dropdown "Angebot → Website".
  *
  * Struktur:
  *   1. Hero (subpage-Konvention: centered, 780px, padding-top 32px)
@@ -17,7 +17,7 @@
  *   6. Aus der Praxis — 3 Referenz-Cards, Link zu /referenzen
  *   7. Final-CTA — Erstgespraech
  *
- * /studio Route wird via vercel.json rewrite → /websites#cms redirected.
+ * /studio Route wird via vercel.json rewrite → /website#cms redirected.
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SubPageBackground from '../components/SubPageBackground.astro';
@@ -76,19 +76,19 @@ const websiteRefs = REFERENCES.filter((r) =>
 ---
 
 <BaseLayout
-  pageTitle="Websites"
-  title="Individuelle Websites — handgemacht in Bremen | Tammo Studios"
-  description="Individuelle Websites, handgemacht in Bremen. Eigenes CMS zum Selbstpflegen, eine individuelle Anwendung inklusive, ab 2.000 € und in 14 Tagen live."
+  pageTitle="Website"
+  title="Individuelle Website — handgemacht in Bremen | Tammo Studios"
+  description="Deine individuelle Website, handgemacht in Bremen. Eigenes Redaktionssystem zum Selbstpflegen, eine individuelle Anwendung inklusive, ab 2.000 € und in 14 Tagen live."
 >
-  <main class="websites-page">
+  <main class="website-page">
     <SubPageBackground />
 
-    <header class="websites-hero">
-      <h1 class="subpage-hero-title">Websites für dein Unternehmen</h1>
+    <header class="website-hero">
+      <h1 class="subpage-hero-title">Deine Website</h1>
       <p class="subpage-hero-subtitle text-lines">
         {'Handgemacht in Bremen. Eine individuelle Anwendung ist drin.\nAb 2.000 €, in 14 Tagen live.'}
       </p>
-      <div class="websites-hero-cta">
+      <div class="website-hero-cta">
         <a class="cta-inline" href="/kontakt">
           Erstgespräch anfragen
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
@@ -99,9 +99,9 @@ const websiteRefs = REFERENCES.filter((r) =>
     <!-- ================================================================
          2. Problem-Framing — wofuer eine Website da ist
          ============================================================== -->
-    <section class="websites-problems" data-reveal aria-labelledby="problems-heading">
-      <p class="websites-eyebrow">WOFÜR DAS GANZE</p>
-      <h2 id="problems-heading" class="websites-section-title">Drei Probleme, immer die gleichen.</h2>
+    <section class="website-problems" data-reveal aria-labelledby="problems-heading">
+      <p class="website-eyebrow">WOFÜR DAS GANZE</p>
+      <h2 id="problems-heading" class="website-section-title">Drei Probleme, immer die gleichen.</h2>
       <div class="problems-grid">
         {problems.map((p) => (
           <article class="problem-card" data-reveal>
@@ -126,9 +126,9 @@ const websiteRefs = REFERENCES.filter((r) =>
     <!-- ================================================================
          3. Du pflegst selbst — CMS-Autonomie (id="cms" fuer /studio Redirect)
          ============================================================== -->
-    <section id="cms" class="websites-cms" data-reveal aria-labelledby="cms-heading">
-      <p class="websites-eyebrow">DU PFLEGST SELBST</p>
-      <h2 id="cms-heading" class="websites-section-title">Kein Anruf beim Entwickler.</h2>
+    <section id="cms" class="website-cms" data-reveal aria-labelledby="cms-heading">
+      <p class="website-eyebrow">DU PFLEGST SELBST</p>
+      <h2 id="cms-heading" class="website-section-title">Kein Anruf beim Entwickler.</h2>
       <div class="cms-body">
         <p>
           Deine Website wird von mir gebaut, nicht in Wix zusammengeklickt.
@@ -157,9 +157,9 @@ const websiteRefs = REFERENCES.filter((r) =>
     <!-- ================================================================
          4. Was du bekommst — Feature-Liste
          ============================================================== -->
-    <section class="websites-features" data-reveal aria-labelledby="features-heading">
-      <p class="websites-eyebrow">WAS DU BEKOMMST</p>
-      <h2 id="features-heading" class="websites-section-title">Alles was eine Website 2026 braucht</h2>
+    <section class="website-features" data-reveal aria-labelledby="features-heading">
+      <p class="website-eyebrow">WAS DU BEKOMMST</p>
+      <h2 id="features-heading" class="website-section-title">Alles was eine Website 2026 braucht</h2>
       <div class="features-grid">
         {features.map((f) => (
           <div class="feature-item" data-reveal>
@@ -173,9 +173,9 @@ const websiteRefs = REFERENCES.filter((r) =>
     <!-- ================================================================
          5. Was kostet's — Preis-Verweis
          ============================================================== -->
-    <section class="websites-preise" data-reveal aria-labelledby="preise-heading">
-      <p class="websites-eyebrow">WAS KOSTET'S</p>
-      <h2 id="preise-heading" class="websites-section-title">Fixpreise, ohne Sternchen</h2>
+    <section class="website-preise" data-reveal aria-labelledby="preise-heading">
+      <p class="website-eyebrow">WAS KOSTET'S</p>
+      <h2 id="preise-heading" class="website-section-title">Fixpreise, ohne Sternchen</h2>
       <div class="preise-cards">
         <div class="preise-item">
           <p class="preise-amount">2.000 €</p>
@@ -200,9 +200,9 @@ const websiteRefs = REFERENCES.filter((r) =>
     <!-- ================================================================
          6. Aus der Praxis — 3 Referenz-Cards
          ============================================================== -->
-    <section class="websites-refs" data-reveal aria-labelledby="refs-heading">
-      <p class="websites-eyebrow">AUS DER PRAXIS</p>
-      <h2 id="refs-heading" class="websites-section-title">Kunden, die schon live sind</h2>
+    <section class="website-refs" data-reveal aria-labelledby="refs-heading">
+      <p class="website-eyebrow">AUS DER PRAXIS</p>
+      <h2 id="refs-heading" class="website-section-title">Kunden, die schon live sind</h2>
       <div class="refs-grid">
         {websiteRefs.map((r) => (
           <a class="ref-preview" href={r.url} target="_blank" rel="noopener noreferrer">
@@ -224,9 +224,9 @@ const websiteRefs = REFERENCES.filter((r) =>
     <!-- ================================================================
          7. Final-CTA
          ============================================================== -->
-    <section class="websites-final" data-reveal>
-      <h2 class="websites-final-headline">Sprechen wir.</h2>
-      <p class="websites-final-body">
+    <section class="website-final" data-reveal>
+      <h2 class="website-final-headline">Sprechen wir.</h2>
+      <p class="website-final-body">
         30 Minuten Erstgespräch, kostenlos, unverbindlich.
       </p>
       <a class="cta-orbital" href="/kontakt">
@@ -240,7 +240,7 @@ const websiteRefs = REFERENCES.filter((r) =>
 </BaseLayout>
 
 <style>
-  .websites-page {
+  .website-page {
     position: relative;
     background: #050507;
     padding: 140px 40px 80px;
@@ -248,13 +248,13 @@ const websiteRefs = REFERENCES.filter((r) =>
     overflow: hidden;
   }
   @media (max-width: 768px) {
-    .websites-page {
+    .website-page {
       padding: 100px 20px 60px;
     }
   }
 
-  .websites-page > section,
-  .websites-hero {
+  .website-page > section,
+  .website-hero {
     position: relative;
     z-index: 1;
     max-width: 960px;
@@ -263,18 +263,18 @@ const websiteRefs = REFERENCES.filter((r) =>
   }
 
   /* === Hero (subpage convention) === */
-  .websites-hero {
+  .website-hero {
     text-align: center;
     max-width: 780px;
     margin: 0 auto 96px;
     padding-top: 32px;
   }
-  .websites-hero-cta {
+  .website-hero-cta {
     margin-top: 28px;
   }
 
   /* === Shared section styling === */
-  .websites-eyebrow {
+  .website-eyebrow {
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-weight: 500;
     font-size: 0.75rem;
@@ -283,7 +283,7 @@ const websiteRefs = REFERENCES.filter((r) =>
     text-transform: uppercase;
     margin: 0 0 16px;
   }
-  .websites-section-title {
+  .website-section-title {
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-weight: 700;
     font-size: clamp(1.6rem, 3vw, 2.4rem);
@@ -292,17 +292,17 @@ const websiteRefs = REFERENCES.filter((r) =>
     color: #f5f5f4;
     margin: 0 0 32px;
   }
-  .websites-page > section {
+  .website-page > section {
     margin-bottom: 96px;
   }
   @media (max-width: 768px) {
-    .websites-page > section {
+    .website-page > section {
       margin-bottom: 72px;
     }
   }
 
   /* === Problem-Framing === */
-  .websites-problems {
+  .website-problems {
     text-align: center;
   }
   .problems-grid {
@@ -375,7 +375,7 @@ const websiteRefs = REFERENCES.filter((r) =>
   }
 
   /* === CMS Section (id="cms" — scroll target from /studio redirect) === */
-  .websites-cms {
+  .website-cms {
     scroll-margin-top: 100px;
     text-align: center;
   }
@@ -425,7 +425,7 @@ const websiteRefs = REFERENCES.filter((r) =>
   }
 
   /* === Features === */
-  .websites-features {
+  .website-features {
     text-align: center;
   }
   .features-grid {
@@ -461,7 +461,7 @@ const websiteRefs = REFERENCES.filter((r) =>
   }
 
   /* === Preise === */
-  .websites-preise {
+  .website-preise {
     text-align: center;
   }
   .preise-inklusive {
@@ -502,7 +502,7 @@ const websiteRefs = REFERENCES.filter((r) =>
   }
 
   /* === Refs === */
-  .websites-refs {
+  .website-refs {
     text-align: center;
   }
   .refs-grid {
@@ -571,17 +571,17 @@ const websiteRefs = REFERENCES.filter((r) =>
   }
 
   /* === Final CTA === */
-  .websites-final {
+  .website-final {
     text-align: center;
   }
-  .websites-final-headline {
+  .website-final-headline {
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-weight: 700;
     font-size: clamp(2rem, 4vw, 2.8rem);
     color: #f5f5f4;
     margin: 0 0 12px;
   }
-  .websites-final-body {
+  .website-final-body {
     font-family: 'Inter', sans-serif;
     font-size: 1.05rem;
     color: rgba(245, 245, 244, 0.72);

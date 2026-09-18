@@ -18,22 +18,25 @@ import SiteFooter from '../components/SiteFooter.astro';
 
 const GAME_URL = 'https://asteroid.tammostudios.de';
 
+// Bewusst ohne englische Fachbegriffe — die ganze Seite ist auf Deutsch.
+// Falls spaeter eine englische Fassung kommt, duerfen die Originalbegriffe
+// dort wieder rein.
 const techPoints = [
   {
-    title: 'Canvas statt Framework',
-    body: 'Kein React, kein Phaser. Rendering, Kollisionen und Game-Loop komplett selbst — 60 Bilder pro Sekunde, auch auf dem Handy.',
+    title: 'Alles selbst gezeichnet',
+    body: 'Kein fertiger Spiele-Baukasten. Bilddarstellung, Kollisionen und Ablaufschleife komplett von Hand — 60 Bilder pro Sekunde, auch auf dem Handy.',
   },
   {
-    title: 'Prozedurale Musik',
-    body: 'Der Soundtrack ist keine Audiodatei. Die Web Audio API erzeugt ihn zur Laufzeit, passend zur Intensität des Levels.',
+    title: 'Musik, die es vorher nicht gab',
+    body: 'Die Musik ist keine fertige Datei. Sie entsteht im Browser, während du spielst — und zieht an, je enger es wird.',
   },
   {
-    title: 'Globales Leaderboard',
-    body: 'Scores laufen über eine eigene API mit Validierung — damit niemand seinen Highscore per DevTools schreibt.',
+    title: 'Weltweite Bestenliste',
+    body: 'Die Punktestände laufen über eine eigene Schnittstelle mit Prüfung — damit sich niemand seinen Rekord einfach selbst einträgt.',
   },
   {
-    title: 'Mehrstufiger Boss',
-    body: 'Zustandsmaschine mit Phasenwechsel, eigenen Angriffsmustern und Schwachstellen. Der Teil, der am meisten Arbeit gemacht hat.',
+    title: 'Endgegner in mehreren Phasen',
+    body: 'Wechselnde Angriffsmuster, eigene Schwachstellen, ein Verhalten das sich anpasst. Der Teil, der am meisten Arbeit gemacht hat.',
   },
 ];
 ---
@@ -41,7 +44,7 @@ const techPoints = [
 <BaseLayout
   pageTitle="Labor"
   title="Labor — eigene Projekte | Tammo Studios"
-  description="Was ich baue, wenn niemand mich beauftragt. ASTEROID//01: Arcade-Game mit Canvas-Rendering, prozeduraler Musik und globalem Leaderboard. Selbst entwickelt, ohne Framework."
+  description="Was ich baue, wenn niemand mich beauftragt. ASTEROID//01: Arcade-Spiel im Browser mit erzeugter Musik, weltweiter Bestenliste und mehrstufigem Endgegner. Komplett selbst entwickelt."
 >
   <main class="labor-page">
     <SubPageBackground />
@@ -72,10 +75,10 @@ const techPoints = [
       <p class="labor-eyebrow">PROJEKT 01</p>
       <h2 id="asteroid-heading" class="labor-section-title">ASTEROID//01</h2>
       <p class="labor-project-intro">
-        Ein Arcade-Game im Browser. Kein Framework, kein Game-Engine-Baukasten —
-        TypeScript, Canvas und die Web Audio API. Angefangen als Frage
-        („geht das überhaupt?"), geendet mit Leaderboard und Boss-Kampf.
-        Spielbar direkt hier.
+        Ein Arcade-Spiel, das direkt im Browser läuft. Ohne fertigen
+        Spiele-Baukasten, alles von Hand gebaut. Angefangen als Frage
+        („geht das überhaupt?"), geendet mit weltweiter Bestenliste und
+        Endgegner. Spielbar direkt hier.
       </p>
 
       <!-- Click-to-activate: das Spiel faengt Touch-Events ab
@@ -86,7 +89,7 @@ const techPoints = [
       <div class="game-frame" data-game-frame>
         <iframe
           src={GAME_URL}
-          title="ASTEROID//01 — Arcade-Game, live"
+          title="ASTEROID//01 — Arcade-Spiel, spielbar"
           allow="fullscreen; autoplay"
           loading="lazy"
           class="game-iframe"
@@ -106,7 +109,7 @@ const techPoints = [
 
       <p class="labor-project-note">
         Läuft auf <a href={GAME_URL} target="_blank" rel="noopener">asteroid.tammostudios.de</a>
-        als eigenständige Web-App. Auf dem Handy macht die
+        als eigenständige Anwendung. Auf dem Handy macht die
         <a href={GAME_URL} target="_blank" rel="noopener">Vollbild-Version</a>
         mehr Spaß.
       </p>
@@ -132,8 +135,8 @@ const techPoints = [
          ============================================================== -->
     <section class="labor-bridge" data-reveal>
       <p class="labor-bridge-text">
-        Ein Spiel ist kein Auftrag. Aber die Technik dahinter ist dieselbe, die
-        einen Konfigurator flüssig macht oder einen Rechner in Echtzeit
+        Ein Spiel ist kein Auftrag. Aber die Technik dahinter ist dieselbe,
+        die einen Konfigurator flüssig macht oder einen Rechner sofort
         durchrechnen lässt.
       </p>
       <a class="cta-inline" href="/software">
@@ -185,6 +188,9 @@ const techPoints = [
 
   .labor-page > section {
     margin-bottom: 96px;
+    /* Site-Konvention: Section-Text zentriert, Karten-Inhalte bleiben
+       linksbuendig (siehe .tech-item). */
+    text-align: center;
   }
   @media (max-width: 768px) {
     .labor-page > section {
@@ -235,7 +241,7 @@ const techPoints = [
   /* === Projekt === */
   .labor-project-intro {
     max-width: 62ch;
-    margin: 0 0 clamp(28px, 4vh, 40px);
+    margin: 0 auto clamp(28px, 4vh, 40px);
     font-family: 'Inter', sans-serif;
     font-size: 1.05rem;
     line-height: 1.6;
@@ -366,6 +372,7 @@ const techPoints = [
   }
   .tech-item {
     padding: 24px;
+    text-align: left;
     background: rgba(15, 15, 18, 0.45);
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 10px;

@@ -15,12 +15,12 @@ const cases = [
     full: 'Institut für Betriebsmedizin',
     branch: 'Betriebsmedizin, Isernhagen',
     body:
-      'Drei-Pfad-Anfrage-System für Vorsorgen. Unternehmen tragen ' +
-      'Mitarbeitende ein, wählen Untersuchungen per Modal aus, das System ' +
-      'erzeugt automatisch ein PDF und schickt es an die Praxis. Der ' +
-      'Absender bekommt eine Bestätigungs-Mail. Was vorher Telefonate und ' +
-      'manuelle Zuordnung war, läuft jetzt strukturiert.',
-    tags: ['3-Pfad-Formular', 'Auto-PDF', 'Multi-Recipient-Mail'],
+      'Anfrage-System für Vorsorgen mit drei Wegen durchs Formular. ' +
+      'Unternehmen tragen Mitarbeitende ein, wählen die Untersuchungen ' +
+      'aus, daraus entsteht automatisch ein PDF, das direkt in der Praxis ' +
+      'landet. Der Absender bekommt eine Bestätigung. Die ganze Seite ' +
+      'schaltet außerdem auf Englisch um — für internationale Belegschaften.',
+    tags: ['Formular mit drei Wegen', 'PDF automatisch', 'Deutsch / Englisch'],
     href: 'https://ibi-doc.de/anfrage',
   },
   {
@@ -28,13 +28,12 @@ const cases = [
     full: 'Arbeitsmedizinische Praxis',
     branch: 'Betriebsmedizin, Bremen',
     body:
-      'CMS-basierte Preisliste mit Live-PDF-Vorschau. Das Team pflegt ' +
-      'Leistungen und Preise im Studio, Kunden sehen sofort die ' +
-      'aktualisierte PDF-Version — inklusive englischer Übersetzung. Dazu ' +
-      'ein 360°-Rundgang über Google Street View und ein Sprachumschalter ' +
-      'für internationale Kunden.',
-    tags: ['Custom-CMS', 'Live-PDF-Preview', 'Mehrsprachig'],
-    href: 'https://www.samedos.de',
+      'Ein 360°-Rundgang durch die Praxis, direkt auf der Seite begehbar — ' +
+      'wer zur Vorsorge kommt, weiß vorher, wo er landet. Dazu eine ' +
+      'vollständige englische Fassung der Seite auf Knopfdruck, ohne ' +
+      'zweite Website und ohne doppelte Pflege.',
+    tags: ['360°-Rundgang', 'Deutsch / Englisch', 'Eigenes Redaktionssystem'],
+    href: 'https://www.samedos.de/rundgang',
   },
   {
     name: 'WärmePower',
@@ -47,7 +46,7 @@ const cases = [
       'WärmePower bekommt das ausgefüllte Formular als Mail und PDF, der ' +
       'Kunde eine Bestätigung. Zweimal im Monat kommen echte Anfragen ' +
       'darüber rein.',
-    tags: ['Recommendation-Engine', 'Auto-PDF', 'BEG-Logik'],
+    tags: ['Empfehlungs-Logik', 'PDF automatisch', 'Förder-Berechnung'],
     href: 'https://waermepower.de/heizungsrechner',
   },
   {
@@ -60,7 +59,7 @@ const cases = [
       'Baupreis-Entwicklungen. Dazu: wie viel Wertsteigerung eine neue ' +
       'Dachhülle der Immobilie zurückgibt. Beratung wird damit nachvollziehbar ' +
       'statt gefühlt.',
-    tags: ['Finanz-Prognose', 'Baupreis-Entwicklung', 'Wertsteigerung'],
+    tags: ['Kosten-Prognose', 'Baupreis-Entwicklung', 'Wertsteigerung'],
     href: 'https://kirsch-dach-fassade.de/investition',
   },
 ] as const;
@@ -71,7 +70,7 @@ const steps = [
     title: 'Erstgespräch',
     meta: '30 Minuten, kostenlos',
     body:
-      'Wir sprechen über deinen Prozess. Was läuft manuell, was könnte ' +
+      'Wir sprechen über deinen Ablauf. Was läuft von Hand, was könnte ' +
       'digital laufen? Wo verbrennst du Zeit? Was würde deinen Kunden das ' +
       'Leben leichter machen? Am Ende hast du eine ehrliche Einschätzung, ' +
       'ob eine eigene Anwendung für dich Sinn ergibt.',
@@ -81,17 +80,19 @@ const steps = [
     title: 'Konzeption + Angebot',
     meta: '48 Stunden',
     body:
-      'Du bekommst einen konkreten Vorschlag: Featureliste, Timeline, ' +
-      'Preis. Fix, nicht mit Sternchen. Darauf entscheidest du.',
+      'Du bekommst einen konkreten Vorschlag: was sie können soll, wie ' +
+      'lange es dauert, was es kostet. Fix, nicht mit Sternchen. Darauf ' +
+      'entscheidest du.',
   },
   {
     number: '03',
     title: 'Entwicklung',
     meta: '2 bis 6 Wochen',
     body:
-      'Kein wochenlanges Pixel-Ping-Pong. Ich baue in klaren Iterationen, ' +
-      'du siehst nach jedem Meilenstein was passiert und kannst ' +
-      'korrigieren. Am Ende bekommst du alles: Code, Dokumentation, Zugänge.',
+      'Kein wochenlanges Hin und Her an Details. Ich baue in klaren ' +
+      'Schritten, du siehst nach jedem Abschnitt was passiert und kannst ' +
+      'korrigieren. Am Ende bekommst du alles: den Quellcode, eine ' +
+      'Anleitung, sämtliche Zugänge.',
   },
 ] as const;
 
@@ -123,7 +124,7 @@ const kinds = [
   {
     title: 'Inhalte, die sich selbst ausgeben',
     body:
-      'Du pflegst einmal im CMS, und daraus entstehen automatisch Seite, ' +
+      'Du pflegst deine Inhalte einmal, und daraus entstehen automatisch Seite, ' +
       'PDF und Übersetzung. Keine drei Dateien, die auseinanderlaufen.',
   },
 ] as const;
@@ -132,7 +133,7 @@ const kinds = [
 <BaseLayout
   pageTitle="Software"
   title="Individuelle Web-Anwendungen aus Bremen | Tammo Studios"
-  description="Preisrechner, mitdenkende Anfrageformulare, Konfiguratoren, Auto-PDF. Eine individuelle Anwendung ist im Website-Preis enthalten. Live-Beispiele von IBI, Samedos, WärmePower und Kirsch."
+  description="Individuelle Web-Anwendungen aus Bremen: Preisrechner, mitdenkende Anfrageformulare, Konfiguratoren, automatische PDFs. Eine Anwendung ist im Website-Preis enthalten. Beispiele von IBI, Samedos, WärmePower und Kirsch."
 >
   <main class="software-page">
     <SubPageBackground />
@@ -165,9 +166,10 @@ const kinds = [
         schicken — passiert dann wieder per Telefon und Zuruf.
       </p>
       <p>
-        Genau dieser Teil ist mein eigentliches Handwerk. Kein Plugin, kein
-        Template: eigenes Frontend, echte Backend-Anbindung, deine
-        Geschäftslogik. Als Freelancer, ohne Agentur dazwischen.
+        Genau dieser Teil ist mein eigentliches Handwerk. Keine fertige
+        Vorlage, kein zugekauftes Modul: eigene Oberfläche, echte Anbindung
+        an das, was dahinter rechnet, und deine Abläufe als Grundlage. Von
+        mir gebaut, ohne Agentur dazwischen.
       </p>
     </section>
 
@@ -282,8 +284,9 @@ const kinds = [
       </p>
     </section>
 
-    <SiteFooter />
   </main>
+
+  <SiteFooter />
 </BaseLayout>
 
 <style>
@@ -304,11 +307,16 @@ const kinds = [
     }
   }
 
+  /* Site-Konvention: Section-Ueberschriften und Fliesstext sind
+     zentriert, Karten-Inhalte bleiben linksbuendig (sonst wird eine
+     mehrzeilige Aufzaehlung unlesbar). Gleiches Schema wie /website
+     und /preise. */
   .software-page > section {
     max-width: 1080px;
     margin: 0 auto;
     position: relative;
     z-index: 1;
+    text-align: center;
   }
 
   /* ------------------------------------------------------------- hero */
@@ -363,7 +371,7 @@ const kinds = [
   /* ------------------------------------------------------ positioning */
 
   .software-positioning p {
-    margin: 0;
+    margin: 0 auto 18px;
     max-width: 58ch;
     font-size: clamp(1.15rem, 2vw, 1.5rem);
     line-height: 1.55;
@@ -386,7 +394,8 @@ const kinds = [
 
   .kind-item {
     padding-left: 18px;
-    border-left: 2px solid rgba(245, 158, 11, 0.35);
+    border-left: 2px solid rgba(245, 158, 11, 0.55);
+    text-align: left;
   }
 
   .kind-title {
@@ -415,6 +424,7 @@ const kinds = [
   .case-card {
     display: flex;
     flex-direction: column;
+    text-align: left;
     padding: clamp(24px, 3vw, 32px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 16px;
@@ -503,6 +513,7 @@ const kinds = [
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: clamp(20px, 3vw, 34px);
+    text-align: left;
   }
 
   .process-number {
@@ -511,7 +522,7 @@ const kinds = [
     font-weight: 700;
     font-size: 2.2rem;
     line-height: 1;
-    color: rgba(245, 158, 11, 0.35);
+    color: rgba(245, 158, 11, 0.95);
   }
 
   .process-title {
@@ -541,7 +552,7 @@ const kinds = [
 
   .pricing-body p {
     max-width: 58ch;
-    margin: 0 0 18px;
+    margin: 0 auto 18px;
     font-size: clamp(1.02rem, 1.6vw, 1.18rem);
     line-height: 1.6;
     color: rgba(245, 245, 244, 0.8);
@@ -554,7 +565,7 @@ const kinds = [
 
   .pricing-aside {
     max-width: 58ch;
-    margin: clamp(24px, 4vh, 36px) 0 0;
+    margin: clamp(24px, 4vh, 36px) auto 0;
     padding-top: 22px;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     font-size: 0.95rem;

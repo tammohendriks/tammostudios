@@ -34,7 +34,12 @@
     },
     {
       "source": "/studio",
-      "destination": "/websites#cms",
+      "destination": "/website#cms",
+      "statusCode": 301
+    },
+    {
+      "source": "/websites",
+      "destination": "/website",
       "statusCode": 301
     }
   ]

@@ -447,10 +447,8 @@ function itemIsActive(item: NavItem): boolean {
 
   /* "Startseite" hängt im DOM auf jeder Page, Sichtbarkeit kommt
      aus dem globalen html[data-page]-State.
-     - Landing: initial versteckt. Sobald User ueber die Hero-Section
-       hinaus scrollt (>60vh), setzt das Scroll-Script data-scrolled=1
-       auf <html>, das enthuellt Startseite mit Fade-in. Beim Rueckscrollen
-       zum Top wird's wieder ausgeblendet.
+     - Landing: nie sichtbar. Ein Link auf die Seite, auf der man schon
+       steht, ist keine Navigation — egal wie weit runtergescrollt.
      - Subpage: sofort sichtbar. Die einmalige Fade-Animation beim
        ersten Landing→Subpage-Wechsel kommt aus dem data-startseite-anim
        Flag (BaseLayout inline-script). */
@@ -458,14 +456,9 @@ function itemIsActive(item: NavItem): boolean {
     display: none;
   }
 
-  :global(html[data-page="subpage"]) .nav-item-startseite,
-  :global(html[data-page="landing"][data-scrolled="1"]) .nav-item-startseite {
+  :global(html[data-page="subpage"]) .nav-item-startseite {
     display: inline-flex;
     align-items: center;
-  }
-
-  :global(html[data-page="landing"][data-scrolled="1"]) .nav-item-startseite {
-    animation: startseite-fade-in 300ms ease-out;
   }
 
   :global(html[data-startseite-anim="1"][data-page="subpage"]) .nav-item-startseite {
@@ -489,8 +482,7 @@ function itemIsActive(item: NavItem): boolean {
     display: none;
   }
 
-  :global(html[data-page="subpage"]) .mobile-item-startseite,
-  :global(html[data-page="landing"][data-scrolled="1"]) .mobile-item-startseite {
+  :global(html[data-page="subpage"]) .mobile-item-startseite {
     display: list-item;
   }
 
@@ -797,34 +789,4 @@ function itemIsActive(item: NavItem): boolean {
     active.blur();
     parentLink?.focus();
   });
-</script>
-
-<script>
-  // Startseite-Nav-Link auf Landing erst zeigen wenn User ueber die
-  // Hero-Section (~60vh) hinaus scrollt. CSS reagiert auf
-  // data-scrolled="1" auf <html> (siehe .nav-item-startseite Regeln).
-  // Sub-Pages: unbeeinflusst, Startseite ist dort sofort da.
-  const html = document.documentElement;
-  if (html.dataset.page === 'landing') {
-    const threshold = () => window.innerHeight * 0.6;
-    let ticking = false;
-    const update = () => {
-      ticking = false;
-      const scrolled = window.scrollY > threshold();
-      const current = html.dataset.scrolled === '1';
-      if (scrolled && !current) {
-        html.dataset.scrolled = '1';
-      } else if (!scrolled && current) {
-        html.removeAttribute('data-scrolled');
-      }
-    };
-    const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(update);
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
-    update();
-  }
 </script>
