@@ -30,3 +30,6 @@ design-reference/
 # Sanity Studio build/cache artifacts
 .sanity/
 .vercel/
+
+# macOS
+.DS_Store
