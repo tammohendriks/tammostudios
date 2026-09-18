@@ -132,8 +132,8 @@ const kinds = [
 
 <BaseLayout
   pageTitle="Software"
-  title="Individuelle Web-Anwendungen aus Bremen | Tammo Studios"
-  description="Individuelle Web-Anwendungen aus Bremen: Preisrechner, mitdenkende Anfrageformulare, Konfiguratoren, automatische PDFs. Eine Anwendung ist im Website-Preis enthalten. Beispiele von IBI, Samedos, WärmePower und Kirsch."
+  title="App- & Software-Entwicklung aus Bremen | Tammo Studios"
+  description="Software-Entwicklung aus Bremen: Preisrechner, Konfiguratoren, mitdenkende Anfrageformulare — und eigene Apps. Eine individuelle Anwendung ist im Website-Preis enthalten, Größeres nach Erstgespräch."
 >
   <main class="software-page">
     <SubPageBackground />
@@ -215,6 +215,36 @@ const kinds = [
       </div>
     </section>
 
+    <!-- ================================================================
+         Groesser als eine Website — App-/Software-Entwicklung als
+         eigenstaendiges Angebot. Zielt auf "app agentur bremen" und
+         "software entwicklung bremen": beides hatte Impressions, aber
+         keinen passenden Landeplatz. Der Werkstatt-Link ist Beleg, KEINE
+         Weiterleitung — wer beauftragen will, bleibt hier.
+         ============================================================== -->
+    <section class="software-bigger" aria-labelledby="bigger-heading" data-reveal>
+      <h2 id="bigger-heading" class="software-section-title">Größer als eine Website</h2>
+      <div class="bigger-body">
+        <p>
+          Manches passt nicht mehr in eine Website. Eine Anwendung, die
+          deine Mitarbeiter täglich benutzen. Ein System mit mehreren
+          Rollen und Rechten. Eine App. Oder ein Spiel.
+        </p>
+        <p>
+          Das baue ich auch — nur eben nicht zum Listenpreis. Wie lange so
+          etwas dauert, hängt komplett am Umfang, und eine Zahl vor dem
+          ersten Gespräch wäre geraten. Nach dem Erstgespräch bekommst du
+          eine feste.
+        </p>
+      </div>
+      <p class="bigger-proof">
+        Wie tief das technisch geht, kannst du dir ansehen statt es mir zu
+        glauben: In der <a href="/werkstatt">Werkstatt</a> liegt ein Spiel,
+        das ich ohne Auftrag von Grund auf gebaut habe. Spielbar direkt im
+        Browser.
+      </p>
+    </section>
+
     <section class="software-process" aria-labelledby="process-heading">
       <h2 id="process-heading" class="software-section-title" data-reveal>So läuft das ab</h2>
 
@@ -280,7 +310,7 @@ const kinds = [
       </p>
       <p class="closing-mail">
         Wissen wollen, wie weit das technisch geht?
-        <a href="/labor">Ins Labor schauen</a>.
+        <a href="/werkstatt">In die Werkstatt schauen</a>.
       </p>
     </section>
 
@@ -505,6 +535,36 @@ const kinds = [
 
   .case-link:hover svg {
     transform: translateX(3px);
+  }
+
+  /* ------------------------------------------- groesser als website */
+
+  .bigger-body p {
+    max-width: 58ch;
+    margin: 0 auto 18px;
+    font-size: clamp(1.02rem, 1.6vw, 1.18rem);
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.8);
+  }
+
+  .bigger-proof {
+    max-width: 58ch;
+    margin: clamp(24px, 4vh, 36px) auto 0;
+    padding-top: 22px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.55);
+  }
+
+  .bigger-proof a {
+    color: rgba(245, 158, 11, 0.9);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.3);
+  }
+
+  .bigger-proof a:hover {
+    border-bottom-color: rgba(245, 158, 11, 0.9);
   }
 
   /* --------------------------------------------------------- process */

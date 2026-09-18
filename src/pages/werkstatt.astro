@@ -1,6 +1,6 @@
 ---
 /**
- * /labor — Eigene Projekte ohne Auftraggeber.
+ * /werkstatt — Eigene Projekte ohne Auftraggeber.
  *
  * Bewusst KEIN Angebot und KEIN Nav-Eintrag: das hier ist
  * Glaubwuerdigkeit, nicht Conversion. Verlinkt von der Landing
@@ -10,7 +10,7 @@
  * thematisch nicht hingehoerte — dort geht es um Kunden-Anwendungen).
  *
  * Skaliert: weitere Experimente werden hier als zusaetzliche
- * .labor-project Sections angehaengt.
+ * .werkstatt-project Sections angehaengt.
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SubPageBackground from '../components/SubPageBackground.astro';
@@ -42,24 +42,24 @@ const techPoints = [
 ---
 
 <BaseLayout
-  pageTitle="Labor"
-  title="Labor — eigene Projekte | Tammo Studios"
-  description="Was ich baue, wenn niemand mich beauftragt. ASTEROID//01: Arcade-Spiel im Browser mit erzeugter Musik, weltweiter Bestenliste und mehrstufigem Endgegner. Komplett selbst entwickelt."
+  pageTitle="Werkstatt"
+  title="Werkstatt — eigene Projekte, Spiele-Entwicklung | Tammo Studios"
+  description="Eigene Projekte ohne Auftraggeber. ASTEROID//01: Arcade-Spiel im Browser mit erzeugter Musik, weltweiter Bestenliste und mehrstufigem Endgegner — komplett selbst entwickelt in Bremen."
 >
-  <main class="labor-page">
+  <main class="werkstatt-page">
     <SubPageBackground />
 
-    <header class="labor-hero">
-      <h1 class="subpage-hero-title">Labor</h1>
+    <header class="werkstatt-hero">
+      <h1 class="subpage-hero-title">Werkstatt</h1>
       <p class="subpage-hero-subtitle text-lines">
-        {'Was ich baue, wenn niemand mich beauftragt.\nHier teste ich Technik, die später in Kundenprojekten landet.'}
+        {'Was hier entsteht, hat kein Kunde bestellt.\nUnd landet trotzdem in Kundenprojekten.'}
       </p>
     </header>
 
     <!-- ================================================================
          Intro — warum es diese Seite gibt
          ============================================================== -->
-    <section class="labor-intro" data-reveal>
+    <section class="werkstatt-intro" data-reveal>
       <p>
         Nicht jedes Projekt braucht einen Auftraggeber. Manche Sachen baue ich,
         weil ich wissen will, ob ich sie bauen kann. Was dabei rauskommt, ist
@@ -71,10 +71,10 @@ const techPoints = [
     <!-- ================================================================
          ASTEROID//01
          ============================================================== -->
-    <section class="labor-project" aria-labelledby="asteroid-heading" data-reveal>
-      <p class="labor-eyebrow">PROJEKT 01</p>
-      <h2 id="asteroid-heading" class="labor-section-title">ASTEROID//01</h2>
-      <p class="labor-project-intro">
+    <section class="werkstatt-project" aria-labelledby="asteroid-heading" data-reveal>
+      <p class="werkstatt-eyebrow">PROJEKT 01</p>
+      <h2 id="asteroid-heading" class="werkstatt-section-title">ASTEROID//01</h2>
+      <p class="werkstatt-project-intro">
         Ein Arcade-Spiel, das direkt im Browser läuft. Ohne fertigen
         Spiele-Baukasten, alles von Hand gebaut. Angefangen als Frage
         („geht das überhaupt?"), geendet mit weltweiter Bestenliste und
@@ -107,7 +107,7 @@ const techPoints = [
         </div>
       </div>
 
-      <p class="labor-project-note">
+      <p class="werkstatt-project-note">
         Läuft auf <a href={GAME_URL} target="_blank" rel="noopener">asteroid.tammostudios.de</a>
         als eigenständige Anwendung. Auf dem Handy macht die
         <a href={GAME_URL} target="_blank" rel="noopener">Vollbild-Version</a>
@@ -118,8 +118,8 @@ const techPoints = [
     <!-- ================================================================
          Was drinsteckt
          ============================================================== -->
-    <section class="labor-tech" aria-labelledby="tech-heading" data-reveal>
-      <h2 id="tech-heading" class="labor-section-title">Was drinsteckt</h2>
+    <section class="werkstatt-tech" aria-labelledby="tech-heading" data-reveal>
+      <h2 id="tech-heading" class="werkstatt-section-title">Was drinsteckt</h2>
       <div class="tech-grid">
         {techPoints.map((t) => (
           <div class="tech-item" data-reveal>
@@ -133,8 +133,8 @@ const techPoints = [
     <!-- ================================================================
          Brücke zurück ins Geschäftliche
          ============================================================== -->
-    <section class="labor-bridge" data-reveal>
-      <p class="labor-bridge-text">
+    <section class="werkstatt-bridge" data-reveal>
+      <p class="werkstatt-bridge-text">
         Ein Spiel ist kein Auftrag. Aber die Technik dahinter ist dieselbe,
         die einen Konfigurator flüssig macht oder einen Rechner sofort
         durchrechnen lässt.
@@ -164,7 +164,7 @@ const techPoints = [
 </script>
 
 <style>
-  .labor-page {
+  .werkstatt-page {
     position: relative;
     background: #050507;
     padding: 140px 40px 80px;
@@ -172,13 +172,13 @@ const techPoints = [
     overflow: hidden;
   }
   @media (max-width: 768px) {
-    .labor-page {
+    .werkstatt-page {
       padding: 100px 20px 60px;
     }
   }
 
-  .labor-page > section,
-  .labor-hero {
+  .werkstatt-page > section,
+  .werkstatt-hero {
     position: relative;
     z-index: 1;
     max-width: 880px;
@@ -186,20 +186,20 @@ const techPoints = [
     margin-right: auto;
   }
 
-  .labor-page > section {
+  .werkstatt-page > section {
     margin-bottom: 96px;
     /* Site-Konvention: Section-Text zentriert, Karten-Inhalte bleiben
        linksbuendig (siehe .tech-item). */
     text-align: center;
   }
   @media (max-width: 768px) {
-    .labor-page > section {
+    .werkstatt-page > section {
       margin-bottom: 72px;
     }
   }
 
   /* === Hero === */
-  .labor-hero {
+  .werkstatt-hero {
     text-align: center;
     max-width: 780px;
     margin: 0 auto 80px;
@@ -207,10 +207,10 @@ const techPoints = [
   }
 
   /* === Intro === */
-  .labor-intro {
+  .werkstatt-intro {
     max-width: 640px;
   }
-  .labor-intro p {
+  .werkstatt-intro p {
     font-family: 'Inter', sans-serif;
     font-size: 1.08rem;
     line-height: 1.7;
@@ -219,7 +219,7 @@ const techPoints = [
   }
 
   /* === Shared === */
-  .labor-eyebrow {
+  .werkstatt-eyebrow {
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-weight: 500;
     font-size: 0.75rem;
@@ -228,7 +228,7 @@ const techPoints = [
     text-transform: uppercase;
     margin: 0 0 14px;
   }
-  .labor-section-title {
+  .werkstatt-section-title {
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-weight: 700;
     font-size: clamp(1.7rem, 3.4vw, 2.5rem);
@@ -239,7 +239,7 @@ const techPoints = [
   }
 
   /* === Projekt === */
-  .labor-project-intro {
+  .werkstatt-project-intro {
     max-width: 62ch;
     margin: 0 auto clamp(28px, 4vh, 40px);
     font-family: 'Inter', sans-serif;
@@ -341,7 +341,7 @@ const techPoints = [
     color: rgba(245, 158, 11, 0.95);
   }
 
-  .labor-project-note {
+  .werkstatt-project-note {
     margin: 16px 0 0;
     font-family: 'Inter', sans-serif;
     font-size: 0.9rem;
@@ -349,13 +349,13 @@ const techPoints = [
     color: rgba(245, 245, 244, 0.5);
   }
 
-  .labor-project-note a {
+  .werkstatt-project-note a {
     color: rgba(245, 158, 11, 0.9);
     text-decoration: none;
     border-bottom: 1px solid rgba(245, 158, 11, 0.3);
   }
 
-  .labor-project-note a:hover {
+  .werkstatt-project-note a:hover {
     border-bottom-color: rgba(245, 158, 11, 0.9);
   }
 
@@ -393,11 +393,11 @@ const techPoints = [
   }
 
   /* === Bridge === */
-  .labor-bridge {
+  .werkstatt-bridge {
     max-width: 640px;
     padding-top: 8px;
   }
-  .labor-bridge-text {
+  .werkstatt-bridge-text {
     font-family: 'Inter', sans-serif;
     font-size: 1.05rem;
     line-height: 1.65;

@@ -156,9 +156,7 @@ export const SECTION5 = {
       { label: 'Journal',      href: '/journal' },
       { label: 'Preise',       href: '/preise' },
       { label: 'Preisrechner', href: '/preisrechner' },
-      // /labor ist bewusst nicht in der Haupt-Navi: eigene Projekte sind
-      // Glaubwuerdigkeit, kein Angebot. Footer ist der richtige Ort.
-      { label: 'Labor',        href: '/labor' },
+      { label: 'Werkstatt',    href: '/werkstatt' },
     ],
     legalLinks: [
       { label: 'Impressum',   href: '/impressum' },
@@ -201,6 +199,10 @@ export const NAV_ITEMS = [
     children: [
       { label: 'Website', href: '/website' },
       { label: 'Software', href: '/software' },
+      // Werkstatt ist kein Auftragsangebot, steht hier aber trotzdem:
+      // sie zeigt die Bandbreite und stuetzt den App-/Spiele-Teil auf
+      // /software. Die Seite selbst macht den Unterschied klar.
+      { label: 'Werkstatt', href: '/werkstatt' },
       { label: 'Preise', href: '/preise' },
     ],
   },

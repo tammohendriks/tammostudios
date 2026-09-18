@@ -1,0 +1,163 @@
+---
+// Section 7 — AUS DER WERKSTATT (Teaser)
+//
+// Sitzt zwischen S6 (Werkzeug, #f3ecd7) und dem Closing (#ecdcbf) und
+// fuehrt die Cream-Reihe fort: #efe4cb liegt genau dazwischen, damit die
+// Abkuehlung Richtung Seitenende ungebrochen bleibt.
+//
+// Zweck: Bandbreite signalisieren, bevor das Closing um Kontakt bittet.
+// Bewusst kompakt und ohne Bild — der Teaser soll neugierig machen, das
+// Spiel selbst liegt auf /werkstatt. Kein Angebots-Versprechen: der
+// Auftrags-Pfad fuer Apps und groessere Software laeuft ueber /software.
+//
+// Style-Signatur identisch zu S5/S6/S7: Eyebrow (Neue Montreal 500,
+// 0.75rem, 0.3em tracking, amber), Charcoal-Headline, editorial
+// inline-link mit amber SVG-Arrow.
+---
+
+<section class="werkstatt-teaser" aria-labelledby="werkstatt-teaser-headline" data-section-bg="cream">
+  <div class="werkstatt-teaser__inner">
+    <p class="werkstatt-teaser__eyebrow">Aus der Werkstatt</p>
+    <h2 id="werkstatt-teaser-headline" class="werkstatt-teaser__headline">
+      Nicht jedes Projekt hat einen Kunden.
+    </h2>
+
+    <div class="werkstatt-teaser__body">
+      <p>
+        Zwischen zwei Aufträgen baue ich Sachen, die niemand bestellt hat.
+        Zuletzt ein Arcade-Spiel, das komplett im Browser läuft — mit
+        Musik, die erst beim Spielen entsteht, und einer weltweiten
+        Bestenliste.
+      </p>
+      <p>
+        Das ist kein Angebot, sondern ein Beleg: Was über eine normale
+        Website hinausgeht, kann ich auch. Und ich bin für ziemlich jede
+        Art von Projekt offen.
+      </p>
+    </div>
+
+    <a class="werkstatt-teaser__cta" href="/werkstatt">
+      <span>In die Werkstatt schauen</span>
+      <svg class="werkstatt-teaser__cta-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </a>
+  </div>
+</section>
+
+<style>
+  .werkstatt-teaser {
+    /* #efe4cb = Mittelwert S6 (#f3ecd7) und Closing (#ecdcbf), damit die
+       Cream-Reihe ohne Sprung weiterlaeuft. */
+    --cream: #efe4cb;
+    --charcoal: #1a1a1c;
+    --amber: #f59e0b;
+    --body: rgba(26, 26, 28, 0.72);
+
+    position: relative;
+    background: var(--cream);
+    background-image:
+      linear-gradient(to right, rgba(245, 158, 11, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(245, 158, 11, 0.05) 1px, transparent 1px);
+    background-size: 32px 32px;
+    padding: 120px 40px;
+  }
+
+  /* Amber-Hairline oben als Kapitel-Trenner — gleiche Signatur wie
+     S5/S6/S7. */
+  .werkstatt-teaser::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      transparent,
+      rgba(245, 158, 11, 0.35) 20%,
+      rgba(245, 158, 11, 0.35) 80%,
+      transparent
+    );
+  }
+
+  .werkstatt-teaser__inner {
+    max-width: 720px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .werkstatt-teaser__eyebrow {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin: 0 0 20px;
+  }
+
+  .werkstatt-teaser__headline {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: var(--charcoal);
+    margin: 0 0 28px;
+  }
+
+  .werkstatt-teaser__body p {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(1rem, 1.5vw, 1.12rem);
+    line-height: 1.65;
+    color: var(--body);
+    margin: 0 auto 16px;
+    max-width: 58ch;
+  }
+
+  .werkstatt-teaser__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+    padding: 0 0 2px;
+    border-bottom: 1px solid transparent;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: clamp(1.15rem, 1.6vw, 1.4rem);
+    color: var(--charcoal);
+    text-decoration: none;
+    transition: border-color 200ms ease, color 200ms ease;
+  }
+
+  .werkstatt-teaser__cta-arrow {
+    color: var(--amber);
+    transition: transform 200ms ease;
+  }
+
+  .werkstatt-teaser__cta:hover,
+  .werkstatt-teaser__cta:focus-visible {
+    border-bottom-color: rgba(245, 158, 11, 0.6);
+    color: #000;
+    outline: none;
+  }
+
+  .werkstatt-teaser__cta:hover .werkstatt-teaser__cta-arrow,
+  .werkstatt-teaser__cta:focus-visible .werkstatt-teaser__cta-arrow {
+    transform: translateX(4px);
+  }
+
+  .werkstatt-teaser__cta:focus-visible {
+    outline: 2px solid rgba(245, 158, 11, 0.5);
+    outline-offset: 6px;
+    border-radius: 2px;
+  }
+
+  /* Mobile — matcht S5/S6 padding-Schema */
+  @media (max-width: 767px) {
+    .werkstatt-teaser {
+      padding: 90px 20px;
+    }
+  }
+</style>
