@@ -94,6 +94,20 @@ const { footer } = SECTION5;
       ))}
     </nav>
   </div>
+
+  <!-- Datenschutz-Kurzhinweis. Bewusst eine dauerhafte Zeile statt eines
+       wegklickbaren Balkens: ein Banner muesste sich das Schliessen
+       merken und braeuchte dafuer Speicher auf dem Geraet — neben der
+       Aussage "wir speichern nichts" ein unnoetiger Widerspruch.
+       Der Wortlaut nennt die Cal.com-Ausnahme ausdruecklich, damit hier
+       nichts steht, was sich widerlegen laesst. -->
+  <p class="footer-privacy">
+    Diese Website setzt von sich aus keine Cookies und nutzt keine
+    Tracking-Tools. Ausgewertet werden nur anonyme Server-Logs. Cookies
+    können nur entstehen, wenn du die Terminbuchung aktiv öffnest.
+    {' '}
+    <a href="/datenschutz">Details</a>
+  </p>
 </footer>
 
 <style>
@@ -153,6 +167,40 @@ const { footer } = SECTION5;
     color: rgba(26, 26, 28, 0.5);
   }
 
+  /* Cream-Variante am Fuss der Startseite */
+  .site-footer.is-embedded-cream .footer-privacy {
+    /* 4.75:1 gegen den Cream-Grund #ecdcbf */
+    color: rgba(26, 26, 28, 0.65);
+  }
+
+  .site-footer.is-embedded-cream .footer-privacy a {
+    color: rgba(26, 26, 28, 0.65);
+    border-bottom-color: rgba(26, 26, 28, 0.25);
+  }
+
+  .site-footer.is-embedded-cream .footer-privacy a:hover {
+    color: #92400e;
+    border-bottom-color: #92400e;
+  }
+
+  /* Hellmodus auf den Unterseiten. Die Component ist gescoped, der
+     Theme-Schalter sitzt auf <html> — daher :global. */
+  :global(html[data-site-theme='light']) .footer-privacy {
+    /* Nicht --theme-text-muted: dessen 0.55 ergaeben nur 3.79:1 auf
+       #f8f4ea. 0.7 bringt 6.15:1. */
+    color: rgba(26, 26, 28, 0.7);
+  }
+
+  :global(html[data-site-theme='light']) .footer-privacy a {
+    color: var(--theme-text-dim);
+    border-bottom-color: rgba(26, 26, 28, 0.25);
+  }
+
+  :global(html[data-site-theme='light']) .footer-privacy a:hover {
+    color: #92400e;
+    border-bottom-color: #92400e;
+  }
+
   .site-footer.is-embedded-cream .footer-nav a:hover,
   .site-footer.is-embedded-cream .footer-nav a:focus-visible,
   .site-footer.is-embedded-cream .footer-legal a:hover,
@@ -189,6 +237,29 @@ const { footer } = SECTION5;
 
   .footer-copy {
     color: rgba(245, 245, 244, 0.5);
+  }
+
+  .footer-privacy {
+    margin: 4px 0 0;
+    max-width: 78ch;
+    font-size: 0.7rem;
+    line-height: 1.55;
+    /* 0.55 statt 0.38: ein Pflichthinweis muss lesbar sein. Gerechnet
+       ergibt 0.38 nur 3.24:1 gegen #050507, 0.55 bringt 5.82:1 und
+       liegt damit ueber den geforderten 4.5:1. */
+    color: rgba(245, 245, 244, 0.55);
+  }
+
+  .footer-privacy a {
+    color: rgba(245, 245, 244, 0.55);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(245, 245, 244, 0.2);
+    transition: color 200ms ease, border-color 200ms ease;
+  }
+
+  .footer-privacy a:hover {
+    color: rgba(245, 158, 11, 0.95);
+    border-bottom-color: rgba(245, 158, 11, 0.6);
   }
 
   .footer-nav,
