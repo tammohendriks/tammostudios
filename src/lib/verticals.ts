@@ -222,7 +222,7 @@ export const VERTICALS: readonly Vertical[] = [
         },
         {
           name: 'IBI',
-          image: '/referenzen/ibi-doc-website.webp',
+          image: '/referenzen/ibi.webp',
           alt: 'Vorschau der IBI-Website',
           url: 'https://www.ibi-doc.de',
           linkLabel: 'ibi-doc.de ansehen',

@@ -7,12 +7,14 @@ import ClosingCta from '../components/ClosingCta.astro';
 import { REFERENCES } from '../lib/references';
 import { VERTICAL_LINK_BY_CATEGORY } from '../lib/verticals';
 
-// Kategorien-Reihenfolge fix (Handwerk, Medizin, Gastronomie) — nicht
-// alphabetisch, nicht nach Count. Diese Reihenfolge spiegelt die
-// Sub-Zeile der Landing-Teaser ("Vier Sites, drei Branchen") und
-// gruppiert Handwerk zuerst, weil aktuell die beiden neuesten
-// Referenzen dort liegen.
-const CATEGORY_ORDER = ['Handwerk', 'Medizin', 'Gastronomie'] as const;
+// Kategorien-Reihenfolge fix — nicht alphabetisch, nicht nach Count.
+// Handwerk zuerst, danach die uebrigen in der Reihenfolge, in der die
+// Branchen dazugekommen sind. Medien ist die juengste.
+//
+// Hinweis: der Landing-Teaser (Section3Referenzen) sagt "Vier Sites,
+// drei Branchen". Das bleibt richtig — er zeigt vier fest gewaehlte
+// Slugs aus drei Branchen, nicht den Gesamtbestand.
+const CATEGORY_ORDER = ['Handwerk', 'Medizin', 'Gastronomie', 'Medien'] as const;
 
 const categoryCounts = CATEGORY_ORDER.map((cat) => ({
   slug: cat.toLowerCase(),
@@ -26,14 +28,14 @@ const totalCount = REFERENCES.length;
 <BaseLayout
   pageTitle="Referenzen"
   title="Referenzen: Websites aus Bremen | Tammo Studios"
-  description="Websites, die ich zuletzt gebaut habe: Arztpraxis, Betriebsmedizin, Dachdecker, Heizungsbau, Eckkneipe. Jede ein Original, keine Vorlage."
+  description="Websites, die ich zuletzt gebaut habe: Arztpraxis, Betriebsmedizin, Dachdecker, Heizungsbau, Eckkneipe, Mediengestaltung. Jede ein Original."
 >
   <main class="referenzen-page">
     <SubPageBackground />
     <header class="ref-hero">
       <h1 class="subpage-hero-title">Referenzen.</h1>
       <p class="subpage-hero-subtitle ref-description text-lines">
-        {'Eine kleine Auswahl der Sites, die ich zuletzt für Unternehmen gebaut habe.\nVon der Praxis bis zur Kneipe.'}
+        {'Eine kleine Auswahl der Sites, die ich zuletzt für Unternehmen gebaut habe.\nVon der Praxis bis zum Mediengestalter.'}
       </p>
     </header>
 
