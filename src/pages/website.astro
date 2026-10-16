@@ -520,8 +520,15 @@ const websiteRefs = REFERENCES.filter((r) =>
     border-color: rgba(245, 158, 11, 0.4);
     transform: translateY(-3px);
   }
+  /* 2/1 statt 4/3: die Screenshots sind rund 2:1, in einem
+     4/3-Rahmen schnitt object-fit:cover ueber 34 % der Breite ab —
+     links und rechts, also genau da wo Logo und Navigation sitzen.
+     Bei 2/1 bleibt unter 1,5 % weg. Gleicher Wert wie auf
+     /referenzen, dadurch sehen die Karten auf beiden Seiten gleich
+     aus. object-position haelt den Kopfbereich im Bild, falls ein
+     Screenshot doch einmal hoeher ausfaellt. */
   .ref-preview-image {
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 2 / 1;
     background: rgba(0, 0, 0, 0.4);
     overflow: hidden;
   }
@@ -529,6 +536,7 @@ const websiteRefs = REFERENCES.filter((r) =>
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: top center;
     display: block;
   }
   .ref-preview-body {
