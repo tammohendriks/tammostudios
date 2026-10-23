@@ -69,6 +69,11 @@
       "statusCode": 301
     },
     {
+      "source": "/en/journal",
+      "destination": "/journal",
+      "statusCode": 301
+    },
+    {
       "source": "/en/journal/:path*",
       "destination": "/journal/:path*",
       "statusCode": 301
