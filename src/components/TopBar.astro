@@ -41,6 +41,12 @@ const angebotKinder = [
   eintrag('werkstatt', d.nav.werkstatt),
 ].filter((e): e is NavChild => e !== null);
 
+// Der Kontakt-Knopf steht neben der Navigation, nicht darin. Sein Pfad
+// kommt trotzdem aus der Routen-Tabelle — vorher stand hier '/kontakt'
+// fest im Markup, und ein Klick darauf fuehrte von jeder englischen
+// Seite zurueck ins Deutsche.
+const kontaktPfad = pathOr('kontakt', locale);
+
 const navItems: NavItem[] = [
   { label: d.nav.home, href: pathOr('home', locale), key: 'startseite' },
   ...(eintrag('ueber', d.nav.ueber) ? [{ label: d.nav.ueber, href: pathOr('ueber', locale) }] : []),
@@ -141,7 +147,7 @@ function itemIsActive(item: NavItem): boolean {
     <span></span>
   </button>
 
-  <a class="cta-orbital topbar-cta" href="/kontakt" aria-current={isActive('/kontakt') ? 'page' : undefined}>
+  <a class="cta-orbital topbar-cta" href={kontaktPfad} aria-current={isActive(kontaktPfad) ? 'page' : undefined}>
     <span class="cta-label">{d.nav.kontakt}</span>
     <svg
       width="14"
@@ -225,7 +231,7 @@ function itemIsActive(item: NavItem): boolean {
       );
     })}
     <li class="mobile-cta-wrap">
-      <a class="cta-orbital" href="/kontakt" aria-current={isActive('/kontakt') ? 'page' : undefined}>
+      <a class="cta-orbital" href={kontaktPfad} aria-current={isActive(kontaktPfad) ? 'page' : undefined}>
         <span class="cta-label">{d.nav.kontakt}</span>
         <svg
           width="14"
