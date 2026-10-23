@@ -90,6 +90,16 @@ export const de = {
     },
   },
 
+  // Das Vorschau-Fenster der Referenzen. Steht hier und nicht in einer
+  // Seiten-Datei, weil die Komponente auf zwei Seiten benutzt wird.
+  referenzModal: {
+    neuerTab: 'In neuem Tab',
+    schliessen: 'Modal schließen',
+    rahmenTitel: 'Referenz-Vorschau',
+    nichtEinbettbar: 'Diese Seite kann nicht direkt eingebettet werden.',
+    neuerTabOeffnen: 'Im neuen Tab öffnen',
+  },
+
   journal: {
     // Hinweis unter der Journal-Unterzeile. Steht nur auf der
     // deutschen Seite, weil es die englische nicht gibt.

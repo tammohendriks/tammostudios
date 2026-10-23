@@ -7,6 +7,9 @@
 // Trigger auf der Page nutzen dieselbe Modal-Instanz. Fuer Rapid-
 // Open/Close-Sicherheit + saubere Cross-Origin-Load-Detection wird
 // AbortController fuer Listener + 12s Safety-Timer verwendet.
+import { t } from '../lib/i18n';
+
+const d = t(Astro.url.pathname);
 ---
 
 <div class="ref-modal" id="ref-modal" hidden>
@@ -27,7 +30,7 @@
           target="_blank"
           rel="noopener noreferrer"
         >
-          <span>In neuem Tab</span>
+          <span>{d.referenzModal.neuerTab}</span>
           <svg
             width="14"
             height="14"
@@ -46,7 +49,7 @@
           class="ref-modal-close"
           data-close-modal
           type="button"
-          aria-label="Modal schließen"
+          aria-label={d.referenzModal.schliessen}
         >
           <svg
             width="16"
@@ -69,11 +72,11 @@
         class="ref-modal-iframe"
         id="ref-modal-iframe"
         src=""
-        title="Referenz-Vorschau"
+        title={d.referenzModal.rahmenTitel}
         sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
         loading="lazy"></iframe>
       <div class="ref-modal-fallback" id="ref-modal-fallback" hidden>
-        <p>Diese Seite kann nicht direkt eingebettet werden.</p>
+        <p>{d.referenzModal.nichtEinbettbar}</p>
         <a
           class="cta-link ref-modal-fallback-link"
           id="ref-modal-fallback-link"
@@ -81,7 +84,7 @@
           target="_blank"
           rel="noopener noreferrer"
         >
-          Im neuen Tab öffnen
+          {d.referenzModal.neuerTabOeffnen}
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
         </a>
       </div>

@@ -41,7 +41,7 @@ export const ROUTES = {
   website:      { de: '/website',               en: '/en/website' },
   software:     { de: '/software',              en: '/en/software' },
   preise:       { de: '/preise',                en: '/en/pricing' },
-  referenzen:   { de: '/referenzen',            en: null }, // → /en/work
+  referenzen:   { de: '/referenzen',            en: '/en/work' },
   werkstatt:    { de: '/werkstatt',             en: '/en/lab' },
   kontakt:      { de: '/kontakt',               en: '/en/contact' },
   handwerk:     { de: '/webdesign-handwerk',    en: '/en/web-design-contractors' },

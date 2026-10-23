@@ -77,6 +77,14 @@ export const en: Shape<typeof de> = {
     },
   },
 
+  referenzModal: {
+    neuerTab: 'In a new tab',
+    schliessen: 'Close the preview',
+    rahmenTitel: 'Reference preview',
+    nichtEinbettbar: 'This site cannot be embedded directly.',
+    neuerTabOeffnen: 'Open in a new tab',
+  },
+
   journal: {
     nurDeutsch: 'The journal is only available in German.',
   },

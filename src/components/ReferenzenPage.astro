@@ -1,0 +1,601 @@
+---
+/**
+ * Liegt als Komponente und nicht in src/pages, weil es zwei Routen
+ * darauf gibt: /referenzen und /en/work. Markup und <style>-Block
+ * gehoeren dabei zusammen.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SubPageBackground from './SubPageBackground.astro';
+import ReferenzModal from './ReferenzModal.astro';
+import SiteFooter from './SiteFooter.astro';
+import ClosingCta from './ClosingCta.astro';
+import { REFERENCES } from '../lib/references';
+import { subtitleFor } from '../lib/references.en';
+import { VERTICAL_KEY_BY_CATEGORY } from '../lib/verticals';
+import { localeOf, path } from '../lib/routes.mjs';
+import { REFERENZEN } from '../lib/i18n/seiten/referenzen';
+
+const locale = localeOf(Astro.url.pathname);
+const d = REFERENZEN[locale];
+
+const softwarePfad = path('software', locale);
+
+/** Einheit in der passenden Zahlform. */
+const einheit = (anzahl: number) =>
+  anzahl === 1 ? d.filter.einheitEinzahl : d.filter.einheit;
+
+/**
+ * Verweis von einer Karte auf die passende Branchenseite, oder null.
+ *
+ * Null kommt in zwei Faellen: die Kategorie hat keine Branchenseite
+ * (Medien), oder die Seite gibt es in dieser Sprache nicht.
+ */
+function branchenLink(kategorie: string) {
+  const key = VERTICAL_KEY_BY_CATEGORY[kategorie];
+  if (!key) return null;
+  const pfad = path(key, locale);
+  if (!pfad) return null;
+  const labels: Record<string, string> = d.karte.branchenLinks;
+  return { pfad, label: labels[kategorie] };
+}
+
+// Kategorien-Reihenfolge fix — nicht alphabetisch, nicht nach Count.
+// Handwerk zuerst, danach die uebrigen in der Reihenfolge, in der die
+// Branchen dazugekommen sind. Medien ist die juengste.
+//
+// Hinweis: der Landing-Teaser (Section3Referenzen) sagt "Vier Sites,
+// drei Branchen". Das bleibt richtig — er zeigt vier fest gewaehlte
+// Slugs aus drei Branchen, nicht den Gesamtbestand.
+const CATEGORY_ORDER = ['Handwerk', 'Medizin', 'Gastronomie', 'Medien'] as const;
+
+// slug bleibt in jeder Sprache derselbe: er steht als data-Attribut am
+// Chip und an jeder Karte, und er landet als #handwerk in der Adresse.
+// Uebersetzt wird nur label.
+const categoryCounts = CATEGORY_ORDER.map((cat) => ({
+  slug: cat.toLowerCase(),
+  label: d.filter.kategorien[cat],
+  count: REFERENCES.filter((r) => r.category === cat).length,
+})).filter((c) => c.count > 0);
+
+const totalCount = REFERENCES.length;
+---
+
+<BaseLayout
+  pageTitle={d.meta.pageTitle}
+  title={d.meta.title}
+  description={d.meta.description}
+>
+  <main class="referenzen-page">
+    <SubPageBackground />
+    <header class="ref-hero">
+      <h1 class="subpage-hero-title">{d.hero.headline}</h1>
+      <p class="subpage-hero-subtitle ref-description text-lines">{d.hero.sub}</p>
+    </header>
+
+    <div
+      class="ref-filter"
+      role="group"
+      aria-label={d.filter.label}
+      data-reveal
+    >
+      <button
+        type="button"
+        class="ref-filter-chip is-active"
+        data-filter="alle"
+        aria-pressed="true"
+      >
+        <span class="ref-filter-label">{d.filter.alle}</span>
+        <span class="ref-filter-count" aria-hidden="true">{totalCount}</span>
+        <span class="sr-only">, {totalCount} {einheit(totalCount)}</span>
+      </button>
+      {categoryCounts.map((cat) => (
+        <button
+          type="button"
+          class="ref-filter-chip"
+          data-filter={cat.slug}
+          aria-pressed="false"
+        >
+          <span class="ref-filter-label">{cat.label}</span>
+          <span class="ref-filter-count" aria-hidden="true">{cat.count}</span>
+          <span class="sr-only">, {cat.count} {einheit(cat.count)}</span>
+        </button>
+      ))}
+    </div>
+
+    <section class="ref-grid" data-active-filter="alle">
+      {REFERENCES.map((ref) => (
+        <article
+          class="ref-card"
+          data-slug={ref.slug}
+          data-category={ref.category.toLowerCase()}
+          data-reveal
+        >
+          <div class="ref-preview">
+            <img
+              src={ref.preview}
+              alt={`${d.karte.vorschauVon} ${ref.title}`}
+              loading="lazy"
+            />
+            <div class="ref-overlay">
+              <span class="ref-overlay-label">{d.karte.ansehen}</span>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M7 17L17 7M7 7h10v10" />
+              </svg>
+            </div>
+          </div>
+          <div class="ref-info">
+            <h3 class="ref-card-title">{ref.title}</h3>
+            <p class="ref-card-subtitle">{subtitleFor(ref, locale)}</p>
+            <div class="ref-tags">
+              {ref.tags.map((tag) => (
+                <span class="ref-tag">{tag}</span>
+              ))}
+            </div>
+            {branchenLink(ref.category) && (
+              <a
+                class="cta-link ref-vertical-link"
+                href={branchenLink(ref.category)!.pfad}
+                aria-label={`${d.karte.mehrZu} ${branchenLink(ref.category)!.label}`}
+              >
+                {d.karte.mehrZu} {branchenLink(ref.category)!.label}
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+              </a>
+            )}
+          </div>
+          <button
+            class="ref-card-trigger"
+            data-url={ref.url}
+            data-title={ref.title}
+            type="button"
+            aria-label={`${ref.title} ${d.karte.modalOeffnenNach}`}
+          />
+        </article>
+      ))}
+    </section>
+
+    <ClosingCta
+      headline="ueberzeugt"
+      recommendation={
+        softwarePfad
+          ? { text: d.empfehlung.text, label: d.empfehlung.label, href: softwarePfad }
+          : undefined
+      }
+    />
+
+    <ReferenzModal />
+  </main>
+
+  <SiteFooter />
+</BaseLayout>
+
+<style>
+  .referenzen-page {
+    min-height: calc(100vh - 200px);
+    background: #050507;
+    padding: 140px 40px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  /* Atmosphäre via <SubPageBackground />, geteilt mit /ueber + /preise. */
+
+  .ref-hero {
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto 80px;
+    position: relative;
+    z-index: 1;
+    padding-top: 32px;
+  }
+
+  /* Typografie der H1 + Subtitle kommt aus .subpage-hero-title /
+     .subpage-hero-subtitle in global.css. .ref-description bleibt
+     als Marker-Klasse für etwaige seitenspezifische Overrides. */
+
+  /* === Filter Chips ===
+     Pill-Row zwischen Hero und Grid. Visuell verwandt mit den
+     .ref-tag-Badges auf den Cards (Amber-Sprache), aber groesser
+     und interaktiv. Wraps auf schmalen Viewports. */
+  .ref-filter {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    max-width: 1200px;
+    margin: 0 auto 48px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .ref-filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 18px 9px 20px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 9999px;
+    color: rgba(245, 245, 244, 0.68);
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition:
+      background-color 240ms ease,
+      border-color 240ms ease,
+      color 240ms ease,
+      box-shadow 240ms ease;
+  }
+
+  .ref-filter-chip:hover {
+    background: rgba(245, 158, 11, 0.05);
+    border-color: rgba(245, 158, 11, 0.28);
+    color: rgba(245, 245, 244, 0.9);
+  }
+
+  .ref-filter-chip:focus-visible {
+    outline: 2px solid rgba(245, 158, 11, 0.8);
+    outline-offset: 3px;
+  }
+
+  .ref-filter-chip.is-active {
+    background: rgba(245, 158, 11, 0.12);
+    border-color: rgba(245, 158, 11, 0.5);
+    color: #f5f5f4;
+    box-shadow:
+      0 0 24px rgba(245, 158, 11, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+
+  /* Count-Badge: neutraler Kreis mit Zahl. Aktiv wird er amber. */
+  .ref-filter-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(245, 245, 244, 0.7);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    transition:
+      background-color 240ms ease,
+      color 240ms ease;
+  }
+
+  .ref-filter-chip.is-active .ref-filter-count {
+    background: rgba(245, 158, 11, 0.9);
+    color: #1a1a1a;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .ref-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    gap: 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* === Filter-Animation ===
+     Non-matching Cards werden direkt aus dem Flow entfernt
+     (.is-removed → display:none) — Grid reflowt instant, keine
+     Ueberschneidung zwischen fadendem Card und schon-reflowten
+     Nachbarn. Dafuer kriegen neu erscheinende Cards eine sanfte
+     Enter-Animation aus opacity 0 + translate 8px in ihre finale
+     Position (kein transform-Property, damit Hover-translateY(-4px)
+     nicht kollidiert — moderne 'translate' Longhand ist separat). */
+  .ref-card.is-removed {
+    display: none;
+  }
+
+  .ref-card.is-entering {
+    opacity: 0;
+    translate: 0 12px;
+  }
+
+  .ref-card {
+    transition:
+      transform 300ms ease,
+      translate 320ms ease,
+      opacity 320ms ease,
+      border-color 300ms ease,
+      box-shadow 300ms ease;
+  }
+
+  @media (max-width: 768px) {
+    .ref-grid {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    .referenzen-page {
+      padding: 100px 16px 60px;
+    }
+    .ref-filter {
+      gap: 8px;
+      margin-bottom: 32px;
+    }
+    .ref-filter-chip {
+      padding: 8px 14px 8px 16px;
+      font-size: 0.72rem;
+      gap: 8px;
+    }
+    .ref-filter-count {
+      min-width: 20px;
+      height: 20px;
+      font-size: 0.62rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ref-card,
+    .ref-card.is-entering,
+    .ref-filter-chip,
+    .ref-filter-count {
+      transition: none;
+      translate: 0 0;
+    }
+  }
+
+  .ref-card {
+    position: relative;
+    background: rgba(15, 15, 18, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .ref-card:hover,
+  .ref-card:focus-within {
+    transform: translateY(-4px);
+    border-color: rgba(245, 158, 11, 0.4);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.4),
+      0 0 48px rgba(245, 158, 11, 0.15);
+  }
+
+  /* Card-Preview-Aspect matched die Source-WebP-Aspect (~2:1).
+     Vorher 16:10 → 13% seitliche Crops pro Card, was Sites mit
+     Randcontent (waermepower Headline links, ibi-doc Right-Nav)
+     abschnitt. 2:1 zeigt alle WebPs edge-to-edge; andere 3 verlieren
+     nur ~0.5% pro Seite (unsichtbar). */
+  .ref-preview {
+    position: relative;
+    aspect-ratio: 2 / 1;
+    overflow: hidden;
+    background: #0a0a0c;
+  }
+
+  .ref-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    transition: transform 600ms ease;
+  }
+
+  .ref-card:hover .ref-preview img,
+  .ref-card:focus-within .ref-preview img {
+    transform: scale(1.05);
+  }
+
+  .ref-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(245, 158, 11, 0.15) 0%,
+      rgba(0, 0, 0, 0.4) 100%
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: #fff;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 0.05em;
+    opacity: 0;
+    transition: opacity 300ms ease;
+  }
+
+  .ref-card:hover .ref-overlay,
+  .ref-card:focus-within .ref-overlay {
+    opacity: 1;
+  }
+
+  .ref-info {
+    padding: 24px;
+  }
+
+  .ref-card-title {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: #f5f5f4;
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+
+  .ref-card-subtitle {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 0.95rem;
+    color: rgba(245, 245, 244, 0.65);
+    margin: 0 0 16px;
+  }
+
+  .ref-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .ref-tag {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(245, 158, 11, 0.85);
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    padding: 4px 10px;
+    border-radius: 4px;
+  }
+
+  /* Unsichtbarer Click-Layer über die ganze Card — fängt Click,
+     liest data-url. Nutzt button statt a href, damit Modal-Logik
+     vor Navigation greift. focus-visible Ring für Tastatur-User. */
+  .ref-card-trigger {
+    position: absolute;
+    inset: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 2;
+  }
+
+  .ref-card-trigger:focus-visible {
+    outline: 2px solid rgba(245, 158, 11, 0.8);
+    outline-offset: 4px;
+  }
+
+  /* Cross-Link zu passender Vertical Landing Page. Aussehen kommt aus
+     .cta-link (global.css), die Positionierung bleibt hier: der Link
+     MUSS auf z-index 3 sitzen, damit der Klick vor dem
+     ref-card-trigger (z-index 2) greift — sonst oeffnet sich das
+     Referenz-Modal statt der Landingpage. */
+  .ref-vertical-link {
+    position: relative;
+    z-index: 3;
+    margin-top: 14px;
+  }
+
+
+  /* Modal-Styles wurden in src/components/ReferenzModal.astro
+     ausgelagert — Component ist auf beiden Pages einsetzbar
+     (/referenzen + Landing-Teaser). */
+
+  /* Footer-Styles leben jetzt in SiteFooter.astro (Component-scoped). */
+
+  /* Ein Satz unter dem Grid statt einer Zeile pro Karte — die Karten
+     sind visuell dicht genug, und der Hinweis gilt ohnehin nur fuer
+     einen Teil von ihnen. */
+
+</style>
+
+<!-- Modal-Script lebt in src/components/ReferenzModal.astro -->
+
+<script>
+  // === Referenzen-Filter ===
+  // Chips im .ref-filter setzen data-active-filter am Grid, Cards mit
+  // nicht-matchendem data-category werden ausgeblendet.
+  //
+  // Flow: click → aria-pressed/.is-active am Chip toggeln → alle Cards
+  // markieren als .is-hidden (fade+scale) → nach 220ms transitionend
+  // .is-removed (display:none) → matching Cards direkt sichtbar lassen.
+  //
+  // URL-Hash sync (#handwerk etc.) fuer Deep-Links + Reload-Persistenz.
+
+  const filterRoot = document.querySelector<HTMLElement>('.ref-filter');
+  const grid = document.querySelector<HTMLElement>('.ref-grid');
+
+  if (filterRoot && grid) {
+    const chips = Array.from(
+      filterRoot.querySelectorAll<HTMLButtonElement>('.ref-filter-chip')
+    );
+    const cards = Array.from(
+      grid.querySelectorAll<HTMLElement>('.ref-card')
+    );
+    const validFilters = new Set(chips.map((c) => c.dataset.filter));
+
+    const applyFilter = (filter: string) => {
+      grid.dataset.activeFilter = filter;
+
+      chips.forEach((chip) => {
+        const isActive = chip.dataset.filter === filter;
+        chip.classList.toggle('is-active', isActive);
+        chip.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+      });
+
+      cards.forEach((card) => {
+        const matches =
+          filter === 'alle' || card.dataset.category === filter;
+
+        if (matches) {
+          const wasHidden = card.classList.contains('is-removed');
+          card.classList.remove('is-removed');
+          if (wasHidden) {
+            // Card kehrt in den Grid zurueck: Enter-Animation triggern.
+            // Doppelter rAF garantiert, dass der Browser den
+            // is-entering-Startzustand (opacity 0, translate 12px) in
+            // einem Frame paintet, bevor der Class-Remove die
+            // Transition auf den Normalzustand ausloest.
+            card.classList.add('is-entering');
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                card.classList.remove('is-entering');
+              });
+            });
+          }
+        } else {
+          // Direkt aus dem Flow nehmen — kein Fade-out. Verhindert
+          // die visuelle Ueberschneidung zwischen fadendem Card und
+          // schon-reflowten Nachbarn (Grid reflowt sonst mid-transition).
+          card.classList.add('is-removed');
+        }
+      });
+    };
+
+    chips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const filter = chip.dataset.filter || 'alle';
+        applyFilter(filter);
+
+        // Hash aktualisieren (ohne Scroll-Jump). "alle" clearct den Hash.
+        const nextHash = filter === 'alle' ? '' : `#${filter}`;
+        if (nextHash) {
+          history.replaceState(null, '', nextHash);
+        } else if (location.hash) {
+          history.replaceState(null, '', location.pathname);
+        }
+      });
+    });
+
+    // Initial-State aus URL-Hash lesen (falls valider Filter).
+    const initialHash = location.hash.slice(1).toLowerCase();
+    if (initialHash && validFilters.has(initialHash)) {
+      applyFilter(initialHash);
+    }
+  }
+</script>
+

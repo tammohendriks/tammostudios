@@ -11,10 +11,19 @@
 // Zuordnung Reference-Kategorie → Vertical-Slug (fuer /referenzen Cross-
 // Links): Handwerk → handwerk, Medizin → praxis, Gastronomie → gastronomie.
 
-export const VERTICAL_LINK_BY_CATEGORY: Record<string, { slug: string; label: string }> = {
-  Handwerk: { slug: 'webdesign-handwerk', label: 'Websites für Handwerk' },
-  Medizin: { slug: 'webdesign-praxis', label: 'Websites für Praxen' },
-  Gastronomie: { slug: 'webdesign-gastronomie', label: 'Websites für Gastronomie' },
+/**
+ * Kategorie einer Referenz → Routen-SCHLUESSEL der passenden
+ * Branchenseite.
+ *
+ * Vorher stand hier der fertige deutsche Pfad und die Beschriftung.
+ * Beides geht in zwei Sprachen nicht: der Pfad haengt an der Sprache,
+ * die Beschriftung steht im Woerterbuch. Uebrig bleibt die Zuordnung
+ * selbst, und die ist sprachunabhaengig.
+ */
+export const VERTICAL_KEY_BY_CATEGORY: Record<string, string> = {
+  Handwerk: 'handwerk',
+  Medizin: 'praxis',
+  Gastronomie: 'gastronomie',
 };
 
 export type VerticalReference = {
