@@ -33,6 +33,32 @@ const renderNoindex = !allowIndexing || noindex;
 // (…de/), die Sitemap liefert sie aber ohne (…de). Zwei Schreibweisen
 // derselben Seite in Canonical und Sitemap sind unnoetig.
 const canonicalURL = absUrl(Astro.url.pathname);
+
+// ZU DEN UEBERGANGS-REGELN WEITER UNTEN (is:inline im <head>):
+//
+// Sie stehen inline, und das ist nicht kosmetisch. Der Uebergang beim
+// Sprachwechsel geht ueber zwei Dokumente: der Browser entscheidet beim
+// ANKOMMEN der neuen Seite, ob er ihn weiterfuehrt, und braucht
+// @view-transition zu diesem Zeitpunkt bereits. Liegt die Regel in
+// einer nachgeladenen Datei, kommt sie zu spaet und der Uebergang
+// faellt still aus. Im Dev-Server liefert Astro JEDEN <style>-Block als
+// nachgeladenes Modul aus — dort waere der Uebergang damit nie zu
+// sehen, im Build dagegen schon. Genau dieser Unterschied hat ihn
+// zuerst unsichtbar gemacht.
+//
+// Aus demselben Grund stehen die Keyframes hier und nicht bei den
+// Umschaltern: sie muessen zur selben Zeit greifen.
+//
+// Was die beiden Uebergaenge zeigen:
+//   Sprachwechsel — die alte Fassung zieht zur Seite ab, die neue kommt
+//   von der anderen nach, in Richtung des Daumens am Umschalter. Vier
+//   Prozent Weg; mehr sieht nach Diashow aus.
+//   Themenwechsel — der neue Zustand wird als Kreis vom Knopf aus ueber
+//   den alten gezogen, wie Licht, das von einem Schalter ausgeht. Den
+//   alten wegzuwischen saehe aus wie ein Loch in der Seite.
+//
+// Ohne gesetzte Richtung laeuft nichts: jede andere Navigation wechselt
+// ohne Ueberblendung. Die Weiche dafuer steht im Skript am Fuss.
 const alternateLinks = hreflangs(Astro.url.pathname);
 // Seitenart ueber die Routen-Tabelle statt ueber Pfad-Vergleiche. Die
 // alten Pruefungen (pathname === '/' und /^\/webdesign-/) waeren fuer
@@ -332,32 +358,49 @@ const jsonLdGraph = {
         }
       } catch (e) {}
     </script>
-    <style is:global>
-      /*
-       * Uebergaenge zwischen zwei Dokumenten erlauben. Das gilt fuer
-       * JEDE Navigation von dieser Seite aus — animiert werden soll
-       * aber nur der Sprachwechsel. Die Weiche dafuer steht im Skript
-       * am Fuss dieses Layouts.
-       *
-       * Die Regel steht hier und nicht im Sprach-Umschalter: dessen
-       * Stile landen im geteilten CSS-Bundle und damit auch auf Seiten
-       * ohne Umschalter (Journal, Rechtstexte). Dort liefe dann die
-       * eingebaute Ueberblendung bei jedem Klick, ohne dass ein Skript
-       * sie abbricht.
-       */
-      @view-transition {
-        navigation: auto;
-      }
+    <!-- Uebergaenge der beiden Umschalter. Inline, weil der Browser
+         @view-transition beim Ankommen der neuen Seite schon braucht —
+         die Begruendung steht im Frontmatter. -->
+    <style is:inline>
+      @view-transition { navigation: auto; }
 
-      /*
-       * Letzte Absicherung: ohne gesetzte Richtung keine Bewegung. Wenn
-       * das Skript unten den Uebergang aus irgendeinem Grund nicht
-       * abbricht, bleibt der Wechsel wenigstens ohne Ueberblendung —
-       * genau wie vorher.
-       */
+      /* Normalfall: keine Richtung gesetzt, keine Bewegung. */
       html:not([data-sprach-richtung]):not([data-thema-wechsel])::view-transition-old(root),
       html:not([data-sprach-richtung]):not([data-thema-wechsel])::view-transition-new(root) {
         animation: none;
+      }
+
+      /* Sprachwechsel: Schub in Richtung des Daumens am Umschalter. */
+      html[data-sprach-richtung='en']::view-transition-old(root) {
+        animation: sprache-raus-links 220ms cubic-bezier(0.4, 0, 1, 1) both;
+      }
+      html[data-sprach-richtung='en']::view-transition-new(root) {
+        animation: sprache-rein-rechts 320ms cubic-bezier(0, 0, 0.2, 1) both;
+      }
+      html[data-sprach-richtung='de']::view-transition-old(root) {
+        animation: sprache-raus-rechts 220ms cubic-bezier(0.4, 0, 1, 1) both;
+      }
+      html[data-sprach-richtung='de']::view-transition-new(root) {
+        animation: sprache-rein-links 320ms cubic-bezier(0, 0, 0.2, 1) both;
+      }
+      @keyframes sprache-raus-links  { to   { opacity: 0; transform: translateX(-4%); } }
+      @keyframes sprache-rein-rechts { from { opacity: 0; transform: translateX(4%);  } }
+      @keyframes sprache-raus-rechts { to   { opacity: 0; transform: translateX(4%);  } }
+      @keyframes sprache-rein-links  { from { opacity: 0; transform: translateX(-4%); } }
+
+      /* Themenwechsel: Lichtkegel vom Knopf aus ueber den alten Stand.
+         mix-blend-mode hebt die eingebaute Vorgabe auf, die die
+         Ueberlappung aufhellen wuerde. */
+      html[data-thema-wechsel]::view-transition-old(root) {
+        animation: none; mix-blend-mode: normal; z-index: 0;
+      }
+      html[data-thema-wechsel]::view-transition-new(root) {
+        animation: thema-kreis 560ms cubic-bezier(0.33, 0, 0.2, 1) both;
+        mix-blend-mode: normal; z-index: 1;
+      }
+      @keyframes thema-kreis {
+        from { clip-path: circle(0 at var(--thema-x) var(--thema-y)); }
+        to   { clip-path: circle(var(--thema-r) at var(--thema-x) var(--thema-y)); }
       }
     </style>
     <slot name="head" />
@@ -420,16 +463,20 @@ const jsonLdGraph = {
           const uebergang = ereignis.viewTransition;
           if (!uebergang) return;
           const merker = vormerker();
-          // Geht die Navigation woanders hin als der Umschalter zeigte,
-          // ist der Vormerker von einem abgebrochenen Wechsel uebrig.
-          // Weg damit, sonst animiert der naechste beliebige Klick.
-          const ziel = pfadVon(ereignis.activation?.entry?.url);
-          if (!merker || merker.ziel !== ziel) {
-            vergessen();
+          if (!merker || reduziert()) {
             uebergang.skipTransition();
             return;
           }
-          if (reduziert()) {
+          // Wohin die Navigation geht, steht in der Navigation-API.
+          // Die gibt es nicht in jedem Browser — fehlt sie, bleibt
+          // ziel null und es wird hier nicht geprueft. Die ankommende
+          // Seite prueft es ohnehin noch einmal, dort steht der Pfad
+          // immer zur Verfuegung.
+          const ziel = pfadVon(ereignis.activation?.entry?.url);
+          if (ziel && merker.ziel !== ziel) {
+            // Der Vormerker ist von einem abgebrochenen Wechsel uebrig.
+            // Weg damit, sonst animiert der naechste beliebige Klick.
+            vergessen();
             uebergang.skipTransition();
             return;
           }

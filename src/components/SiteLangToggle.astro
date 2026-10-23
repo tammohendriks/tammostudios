@@ -92,57 +92,9 @@ const istEnglisch = locale === 'en';
     });
 </script>
 
-<style is:global>
-  /*
-   * Wie ein Sprachwechsel aussieht. Die Weiche, OB ueberhaupt ein
-   * Uebergang laeuft, steht im BaseLayout; hier steht nur das Bild.
-   *
-   * Nach Englisch: der Daumen am Umschalter laeuft nach rechts, also
-   * zieht die alte Fassung nach links ab und die neue kommt von rechts
-   * nach. Zurueck nach Deutsch spiegelverkehrt.
-   *
-   * Der Weg ist absichtlich kurz. Ein halber Bildschirm Schub sieht
-   * nach Diashow aus; vier Prozent lesen sich als "daneben liegt noch
-   * eine Fassung desselben Inhalts".
-   */
-  html[data-sprach-richtung='en']::view-transition-old(root) {
-    animation: sprache-raus-links 220ms cubic-bezier(0.4, 0, 1, 1) both;
-  }
-  html[data-sprach-richtung='en']::view-transition-new(root) {
-    animation: sprache-rein-rechts 320ms cubic-bezier(0, 0, 0.2, 1) both;
-  }
-  html[data-sprach-richtung='de']::view-transition-old(root) {
-    animation: sprache-raus-rechts 220ms cubic-bezier(0.4, 0, 1, 1) both;
-  }
-  html[data-sprach-richtung='de']::view-transition-new(root) {
-    animation: sprache-rein-links 320ms cubic-bezier(0, 0, 0.2, 1) both;
-  }
-
-  @keyframes sprache-raus-links {
-    to {
-      opacity: 0;
-      transform: translateX(-4%);
-    }
-  }
-  @keyframes sprache-rein-rechts {
-    from {
-      opacity: 0;
-      transform: translateX(4%);
-    }
-  }
-  @keyframes sprache-raus-rechts {
-    to {
-      opacity: 0;
-      transform: translateX(4%);
-    }
-  }
-  @keyframes sprache-rein-links {
-    from {
-      opacity: 0;
-      transform: translateX(-4%);
-    }
-  }
-</style>
+{/* Wie ein Sprachwechsel AUSSIEHT, steht als is:inline-Stil im
+    BaseLayout — dort muss es stehen, damit die Regeln schon beim
+    ersten Parse-Durchgang der ankommenden Seite greifen. */}
 
 <style>
   /* Spiegelbild des Theme-Umschalters: dort top:88 right:24, hier
