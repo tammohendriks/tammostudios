@@ -38,7 +38,7 @@ export const LOCALES = /** @type {const} */ (['de', 'en']);
 export const ROUTES = {
   home:         { de: '/',                      en: null }, // → /en
   ueber:        { de: '/ueber',                 en: null }, // → /en/about
-  website:      { de: '/website',               en: null }, // → /en/website
+  website:      { de: '/website',               en: '/en/website' },
   software:     { de: '/software',              en: null }, // → /en/software
   preise:       { de: '/preise',                en: '/en/pricing' },
   referenzen:   { de: '/referenzen',            en: null }, // → /en/work
