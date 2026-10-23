@@ -7,7 +7,7 @@ import sitemap from '@astrojs/sitemap';
 import react from '@astrojs/react';
 import vercel from '@astrojs/vercel';
 
-import { SITE_URL, sitemapAlternates } from './src/lib/routes.mjs';
+import { SITE_URL, sitemapAlternates, ROUTES } from './src/lib/routes.mjs';
 
 // https://astro.build/config
 export default defineConfig({
@@ -40,6 +40,38 @@ export default defineConfig({
   },
 
   integrations: [
+    // Sicherung gegen den einen Fehler, der sich nicht zuruecknehmen
+    // laesst: ein ROUTES-Eintrag, dessen Seite es gar nicht gibt. Der
+    // wuerde per hreflang auf eine 404 zeigen, und Google meldet das
+    // erst Wochen spaeter. Hier bricht stattdessen der Build.
+    {
+      name: 'i18n-routen-guard',
+      hooks: {
+        'astro:routes:resolved': ({ routes, logger }) => {
+          const vorhanden = new Set(
+            routes
+              .filter((r) => r.type === 'page')
+              .map((r) => (r.pathname ?? '').replace(/\/$/, '') || '/')
+          );
+          const fehlend = [];
+          for (const [key, eintrag] of Object.entries(ROUTES)) {
+            for (const locale of ['de', 'en']) {
+              const pfad = eintrag[locale];
+              if (!pfad) continue;
+              if (!vorhanden.has(pfad)) fehlend.push(`${key}.${locale} → ${pfad}`);
+            }
+          }
+          if (fehlend.length) {
+            logger.error(
+              'ROUTES zeigt auf Seiten, die es nicht gibt:\n  ' +
+                fehlend.join('\n  ') +
+                '\nEntweder die Seite anlegen oder den Eintrag auf null setzen.'
+            );
+            throw new Error(`i18n-Routen-Guard: ${fehlend.length} Eintrag/Eintraege ohne Seite`);
+          }
+        },
+      },
+    },
     sitemap({
       // 404 nicht in die Sitemap aufnehmen — Google soll keine Fehler-
       // Seite indexieren.
