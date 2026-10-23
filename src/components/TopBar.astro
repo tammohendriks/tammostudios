@@ -1,6 +1,6 @@
 ---
-import { SITE_LABELS, NAV_ITEMS, CTA } from '../lib/constants';
-import { keyOf } from '../lib/routes.mjs';
+import { t } from '../lib/i18n';
+import { keyOf, localeOf, path, pathOr } from '../lib/routes.mjs';
 
 // "Startseite" wird IMMER ins DOM gerendert. Sichtbarkeit kommt
 // per CSS aus dem html[data-page]- bzw. header[data-page]-State,
@@ -15,6 +15,9 @@ const currentPath = Astro.url.pathname.replace(/\/index\.html$/, '') || '/';
 const isLanding = keyOf(currentPath) === 'home';
 const pageType = isLanding ? 'landing' : 'subpage';
 
+const d = t(currentPath);
+const locale = localeOf(currentPath);
+
 type NavChild = { label: string; href: string };
 type NavItem = {
   label: string;
@@ -22,9 +25,30 @@ type NavItem = {
   key?: string;
   children?: readonly NavChild[];
 };
+
+// Navigation aus Routen-Schluesseln. Was es in dieser Sprache nicht
+// gibt, faellt weg — auf Englisch verschwindet dadurch das Journal,
+// ohne dass es hier als Sonderfall stehen muss.
+function eintrag(key: string, label: string): NavChild | null {
+  const href = path(key, locale);
+  return href ? { label, href } : null;
+}
+
+const angebotKinder = [
+  eintrag('website', d.nav.website),
+  eintrag('software', d.nav.software),
+  eintrag('preise', d.nav.preise),
+  eintrag('werkstatt', d.nav.werkstatt),
+].filter((e): e is NavChild => e !== null);
+
 const navItems: NavItem[] = [
-  { label: 'Startseite', href: '/', key: 'startseite' },
-  ...NAV_ITEMS,
+  { label: d.nav.home, href: pathOr('home', locale), key: 'startseite' },
+  ...(eintrag('ueber', d.nav.ueber) ? [{ label: d.nav.ueber, href: pathOr('ueber', locale) }] : []),
+  ...(angebotKinder.length
+    ? [{ label: d.nav.angebot, href: pathOr('website', locale), children: angebotKinder }]
+    : []),
+  ...(eintrag('referenzen', d.nav.referenzen) ? [{ label: d.nav.referenzen, href: pathOr('referenzen', locale) }] : []),
+  ...(eintrag('journal', d.nav.journal) ? [{ label: d.nav.journal, href: pathOr('journal', locale) }] : []),
 ];
 
 function isActive(href: string) {
@@ -50,9 +74,9 @@ function itemIsActive(item: NavItem): boolean {
 ---
 
 <header class="topbar" data-topbar data-page={pageType}>
-  <span class="top-left label-tracked">{SITE_LABELS.establishedLine}</span>
+  <span class="top-left label-tracked">{d.establishedLine}</span>
 
-  <nav class="nav" aria-label="Hauptnavigation">
+  <nav class="nav" aria-label={locale === "en" ? "Main navigation" : "Hauptnavigation"}>
     {navItems.map((item, i) => {
       const hasChildren = !!(item.children && item.children.length > 0);
       return (
@@ -107,7 +131,9 @@ function itemIsActive(item: NavItem): boolean {
     id="nav-toggle"
     class="hamburger"
     type="button"
-    aria-label="Menü öffnen"
+    aria-label={d.nav.menueOeffnen}
+    data-label-open={d.nav.menueOeffnen}
+    data-label-close={d.nav.menueSchliessen}
     aria-expanded="false"
     aria-controls="mobile-menu"
   >
@@ -116,7 +142,7 @@ function itemIsActive(item: NavItem): boolean {
   </button>
 
   <a class="cta-orbital topbar-cta" href="/kontakt" aria-current={isActive('/kontakt') ? 'page' : undefined}>
-    <span class="cta-label">{CTA.label}</span>
+    <span class="cta-label">{d.nav.kontakt}</span>
     <svg
       width="14"
       height="14"
@@ -155,7 +181,7 @@ function itemIsActive(item: NavItem): boolean {
                   type="button"
                   aria-expanded="false"
                   aria-controls={subId}
-                  aria-label={`${item.label} Untermenü ein-/ausklappen`}
+                  aria-label={locale === "en" ? `Toggle ${item.label} submenu` : `${item.label} Untermenü ein-/ausklappen`}
                 >
                   <svg
                     width="14"
@@ -200,7 +226,7 @@ function itemIsActive(item: NavItem): boolean {
     })}
     <li class="mobile-cta-wrap">
       <a class="cta-orbital" href="/kontakt" aria-current={isActive('/kontakt') ? 'page' : undefined}>
-        <span class="cta-label">{CTA.label}</span>
+        <span class="cta-label">{d.nav.kontakt}</span>
         <svg
           width="14"
           height="14"
@@ -794,7 +820,7 @@ function itemIsActive(item: NavItem): boolean {
     const open = () => {
       menu.removeAttribute('hidden');
       toggle.setAttribute('aria-expanded', 'true');
-      toggle.setAttribute('aria-label', 'Menü schließen');
+      toggle.setAttribute('aria-label', toggle.dataset.labelClose || 'Menü schließen');
       document.body.style.overflow = 'hidden';
       // Der Header liegt ueber dem Menue. Im hellen Modus muessen seine
       // dunklen Elemente mit umschalten, sonst schweben sie schwarz auf
@@ -804,7 +830,7 @@ function itemIsActive(item: NavItem): boolean {
     const close = () => {
       menu.setAttribute('hidden', '');
       toggle.setAttribute('aria-expanded', 'false');
-      toggle.setAttribute('aria-label', 'Menü öffnen');
+      toggle.setAttribute('aria-label', toggle.dataset.labelOpen || 'Menü öffnen');
       document.body.style.overflow = '';
       document.documentElement.removeAttribute('data-menu-open');
     };
