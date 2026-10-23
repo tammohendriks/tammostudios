@@ -28,3 +28,21 @@ export type Shape<T> = T extends string
     : T extends boolean
       ? boolean
       : { [K in keyof T]: Shape<T[K]> };
+
+/**
+ * Ein Tupel gleicher Laenge wie T, in dem jeder Eintrag E ist.
+ *
+ * Fuer die Faelle, in denen eine Liste im Komponentencode zu einer
+ * Liste im Woerterbuch passen MUSS, weil sie per Index aneinander
+ * haengen. Ohne diese Bindung stand die Zusicherung nur im Kommentar,
+ * und eine zusaetzliche Zeile im Woerterbuch fiel erst im Browser auf:
+ * als Auswahl-Eintrag ohne Beschriftung oder als Verweis, der lautlos
+ * verschwindet.
+ *
+ * T MUSS ein nackter Typ-Parameter sein. Stuende stattdessen direkt
+ * `{ [K in keyof X['liste']]: E }` an der Verwendungsstelle, waere der
+ * Mapped Type nicht homomorph: TypeScript bildete dann auch length,
+ * toString und den Rest des Array-Prototyps mit ab und das Tupel waere
+ * verloren.
+ */
+export type Gleichlang<T, E> = { [K in keyof T]: E };

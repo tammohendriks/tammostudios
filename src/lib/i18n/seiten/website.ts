@@ -130,9 +130,14 @@ export const de = {
 export const en: Shape<typeof de> = {
   meta: {
     pageTitle: 'Website',
-    title: 'A custom website — handcrafted in Bremen | Tammo Studios',
+    // "web development" ist die staerkste englische Suchanfrage in der
+    // Search Console (25 Impressionen). Der deutsche Titel fuehrt mit
+    // "Website", weil das die deutsche Nachfrage ist; die englische
+    // Fassung fuehrt mit dem Begriff, der hier gesucht wird. Titel
+    // muessen zwischen zwei hreflang-Fassungen nicht gleich sein.
+    title: 'Custom web development from Bremen — from €2,000',
     description:
-      'Your custom website, handcrafted in Bremen: from €2,000, live in 14 days, with a CMS of your own and one application included.',
+      'Custom web development from Bremen: your own website, live in 14 days, with a CMS of your own and one custom application included. From €2,000.',
   },
 
   hero: {

@@ -28,6 +28,7 @@ import SiteFooter from './SiteFooter.astro';
 import { SITE, PHONE_INTERNATIONAL } from '../lib/constants';
 import { localeOf, pathOr } from '../lib/routes.mjs';
 import { KONTAKT } from '../lib/i18n/seiten/kontakt';
+import type { Gleichlang } from '../lib/i18n/shape';
 
 const locale = localeOf(Astro.url.pathname);
 const k = KONTAKT[locale];
@@ -43,13 +44,18 @@ const zeigeKalender = locale === 'de';
 // Beschriftung, in derselben Reihenfolge. Haette die englische Liste
 // andere Werte, kaeme von der API eine Validierungsmeldung und niemand
 // wuesste, warum.
+// satisfies Gleichlang<...> bindet die Laenge an die Beschriftungen im
+// Woerterbuch. Vorher stand diese Zusicherung nur im Kommentar darueber:
+// ein sechster Eintrag im Woerterbuch haette eine Auswahl mit leerer
+// Beschriftung ergeben und die Vorbelegung des Nachrichtenfeldes
+// lautlos ausfallen lassen.
 const ANLIEGEN_WERTE = [
   'website-projekt',
   'online-shop',
   'wartung-support',
   'allgemein',
   'anderes',
-] as const;
+] as const satisfies Gleichlang<typeof KONTAKT.de.anliegen, string>;
 
 const subjectOptions = ANLIEGEN_WERTE.map((value, i) => ({ value, label: k.anliegen[i] }));
 
@@ -199,12 +205,16 @@ const skriptTexteJson = JSON.stringify(skriptTexte).replace(/</g, '\\u003c');
           </label>
         </div>
 
+        {/* Ohne hidden: ein Live-Bereich muss im Baum stehen, BEVOR
+            Text darin erscheint, sonst sagt eine Sprachausgabe nichts.
+            Vorher wurde er aus hidden heraus eingeblendet und im selben
+            Durchlauf gefuellt — die Ansage war Glueckssache. Leer nimmt
+            er keinen Platz ein, siehe .form-status:empty. */}
         <div
           class="form-status"
           id="kontakt-status"
           role="status"
           aria-live="polite"
-          hidden
         ></div>
 
         <button type="submit" class="form-submit" id="kontakt-submit">
@@ -213,7 +223,11 @@ const skriptTexteJson = JSON.stringify(skriptTexte).replace(/</g, '\\u003c');
       </form>
 
       <!-- Success-State wird per JS gefuellt + eingeblendet nach 200. -->
-      <div class="form-success" id="kontakt-success" hidden>
+      {/* tabindex="-1", damit das Skript den Fokus hierher setzen kann.
+          Beim Absenden verschwindet das Formular samt fokussiertem
+          Knopf; ohne diesen Schritt landet der Fokus am Seitenanfang und
+          die Bestaetigung wird nicht vorgelesen. */}
+      <div class="form-success" id="kontakt-success" tabindex="-1" hidden>
         <span class="form-success-icon" aria-hidden="true">✓</span>
         <h2 class="form-success-headline">{k.formular.dankeTitel}</h2>
         <p class="form-success-body">{k.formular.dankeText}</p>
@@ -399,15 +413,11 @@ const skriptTexteJson = JSON.stringify(skriptTexte).replace(/</g, '\\u003c');
 
   const setStatus = (msg: string, kind: 'error' | 'info' | '' = '') => {
     if (!statusEl) return;
-    if (!msg) {
-      statusEl.hidden = true;
-      statusEl.textContent = '';
-      statusEl.dataset.kind = '';
-      return;
-    }
-    statusEl.hidden = false;
+    // Kein hidden mehr: der Bereich bleibt stehen, nur sein Inhalt
+    // wechselt. Das ist der Unterschied zwischen einer Ansage, die
+    // ankommt, und einer, die manchmal ankommt.
     statusEl.textContent = msg;
-    statusEl.dataset.kind = kind;
+    statusEl.dataset.kind = msg ? kind : '';
   };
 
   form?.addEventListener('submit', async (e) => {
@@ -453,6 +463,12 @@ const skriptTexteJson = JSON.stringify(skriptTexte).replace(/</g, '\\u003c');
         if (successEl) successEl.hidden = false;
         // Scroll zum Success-Panel damit User Feedback sieht
         successEl?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Und den Fokus hinterher. Der lag auf dem Absende-Knopf, der
+        // gerade mit dem Formular verschwunden ist — ohne diesen Schritt
+        // sitzt er am Seitenanfang und die Bestaetigung bleibt
+        // ungelesen. preventScroll, damit das sanfte Scrollen oben nicht
+        // von einem harten Sprung ueberholt wird.
+        successEl?.focus({ preventScroll: true });
       } else {
         setStatus(data.error || texte.fehler, 'error');
         submitBtn.disabled = false;
@@ -767,6 +783,13 @@ const skriptTexteJson = JSON.stringify(skriptTexte).replace(/</g, '\\u003c');
     font-family: 'Inter', sans-serif;
     font-size: 0.9rem;
     line-height: 1.5;
+  }
+  /* Solange nichts drinsteht, soll er keinen Platz einnehmen — aber
+     display:none waere falsch: das nimmt ihn auch aus dem
+     Baum fuer Hilfstechnik, und genau dort muss er vorher stehen. */
+  .form-status:empty {
+    padding: 0;
+    border: 0;
   }
   .form-status[data-kind='error'] {
     background: rgba(220, 38, 38, 0.1);

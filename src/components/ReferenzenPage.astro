@@ -30,13 +30,19 @@ const einheit = (anzahl: number) =>
  * Null kommt in zwei Faellen: die Kategorie hat keine Branchenseite
  * (Medien), oder die Seite gibt es in dieser Sprache nicht.
  */
+// Beide Nachschlagewerke haben dieselben drei Schluessel, und das
+// soll der Typchecker wissen: hier stand mal Record<string, string>,
+// was die Literal-Schluessel zu einer Index-Signatur aufweitete. Eine
+// vierte Branche ohne Beschriftung waere damit kein Typfehler gewesen,
+// sondern ein sichtbares "More on undefined" auf der Karte.
+type Kategorie = keyof typeof VERTICAL_KEY_BY_CATEGORY;
+
 function branchenLink(kategorie: string) {
-  const key = VERTICAL_KEY_BY_CATEGORY[kategorie];
-  if (!key) return null;
-  const pfad = path(key, locale);
+  // Medien hat keine Branchenseite und faellt hier heraus.
+  if (!(kategorie in VERTICAL_KEY_BY_CATEGORY)) return null;
+  const pfad = path(VERTICAL_KEY_BY_CATEGORY[kategorie as Kategorie], locale);
   if (!pfad) return null;
-  const labels: Record<string, string> = d.karte.branchenLinks;
-  return { pfad, label: labels[kategorie] };
+  return { pfad, label: d.karte.branchenLinks[kategorie as Kategorie] };
 }
 
 // Kategorien-Reihenfolge fix — nicht alphabetisch, nicht nach Count.

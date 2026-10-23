@@ -28,13 +28,14 @@ export const en: Shape<typeof de> = {
     // Struktur beider Sprachen gleich ist.
     journal: 'Journal',
     kontakt: 'Contact',
+    hauptnavigation: 'Main navigation',
     menueOeffnen: 'Open menu',
     menueSchliessen: 'Close menu',
     bereichRechtliches: 'Legal',
   },
 
   sprache: {
-    umschalten: 'Switch language, go to the German version',
+    umschalten: 'DE — switch language, go to the German version',
     kurzDe: 'DE',
     kurzEn: 'EN',
   },
@@ -54,6 +55,8 @@ export const en: Shape<typeof de> = {
       'tools. Only anonymous server logs are evaluated. Cookies can ' +
       'only appear if you actively open the booking calendar.',
     datenschutzDetails: 'Details',
+    socialsLabel: 'Social media',
+    neuerTab: '(opens in a new tab)',
   },
 
   abschluss: {
@@ -81,6 +84,52 @@ export const en: Shape<typeof de> = {
       text: 'The industry is never the problem. What matters is what the site needs to do:',
       label: 'See the custom applications',
     },
+  },
+
+  schema: {
+    beschreibung:
+      'Custom websites, handcrafted in Bremen. ' +
+      'No recycled templates, clear fixed prices, ' +
+      'live in 14 days at most.',
+    slogan: 'Websites, handcrafted in Bremen.',
+    bildAlt: 'Tammo Studios — websites, handcrafted in Bremen',
+    jobTitle: 'Web developer',
+    land: 'Germany',
+    bundesland: 'Lower Saxony',
+    katalog: 'Website packages',
+    brotkrumeStart: 'Home',
+    angebote: [
+      {
+        name: 'A custom website',
+        beschreibung:
+          'A design of your own, a CMS of your own, one custom ' +
+          'application included, optimized for mobile and desktop, fast ' +
+          'and clean for SEO, GDPR compliant. One time, fixed.',
+      },
+      {
+        name: 'Online store',
+        beschreibung:
+          'Everything from "One website" plus a full store with cart and ' +
+          'checkout, payment provider integration, products and orders ' +
+          'in the CMS.',
+      },
+      {
+        name: 'A further custom application',
+        beschreibung:
+          'A price calculator, a configurator, an inquiry form that ' +
+          'thinks along and produces a PDF. The first application is part ' +
+          'of the website or store price, every further one costs €500.',
+      },
+    ],
+    kannUeber: [
+      'Web development',
+      'Astro Framework',
+      'Tailwind CSS',
+      'Sanity CMS',
+      'Vercel Deployment',
+      'E-Commerce',
+      'SEO',
+    ],
   },
 
   referenzModal: {

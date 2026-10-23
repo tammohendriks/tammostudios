@@ -34,6 +34,8 @@ export const prerender = false;
 import type { APIRoute } from 'astro';
 import { z } from 'zod';
 import { Resend } from 'resend';
+import { PHONE_INTERNATIONAL, SITE } from '../../lib/constants';
+import type { Gleichlang } from '../../lib/i18n/shape';
 
 // --- Config ------------------------------------------------------------
 
@@ -201,34 +203,55 @@ const buildNotificationHtml = (
 // Fassung steht einmal als Textzeilen da; das HTML setzt dieselben
 // Zeilen mit <br /> zusammen, damit Text- und HTML-Teil derselben Mail
 // nicht auseinanderlaufen koennen.
-const antwortZeilen = {
-  de: (vorname: string) => [
+// Deutsch ist die Quelle, Englisch wird dagegen typisiert — dasselbe
+// Verfahren wie bei den Meldungen oben. Vorher waren beide Rueckgaben
+// nur string[]: eine fuenfte Zeile im deutschen Zweig haette die
+// englische Mail vierzeilig gelassen, ohne Typfehler und ohne
+// Build-Abbruch. Genau die Drift, gegen die der Rest der Datei
+// gesichert ist.
+const antwortZeilenDe = (vorname: string) =>
+  [
     `Hi ${vorname},`,
     'danke für deine Anfrage.',
     'Ich melde mich innerhalb von 24 Stunden bei dir zurück.',
     'Falls dringend: du erreichst mich auch per WhatsApp unter:',
-  ],
-  en: (vorname: string) => [
-    `Hi ${vorname},`,
-    'thanks for your inquiry.',
-    "I'll get back to you within 24 hours.",
-    'If it is urgent, you can also reach me on WhatsApp:',
-  ],
+  ] as const;
+
+const antwortZeilenEn: (vorname: string) => Gleichlang<
+  ReturnType<typeof antwortZeilenDe>,
+  string
+> = (vorname) => [
+  `Hi ${vorname},`,
+  'thanks for your inquiry.',
+  "I'll get back to you within 24 hours.",
+  'If it is urgent, you can also reach me on WhatsApp:',
+];
+
+const antwortZeilen: Record<Locale, (vorname: string) => readonly string[]> = {
+  de: antwortZeilenDe,
+  en: antwortZeilenEn,
 };
 
-const ANTWORT = {
-  de: {
-    subject: 'Danke für deine Anfrage — Tammo Studios',
-    signatur: 'Tammo Studios — Freelance-Webdesign aus Bremen',
-  },
-  en: {
-    subject: 'Thanks for your inquiry — Tammo Studios',
-    signatur: 'Tammo Studios — freelance web design from Bremen',
-  },
+const antwortDe = {
+  subject: 'Danke für deine Anfrage — Tammo Studios',
+  signatur: 'Tammo Studios — Freelance-Webdesign aus Bremen',
 };
+
+const antwortEn: typeof antwortDe = {
+  subject: 'Thanks for your inquiry — Tammo Studios',
+  signatur: 'Tammo Studios — freelance web design from Bremen',
+};
+
+const ANTWORT: Record<Locale, typeof antwortDe> = { de: antwortDe, en: antwortEn };
+
+// Die Rufnummer in der Schreibweise, die zur Sprache passt: eine 0177
+// kann aus dem Ausland niemand waehlen. Beide Fassungen stammen aus
+// constants.ts, die internationale ist dort abgeleitet.
+const rufnummer = (locale: Locale) =>
+  locale === 'en' ? PHONE_INTERNATIONAL : SITE.phone;
 
 const buildAutoReplyText = (firstName: string, locale: Locale): string =>
-  [...antwortZeilen[locale](firstName), '0177 1962704.'].join('\n');
+  [...antwortZeilen[locale](firstName), `${rufnummer(locale)}.`].join('\n');
 
 const buildAutoReplyHtml = (firstName: string, locale: Locale): string => `
 <!doctype html>
@@ -237,7 +260,7 @@ const buildAutoReplyHtml = (firstName: string, locale: Locale): string => `
   <div style="max-width:560px;margin:32px auto;padding:36px 32px;background:#ffffff;border-radius:12px;border:1px solid rgba(0,0,0,0.08);">
     <p style="font-size:1.05rem;margin:0;">
       ${antwortZeilen[locale](escapeHtml(firstName)).join('<br />\n      ')}<br />
-      <a href="https://wa.me/491771962704" style="color:rgba(245,158,11,0.95);text-decoration:none;font-weight:500;">0177 1962704</a>.
+      <a href="https://wa.me/491771962704" style="color:rgba(245,158,11,0.95);text-decoration:none;font-weight:500;">${rufnummer(locale)}</a>.
     </p>
     <div style="margin-top:36px;padding-top:20px;border-top:1px solid rgba(0,0,0,0.08);font-size:0.85rem;color:#6b6b70;">
       ${ANTWORT[locale].signatur}<br />

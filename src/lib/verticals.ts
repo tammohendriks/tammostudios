@@ -11,6 +11,8 @@
 // Zuordnung Reference-Kategorie → Vertical-Slug (fuer /referenzen Cross-
 // Links): Handwerk → handwerk, Medizin → praxis, Gastronomie → gastronomie.
 
+import type { RouteKey } from './routes.mjs';
+
 /**
  * Kategorie einer Referenz → Routen-SCHLUESSEL der passenden
  * Branchenseite.
@@ -20,11 +22,11 @@
  * die Beschriftung steht im Woerterbuch. Uebrig bleibt die Zuordnung
  * selbst, und die ist sprachunabhaengig.
  */
-export const VERTICAL_KEY_BY_CATEGORY: Record<string, string> = {
+export const VERTICAL_KEY_BY_CATEGORY = {
   Handwerk: 'handwerk',
   Medizin: 'praxis',
   Gastronomie: 'gastronomie',
-};
+} as const satisfies Record<string, RouteKey>;
 
 export type VerticalReference = {
   name: string;

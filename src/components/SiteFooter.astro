@@ -45,8 +45,11 @@ const navLinks = FOOTER_KEYS
   }));
 
 // Rechtstexte bleiben deutsch. Auf englischen Seiten tragen die Links
-// deshalb lang/hreflang, damit klar ist, in welcher Sprache das Ziel
-// verfasst ist.
+// deshalb hreflang, damit klar ist, in welcher Sprache das ZIEL
+// verfasst ist. NICHT lang: das beschreibt den Inhalt des Elements
+// selbst, und der Linktext ist englisch ("Imprint (German)"). Mit
+// lang="de" haette eine englische Sprachausgabe auf die deutsche Stimme
+// umgeschaltet, um englischen Text vorzulesen.
 const legalLinks = [
   { href: pathOr('impressum'), label: d.footer.impressum },
   { href: pathOr('datenschutz'), label: d.footer.datenschutz },
@@ -57,7 +60,12 @@ const legalLinks = [
   <div class="footer-row">
     <span class="footer-brand">{d.establishedLine}</span>
     <div class="footer-links">
-      <nav class="footer-nav" aria-label={d.nav.bereichRechtliches === "Legal" ? "Main navigation" : "Hauptnavigation"}>
+      {/* Die Sprache kommt aus dem Pfad, nicht daraus, wie ein
+          uebersetzter String gerade lautet. Vorher stand hier ein
+          Vergleich auf d.nav.bereichRechtliches === "Legal" — eine
+          Aenderung dieser Beschriftung haette die Navigation
+          stillschweigend wieder deutsch benannt. */}
+      <nav class="footer-nav" aria-label={d.nav.hauptnavigation}>
         {navLinks.map((link, i) => (
           <>
             {i > 0 && <span aria-hidden="true">·</span>}
@@ -65,14 +73,14 @@ const legalLinks = [
           </>
         ))}
       </nav>
-      <ul class="footer-socials" aria-label="Social Media">
+      <ul class="footer-socials" aria-label={d.footer.socialsLabel}>
         {SITE.socials.map((social) => (
           <li>
             <a
               href={social.href}
               target="_blank"
               rel="noopener noreferrer me"
-              aria-label={`${social.label}: ${social.handle} (oeffnet in neuem Tab)`}
+              aria-label={`${social.label}: ${social.handle} ${d.footer.neuerTab}`}
               class="footer-social-link"
             >
               {social.platform === 'instagram' && (
@@ -123,7 +131,6 @@ const legalLinks = [
           {i > 0 && <span aria-hidden="true">·</span>}
           <a
             href={link.href}
-            lang={locale === 'en' ? 'de' : undefined}
             hreflang={locale === 'en' ? 'de' : undefined}
           >{link.label}</a>
         </>
@@ -142,7 +149,6 @@ const legalLinks = [
     {' '}
     <a
       href={pathOr('datenschutz')}
-      lang={locale === 'en' ? 'de' : undefined}
       hreflang={locale === 'en' ? 'de' : undefined}
     >{d.footer.datenschutzDetails}</a>
   </p>

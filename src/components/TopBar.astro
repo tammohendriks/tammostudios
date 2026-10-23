@@ -1,6 +1,7 @@
 ---
 import { t } from '../lib/i18n';
 import { keyOf, localeOf, path, pathOr } from '../lib/routes.mjs';
+import type { RouteKey } from '../lib/routes.mjs';
 
 // "Startseite" wird IMMER ins DOM gerendert. Sichtbarkeit kommt
 // per CSS aus dem html[data-page]- bzw. header[data-page]-State,
@@ -29,7 +30,7 @@ type NavItem = {
 // Navigation aus Routen-Schluesseln. Was es in dieser Sprache nicht
 // gibt, faellt weg — auf Englisch verschwindet dadurch das Journal,
 // ohne dass es hier als Sonderfall stehen muss.
-function eintrag(key: string, label: string): NavChild | null {
+function eintrag(key: RouteKey, label: string): NavChild | null {
   const href = path(key, locale);
   return href ? { label, href } : null;
 }

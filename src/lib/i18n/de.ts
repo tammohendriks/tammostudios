@@ -26,15 +26,19 @@ export const de = {
     referenzen: 'Referenzen',
     journal: 'Journal',
     kontakt: 'Kontakt',
+    hauptnavigation: 'Hauptnavigation',
     menueOeffnen: 'Menü öffnen',
     menueSchliessen: 'Menü schließen',
     bereichRechtliches: 'Rechtliches',
   },
 
   sprache: {
-    // Beschriftung des Umschalters. aria-label beschreibt die Wirkung,
-    // nicht den Zustand.
-    umschalten: 'Sprache wechseln, zur englischen Fassung',
+    // Beschriftung des Umschalters. Das aria-label beschreibt die
+    // Wirkung, nicht den Zustand — und es beginnt mit dem sichtbaren
+    // Kuerzel des ZIELS. Sichtbar sind am Schalter "DE" und "EN"; wer
+    // per Sprachbefehl bedient, sagt "klick EN", weil das dasteht. Ohne
+    // das Kuerzel im Namen trifft dieser Befehl nichts.
+    umschalten: 'EN — Sprache wechseln, zur englischen Fassung',
     kurzDe: 'DE',
     kurzEn: 'EN',
   },
@@ -58,6 +62,10 @@ export const de = {
       'Cookies können nur entstehen, wenn du die Terminbuchung aktiv ' +
       'öffnest.',
     datenschutzDetails: 'Details',
+    socialsLabel: 'Social Media',
+    // Wird dem Namen und dem Konto nachgestellt:
+    // "Instagram: @tammostudios (öffnet in neuem Tab)".
+    neuerTab: '(öffnet in neuem Tab)',
   },
 
   abschluss: {
@@ -104,6 +112,61 @@ export const de = {
     rahmenTitel: 'Referenz-Vorschau',
     nichtEinbettbar: 'Diese Seite kann nicht direkt eingebettet werden.',
     neuerTabOeffnen: 'Im neuen Tab öffnen',
+  },
+
+  // Texte der strukturierten Daten im Kopf jeder Seite (siehe
+  // BaseLayout). Sie beschreiben denselben Betrieb unter derselben @id,
+  // nur in der Sprache der Seite — hreflang verbindet die Fassungen.
+  //
+  // Vorher standen sie fest auf Deutsch im Layout. Damit trug jede
+  // englische Seite eine deutsche Beschreibung, eine Brotkrume namens
+  // "Startseite", die auf die deutsche Startseite zeigte, und Angebote,
+  // die auf /preise statt /en/pricing verwiesen.
+  schema: {
+    beschreibung:
+      'Individuelle Websites, handgemacht in Bremen. ' +
+      'Kein Template-Recycling, klare Fixpreise, ' +
+      'in maximal 14 Tagen live.',
+    slogan: 'Websites, handgemacht in Bremen.',
+    // Alternativtext des Vorschaubildes beim Teilen.
+    bildAlt: 'Tammo Studios — Websites, handgemacht in Bremen',
+    jobTitle: 'Webentwickler',
+    land: 'Deutschland',
+    bundesland: 'Niedersachsen',
+    katalog: 'Website-Pakete',
+    brotkrumeStart: 'Startseite',
+    angebote: [
+      {
+        name: 'Individuelle Website',
+        beschreibung:
+          'Eigenes Design, eigenes CMS, eine individuelle Anwendung ' +
+          'inklusive, Mobile- & Desktop-optimiert, schnell + sauber im ' +
+          'SEO, DSGVO-konform. Einmalig, fix.',
+      },
+      {
+        name: 'Online-Shop',
+        beschreibung:
+          'Alles aus "Eine Website" plus voller Shop mit Warenkorb & ' +
+          'Checkout, Zahlungsanbieter-Integration, Produkte & ' +
+          'Bestellungen im CMS.',
+      },
+      {
+        name: 'Weitere individuelle Anwendung',
+        beschreibung:
+          'Preisrechner, Konfigurator, mitdenkendes Anfrageformular mit ' +
+          'PDF-Ausgabe. Die erste Anwendung ist im Website- oder ' +
+          'Shop-Preis enthalten, jede weitere kostet 500 €.',
+      },
+    ],
+    kannUeber: [
+      'Webentwicklung',
+      'Astro Framework',
+      'Tailwind CSS',
+      'Sanity CMS',
+      'Vercel Deployment',
+      'E-Commerce',
+      'SEO',
+    ],
   },
 
   journal: {

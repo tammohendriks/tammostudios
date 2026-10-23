@@ -15,6 +15,7 @@
 // Gedankenstriche, amerikanische Schreibweise. Deshalb steht im
 // Englischen ein Doppelpunkt, wo im Deutschen ein Gedankenstrich steht.
 
+import type { Gleichlang } from './i18n/shape';
 import type { VERTICALS } from './verticals';
 
 type DeutscheEintraege = (typeof VERTICALS)[number];
@@ -24,24 +25,6 @@ type Slug = DeutscheEintraege['slug'];
 
 /** Der deutsche Eintrag zu einem Slug. */
 type Deutsch<S extends Slug> = Extract<DeutscheEintraege, { slug: S }>;
-
-/**
- * Ein Tupel gleicher Laenge wie T, in dem jeder Eintrag E ist.
- *
- * Darauf beruht die ganze Sicherung: `as const satisfies` in
- * verticals.ts macht aus den Listen Tupel mit fester Laenge, und ein
- * Mapped Type ueber ein Tupel erhaelt diese Laenge. Hat die englische
- * Checkliste einen Punkt weniger als die deutsche, meldet
- * `npm run check` TS2322. Ein handgeschriebenes `readonly string[]`
- * faenge das nicht.
- *
- * T MUSS hier ein nackter Typ-Parameter sein. Stuende stattdessen
- * direkt `{ [K in keyof V['faq']]: ... }` unten im Typ, waere der
- * Mapped Type nicht mehr homomorph: TypeScript wuerde dann auch length,
- * toString und den ganzen Rest des Array-Prototyps mitabbilden und das
- * Tupel verlieren. Genau deshalb diese Zwischenstufe.
- */
-type Gleichlang<T, E> = { [K in keyof T]: E };
 
 /** Tupel gleicher Laenge aus Zeichenketten. */
 type Texte<T> = Gleichlang<T, string>;
@@ -154,11 +137,16 @@ export const VERTICAL_TEXT_EN: VerticalTexte = {
 
   praxis: {
     meta: {
-      title: 'Website for Medical Practices: GDPR Compliant',
+      // Gekuerzt auf 41 Zeichen: mit dem ' — Tammo Studios' des Layouts
+      // dahinter bleibt der Titel unter 60. Die Substantivgruppe vorn
+      // ist auch die, nach der gesucht wird ("medical practice website").
+      title: 'Medical Practice Websites: GDPR Compliant',
+      // Die Beschreibung lag bei 172 Zeichen. Google schnitt damit genau
+      // den Teil ab, der den Beweis traegt — die beiden Referenzen.
       description:
         'Handcrafted websites for medical practices in Bremen: GDPR ' +
-        'compliant, with appointment requests, team profiles, and ' +
-        'office hours. From €2,000. Recent work: Samedos and IBI.',
+        'compliant, with appointment requests and team profiles. ' +
+        'From €2,000. Recent work: Samedos and IBI.',
     },
     hero: {
       eyebrow: 'WEBSITE FOR PRACTICES',

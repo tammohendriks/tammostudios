@@ -4,7 +4,8 @@ import TopBar from '../components/TopBar.astro';
 import SiteThemeToggle from '../components/SiteThemeToggle.astro';
 import SiteLangToggle from '../components/SiteLangToggle.astro';
 import { SITE } from '../lib/constants';
-import { absUrl, hreflangs, keyOf, localeOf } from '../lib/routes.mjs';
+import { absUrl, hreflangs, keyOf, localeOf, pathOr } from '../lib/routes.mjs';
+import { t } from '../lib/i18n';
 
 interface Props {
   pageTitle: string;
@@ -33,6 +34,11 @@ const renderNoindex = !allowIndexing || noindex;
 // (…de/), die Sitemap liefert sie aber ohne (…de). Zwei Schreibweisen
 // derselben Seite in Canonical und Sitemap sind unnoetig.
 const canonicalURL = absUrl(Astro.url.pathname);
+// Texte der strukturierten Daten. Vorher standen sie fest auf Deutsch,
+// und damit trug jede englische Seite eine deutsche Beschreibung, eine
+// Brotkrume namens "Startseite" mit der deutschen Startseite als Ziel
+// und Angebote, die auf /preise statt /en/pricing verwiesen.
+const d = t(Astro.url.pathname);
 
 // ZU DEN UEBERGANGS-REGELN WEITER UNTEN (is:inline im <head>):
 //
@@ -96,11 +102,10 @@ const businessSchema: Record<string, unknown> = {
   '@type': 'ProfessionalService',
   '@id': BUSINESS_ID,
   name: SITE.name,
-  description:
-    'Individuelle Websites, handgemacht in Bremen. ' +
-    'Kein Template-Recycling, klare Fixpreise, ' +
-    'in maximal 14 Tagen live.',
-  url: SITE.url,
+  description: d.schema.beschreibung,
+  // Die Adresse DIESER Sprachfassung. @id bleibt dieselbe: es ist
+  // derselbe Betrieb, nur anders beschrieben.
+  url: absUrl(pathOr('home', locale)),
   logo: new URL('/logos/logo-websiteicon.png', SITE.url).toString(),
   image: new URL('/og-image.png', SITE.url).toString(),
   telephone: '+49 177 1962704',
@@ -122,84 +127,49 @@ const businessSchema: Record<string, unknown> = {
   },
   areaServed: [
     { '@type': 'City', name: 'Bremen' },
-    { '@type': 'AdministrativeArea', name: 'Niedersachsen' },
-    { '@type': 'Country', name: 'Deutschland' },
+    { '@type': 'AdministrativeArea', name: d.schema.bundesland },
+    { '@type': 'Country', name: d.schema.land },
   ],
   priceRange: '€€',
   // Konkrete Angebote — Google kann Preise im Rich-Result ausspielen.
   // Preise als String (schema.org empfiehlt das fuer Waehrungsangaben).
+  // Preis und Ziel sind Struktur, Name und Beschreibung stehen im
+  // Woerterbuch. Die Ziele folgen der Sprache: ein englisches Angebot,
+  // das auf die deutsche Preisseite zeigt, schickt den Leser in die
+  // falsche Fassung.
   hasOfferCatalog: {
     '@type': 'OfferCatalog',
-    name: 'Website-Pakete',
-    itemListElement: [
-      {
-        '@type': 'Offer',
-        priceCurrency: 'EUR',
-        price: '2000',
-        availability: 'https://schema.org/InStock',
-        url: `${SITE.url}/preise`,
-        itemOffered: {
-          '@type': 'Service',
-          name: 'Individuelle Website',
-          description:
-            'Eigenes Design, eigenes CMS, eine individuelle Anwendung ' +
-            'inklusive, Mobile- & Desktop-optimiert, schnell + sauber im ' +
-            'SEO, DSGVO-konform. Einmalig, fix.',
-          provider: { '@id': BUSINESS_ID },
-        },
+    name: d.schema.katalog,
+    itemListElement: (
+      [
+        { preis: '2000', ziel: 'preise' },
+        { preis: '3000', ziel: 'preise' },
+        { preis: '500', ziel: 'software' },
+      ] as const
+    ).map((angebot, i) => ({
+      '@type': 'Offer',
+      priceCurrency: 'EUR',
+      price: angebot.preis,
+      availability: 'https://schema.org/InStock',
+      url: absUrl(pathOr(angebot.ziel, locale)),
+      itemOffered: {
+        '@type': 'Service',
+        name: d.schema.angebote[i].name,
+        description: d.schema.angebote[i].beschreibung,
+        provider: { '@id': BUSINESS_ID },
       },
-      {
-        '@type': 'Offer',
-        priceCurrency: 'EUR',
-        price: '3000',
-        availability: 'https://schema.org/InStock',
-        url: `${SITE.url}/preise`,
-        itemOffered: {
-          '@type': 'Service',
-          name: 'Online-Shop',
-          description:
-            'Alles aus "Eine Website" plus voller Shop mit Warenkorb & ' +
-            'Checkout, Zahlungsanbieter-Integration, Produkte & ' +
-            'Bestellungen im CMS.',
-          provider: { '@id': BUSINESS_ID },
-        },
-      },
-      {
-        '@type': 'Offer',
-        priceCurrency: 'EUR',
-        price: '500',
-        availability: 'https://schema.org/InStock',
-        url: `${SITE.url}/software`,
-        itemOffered: {
-          '@type': 'Service',
-          name: 'Weitere individuelle Anwendung',
-          description:
-            'Preisrechner, Konfigurator, mitdenkendes Anfrageformular mit ' +
-            'PDF-Ausgabe. Die erste Anwendung ist im Website- oder ' +
-            'Shop-Preis enthalten, jede weitere kostet 500 €.',
-          provider: { '@id': BUSINESS_ID },
-        },
-      },
-    ],
+    })),
   },
   founder: {
     '@type': 'Person',
     '@id': TAMMO_ID,
     name: 'Tammo Hendriks',
-    jobTitle: 'Webentwickler',
-    url: `${SITE.url}/ueber`,
+    jobTitle: d.schema.jobTitle,
+    url: absUrl(pathOr('ueber', locale)),
   },
   sameAs: ['https://www.instagram.com/tammostudios/'],
-  knowsAbout: [
-    'Webentwicklung',
-    'Astro Framework',
-    'Tailwind CSS',
-    'Sanity CMS',
-    'Vercel Deployment',
-    'E-Commerce',
-    'SEO',
-  ],
-  slogan: 'Websites, handgemacht in Bremen.',
+  knowsAbout: d.schema.kannUeber,
+  slogan: d.schema.slogan,
 };
 
 // BreadcrumbList: nur auf Sub-Pages. Zwei Ebenen (Startseite -> Page),
@@ -213,8 +183,13 @@ const breadcrumbSchema: Record<string, unknown> | null = isLanding
         {
           '@type': 'ListItem',
           position: 1,
-          name: 'Startseite',
-          item: `${SITE.url}/`,
+          // Nicht fest 'Startseite' und nicht fest die deutsche Wurzel:
+          // auf einer englischen Seite stand damit "Startseite" im
+          // Suchergebnis, und die Brotkrume fuehrte aus der Sprache
+          // heraus. absUrl schreibt die Wurzel ausserdem ohne Slash am
+          // Ende, wie canonical und Sitemap es auch tun.
+          name: d.schema.brotkrumeStart,
+          item: absUrl(pathOr('home', locale)),
         },
         {
           '@type': 'ListItem',
@@ -268,7 +243,7 @@ const jsonLdGraph = {
     <meta property="og:image" content={new URL('og-image.png', Astro.site).toString()} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Tammo Studios — Websites, handgemacht in Bremen" />
+    <meta property="og:image:alt" content={d.schema.bildAlt} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
@@ -430,6 +405,110 @@ const jsonLdGraph = {
         }
       </style>
     )}
+    <!--
+      Die Weiche fuer die Uebergaenge. Als is:inline im KOPF, nicht als
+      Modul im Body: pagereveal feuert auf der ankommenden Seite vor der
+      ersten Darstellungsmoeglichkeit. Ein Modul-Skript laeuft
+      verzoegert, und auch wenn es in der Messung rechtzeitig dran war,
+      haengt das an der Reihenfolge, die der Browser nicht zusichert.
+      Inline im Kopf ist der Hoerer garantiert vor dem Ereignis da.
+
+      Kein TypeScript hier — is:inline reicht Astro unveraendert durch.
+    -->
+    <script is:inline>
+      (function () {
+        var SCHLUESSEL = 'sprachwechsel';
+
+        // Vormerker lesen: "<richtung> <zielpfad>".
+        function vormerker() {
+          try {
+            var roh = sessionStorage.getItem(SCHLUESSEL);
+            if (!roh) return null;
+            var teile = roh.split(' ');
+            return teile[0] && teile[1] ? { richtung: teile[0], ziel: teile[1] } : null;
+          } catch (e) {
+            return null;
+          }
+        }
+
+        function vergessen() {
+          try {
+            sessionStorage.removeItem(SCHLUESSEL);
+          } catch (e) {
+            // kein Speicher, also auch nichts zu vergessen
+          }
+        }
+
+        function reduziert() {
+          return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        }
+
+        function pfadVon(url) {
+          if (!url) return null;
+          try {
+            return new URL(url).pathname;
+          } catch (e) {
+            return null;
+          }
+        }
+
+        // Verlassende Seite.
+        window.addEventListener('pageswap', function (e) {
+          var uebergang = e.viewTransition;
+          if (!uebergang) return;
+          var merker = vormerker();
+          if (!merker || reduziert()) {
+            uebergang.skipTransition();
+            return;
+          }
+          // Wohin die Navigation geht, steht in der Navigation-API. Die
+          // gibt es nicht in jedem Browser — fehlt sie, bleibt ziel null
+          // und es wird hier nicht geprueft. Die ankommende Seite prueft
+          // es ohnehin noch einmal.
+          var ziel = pfadVon(e.activation && e.activation.entry && e.activation.entry.url);
+          if (ziel && merker.ziel !== ziel) {
+            // Vormerker von einem abgebrochenen Wechsel. Weg damit,
+            // sonst animiert der naechste beliebige Klick.
+            vergessen();
+            uebergang.skipTransition();
+            return;
+          }
+          document.documentElement.dataset.sprachRichtung = merker.richtung;
+        });
+
+        // Ankommende Seite. Hier wird der Vormerker geloescht: er hat
+        // seinen Zweck erfuellt, und beim Zurueckblaettern soll er nicht
+        // ein zweites Mal greifen.
+        window.addEventListener('pagereveal', function (e) {
+          var uebergang = e.viewTransition;
+          if (!uebergang) return;
+          var merker = vormerker();
+          vergessen();
+          if (!merker || merker.ziel !== location.pathname || reduziert()) {
+            uebergang.skipTransition();
+            return;
+          }
+          var html = document.documentElement;
+          html.dataset.sprachRichtung = merker.richtung;
+          // then(f, f) statt finally: finished wird abgelehnt, wenn der
+          // Uebergang abgebrochen wird, und finally wuerfe die Ablehnung
+          // weiter — als unbehandelte Ablehnung in der Konsole.
+          var aufraeumen = function () {
+            delete html.dataset.sprachRichtung;
+          };
+          uebergang.finished.then(aufraeumen, aufraeumen);
+        });
+
+        // Die verlassende Seite behaelt ihr Richtungs-Merkmal, weil der
+        // alte Schnappschuss es fuer seine Animation braucht. Landet sie
+        // im Vor-Zurueck-Zwischenspeicher, kommt sie damit spaeter
+        // wieder hervor — und der naechste Klick von dort waere
+        // animiert, ohne ein Sprachwechsel zu sein.
+        window.addEventListener('pageshow', function (e) {
+          if (e.persisted) delete document.documentElement.dataset.sprachRichtung;
+        });
+      })();
+    </script>
     <slot name="head" />
   </head>
   <body class="min-h-screen bg-ts-bg text-ts-fg">
@@ -440,96 +519,6 @@ const jsonLdGraph = {
         Routen-Tabelle, nicht ins Layout. */}
     <SiteLangToggle />
     <slot />
-    <script>
-      // Weiche fuer die Uebergaenge zwischen Dokumenten (siehe
-      // @view-transition im Kopf). Ein Uebergang laeuft nur, wenn der
-      // Sprach-Umschalter vorher einen Vormerker gesetzt hat; alles
-      // andere wird abgebrochen und wechselt wie immer sofort.
-      //
-      // Steht hier im Layout, weil die Entscheidung das ganze Dokument
-      // betrifft — auch Seiten, auf denen es gar keinen Umschalter
-      // gibt. Wie ein Sprachwechsel dann AUSSIEHT, steht im Umschalter.
-      {
-        const SCHLUESSEL = 'sprachwechsel';
-
-        // Vormerker lesen: "<richtung> <zielpfad>".
-        const vormerker = () => {
-          try {
-            const roh = sessionStorage.getItem(SCHLUESSEL);
-            if (!roh) return null;
-            const [richtung, ziel] = roh.split(' ');
-            return richtung && ziel ? { richtung, ziel } : null;
-          } catch (_) {
-            return null;
-          }
-        };
-
-        const vergessen = () => {
-          try {
-            sessionStorage.removeItem(SCHLUESSEL);
-          } catch (_) {
-            // kein Speicher, also auch nichts zu vergessen
-          }
-        };
-
-        const reduziert = () =>
-          window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-        const pfadVon = (url: string | null | undefined) => {
-          if (!url) return null;
-          try {
-            return new URL(url).pathname;
-          } catch (_) {
-            return null;
-          }
-        };
-
-        // Verlassende Seite.
-        window.addEventListener('pageswap', (e) => {
-          const ereignis = e as PageSwapEvent;
-          const uebergang = ereignis.viewTransition;
-          if (!uebergang) return;
-          const merker = vormerker();
-          if (!merker || reduziert()) {
-            uebergang.skipTransition();
-            return;
-          }
-          // Wohin die Navigation geht, steht in der Navigation-API.
-          // Die gibt es nicht in jedem Browser — fehlt sie, bleibt
-          // ziel null und es wird hier nicht geprueft. Die ankommende
-          // Seite prueft es ohnehin noch einmal, dort steht der Pfad
-          // immer zur Verfuegung.
-          const ziel = pfadVon(ereignis.activation?.entry?.url);
-          if (ziel && merker.ziel !== ziel) {
-            // Der Vormerker ist von einem abgebrochenen Wechsel uebrig.
-            // Weg damit, sonst animiert der naechste beliebige Klick.
-            vergessen();
-            uebergang.skipTransition();
-            return;
-          }
-          document.documentElement.dataset.sprachRichtung = merker.richtung;
-        });
-
-        // Ankommende Seite. Hier wird der Vormerker geloescht: er hat
-        // seinen Zweck erfuellt, und beim Zurueckblaettern soll er
-        // nicht ein zweites Mal greifen.
-        window.addEventListener('pagereveal', (e) => {
-          const uebergang = (e as PageRevealEvent).viewTransition;
-          if (!uebergang) return;
-          const merker = vormerker();
-          vergessen();
-          if (!merker || merker.ziel !== location.pathname || reduziert()) {
-            uebergang.skipTransition();
-            return;
-          }
-          const html = document.documentElement;
-          html.dataset.sprachRichtung = merker.richtung;
-          uebergang.finished.finally(() => {
-            delete html.dataset.sprachRichtung;
-          });
-        });
-      }
-    </script>
     <script>
       // Site-weiter Scroll-Reveal: alle [data-reveal] Elemente werden
       // beim Eintritt in den Viewport (15% sichtbar) eingefadet. Pro

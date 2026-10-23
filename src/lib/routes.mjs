@@ -33,7 +33,15 @@ export const LOCALES = /** @type {const} */ (['de', 'en']);
  * Schluessel sind sprachunabhaengig und bleiben deutsch, damit der Code
  * an einer Stelle lesbar bleibt. Sie tauchen nie in einer URL auf.
  *
- * @type {Record<string, { de: string, en: string | null }>}
+ * BEWUSST OHNE @type-Annotation: ein Record<string, …> waere eine
+ * Index-Signatur, und damit waere ROUTES['kontak'] typkorrekt. Bei
+ * path() faellt ein Tippfehler dann nicht von "gibt es in dieser
+ * Sprache nicht" zu unterscheiden auf — der Verweis verschwindet
+ * einfach. Bei pathOr() ist es schlimmer: der Rueckfall endet auf '/',
+ * aus pathOr('kontak', locale) wird ein Kontakt-Knopf, der auf die
+ * Startseite zeigt. Ohne Annotation leitet TypeScript die Schluessel
+ * als Literale ab, und RouteKey weiter unten macht jeden Tippfehler zu
+ * einem Fehler in npm run check.
  */
 export const ROUTES = {
   home:         { de: '/',                      en: '/en' },
@@ -60,6 +68,11 @@ export const ROUTES = {
   preisrechner: { de: '/preisrechner',          en: null },
 };
 
+/**
+ * Die erlaubten Routen-Schluessel, abgeleitet aus der Tabelle selbst.
+ * @typedef {keyof typeof ROUTES} RouteKey
+ */
+
 /** Pfad ohne abschliessenden Slash, Wurzel bleibt '/'. */
 function normalize(pathname) {
   if (!pathname) return '/';
@@ -80,6 +93,8 @@ export function localeOf(pathname) {
 /**
  * Schluessel zu einem Pfad, oder null fuer Seiten ausserhalb der
  * Tabelle (Journal-Artikel, 404).
+ *
+ * @returns {RouteKey | null}
  */
 export function keyOf(pathname) {
   const p = normalize(pathname);
@@ -89,7 +104,12 @@ export function keyOf(pathname) {
   return null;
 }
 
-/** Pfad zu Schluessel und Sprache, oder null wenn es ihn nicht gibt. */
+/**
+ * Pfad zu Schluessel und Sprache, oder null wenn es ihn nicht gibt.
+ *
+ * @param {RouteKey} key
+ * @param {'de' | 'en'} [locale]
+ */
 export function path(key, locale = DEFAULT_LOCALE) {
   const eintrag = ROUTES[key];
   if (!eintrag) return null;
@@ -100,6 +120,9 @@ export function path(key, locale = DEFAULT_LOCALE) {
  * Wie path(), faellt aber auf Deutsch zurueck statt null zu liefern.
  * Fuer interne Links: ein href="null" darf nie im HTML landen. Wer den
  * Rueckfall nicht will, prueft vorher mit path().
+ *
+ * @param {RouteKey} key
+ * @param {'de' | 'en'} [locale]
  */
 export function pathOr(key, locale = DEFAULT_LOCALE) {
   return path(key, locale) ?? ROUTES[key]?.de ?? '/';

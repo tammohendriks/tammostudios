@@ -49,9 +49,20 @@ const kunden = d.studio.kunden.map((kunde, i) => ({
 const start = kunden[0];
 const startReiter = start.tabs[start.activeIdx];
 
+// Die Grundlinien der Eintraege in der Seitenleiste, aus der Zahl der
+// Reiter gerechnet statt zweimal hingeschrieben. Dieselbe Liste geht
+// unten als JSON ans Skript, das daraus die gestrichelte Verbindung
+// zeichnet. Vorher stand sie dort als festes Fuenf-Tupel: ein Reiter
+// mehr oder weniger ergab dort undefined, daraus NaN im Pfad, und die
+// Linie verschwand lautlos.
+const SEITENLEISTE_Y = start.tabs.map((_, i) => 118 + 32 * i);
+
 // Das Skript wird gebuendelt und sieht dieses Frontmatter nicht, die
 // Daten gehen deshalb als JSON durchs DOM.
-const kundenJson = JSON.stringify(kunden).replace(/</g, '\\u003c');
+const kundenJson = JSON.stringify({ kunden, seitenleisteY: SEITENLEISTE_Y }).replace(
+  /</g,
+  '\\u003c'
+);
 ---
 
 <section class="werkzeug" aria-labelledby="werkzeug-headline" data-section-bg="cream">
@@ -158,12 +169,12 @@ const kundenJson = JSON.stringify(kunden).replace(/</g, '\\u003c');
           <g class="wz-sidebar" data-role="sidebar">
             {start.tabs.map((reiter, i) => (
               <g class={`wz-side-item${i === start.activeIdx ? ' is-active' : ''}`} data-side-idx={i}>
-                <rect x="20" y={102 + 32 * i} width="150" height="26" fill="transparent" pointer-events="all" style="cursor:pointer" />
+                <rect x="20" y={SEITENLEISTE_Y[i] - 16} width="150" height="26" fill="transparent" pointer-events="all" style="cursor:pointer" />
                 <text
                   class={`wz-side-label${i === start.activeIdx ? ' is-active' : ''}`}
                   style={`--i:${i}`}
                   x="42"
-                  y={118 + 32 * i}
+                  y={SEITENLEISTE_Y[i]}
                   data-role={i === start.activeIdx ? 'active-label' : undefined}
                 >{reiter.label}</text>
               </g>
@@ -270,15 +281,20 @@ const kundenJson = JSON.stringify(kunden).replace(/</g, '\\u003c');
 
   const kundenEl = document.getElementById('werkzeug-kunden');
   let CLIENTS: Client[] = [];
+  let SIDEBAR_Y: number[] = [];
   try {
-    if (kundenEl?.textContent) CLIENTS = JSON.parse(kundenEl.textContent) as Client[];
+    if (kundenEl?.textContent) {
+      const daten = JSON.parse(kundenEl.textContent) as {
+        kunden: Client[];
+        seitenleisteY: number[];
+      };
+      CLIENTS = daten.kunden;
+      SIDEBAR_Y = daten.seitenleisteY;
+    }
   } catch (err) {
     console.error('[werkzeug] Kundendaten nicht lesbar:', err);
   }
 
-  // Y-Positionen der Sidebar-Items im SVG viewBox (fuer Trace-Line
-  // Berechnung — die dashed Bezier von aktivem Sidebar-Item zum H2).
-  const SIDEBAR_Y = [118, 150, 182, 214, 246];
 
   const section = document.querySelector<HTMLElement>('.werkzeug');
   // Ohne Kundendaten bleibt die Blaupause stehen wie serverseitig
@@ -462,7 +478,10 @@ const kundenJson = JSON.stringify(kunden).replace(/</g, '\\u003c');
     // aktivem Item (x=158, y=item-y-4) zu Content-H2 (x=218, y=120).
     const updateTracePosition = (sidebarIdx: number) => {
       if (!traceEl) return;
-      const y = SIDEBAR_Y[sidebarIdx] - 4;
+      // Ohne den Rueckfall ergaebe ein Index ausserhalb der Liste
+      // undefined - 4 = NaN, und der Pfad "M158 NaN C …" verschwindet
+      // lautlos.
+      const y = (SIDEBAR_Y[sidebarIdx] ?? SIDEBAR_Y[0] ?? 118) - 4;
       traceEl.setAttribute('d', `M158 ${y} C 190 ${y}, 195 122, 218 120`);
     };
 
