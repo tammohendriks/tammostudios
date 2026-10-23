@@ -39,7 +39,7 @@ export const ROUTES = {
   home:         { de: '/',                      en: null }, // → /en
   ueber:        { de: '/ueber',                 en: null }, // → /en/about
   website:      { de: '/website',               en: '/en/website' },
-  software:     { de: '/software',              en: null }, // → /en/software
+  software:     { de: '/software',              en: '/en/software' },
   preise:       { de: '/preise',                en: '/en/pricing' },
   referenzen:   { de: '/referenzen',            en: null }, // → /en/work
   werkstatt:    { de: '/werkstatt',             en: null }, // → /en/lab

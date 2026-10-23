@@ -1,0 +1,534 @@
+---
+/**
+ * /software — App- und Software-Entwicklung als eigenstaendiges
+ * Angebot.
+ *
+ * Liegt als Komponente und nicht in src/pages, weil es zwei Routen
+ * darauf gibt: /software und /en/software. Markup und <style>-Block
+ * gehoeren dabei zusammen.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SubPageBackground from './SubPageBackground.astro';
+import SiteFooter from './SiteFooter.astro';
+import ClosingCta from './ClosingCta.astro';
+import { localeOf, path, pathOr } from '../lib/routes.mjs';
+import { SOFTWARE } from '../lib/i18n/seiten/software';
+
+const locale = localeOf(Astro.url.pathname);
+const d = SOFTWARE[locale];
+
+const preisePfad = path('preise', locale);
+const rechnerPfad = path('preisrechner', locale);
+const werkstattPfad = path('werkstatt', locale);
+
+// Name und Adresse der vier Faelle: Eigenname und URL sind in beiden
+// Sprachen dieselben, die Beschreibungen stehen im Woerterbuch. Die
+// Reihenfolge muss zu faelle.eintraege passen.
+const FALL_KOEPFE = [
+  { name: 'IBI', href: 'https://ibi-doc.de/anfrage' },
+  { name: 'Samedos', href: 'https://www.samedos.de/rundgang' },
+  { name: 'WärmePower', href: 'https://waermepower.de/heizungsrechner' },
+  { name: 'Kirsch', href: 'https://kirsch-dach-fassade.de/investition' },
+] as const;
+
+const faelle = d.faelle.eintraege.map((eintrag, i) => ({ ...eintrag, ...FALL_KOEPFE[i] }));
+---
+
+<BaseLayout
+  pageTitle={d.meta.pageTitle}
+  title={d.meta.title}
+  description={d.meta.description}
+>
+  <main class="software-page">
+    <SubPageBackground />
+
+    <header class="software-hero">
+      <h1 class="subpage-hero-title">{d.hero.headline}</h1>
+      <p class="subpage-hero-subtitle software-hero-sub">{d.hero.sub}</p>
+
+      <div class="software-hero-cta">
+        <a class="cta-link" href={pathOr('kontakt', locale)}>
+          {d.hero.cta}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+        </a>
+        <p class="software-hero-note">{d.hero.notiz}</p>
+      </div>
+    </header>
+
+    <section class="software-positioning" aria-label={d.positionierung.label} data-reveal>
+      {[d.positionierung.absatz1, d.positionierung.absatz2].map((absatz) => (
+        <p>
+          {absatz.map((zeile, i) => (
+            <>{i > 0 && <br class="hidden sm:inline" />}{zeile}{' '}</>
+          ))}
+        </p>
+      ))}
+    </section>
+
+    <!-- ================================================================
+         Was eine "Anwendung" ueberhaupt ist — Kategorie vor Beispielen
+         ============================================================== -->
+    <section class="software-kinds" aria-labelledby="kinds-heading" data-reveal>
+      <h2 id="kinds-heading" class="software-section-title">{d.arten.headline}</h2>
+      <div class="kinds-grid">
+        {d.arten.punkte.map((k) => (
+          <article class="kind-item" data-reveal>
+            <h3 class="kind-title">{k.title}</h3>
+            <p class="kind-body">{k.body}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="software-cases" aria-labelledby="cases-heading">
+      <h2 id="cases-heading" class="software-section-title" data-reveal>{d.faelle.headline}</h2>
+
+      <div class="case-grid">
+        {faelle.map((item) => (
+          <article class="case-card" data-reveal>
+            <h3 class="case-name">{item.name}</h3>
+            <p class="case-full">{item.full}</p>
+            <p class="case-branch">{item.branch}</p>
+            <p class="case-body">{item.body}</p>
+
+            <ul class="case-tags">
+              {item.tags.map((tag) => <li class="case-tag">{tag}</li>)}
+            </ul>
+
+            <a class="cta-link case-link" href={item.href} target="_blank" rel="noopener">
+              {d.faelle.ansehen}
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </a>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <!-- ================================================================
+         Groesser als eine Website — App-/Software-Entwicklung als
+         eigenstaendiges Angebot. Zielt auf "app agentur bremen" und
+         "software entwicklung bremen": beides hatte Impressions, aber
+         keinen passenden Landeplatz. Der Werkstatt-Link ist Beleg, KEINE
+         Weiterleitung — wer beauftragen will, bleibt hier.
+         ============================================================== -->
+    <section class="software-bigger" aria-labelledby="bigger-heading" data-reveal>
+      <h2 id="bigger-heading" class="software-section-title">{d.groesser.headline}</h2>
+      <div class="bigger-body">
+        <p>{d.groesser.absatz1}</p>
+        <p>
+          {d.groesser.absatz2.map((zeile, i) => (
+            <>{i > 0 && <br class="hidden sm:inline" />}{zeile}{' '}</>
+          ))}
+        </p>
+      </div>
+      {werkstattPfad && (
+      <p class="bigger-proof">
+        {d.groesser.belegVor}<a href={werkstattPfad}>{d.groesser.belegLink}</a>{d.groesser.belegNach}
+      </p>
+      )}
+    </section>
+
+    <section class="software-process" aria-labelledby="process-heading">
+      <h2 id="process-heading" class="software-section-title" data-reveal>{d.ablauf.headline}</h2>
+
+      <div class="process-grid">
+        {d.ablauf.schritte.map((step, i) => (
+          <article class="process-step" data-reveal>
+            <p class="process-number">{String(i + 1).padStart(2, '0')}</p>
+            <h3 class="process-title">{step.title}</h3>
+            <p class="process-meta">{step.meta}</p>
+            <p class="process-body">{step.body}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="software-pricing" aria-labelledby="pricing-heading" data-reveal>
+      <h2 id="pricing-heading" class="software-section-title">{d.kosten.headline}</h2>
+
+      <div class="pricing-body">
+        <p>
+          <strong>{d.kosten.websitePreis}</strong>{d.kosten.websiteNach}<strong
+            >{d.kosten.shopPreis}</strong
+          >
+          {d.kosten.shopNach} <br class="hidden sm:inline" />
+          {d.kosten.inklusive} <br class="hidden sm:inline" />
+          {d.kosten.entstehtVor}<strong>{d.kosten.tage}</strong>{d.kosten.weitereVor}<strong
+            >{d.kosten.weiterePreis}</strong
+          >.
+        </p>
+        <p>{d.kosten.darueber}</p>
+      </div>
+
+      {preisePfad && (
+      <p class="pricing-aside">
+        {rechnerPfad ? (
+          <>
+            {d.kosten.hinweisMitRechner.vor}<a href={preisePfad}
+              >{d.kosten.hinweisMitRechner.preisseite}</a
+            >{d.kosten.hinweisMitRechner.mitte}<a href={rechnerPfad}
+              >{d.kosten.hinweisMitRechner.rechner}</a
+            >{d.kosten.hinweisMitRechner.nach}
+          </>
+        ) : (
+          <>
+            {d.kosten.hinweisOhneRechner.vor}<a href={preisePfad}
+              >{d.kosten.hinweisOhneRechner.preisseite}</a
+            >{d.kosten.hinweisOhneRechner.nach}
+          </>
+        )}
+      </p>
+      )}
+    </section>
+
+    <ClosingCta
+      recommendation={
+        werkstattPfad
+          ? { text: d.empfehlung.text, label: d.empfehlung.label, href: werkstattPfad }
+          : undefined
+      }
+    />
+
+  </main>
+
+  <SiteFooter />
+</BaseLayout>
+
+<style>
+  /* Site-Konvention fuer Sub-Pages: full-width page-container mit
+     140px 40px 80px padding, content darin per max-width zentriert.
+     Matched /referenzen /preise /journal /kontakt etc. */
+  .software-page {
+    position: relative;
+    background: #050507;
+    padding: 140px 40px 80px;
+    min-height: calc(100vh - 200px);
+    overflow: hidden;
+  }
+
+  @media (max-width: 768px) {
+    .software-page {
+      padding: 100px 20px 60px;
+    }
+  }
+
+  /* Site-Konvention: Section-Ueberschriften und Fliesstext sind
+     zentriert, Karten-Inhalte bleiben linksbuendig (sonst wird eine
+     mehrzeilige Aufzaehlung unlesbar). Gleiches Schema wie /website
+     und /preise. */
+  .software-page > section {
+    max-width: 1080px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+
+  /* ------------------------------------------------------------- hero */
+  /* Hero folgt der Sub-Page-Konvention: text-align:center, max-width
+     780px, padding-top:32px matched /referenzen /preise /journal /ueber.
+     Kein Eyebrow — das hat sonst keine Unterseite. CTA + Note bleiben
+     zentriert unter dem Header. */
+  .software-hero {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    max-width: 780px;
+    margin: 0 auto 60px;
+    /* 32px wie auf jeder anderen Sub-Page. Der Abstand ist nicht
+       optional: der Theme-Umschalter haengt fix auf top:90px und
+       ueberdeckt die Headline sonst. Dass der Hero frueher zu tief
+       wirkte, lag an der dreizeiligen Headline — die ist unten
+       gedeckelt, das reicht als Korrektur. */
+    padding-top: 32px;
+  }
+
+  /* "Websites koennen mehr als nur da sein." laeuft bei den globalen
+     96px auf drei Zeilen und schiebt den Hero optisch nach unten.
+     Gedeckelt liest sich der Satz als ein Block — gleiches Mittel wie
+     auf den Rechtsseiten. */
+  .software-hero .subpage-hero-title {
+    font-size: clamp(36px, 5.6vw, 64px);
+  }
+
+  .software-hero-sub {
+    max-width: 62ch;
+    margin-inline: auto;
+  }
+
+  .software-hero-cta {
+    margin-top: clamp(32px, 5vh, 48px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .software-hero-note {
+    margin: 0;
+    color: rgba(245, 245, 244, 0.5);
+    font-size: 0.9rem;
+  }
+
+  /* ------------------------------------------------- section headings */
+
+  .software-section-title {
+    margin: 0 0 clamp(24px, 4vh, 40px);
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.8rem, 3.6vw, 2.6rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: rgba(245, 245, 244, 0.96);
+  }
+
+  .software-page > section {
+    /* War clamp(48px, 8vh, 88px) — zusammen mit den kuerzeren Texten
+       stand die Seite sonst zu weit auseinander. */
+    padding-block: clamp(28px, 4.5vh, 52px);
+  }
+
+  /* ------------------------------------------------------ positioning */
+
+  .software-positioning p {
+    margin: 0 auto 18px;
+    max-width: 58ch;
+    font-size: clamp(1.15rem, 2vw, 1.5rem);
+    line-height: 1.55;
+    color: rgba(245, 245, 244, 0.82);
+  }
+
+  /* ------------------------------------------------ was gemeint ist */
+
+  .kinds-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  @media (max-width: 640px) {
+    .kinds-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .kind-item {
+    padding-left: 18px;
+    border-left: 2px solid rgba(245, 158, 11, 0.55);
+    text-align: left;
+  }
+
+  .kind-title {
+    margin: 0 0 8px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #f5f5f4;
+  }
+
+  .kind-body {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.7);
+  }
+
+  /* ----------------------------------------------------- client cases */
+
+  .case-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(18px, 2.5vw, 26px);
+  }
+
+  .case-card {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    padding: clamp(24px, 3vw, 32px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.02);
+    transition: border-color 260ms ease, transform 260ms ease;
+  }
+
+  .case-card:hover {
+    border-color: rgba(245, 158, 11, 0.35);
+    transform: translateY(-2px);
+  }
+
+  .case-name {
+    margin: 0;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: rgba(245, 245, 244, 0.96);
+  }
+
+  .case-full {
+    margin: 2px 0 0;
+    font-size: 0.95rem;
+    color: rgba(245, 245, 244, 0.6);
+  }
+
+  .case-branch {
+    margin: 10px 0 0;
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(245, 158, 11, 0.75);
+  }
+
+  .case-body {
+    margin: 18px 0 0;
+    font-size: 0.98rem;
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.72);
+  }
+
+  .case-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 20px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .case-tag {
+    padding: 5px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 9999px;
+    font-size: 0.74rem;
+    letter-spacing: 0.04em;
+    color: rgba(245, 245, 244, 0.6);
+  }
+
+  /* Aussehen kommt aus .cta-link (global.css). Hier bleibt nur, was
+     die Position in der Karte betrifft: der Link sitzt am unteren Rand,
+     damit er in allen Karten einer Reihe auf derselben Linie liegt. */
+  .case-link {
+    margin-top: auto;
+    padding-top: 22px;
+    align-self: flex-start;
+  }
+
+  /* ------------------------------------------- groesser als website */
+
+  .bigger-body p {
+    max-width: 58ch;
+    margin: 0 auto 18px;
+    font-size: clamp(1.02rem, 1.6vw, 1.18rem);
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.8);
+  }
+
+  .bigger-proof {
+    max-width: 58ch;
+    margin: clamp(24px, 4vh, 36px) auto 0;
+    padding-top: 22px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.55);
+  }
+
+  .bigger-proof a {
+    color: rgba(245, 158, 11, 0.9);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.3);
+  }
+
+  .bigger-proof a:hover {
+    border-bottom-color: rgba(245, 158, 11, 0.9);
+  }
+
+  /* --------------------------------------------------------- process */
+
+  .process-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(20px, 3vw, 34px);
+    text-align: left;
+  }
+
+  .process-number {
+    margin: 0;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 2.2rem;
+    line-height: 1;
+    color: rgba(245, 158, 11, 0.95);
+  }
+
+  .process-title {
+    margin: 12px 0 0;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: rgba(245, 245, 244, 0.96);
+  }
+
+  .process-meta {
+    margin: 4px 0 0;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(245, 245, 244, 0.45);
+  }
+
+  .process-body {
+    margin: 14px 0 0;
+    font-size: 0.98rem;
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.72);
+  }
+
+  /* --------------------------------------------------------- pricing */
+
+  .pricing-body p {
+    max-width: 58ch;
+    margin: 0 auto 18px;
+    font-size: clamp(1.02rem, 1.6vw, 1.18rem);
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.8);
+  }
+
+  .pricing-body strong {
+    color: rgba(245, 158, 11, 0.95);
+    font-weight: 600;
+  }
+
+  .pricing-aside {
+    max-width: 58ch;
+    margin: clamp(24px, 4vh, 36px) auto 0;
+    padding-top: 22px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.55);
+  }
+
+  .pricing-aside a {
+    color: rgba(245, 158, 11, 0.9);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.3);
+  }
+
+  .pricing-aside a:hover {
+    border-bottom-color: rgba(245, 158, 11, 0.9);
+  }
+
+  /* ---------------------------------------------------------- mobile */
+
+  @media (max-width: 860px) {
+    .case-grid,
+    .process-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+</style>
