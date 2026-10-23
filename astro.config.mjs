@@ -55,7 +55,7 @@ export default defineConfig({
           );
           const fehlend = [];
           for (const [key, eintrag] of Object.entries(ROUTES)) {
-            for (const locale of ['de', 'en']) {
+            for (const locale of /** @type {const} */ (['de', 'en'])) {
               const pfad = eintrag[locale];
               if (!pfad) continue;
               if (!vorhanden.has(pfad)) fehlend.push(`${key}.${locale} → ${pfad}`);
