@@ -11,7 +11,7 @@
  * SANITY_READ_TOKEN ist optional. Wird nur gebraucht wenn das Dataset
  * auf "Private" steht. Fuer "Public" reicht der Client ohne Token.
  */
-import { createClient, type SanityImageAssetDocument } from '@sanity/client';
+import { createClient } from '@sanity/client';
 import imageUrlBuilder from '@sanity/image-url';
 
 export const sanityClient = createClient({
