@@ -1,8 +1,5 @@
 ---
 import VerticalLandingPage from '../components/VerticalLandingPage.astro';
-import { getVerticalBySlug } from '../lib/verticals';
-
-const vertical = getVerticalBySlug('gastronomie')!;
 ---
 
-<VerticalLandingPage vertical={vertical} />
+<VerticalLandingPage slug="gastronomie" />

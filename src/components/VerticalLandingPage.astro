@@ -20,21 +20,34 @@
 // FAQ-Section bekommt zusaetzlich FAQPage JSON-LD via additionalSchema —
 // Google kann daraus Rich-Snippets im Suchergebnis machen.
 
-import type { Vertical } from '../lib/verticals';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SiteFooter from './SiteFooter.astro';
 import ClosingCta from './ClosingCta.astro';
 import { t } from '../lib/i18n';
 import { localeOf, path, pathOr } from '../lib/routes.mjs';
+import { getVertical, type VerticalSlug } from '../lib/verticals.i18n';
 
 export interface Props {
-  vertical: Vertical;
+  /**
+   * Welche Branche. Die Sprache steht NICHT in den Props: die liest die
+   * Komponente aus dem Pfad. Sonst muesste jede Seite ihre eigene
+   * Sprache nochmal nennen, und eine englische Seite koennte
+   * versehentlich die deutschen Texte anfordern.
+   */
+  slug: VerticalSlug;
 }
 
-const { vertical } = Astro.props;
+const { slug } = Astro.props;
 
 const d = t(Astro.url.pathname);
 const locale = localeOf(Astro.url.pathname);
+
+const vertical = getVertical(slug, locale);
+// Der Typ laesst nur die drei bekannten Slugs zu, der Fall kann also
+// nicht eintreten. Ein Abbruch mit Grund ist trotzdem besser als ein
+// nicht-null-Ausrufezeichen, das im Fehlerfall nur "undefined is not an
+// object" liefert.
+if (!vertical) throw new Error(`Unbekannte Branche: ${slug}`);
 
 // Die Preisseite und die Software-Seite gibt es nicht zwangslaeufig in
 // der Sprache dieser Seite. Solange nicht, faellt der Verweis darauf

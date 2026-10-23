@@ -113,6 +113,21 @@
       "source": "/en/werkstatt",
       "destination": "/en/lab",
       "statusCode": 301
+    },
+    {
+      "source": "/en/webdesign-handwerk",
+      "destination": "/en/web-design-contractors",
+      "statusCode": 301
+    },
+    {
+      "source": "/en/webdesign-praxis",
+      "destination": "/en/web-design-medical-practices",
+      "statusCode": 301
+    },
+    {
+      "source": "/en/webdesign-gastronomie",
+      "destination": "/en/web-design-restaurants",
+      "statusCode": 301
     }
   ]
 }

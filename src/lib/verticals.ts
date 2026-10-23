@@ -334,6 +334,3 @@ export const VERTICALS = [
     ],
   },
 ] as const satisfies readonly Vertical[];
-
-export const getVerticalBySlug = (slug: string): Vertical | undefined =>
-  VERTICALS.find((v) => v.slug === slug);

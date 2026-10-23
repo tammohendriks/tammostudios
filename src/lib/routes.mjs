@@ -44,9 +44,9 @@ export const ROUTES = {
   referenzen:   { de: '/referenzen',            en: null }, // → /en/work
   werkstatt:    { de: '/werkstatt',             en: null }, // → /en/lab
   kontakt:      { de: '/kontakt',               en: null }, // → /en/contact
-  handwerk:     { de: '/webdesign-handwerk',    en: null }, // → /en/web-design-trades
-  praxis:       { de: '/webdesign-praxis',      en: null }, // → /en/web-design-medical-practices
-  gastronomie:  { de: '/webdesign-gastronomie', en: null }, // → /en/web-design-restaurants
+  handwerk:     { de: '/webdesign-handwerk',    en: '/en/web-design-contractors' },
+  praxis:       { de: '/webdesign-praxis',      en: '/en/web-design-medical-practices' },
+  gastronomie:  { de: '/webdesign-gastronomie', en: '/en/web-design-restaurants' },
 
   // Dauerhaft nur deutsch. Das Journal ist rein deutsch geschrieben,
   // die Rechtstexte sind in der deutschen Fassung verbindlich.
