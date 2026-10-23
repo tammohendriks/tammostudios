@@ -40,7 +40,7 @@ export const ROUTES = {
   ueber:        { de: '/ueber',                 en: null }, // → /en/about
   website:      { de: '/website',               en: null }, // → /en/website
   software:     { de: '/software',              en: null }, // → /en/software
-  preise:       { de: '/preise',                en: null }, // → /en/pricing
+  preise:       { de: '/preise',                en: '/en/pricing' },
   referenzen:   { de: '/referenzen',            en: null }, // → /en/work
   werkstatt:    { de: '/werkstatt',             en: null }, // → /en/lab
   kontakt:      { de: '/kontakt',               en: '/en/contact' },

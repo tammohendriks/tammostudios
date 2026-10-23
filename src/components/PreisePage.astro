@@ -1,0 +1,704 @@
+---
+/**
+ * Liegt als Komponente und nicht in src/pages, weil es zwei Routen
+ * darauf gibt: /preise und /en/pricing. Markup und <style>-Block
+ * gehoeren dabei zusammen — Astro bindet die Regeln an eine Kennung der
+ * Komponente.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SubPageBackground from './SubPageBackground.astro';
+import SiteFooter from './SiteFooter.astro';
+import ClosingCta from './ClosingCta.astro';
+import { localeOf, path } from '../lib/routes.mjs';
+import { PREISE } from '../lib/i18n/seiten/preise';
+
+const locale = localeOf(Astro.url.pathname);
+const d = PREISE[locale];
+
+// Den Preisrechner gibt es nur auf Deutsch. Auf der englischen Seite
+// fallen deshalb beide Verweise darauf weg — ein englischer Linktext,
+// der auf eine deutsche Seite fuehrt, ist schlechter als kein Link.
+const rechnerPfad = path('preisrechner', locale);
+
+// Inline-SVG für Häkchen — kleiner amber-umrandeter Kreis mit
+// amber Häkchen innen. Wird in der "Immer dabei"-Liste pro Item
+// gerendert.
+const checkIcon = `
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <circle cx="12" cy="12" r="10" stroke="rgba(245, 158, 11, 0.6)" stroke-width="1.5"/>
+    <path d="M8 12.5L11 15.5L16 9" stroke="rgba(245, 158, 11, 1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+`;
+
+---
+
+<BaseLayout
+  pageTitle={d.meta.pageTitle}
+  title={d.meta.title}
+  description={d.meta.description}
+>
+  <main class="preise-page">
+    <SubPageBackground />
+
+    <header class="preise-hero">
+      <h1 class="subpage-hero-title">{d.hero.headline}</h1>
+      <p class="subpage-hero-subtitle">{d.hero.sub}</p>
+    </header>
+
+    <section class="preise-intro" aria-label={d.intro.label} data-reveal>
+      <p>{d.intro.websiteText} <strong>{d.intro.websitePreis}</strong>.</p>
+      <p>{d.intro.shopText} <strong>{d.intro.shopPreis}</strong>.</p>
+      <p>{d.intro.anwendung}</p>
+      <p class="preise-intro-punkt">{d.intro.punkt}</p>
+    </section>
+
+    <section class="preise-cards" aria-label={d.karten.label}>
+      {[d.karten.website, d.karten.shop].map((karte) => (
+        <article class="price-card" data-reveal>
+          <p class="price-eyebrow">{karte.eyebrow}</p>
+          <p class="price-amount">{karte.preis}</p>
+          <p class="price-sublabel">{d.karten.einmalig}</p>
+          <div class="price-divider"></div>
+          <ul class="dash-list">
+            {karte.punkte.map((punkt) => <li>{punkt}</li>)}
+          </ul>
+          <div class="price-divider"></div>
+          <p class="price-payment">
+            {d.karten.zahlung}<br />
+            {d.karten.bugfixes}
+          </p>
+        </article>
+      ))}
+    </section>
+
+    <!-- Preisrechner-Anker: dezenter CTA-Block zwischen Preis-Karten
+         und "Immer dabei". Nicht dominant — keine grosse Pill, nur
+         Card mit amber Border + kurzer Text + Link. -->
+    {rechnerPfad && (
+    <section class="preise-calc-cta" data-reveal aria-label={d.rechner.label}>
+      <article class="calc-cta-card">
+        <p class="calc-cta-eyebrow">{d.rechner.eyebrow}</p>
+        <h2 class="calc-cta-headline">{d.rechner.headline}</h2>
+        <p class="calc-cta-body">{d.rechner.body}</p>
+        <a class="cta-link" href={rechnerPfad}>
+          <span>{d.rechner.cta}</span>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </a>
+      </article>
+    </section>
+    )}
+
+    <section class="preise-always" aria-label={d.immerDabei.label} data-reveal>
+      <article class="always-card">
+        <p class="price-eyebrow">{d.immerDabei.eyebrow}</p>
+        <h2 class="always-headline">{d.immerDabei.headline}</h2>
+        <ul class="check-list always-list">
+          {d.immerDabei.punkte.map((item) => (
+            <li>
+              <span class="check-icon" set:html={checkIcon} />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </article>
+    </section>
+
+    <section class="preise-section" data-reveal>
+      <p class="section-eyebrow">
+        {d.erweiterungen.eyebrowZeile1}<br class="sm:hidden" />{d.erweiterungen.eyebrowZeile2}
+      </p>
+      <h2>{d.erweiterungen.headline}</h2>
+      <ul class="dash-list erweiterungen-list">
+        {d.erweiterungen.punkte.map((punkt) => (
+          <li>
+            <span class="erweiterung-head">
+              {punkt.label} <strong>{punkt.wert}</strong>
+            </span>
+            <span class="erweiterung-body">{punkt.body}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="preise-pflege" aria-label={d.pflege.label} data-reveal>
+      <article class="pflege-card">
+        <p class="price-eyebrow">{d.pflege.eyebrow}</p>
+        <h2 class="pflege-headline">{d.pflege.headline}</h2>
+        <div class="pflege-amount-row">
+          <p class="pflege-amount">{d.pflege.preis}</p>
+          <span class="pflege-tag">{d.pflege.tag}</span>
+        </div>
+        <div class="price-divider"></div>
+        <ul class="dash-list">
+          {d.pflege.punkte.map((punkt) => <li>{punkt}</li>)}
+        </ul>
+      </article>
+    </section>
+
+    <section class="preise-section preise-manifest" data-reveal>
+      <h2>{d.manifest.headline}</h2>
+      <p>{d.manifest.body}</p>
+    </section>
+
+    <ClosingCta
+      recommendation={
+        rechnerPfad
+          ? { text: d.empfehlung.text, label: d.empfehlung.label, href: rechnerPfad }
+          : undefined
+      }
+    />
+  </main>
+
+  <SiteFooter />
+</BaseLayout>
+
+<style>
+  .preise-page {
+    position: relative;
+    background: #050507;
+    padding: 140px 40px 80px;
+    min-height: calc(100vh - 200px);
+    overflow: hidden;
+  }
+
+  @media (max-width: 768px) {
+    .preise-page {
+      padding: 100px 20px 60px;
+    }
+  }
+
+  /* Atmosphäre liegt jetzt in <SubPageBackground /> — geteilt mit
+     /ueber und /referenzen. */
+
+  /* === Hero === */
+  .preise-hero {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto 80px;
+    padding-top: 32px;
+  }
+
+  /* Typografie der H1 + Subtitle kommt aus .subpage-hero-title /
+     .subpage-hero-subtitle in global.css. */
+
+  /* === Intro-Statement: drei Zeilen, Preise in Amber === */
+  .preise-intro {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    /* 48px statt 96px: der Disclaimer, fuer den der grosse Abstand
+       gedacht war, sitzt hier nicht mehr. */
+    margin: 0 auto 48px;
+    text-align: center;
+  }
+
+  .preise-intro p {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: clamp(1.25rem, 2vw, 1.5rem);
+    line-height: 1.5;
+    color: #f5f5f4;
+    margin: 0 0 6px;
+  }
+
+  .preise-intro-punkt {
+    margin: 12px 0 0 !important;
+    font-weight: 700;
+    color: #ffffff !important;
+  }
+
+  .preise-intro strong {
+    color: rgba(245, 158, 11, 1);
+    font-weight: 700;
+  }
+
+  /* === Zwei Hauptkarten === */
+  .preise-cards {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    max-width: 1100px;
+    margin: 0 auto 96px;
+  }
+
+  @media (max-width: 768px) {
+    .preise-cards {
+      grid-template-columns: 1fr;
+      gap: 20px;
+      margin-bottom: 72px;
+    }
+  }
+
+  .price-card {
+    background: rgba(15, 15, 18, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 40px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: border-color 300ms ease;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .price-card:hover,
+  .price-card:focus-within {
+    border-color: rgba(245, 158, 11, 0.4);
+  }
+
+  @media (max-width: 768px) {
+    .price-card {
+      padding: 28px;
+      border-radius: 16px;
+    }
+  }
+
+  /* Reduced-Motion (aka iOS Low Power Mode ab 15.4): backdrop-filter:blur
+     wird pro Scroll-Frame re-sampled, unter LPM ist das der teuerste
+     Compositor-Kostenpunkt der Subpage. Solid Background mit hoeherer
+     Alpha kompensiert visuell — Karten behalten Praesenz ohne Blur-Cost.
+     Normal-Mobile behaelt den Frosted-Glass-Look. */
+  @media (prefers-reduced-motion: reduce) {
+    .price-card {
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      background: rgba(15, 15, 18, 0.9);
+    }
+  }
+
+  .price-eyebrow {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    color: rgba(245, 158, 11, 0.95);
+    text-transform: uppercase;
+    margin: 0 0 14px;
+  }
+
+  .price-amount {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: #f5f5f4;
+    margin: 0 0 6px;
+  }
+
+  .price-sublabel {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.95rem;
+    color: rgba(245, 245, 244, 0.55);
+    margin: 0;
+  }
+
+  .price-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.08);
+    margin: 24px 0;
+  }
+
+  .price-payment {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    color: rgba(245, 245, 244, 0.6);
+    margin: 0;
+  }
+
+  /* === Em-Dash-Liste — kein Bullet-Symbol, stattdessen "—"
+     als ::before. Wiederverwendet von price-card features,
+     Erweiterungen, Pflege-Paket. */
+  .dash-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .dash-list li {
+    position: relative;
+    padding-left: 22px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 1rem;
+    line-height: 1.55;
+    color: rgba(245, 245, 244, 0.85);
+  }
+
+  .dash-list li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: rgba(245, 158, 11, 0.85);
+    font-weight: 500;
+  }
+
+  .dash-list strong {
+    color: #f5f5f4;
+    font-weight: 600;
+  }
+
+  .dash-list code {
+    font-family: 'SF Mono', Monaco, monospace;
+    font-size: 0.92em;
+    color: rgba(245, 158, 11, 0.95);
+    background: rgba(245, 158, 11, 0.08);
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+
+  /* === "Immer dabei" — eine ruhige Karte zwischen Pakete-Cards und
+     Erweiterungen. Bewusst kein Verkauf, sondern Vergewisserung:
+     etwas dunkler als der Page-Hintergrund, dünne Outline, kompakte
+     Häkchen-Liste. */
+  .preise-always {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: 0 auto 80px;
+  }
+
+  .always-card {
+    background: rgba(8, 8, 11, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    padding: 36px 40px;
+  }
+
+  @media (max-width: 768px) {
+    .always-card {
+      padding: 28px 24px;
+    }
+  }
+
+  .always-card .price-eyebrow {
+    margin-bottom: 8px;
+  }
+
+  .always-headline {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.4rem, 2.2vw, 1.75rem);
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    color: #f5f5f4;
+    margin: 0 0 24px;
+  }
+
+  /* check-list-Override innerhalb der Always-Karte: einspaltig,
+     etwas kompakter — die 5 Items reihen sich klarer als in
+     Zwei-Spalten. */
+  .always-list {
+    grid-template-columns: 1fr !important;
+    margin: 0 !important;
+    gap: 12px !important;
+  }
+
+  /* === Erweiterungen + Manifest: gleiche Section-Spalte mit
+     Amber-Bar-Headline wie auf /ueber */
+  .preise-section {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: 0 auto 80px;
+  }
+
+  /* Optionaler kleiner Section-Eyebrow über dem h2 — wird auf
+     Erweiterungen verwendet, sitzt visuell über der Amber-Bar-
+     Headline ohne sie zu konkurrenzieren. */
+  .section-eyebrow {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(245, 158, 11, 0.95);
+    margin: 0 0 12px !important;
+  }
+
+  /* Erweiterungen-Liste: zwei Items mit jeweils Head (Bold + Preis)
+     und Body (gedämpfter Sub-Text). */
+  .erweiterungen-list li {
+    flex-direction: column;
+    gap: 4px;
+    padding-left: 22px;
+    margin-bottom: 6px;
+  }
+
+  .erweiterung-head {
+    display: block;
+    color: rgba(245, 245, 244, 0.92);
+    font-weight: 500;
+  }
+
+  .erweiterung-head strong {
+    color: rgba(245, 158, 11, 1);
+    font-weight: 700;
+  }
+
+  .erweiterung-body {
+    display: block;
+    font-size: 0.92rem;
+    color: rgba(245, 245, 244, 0.55);
+    line-height: 1.55;
+  }
+
+  .preise-section h2 {
+    position: relative;
+    padding-left: 18px;
+    margin: 0 0 20px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.4rem, 2.2vw, 1.75rem);
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    color: #f5f5f4;
+  }
+
+  .preise-section h2::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 4px;
+    bottom: 4px;
+    width: 3px;
+    background: rgba(245, 158, 11, 0.9);
+    border-radius: 2px;
+  }
+
+  .preise-section p {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: clamp(1.05rem, 1.15vw, 1.125rem);
+    line-height: 1.7;
+    color: rgba(245, 245, 244, 0.78);
+    margin: 0 0 18px;
+  }
+
+  .preise-section .dash-list {
+    margin: 18px 0;
+  }
+
+  /* === Pflege-Karte: eigenständig, dezenter als Hauptkarten === */
+  .preise-pflege {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: 0 auto 80px;
+  }
+
+  .pflege-card {
+    background: rgba(10, 10, 12, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    padding: 36px;
+  }
+
+  @media (max-width: 768px) {
+    .pflege-card {
+      padding: 24px;
+    }
+  }
+
+  .pflege-headline {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.4rem, 2.2vw, 1.75rem);
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    color: #f5f5f4;
+    margin: 8px 0 18px;
+  }
+
+  .pflege-amount-row {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 0 0 6px;
+  }
+
+  .pflege-amount {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: #f5f5f4;
+    margin: 0;
+  }
+
+  .pflege-tag {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(245, 245, 244, 0.5);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 9999px;
+    padding: 4px 10px;
+  }
+
+  .pflege-closing {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.6);
+    margin: 0;
+  }
+
+  /* === "Was schon drin ist" — Häkchen-Liste === */
+  .check-list {
+    list-style: none;
+    margin: 24px 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 32px;
+  }
+
+  @media (max-width: 768px) {
+    .check-list {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+  }
+
+  .check-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: rgba(245, 245, 244, 0.85);
+  }
+
+  .check-icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+
+  /* === CTA-Schluss: leiser, kein Pill === */
+
+  /* Inline-Link mit amber Pfeil — funktioniert auf <a> und
+     <button> identisch (Browser-Default-Reset auf .inline-link
+     selbst, damit ein Button-Trigger fürs Kontakt-Modal sich
+     visuell wie der vorherige Anchor verhält). */
+  .inline-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid transparent;
+    color: #f5f5f4;
+    text-decoration: none;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    padding: 0 0 1px;
+    cursor: pointer;
+    transition: border-color 200ms ease, color 200ms ease;
+  }
+
+  .inline-link svg {
+    color: rgba(245, 158, 11, 0.95);
+    transition: transform 200ms ease;
+    flex-shrink: 0;
+  }
+
+  .inline-link:hover,
+  .inline-link:focus-visible {
+    border-bottom-color: rgba(245, 158, 11, 0.6);
+    color: #fff;
+    outline: none;
+  }
+
+  .inline-link:hover svg,
+  .inline-link:focus-visible svg {
+    transform: translateX(3px);
+  }
+
+  /* === Preisrechner-CTA-Card ===
+     Dezenter Anker-Block zwischen Preis-Karten und "Immer dabei".
+     max-width 600px, zentriert, amber Border + subtle Glow. Nicht
+     zu dominant damit die Preis-Karten drueber Blickfang bleiben. */
+  .preise-calc-cta {
+    position: relative;
+    z-index: 1;
+    max-width: 600px;
+    margin: 40px auto 60px;
+    padding: 0 20px;
+  }
+
+  .calc-cta-card {
+    background: linear-gradient(180deg, rgba(20, 20, 24, 0.6) 0%, rgba(15, 15, 18, 0.6) 100%);
+    border: 1px solid rgba(245, 158, 11, 0.32);
+    border-radius: 12px;
+    padding: 28px 28px 24px;
+    text-align: center;
+    box-shadow:
+      0 6px 24px rgba(0, 0, 0, 0.2),
+      0 0 32px rgba(245, 158, 11, 0.08);
+  }
+
+  .calc-cta-eyebrow {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.72rem;
+    letter-spacing: 0.28em;
+    color: rgba(245, 158, 11, 0.9);
+    text-transform: uppercase;
+    margin: 0 0 12px;
+  }
+
+  .calc-cta-headline {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.2rem, 1.8vw, 1.5rem);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: #f5f5f4;
+    margin: 0 0 10px;
+  }
+
+  .calc-cta-body {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: rgba(245, 245, 244, 0.7);
+    margin: 0 0 20px;
+  }
+
+  @media (max-width: 640px) {
+    .calc-cta-card {
+      padding: 24px 22px 20px;
+    }
+  }
+
+  /* Querverweis auf /software: bewusst leise unter dem Haupt-CTA — die
+     Preisseite verkauft Websites, Software ist der Seitenpfad. */
+
+  /* Footer-Styles leben jetzt in SiteFooter.astro (Component-scoped). */
+</style>
