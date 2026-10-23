@@ -40,9 +40,9 @@ export const en: Shape<typeof de> = {
   },
 
   thema: {
-    umschalten: 'Switch colour theme (dark / light)',
-    aktuellHell: 'Switch colour theme (currently light)',
-    aktuellDunkel: 'Switch colour theme (currently dark)',
+    umschalten: 'Switch color theme (dark / light)',
+    aktuellHell: 'Switch color theme (currently light)',
+    aktuellDunkel: 'Switch color theme (currently dark)',
   },
 
   footer: {
