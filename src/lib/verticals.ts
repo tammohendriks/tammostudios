@@ -3,9 +3,10 @@
 // /referenzen-Cards + Search-Traffic.
 //
 // Alle 3 Verticals folgen exakt der gleichen Struktur (Hero → Intro →
-// Checklist → Pricing → CaseStudy → FAQ → FinalCTA). Rendering laeuft
-// ueber src/components/VerticalLandingPage.astro — dieses File ist reine
-// Datenquelle.
+// Checklist → Pricing → CaseStudy → FAQ). Den Abschluss liefert der
+// gemeinsame ClosingCta-Block, deshalb steht hier kein eigener CTA-Text
+// mehr. Rendering laeuft ueber src/components/VerticalLandingPage.astro —
+// dieses File ist reine Datenquelle.
 //
 // Zuordnung Reference-Kategorie → Vertical-Slug (fuer /referenzen Cross-
 // Links): Handwerk → handwerk, Medizin → praxis, Gastronomie → gastronomie.
@@ -59,10 +60,14 @@ export type Vertical = {
     references: readonly VerticalReference[];
   };
   faq: readonly VerticalFaqEntry[];
-  finalCta: { headline: string; sub: string; buttonLabel: string };
 };
 
-export const VERTICALS: readonly Vertical[] = [
+// `as const satisfies` statt einer Typ-Annotation: die Annotation
+// wuerde die Literal-Typen wegwerfen, und damit auch die Laengen der
+// Listen. Genau die braucht Shape<> aber, um zu merken, wenn die
+// englische Checkliste einen Punkt weniger hat als die deutsche.
+// `satisfies` prueft trotzdem weiter gegen Vertical.
+export const VERTICALS = [
   {
     slug: 'handwerk',
     pageSlug: 'webdesign-handwerk',
@@ -149,11 +154,6 @@ export const VERTICALS: readonly Vertical[] = [
         a: 'Deine Site läuft auf Vercel, einer der zuverlässigsten Hosting-Plattformen mit 99.99% Uptime. Im Pflege-Paket bin ich bei Störungen priorisiert erreichbar.',
       },
     ],
-    finalCta: {
-      headline: 'Klingt fair?',
-      sub: '30 Minuten Erstgespräch. Kostenlos, unverbindlich.',
-      buttonLabel: 'Erstgespräch anfragen',
-    },
   },
 
   {
@@ -251,11 +251,6 @@ export const VERTICALS: readonly Vertical[] = [
         a: 'Rechtlich schwierig bei Kassenpraxen, unproblematisch bei Privat- und Wahlleistungen. Wir klären das im Erstgespräch und finden die passende Kommunikation.',
       },
     ],
-    finalCta: {
-      headline: 'Klingt vertrauenswürdig?',
-      sub: '30 Minuten Erstgespräch. Kostenlos, unverbindlich.',
-      buttonLabel: 'Erstgespräch anfragen',
-    },
   },
 
   {
@@ -337,13 +332,8 @@ export const VERTICALS: readonly Vertical[] = [
         a: 'Wir verknüpfen dein Google Business Profile prominent. Falls du noch keins hast: setzen wir zusammen auf.',
       },
     ],
-    finalCta: {
-      headline: 'Klingt nach deinem Stil?',
-      sub: '30 Minuten Erstgespräch. Kostenlos, unverbindlich.',
-      buttonLabel: 'Erstgespräch anfragen',
-    },
   },
-];
+] as const satisfies readonly Vertical[];
 
 export const getVerticalBySlug = (slug: string): Vertical | undefined =>
   VERTICALS.find((v) => v.slug === slug);
