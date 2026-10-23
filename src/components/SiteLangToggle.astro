@@ -1,0 +1,150 @@
+---
+/**
+ * SiteLangToggle — Umschalter zwischen deutscher und englischer Fassung.
+ *
+ * Sieht aus wie der SiteThemeToggle (gleicher Schieber, gleiche Pille),
+ * sitzt aber LINKS unter der "EST. 2026 · BREMEN"-Pille statt rechts.
+ *
+ * Ist ein <a>, kein <button>: die beiden Sprachen sind eigene Seiten mit
+ * eigenen Adressen. Ein Knopf mit JavaScript waere hier falsch — er
+ * wuerde die Adresse verschweigen, liesse sich nicht in einem neuen Tab
+ * oeffnen und waere fuer Suchmaschinen unsichtbar. Das Aussehen eines
+ * Schalters bleibt trotzdem, weil der Nutzer genau das erwartet.
+ *
+ * Wird NICHT gerendert, wenn es keine Gegenseite gibt. counterpart()
+ * liefert dann null — auf /journal, /impressum, /datenschutz und auf
+ * jeder englischen Seite, deren deutsches Gegenstueck noch nicht
+ * uebersetzt ist. Lieber kein Umschalter als einer, der ins Leere oder
+ * auf die falsche Sprache fuehrt.
+ */
+import { counterpart, localeOf } from '../lib/routes.mjs';
+import { t } from '../lib/i18n';
+
+const ziel = counterpart(Astro.url.pathname);
+const locale = localeOf(Astro.url.pathname);
+const d = t(Astro.url.pathname);
+
+// Nach rechts geschoben heisst Englisch, wie beim Thema hell rechts
+// steht. Der Zustand zeigt die AKTUELLE Sprache, der Klick fuehrt zur
+// anderen.
+const istEnglisch = locale === 'en';
+---
+
+{ziel && (
+  <a
+    class="site-lang-toggle"
+    href={ziel}
+    hreflang={istEnglisch ? 'de' : 'en'}
+    aria-label={d.sprache.umschalten}
+    data-lang-toggle
+  >
+    <span class="site-lang-track" aria-hidden="true">
+      <span class="site-lang-label site-lang-label-de">{d.sprache.kurzDe}</span>
+      <span class="site-lang-label site-lang-label-en">{d.sprache.kurzEn}</span>
+      <span class="site-lang-thumb"></span>
+    </span>
+  </a>
+)}
+
+<style>
+  /* Spiegelbild des Theme-Umschalters: dort top:88 right:24, hier
+     top:88 left:24. Gleiche Hoehe, damit beide auf einer Linie sitzen. */
+  .site-lang-toggle {
+    position: fixed;
+    top: 88px;
+    left: 24px;
+    z-index: 50;
+    padding: 6px 8px;
+    background: rgba(5, 5, 7, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: border-color 200ms ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .site-lang-toggle:hover {
+    border-color: rgba(245, 158, 11, 0.5);
+  }
+
+  .site-lang-toggle:focus-visible {
+    outline: 2px solid rgba(245, 158, 11, 0.95);
+    outline-offset: 2px;
+  }
+
+  .site-lang-track {
+    position: relative;
+    display: block;
+    width: 52px;
+    height: 22px;
+    border-radius: 999px;
+    box-sizing: border-box;
+  }
+
+  /* Zwei feste Beschriftungen statt Icons. Die Mitten liegen auf
+     denselben Punkten wie Mond und Sonne beim Theme-Schalter (10 und
+     42), damit der Daumen in beiden Schaltern identisch laeuft. */
+  .site-lang-label {
+    position: absolute;
+    top: 50%;
+    z-index: 2;
+    width: 18px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    text-align: center;
+    color: rgba(245, 245, 244, 0.7);
+    transform: translateY(-50%);
+    transition: color 200ms ease;
+  }
+  .site-lang-label-de { left: 1px; }
+  .site-lang-label-en { left: 33px; }
+
+  .site-lang-thumb {
+    position: absolute;
+    top: 2px;
+    left: 1px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(245, 158, 11, 0.95);
+    transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+  }
+
+  /* Der Zustand haengt an der Sprache der GELADENEN Seite, die das
+     BaseLayout als lang-Attribut setzt. Kein eigener Zustand, kein
+     Speicher: die Adresse ist die Wahrheit. */
+  :global(html[lang='en']) .site-lang-thumb {
+    transform: translateX(32px);
+  }
+  :global(html[lang='en']) .site-lang-label-de {
+    color: rgba(245, 245, 244, 0.4);
+  }
+  :global(html:not([lang='en'])) .site-lang-label-en {
+    color: rgba(245, 245, 244, 0.4);
+  }
+
+  /* Ueber dem offenen Mobile-Menue haette eine schwebende Pille nichts
+     verloren. Das Attribut setzt TopBar beim Oeffnen. */
+  :global(html[data-menu-open]) .site-lang-toggle {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  @media (max-width: 768px) {
+    .site-lang-toggle {
+      top: 90px;
+      left: 16px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-lang-thumb {
+      transition: none;
+    }
+  }
+</style>

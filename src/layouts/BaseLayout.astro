@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import TopBar from '../components/TopBar.astro';
 import SiteThemeToggle from '../components/SiteThemeToggle.astro';
+import SiteLangToggle from '../components/SiteLangToggle.astro';
 import { SITE } from '../lib/constants';
 import { absUrl, hreflangs, keyOf, localeOf } from '../lib/routes.mjs';
 
@@ -336,6 +337,10 @@ const jsonLdGraph = {
   <body class="min-h-screen bg-ts-bg text-ts-fg">
     <TopBar />
     {!hideThemeToggle && <SiteThemeToggle />}
+    {/* Rendert sich selbst nur, wenn es eine Gegenseite gibt. Kein
+        Ausblenden per Bedingung hier — die Entscheidung gehoert in die
+        Routen-Tabelle, nicht ins Layout. */}
+    <SiteLangToggle />
     <slot />
     <script>
       // Site-weiter Scroll-Reveal: alle [data-reveal] Elemente werden

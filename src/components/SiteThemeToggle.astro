@@ -159,6 +159,16 @@
     color: rgba(245, 245, 244, 0.4);
   }
 
+  /* Bestandsfehler, hier mitbehoben: TopBar setzt beim Oeffnen des
+     Mobile-Menues data-menu-open auf <html>, dieser Schalter hat aber
+     nie darauf reagiert und schwebte mit z-index 50 ueber dem Menue
+     (z-index 45). Faellt erst auf, seit ein zweiter Schalter daneben
+     sitzt — einer, der verschwindet, und einer, der bleibt. */
+  :global(html[data-menu-open]) .site-theme-toggle {
+    opacity: 0;
+    pointer-events: none;
+  }
+
   @media (max-width: 768px) {
     /* Unter TopBar-Bottom (mobile TopBar ~76px hoch, top:90 = 14px Luft) */
     .site-theme-toggle {

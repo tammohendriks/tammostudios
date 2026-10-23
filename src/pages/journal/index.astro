@@ -57,6 +57,13 @@ const TAG_FILTERS = [
       <p class="subpage-hero-subtitle text-lines">
         {"Gedanken über Webdesign, Preise, Prozess.\nNur wenn's was zu sagen gibt."}
       </p>
+      {/* Englisch, weil der Hinweis sich an englischsprachige Besucher
+          richtet: auf dieser Seite gibt es keinen Sprach-Umschalter,
+          und sie sollen verstehen warum. lang-Attribut, damit
+          Vorleseprogramme umschalten. */}
+      <p class="journal-lang-note" lang="en">
+        The journal is only available in German.
+      </p>
     </header>
 
     {posts.length > 0 && (
@@ -235,6 +242,20 @@ const TAG_FILTERS = [
      Klassen aus global.css (dieselben wie /referenzen, /ueber, /preise) —
      einheitliche H1-Groesse (clamp 48–96px) und Subtitle-Ton ueber alle
      Sub-Pages. Keine eigenen typografischen Overrides hier. */
+  /* Hinweis fuer englischsprachige Besucher. Leiser als der
+     Untertitel, aber lesbar: rgba(…,0.55) ergibt 5.8:1 auf #050507. */
+  .journal-lang-note {
+    margin: 14px 0 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.01em;
+    color: rgba(245, 245, 244, 0.55);
+  }
+
+  :global(html[data-site-theme='light']) .journal-lang-note {
+    color: rgba(26, 26, 28, 0.6);
+  }
+
   .journal-hero {
     position: relative;
     z-index: 2;
