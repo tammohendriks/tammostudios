@@ -7,9 +7,11 @@ import sitemap from '@astrojs/sitemap';
 import react from '@astrojs/react';
 import vercel from '@astrojs/vercel';
 
+import { SITE_URL, sitemapAlternates } from './src/lib/routes.mjs';
+
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://tammostudios.de',
+  site: SITE_URL,
 
   // Vercel-Adapter fuer server-side API-Routes (src/pages/api/*.ts mit
   // `export const prerender = false`). Alle statischen Pages bleiben
@@ -42,6 +44,19 @@ export default defineConfig({
       // 404 nicht in die Sitemap aufnehmen — Google soll keine Fehler-
       // Seite indexieren.
       filter: (page) => !page.endsWith('/404') && !page.includes('/admin'),
+
+      // hreflang von Hand statt ueber sitemap({ i18n }). Die eingebaute
+      // Option paart URLs ueber den Pfad NACH dem Sprach-Praefix: aus
+      // /preise wird '/preise', aus /en/pricing wird '/pricing'. Die
+      // finden nie zueinander, und bei nur einem Treffer liefert sie
+      // undefined. Es entstuende kein einziges xhtml:link — ohne
+      // Warnung. Solange kein en-Eintrag gesetzt ist, gibt
+      // sitemapAlternates() ebenfalls undefined zurueck und das Item
+      // bleibt unveraendert.
+      serialize(item) {
+        const links = sitemapAlternates(item.url);
+        return links ? { ...item, links } : item;
+      },
     }),
     // React-Integration ausschliesslich fuer /admin (Sanity Studio).
      // Alles andere bleibt reines Astro — Landing/Sub-Pages ziehen KEIN

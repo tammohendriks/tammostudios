@@ -3,6 +3,7 @@ import '../styles/global.css';
 import TopBar from '../components/TopBar.astro';
 import SiteThemeToggle from '../components/SiteThemeToggle.astro';
 import { SITE } from '../lib/constants';
+import { absUrl, hreflangs } from '../lib/routes.mjs';
 
 interface Props {
   pageTitle: string;
@@ -27,7 +28,11 @@ const fullTitle = title ?? `${pageTitle} — ${SITE.name}`;
 // können selbst noindex erzwingen (z.B. 404).
 const allowIndexing = import.meta.env.PUBLIC_ALLOW_INDEXING !== 'false';
 const renderNoindex = !allowIndexing || noindex;
-const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
+// absUrl() statt new URL(): letzteres haengt der Wurzel einen Slash an
+// (…de/), die Sitemap liefert sie aber ohne (…de). Zwei Schreibweisen
+// derselben Seite in Canonical und Sitemap sind unnoetig.
+const canonicalURL = absUrl(Astro.url.pathname);
+const alternateLinks = hreflangs(Astro.url.pathname);
 const isLanding = Astro.url.pathname === '/' || Astro.url.pathname === '/index.html';
 const initialPage = isLanding ? 'landing' : 'subpage';
 
@@ -211,6 +216,9 @@ const jsonLdGraph = {
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalURL} />
+    {alternateLinks.map((l) => (
+      <link rel="alternate" hreflang={l.hreflang} href={l.href} />
+    ))}
     {renderNoindex && <meta name="robots" content="noindex,nofollow" />}
     <link rel="icon" type="image/png" href="/logos/logo-websiteicon.png" />
     <link rel="apple-touch-icon" href="/logos/logo-websiteicon.png" />
