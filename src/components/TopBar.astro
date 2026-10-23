@@ -1,5 +1,6 @@
 ---
 import { SITE_LABELS, NAV_ITEMS, CTA } from '../lib/constants';
+import { keyOf } from '../lib/routes.mjs';
 
 // "Startseite" wird IMMER ins DOM gerendert. Sichtbarkeit kommt
 // per CSS aus dem html[data-page]- bzw. header[data-page]-State,
@@ -7,8 +8,11 @@ import { SITE_LABELS, NAV_ITEMS, CTA } from '../lib/constants';
 // Ohne View Transitions: kein Sync nötig, jede Navigation ist ein
 // Full-Page-Reload und liefert das richtige data-page direkt vom
 // Server.
-const currentPath = Astro.url.pathname;
-const isLanding = currentPath === '/' || currentPath === '/index.html';
+const currentPath = Astro.url.pathname.replace(/\/index\.html$/, '') || '/';
+// Ueber die Routen-Tabelle statt per Pfad-Vergleich: /en ist genauso
+// Startseite wie /, und das stand hier vorher ein zweites Mal
+// unabhaengig vom BaseLayout.
+const isLanding = keyOf(currentPath) === 'home';
 const pageType = isLanding ? 'landing' : 'subpage';
 
 type NavChild = { label: string; href: string };
@@ -24,10 +28,15 @@ const navItems: NavItem[] = [
 ];
 
 function isActive(href: string) {
-  if (href === '/') return isLanding;
-  // Sub-Pages: aktiv wenn currentPath mit href beginnt — fängt
-  // auch potenzielle Sub-Routes wie /referenzen/foo später ab.
-  return currentPath === href || currentPath.startsWith(href + '/');
+  if (currentPath === href) return true;
+  // Die Startseite darf NIE per Praefix treffen. Sonst waere '/en' ein
+  // Praefix von '/en/about' und der Home-Eintrag leuchtete auf jeder
+  // englischen Unterseite dauerhaft aktiv. Im Deutschen fiel das nie
+  // auf, weil '/' per Sonderfall behandelt wurde.
+  if (keyOf(href) === 'home') return false;
+  // Sub-Pages: aktiv wenn currentPath mit href beginnt — faengt
+  // auch Sub-Routes wie /journal/mein-post ab.
+  return currentPath.startsWith(href + '/');
 }
 
 // Ein Nav-Item ist "aktiv" wenn seine eigene href matcht ODER

@@ -3,7 +3,7 @@ import '../styles/global.css';
 import TopBar from '../components/TopBar.astro';
 import SiteThemeToggle from '../components/SiteThemeToggle.astro';
 import { SITE } from '../lib/constants';
-import { absUrl, hreflangs } from '../lib/routes.mjs';
+import { absUrl, hreflangs, keyOf, localeOf } from '../lib/routes.mjs';
 
 interface Props {
   pageTitle: string;
@@ -33,13 +33,18 @@ const renderNoindex = !allowIndexing || noindex;
 // derselben Seite in Canonical und Sitemap sind unnoetig.
 const canonicalURL = absUrl(Astro.url.pathname);
 const alternateLinks = hreflangs(Astro.url.pathname);
-const isLanding = Astro.url.pathname === '/' || Astro.url.pathname === '/index.html';
+// Seitenart ueber die Routen-Tabelle statt ueber Pfad-Vergleiche. Die
+// alten Pruefungen (pathname === '/' und /^\/webdesign-/) waeren fuer
+// /en und /en/web-design-trades beide falsch ausgegangen.
+const routeKey = keyOf(Astro.url.pathname);
+const locale = localeOf(Astro.url.pathname);
+const isLanding = routeKey === 'home';
 const initialPage = isLanding ? 'landing' : 'subpage';
 
-// Vertical Landings (/webdesign-gastronomie etc.) sind eigene Photo-Hero-
-// Landings mit eigener Design-Sprache — kein Site-Theme-Toggle darauf.
-// isLanding bleibt fuer JSON-LD/tracking beim /-only Check.
-const isVerticalLanding = /^\/webdesign-/.test(Astro.url.pathname);
+// Vertical Landings sind eigene Photo-Hero-Landings mit eigener
+// Design-Sprache — kein Site-Theme-Toggle darauf.
+const VERTICAL_KEYS = ['handwerk', 'praxis', 'gastronomie'];
+const isVerticalLanding = VERTICAL_KEYS.includes(routeKey ?? '');
 const hideThemeToggle = isLanding || isVerticalLanding;
 
 // LocalBusiness JSON-LD Schema. ProfessionalService (Subtype von
@@ -209,7 +214,7 @@ const jsonLdGraph = {
 ---
 
 <!doctype html>
-<html lang="de" data-page={initialPage}>
+<html lang={locale} data-page={initialPage} data-no-theme={hideThemeToggle ? "" : undefined}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -228,7 +233,7 @@ const jsonLdGraph = {
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={SITE.name} />
-    <meta property="og:locale" content="de_DE" />
+    <meta property="og:locale" content={locale === "en" ? "en_US" : "de_DE"} />
     <meta property="og:image" content={new URL('og-image.png', Astro.site).toString()} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
@@ -278,8 +283,10 @@ const jsonLdGraph = {
       // Bei Rückkehr zur Landing wird das Flag gelöscht, sodass der
       // nächste Wechsel wieder eine Animation produziert.
       try {
-        var path = window.location.pathname;
-        var isLanding = path === '/' || path === '/index.html';
+        // Liest data-page vom <html>, das serverseitig ueber die
+        // Routen-Tabelle gesetzt wird. Kein Pfad-Vergleich mehr, damit
+        // /en genauso als Landing gilt wie /.
+        var isLanding = document.documentElement.dataset.page === 'landing';
         if (isLanding) {
           window.sessionStorage.removeItem('ts-startseite-shown');
         } else if (!window.sessionStorage.getItem('ts-startseite-shown')) {
@@ -299,18 +306,18 @@ const jsonLdGraph = {
     </script>
     <script is:inline>
       // Site-Theme (Dark ↔ Light) fruehzeitig setzen um FOUC zu vermeiden.
-      // WIRKT NICHT auf: Landing (/), Vertical-Landings (/webdesign-*).
+      // WIRKT NICHT wo data-no-theme gesetzt ist (Landing + Verticals).
       // Toggle-Component + CSS reagieren auf data-site-theme=light auf <html>.
       //
       // Legacy-Migration: der fruehere Journal-only Toggle hat
       // 'journal-theme' localStorage geschrieben. Wir migrieren einmalig
       // zu 'site-theme' damit User's Preference erhalten bleibt.
       try {
-        var path = location.pathname;
+        // data-no-theme setzt der Server ueber die Routen-Tabelle auf
+        // Landing und Vertical-Landings. Frueher stand hier derselbe
+        // Pfad-Vergleich ein zweites Mal — zwei Orte, eine Wahrheit.
         var isLandingPath =
-          path === '/' ||
-          path === '/index.html' ||
-          /^\/webdesign-/.test(path);
+          document.documentElement.hasAttribute('data-no-theme');
 
         // Migration von altem 'journal-theme' → 'site-theme'
         var legacy = localStorage.getItem('journal-theme');
