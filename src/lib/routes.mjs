@@ -37,12 +37,12 @@ export const LOCALES = /** @type {const} */ (['de', 'en']);
  */
 export const ROUTES = {
   home:         { de: '/',                      en: null }, // → /en
-  ueber:        { de: '/ueber',                 en: null }, // → /en/about
+  ueber:        { de: '/ueber',                 en: '/en/about' },
   website:      { de: '/website',               en: '/en/website' },
   software:     { de: '/software',              en: '/en/software' },
   preise:       { de: '/preise',                en: '/en/pricing' },
   referenzen:   { de: '/referenzen',            en: null }, // → /en/work
-  werkstatt:    { de: '/werkstatt',             en: null }, // → /en/lab
+  werkstatt:    { de: '/werkstatt',             en: '/en/lab' },
   kontakt:      { de: '/kontakt',               en: '/en/contact' },
   handwerk:     { de: '/webdesign-handwerk',    en: '/en/web-design-contractors' },
   praxis:       { de: '/webdesign-praxis',      en: '/en/web-design-medical-practices' },
