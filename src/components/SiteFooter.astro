@@ -17,16 +17,49 @@ export interface Props {
 const { variant = 'default' } = Astro.props;
 
 import { SECTION5 } from '../lib/constants';
+import { t } from '../lib/i18n';
+import { localeOf, path, pathOr } from '../lib/routes.mjs';
 
 const { footer } = SECTION5;
+const d = t(Astro.url.pathname);
+const locale = localeOf(Astro.url.pathname);
+
+// Fussleiste aus Routen-Schluesseln statt aus festen Pfaden. Eintraege,
+// die es in dieser Sprache nicht gibt (Journal auf Englisch), fallen
+// ganz weg — eine Fussleiste ist Navigation, dort gehoert kein Verweis
+// auf eine Seite hin, die in dieser Sprache nicht existiert.
+// as const, damit die Schluessel ein Literal-Union sind und d.nav
+// damit indiziert werden kann. Ohne das ist key einfach string, und
+// der Typchecker laesst den Zugriff zu Recht nicht durch.
+const FOOTER_KEYS = [
+  'home', 'ueber', 'website', 'software', 'preise', 'werkstatt',
+  'referenzen', 'journal',
+] as const;
+const navLinks = FOOTER_KEYS
+  .map((key) => ({ key, href: path(key, locale) }))
+  .filter((e): e is { key: (typeof FOOTER_KEYS)[number]; href: string } => e.href !== null)
+  .map((e) => ({
+    href: e.href,
+    // 'website' traegt in der Fussleiste das Angebots-Label, so wie im
+    // Kopf — der Eintrag zeigt auf die Angebots-Uebersicht.
+    label: e.key === 'website' ? d.nav.angebot : d.nav[e.key],
+  }));
+
+// Rechtstexte bleiben deutsch. Auf englischen Seiten tragen die Links
+// deshalb lang/hreflang, damit klar ist, in welcher Sprache das Ziel
+// verfasst ist.
+const legalLinks = [
+  { href: pathOr('impressum'), label: d.footer.impressum },
+  { href: pathOr('datenschutz'), label: d.footer.datenschutz },
+];
 ---
 
 <footer class:list={['site-footer', `is-${variant}`]}>
   <div class="footer-row">
-    <span class="footer-brand">{footer.brand}</span>
+    <span class="footer-brand">{d.establishedLine}</span>
     <div class="footer-links">
-      <nav class="footer-nav" aria-label="Hauptnavigation">
-        {footer.navLinks.map((link, i) => (
+      <nav class="footer-nav" aria-label={d.nav.bereichRechtliches === "Legal" ? "Main navigation" : "Hauptnavigation"}>
+        {navLinks.map((link, i) => (
           <>
             {i > 0 && <span aria-hidden="true">·</span>}
             <a href={link.href}>{link.label}</a>
@@ -84,12 +117,16 @@ const { footer } = SECTION5;
     </div>
   </div>
   <div class="footer-row footer-row-legal">
-    <span class="footer-copy">{footer.copyright}</span>
-    <nav class="footer-legal" aria-label="Rechtliches">
-      {footer.legalLinks.map((link, i) => (
+    <span class="footer-copy">{d.footer.copyright}</span>
+    <nav class="footer-legal" aria-label={d.nav.bereichRechtliches}>
+      {legalLinks.map((link, i) => (
         <>
           {i > 0 && <span aria-hidden="true">·</span>}
-          <a href={link.href}>{link.label}</a>
+          <a
+            href={link.href}
+            lang={locale === 'en' ? 'de' : undefined}
+            hreflang={locale === 'en' ? 'de' : undefined}
+          >{link.label}</a>
         </>
       ))}
     </nav>
@@ -102,11 +139,13 @@ const { footer } = SECTION5;
        Der Wortlaut nennt die Cal.com-Ausnahme ausdruecklich, damit hier
        nichts steht, was sich widerlegen laesst. -->
   <p class="footer-privacy">
-    Diese Website setzt von sich aus keine Cookies und nutzt keine
-    Tracking-Tools. Ausgewertet werden nur anonyme Server-Logs. Cookies
-    können nur entstehen, wenn du die Terminbuchung aktiv öffnest.
+    {d.footer.datenschutzHinweis}
     {' '}
-    <a href="/datenschutz">Details</a>
+    <a
+      href={pathOr('datenschutz')}
+      lang={locale === 'en' ? 'de' : undefined}
+      hreflang={locale === 'en' ? 'de' : undefined}
+    >{d.footer.datenschutzDetails}</a>
   </p>
 </footer>
 

@@ -1,10 +1,12 @@
 ---
-import { SITE_LABELS } from '../lib/constants';
+import { t } from '../lib/i18n';
+
+const d = t(Astro.url.pathname);
 ---
 
 <div class="scroll-cue-anchor">
   <button class="scroll-cue" type="button" aria-label="Nach unten scrollen">
-    <span class="scroll-cue-label">{SITE_LABELS.scrollCue}</span>
+    <span class="scroll-cue-label">{d.scrollCue}</span>
     <svg class="scroll-cue-arrow" viewBox="0 0 24 24" aria-hidden="true">
       <path d="M6 9l6 6 6-6" />
     </svg>

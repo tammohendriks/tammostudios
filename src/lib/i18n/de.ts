@@ -1,0 +1,78 @@
+// Deutsche Texte der geteilten Hülle: Navigation, Fußzeile,
+// Abschluss-Block, Sprach-Umschalter.
+//
+// Quelle der Wahrheit. en.ts wird dagegen typgeprüft (siehe shape.ts),
+// jede Abweichung in Struktur oder Listenlänge bricht den Build.
+//
+// Seiteninhalte liegen NICHT hier, sondern bleiben vorerst in den
+// Seiten selbst. Hier steht nur, was auf jeder Seite erscheint.
+//
+// Die href-Werte sind Routen-SCHLÜSSEL aus routes.mjs, keine Pfade.
+// So entsteht der richtige Pfad je Sprache automatisch, und ein
+// Verweis kann nicht auf die falsche Sprachfassung zeigen.
+
+export const de = {
+  // Kopfzeile links, in beiden Sprachen identisch
+  establishedLine: 'EST. 2026 · BREMEN',
+
+  nav: {
+    home: 'Startseite',
+    ueber: 'Über',
+    angebot: 'Angebot',
+    website: 'Website',
+    software: 'Software',
+    preise: 'Preise',
+    werkstatt: 'Werkstatt',
+    referenzen: 'Referenzen',
+    journal: 'Journal',
+    kontakt: 'Kontakt',
+    menueOeffnen: 'Menü öffnen',
+    menueSchliessen: 'Menü schließen',
+    bereichRechtliches: 'Rechtliches',
+  },
+
+  sprache: {
+    // Beschriftung des Umschalters. aria-label beschreibt die Wirkung,
+    // nicht den Zustand.
+    umschalten: 'Sprache wechseln, zur englischen Fassung',
+    kurzDe: 'DE',
+    kurzEn: 'EN',
+  },
+
+  footer: {
+    copyright: '© 2026 Tammo Studios',
+    impressum: 'Impressum',
+    datenschutz: 'Datenschutz',
+    // Der Datenschutz-Kurzhinweis. Die Cal.com-Einschränkung muss
+    // erhalten bleiben: ohne sie wäre der Satz nachweislich falsch,
+    // sobald jemand den Kalender öffnet.
+    datenschutzHinweis:
+      'Diese Website setzt von sich aus keine Cookies und nutzt keine ' +
+      'Tracking-Tools. Ausgewertet werden nur anonyme Server-Logs. ' +
+      'Cookies können nur entstehen, wenn du die Terminbuchung aktiv ' +
+      'öffnest.',
+    datenschutzDetails: 'Details',
+  },
+
+  abschluss: {
+    headlineFair: 'Klingt fair?',
+    headlineUeberzeugt: 'Überzeugt?',
+    naechsterSchritt: 'Nächster Schritt:',
+    erstgespraech: '30 Min Erstgespräch, kostenlos und unverbindlich.',
+    cta: 'Lass uns sprechen',
+    zusagen: [
+      'Antwort < 24 h',
+      'Erstgespräch gratis',
+      'DE & EN',
+    ],
+    zusagenLabel: 'Was du erwarten kannst',
+  },
+
+  journal: {
+    // Hinweis unter der Journal-Unterzeile. Steht nur auf der
+    // deutschen Seite, weil es die englische nicht gibt.
+    nurDeutsch: 'Das Journal gibt es nur auf Deutsch.',
+  },
+
+  scrollCue: 'SCROLLEN',
+} as const;
