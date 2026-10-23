@@ -24,12 +24,24 @@ import type { Vertical } from '../lib/verticals';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SiteFooter from './SiteFooter.astro';
 import ClosingCta from './ClosingCta.astro';
+import { t } from '../lib/i18n';
+import { localeOf, path, pathOr } from '../lib/routes.mjs';
 
 export interface Props {
   vertical: Vertical;
 }
 
 const { vertical } = Astro.props;
+
+const d = t(Astro.url.pathname);
+const locale = localeOf(Astro.url.pathname);
+
+// Die Preisseite und die Software-Seite gibt es nicht zwangslaeufig in
+// der Sprache dieser Seite. Solange nicht, faellt der Verweis darauf
+// weg: ein englischer Linktext, der auf eine deutsche Seite fuehrt, ist
+// schlechter als kein Link. pathOr() waere hier also falsch.
+const preisePfad = path('preise', locale);
+const softwarePfad = path('software', locale);
 
 // FAQPage Schema fuer Rich-Snippets in Google.
 const faqSchema = {
@@ -96,8 +108,8 @@ const heroFocalPoint = vertical.hero.background.focalPoint ?? 'center center';
         </h1>
         <p class="v-hero-subtitle text-lines">{vertical.hero.subheadline}</p>
         <div class="v-hero-cta">
-          <a class="cta-orbital" href="/kontakt">
-            <span>Erstgespräch anfragen</span>
+          <a class="cta-orbital" href={pathOr('kontakt', locale)}>
+            <span>{d.branche.erstgespraech}</span>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M5 12h14M13 6l6 6-6 6" />
             </svg>
@@ -125,14 +137,16 @@ const heroFocalPoint = vertical.hero.background.focalPoint ?? 'center center';
     </section>
 
     <!-- PRICING -->
-    <section class="v-pricing" data-reveal aria-label="Was es kostet">
+    <section class="v-pricing" data-reveal aria-label={d.branche.wasEsKostet}>
       <article class="v-pricing-card">
-        <p class="v-eyebrow v-eyebrow-inline">WAS ES KOSTET</p>
-        <h2 class="v-section-headline v-pricing-headline">Klar, fix, ohne Sternchen.</h2>
+        <p class="v-eyebrow v-eyebrow-inline">{d.branche.wasEsKostet}</p>
+        <h2 class="v-section-headline v-pricing-headline">{d.branche.preisHeadline}</h2>
         <div class="v-pricing-body">
           {vertical.pricing.paragraphs.map((p) => <p class="text-lines">{p}</p>)}
         </div>
-        <a class="cta-link" href="/preise">Volle Preisliste ansehen <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg></a>
+        {preisePfad && (
+          <a class="cta-link" href={preisePfad}>{d.branche.preislisteAnsehen} <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg></a>
+        )}
       </article>
     </section>
 
@@ -153,7 +167,7 @@ const heroFocalPoint = vertical.hero.background.focalPoint ?? 'center center';
         </div>
         <div class="v-case-images">
           {vertical.caseStudy.references.map((ref) => (
-            <a class="v-case-image-link" href={ref.url} target="_blank" rel="noopener noreferrer" aria-label={`${ref.name} — Live-Site oeffnen (neuer Tab)`}>
+            <a class="v-case-image-link" href={ref.url} target="_blank" rel="noopener noreferrer" aria-label={`${ref.name} — ${d.branche.liveSeiteOeffnen}`}>
               <img src={ref.image} alt={ref.alt} loading="lazy" />
             </a>
           ))}
@@ -162,8 +176,8 @@ const heroFocalPoint = vertical.hero.background.focalPoint ?? 'center center';
     </section>
 
     <!-- FAQ -->
-    <section class="v-faq" data-reveal aria-label="Häufige Fragen">
-      <h2 class="v-section-headline">Häufige Fragen</h2>
+    <section class="v-faq" data-reveal aria-label={d.branche.faqTitel}>
+      <h2 class="v-section-headline">{d.branche.faqTitel}</h2>
       <div class="v-faq-list">
         {vertical.faq.map((entry) => (
           <details class="v-faq-item">
@@ -183,11 +197,15 @@ const heroFocalPoint = vertical.hero.background.focalPoint ?? 'center center';
 
     <!-- FINAL CTA -->
     <ClosingCta
-      recommendation={{
-        text: 'Die Branche ist nie das Problem. Was zählt, ist was die Seite können soll:',
-        label: 'Zu den individuellen Anwendungen',
-        href: '/software',
-      }}
+      recommendation={
+        softwarePfad
+          ? {
+              text: d.branche.empfehlung.text,
+              label: d.branche.empfehlung.label,
+              href: softwarePfad,
+            }
+          : undefined
+      }
     />
   </main>
 

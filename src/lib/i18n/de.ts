@@ -68,6 +68,28 @@ export const de = {
     zusagenLabel: 'Was du erwarten kannst',
   },
 
+  // Die geteilte Hülle der drei Branchen-Landingpages. Hier steht nur,
+  // was auf allen drei Seiten gleich ist; die branchenspezifischen Texte
+  // liegen in verticals.ts und verticals.en.ts.
+  //
+  // Die Vorsilbe WAS ES KOSTET steht großgeschrieben, weil das
+  // Augenbrauen-Element der Seite seine Texte so vorhält (siehe die
+  // anderen eyebrow-Werte in verticals.ts). Dieselbe Zeichenkette dient
+  // als aria-label des Abschnitts.
+  branche: {
+    erstgespraech: 'Erstgespräch anfragen',
+    wasEsKostet: 'WAS ES KOSTET',
+    preisHeadline: 'Klar, fix, ohne Sternchen.',
+    preislisteAnsehen: 'Volle Preisliste ansehen',
+    // Wird dem Namen der Referenz nachgestellt: "Wärmepower — …".
+    liveSeiteOeffnen: 'Live-Site öffnen (neuer Tab)',
+    faqTitel: 'Häufige Fragen',
+    empfehlung: {
+      text: 'Die Branche ist nie das Problem. Was zählt, ist was die Seite können soll:',
+      label: 'Zu den individuellen Anwendungen',
+    },
+  },
+
   journal: {
     // Hinweis unter der Journal-Unterzeile. Steht nur auf der
     // deutschen Seite, weil es die englische nicht gibt.

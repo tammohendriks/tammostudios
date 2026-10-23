@@ -64,6 +64,19 @@ export const en: Shape<typeof de> = {
     zusagenLabel: 'What you can expect',
   },
 
+  branche: {
+    erstgespraech: 'Request an intro call',
+    wasEsKostet: 'WHAT IT COSTS',
+    preisHeadline: 'Clear, fixed, no fine print.',
+    preislisteAnsehen: 'See the full price list',
+    liveSeiteOeffnen: 'open live site (new tab)',
+    faqTitel: 'Frequently asked questions',
+    empfehlung: {
+      text: 'The industry is never the problem. What matters is what the site needs to do:',
+      label: 'See the custom applications',
+    },
+  },
+
   journal: {
     nurDeutsch: 'The journal is only available in German.',
   },
