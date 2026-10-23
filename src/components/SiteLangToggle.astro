@@ -16,6 +16,18 @@
  * jeder englischen Seite, deren deutsches Gegenstueck noch nicht
  * uebersetzt ist. Lieber kein Umschalter als einer, der ins Leere oder
  * auf die falsche Sprache fuehrt.
+ *
+ * Uebergang: die alte Fassung schiebt sich zur Seite, die neue kommt
+ * von der anderen nach — in derselben Richtung, in die der Daumen am
+ * Umschalter laeuft. Das Bild dahinter sind zwei Fassungen desselben
+ * Inhalts, die nebeneinander liegen, nicht hintereinander.
+ *
+ * Technisch ein Uebergang zwischen zwei Dokumenten, rein ueber CSS und
+ * zwei Fenster-Ereignisse. Astros ClientRouter kommt hier bewusst NICHT
+ * zum Einsatz: die Seite verlaesst sich darauf, dass jede Navigation
+ * ein vollstaendiger Neuaufbau ist (siehe die Kommentare zu data-page
+ * in TopBar und BaseLayout). Wo der Browser das nicht kann, wechselt
+ * die Seite wie vorher ohne Uebergang.
  */
 import { counterpart, localeOf } from '../lib/routes.mjs';
 import { t } from '../lib/i18n';
@@ -45,6 +57,92 @@ const istEnglisch = locale === 'en';
     </span>
   </a>
 )}
+
+<script>
+  // Vormerken, dass der naechste Seitenwechsel ein Sprachwechsel ist:
+  // Richtung und Zielpfad, durch ein Leerzeichen getrennt. Ob daraus
+  // ein Uebergang wird, entscheidet das BaseLayout — dort steht die
+  // Weiche fuer das ganze Dokument.
+  //
+  // Der Zielpfad gehoert mit dazu, damit ein liegengebliebener
+  // Vormerker nichts kaputt macht: bricht der Besucher die Navigation
+  // ab, prueft das Layout beim naechsten Klick, dass das Ziel noch
+  // stimmt, und wirft den Vormerker sonst weg.
+  //
+  // sessionStorage, weil der Vormerker einen Dokumentwechsel
+  // ueberleben muss.
+  document
+    .querySelector<HTMLAnchorElement>('[data-lang-toggle]')
+    ?.addEventListener('click', (e) => {
+      // Nur der einfache Linksklick. Mit Mittelklick oder gedrueckter
+      // Befehls-/Strg-Taste oeffnet sich ein neuer Tab — dort gibt es
+      // nichts zu ueberblenden.
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const link = e.currentTarget as HTMLAnchorElement;
+      const richtung = link.getAttribute('hreflang');
+      if (!richtung) return;
+      try {
+        sessionStorage.setItem(
+          'sprachwechsel',
+          `${richtung} ${new URL(link.href).pathname}`
+        );
+      } catch (_) {
+        // ohne Speicher kein Uebergang, der Wechsel passiert trotzdem
+      }
+    });
+</script>
+
+<style is:global>
+  /*
+   * Wie ein Sprachwechsel aussieht. Die Weiche, OB ueberhaupt ein
+   * Uebergang laeuft, steht im BaseLayout; hier steht nur das Bild.
+   *
+   * Nach Englisch: der Daumen am Umschalter laeuft nach rechts, also
+   * zieht die alte Fassung nach links ab und die neue kommt von rechts
+   * nach. Zurueck nach Deutsch spiegelverkehrt.
+   *
+   * Der Weg ist absichtlich kurz. Ein halber Bildschirm Schub sieht
+   * nach Diashow aus; vier Prozent lesen sich als "daneben liegt noch
+   * eine Fassung desselben Inhalts".
+   */
+  html[data-sprach-richtung='en']::view-transition-old(root) {
+    animation: sprache-raus-links 220ms cubic-bezier(0.4, 0, 1, 1) both;
+  }
+  html[data-sprach-richtung='en']::view-transition-new(root) {
+    animation: sprache-rein-rechts 320ms cubic-bezier(0, 0, 0.2, 1) both;
+  }
+  html[data-sprach-richtung='de']::view-transition-old(root) {
+    animation: sprache-raus-rechts 220ms cubic-bezier(0.4, 0, 1, 1) both;
+  }
+  html[data-sprach-richtung='de']::view-transition-new(root) {
+    animation: sprache-rein-links 320ms cubic-bezier(0, 0, 0.2, 1) both;
+  }
+
+  @keyframes sprache-raus-links {
+    to {
+      opacity: 0;
+      transform: translateX(-4%);
+    }
+  }
+  @keyframes sprache-rein-rechts {
+    from {
+      opacity: 0;
+      transform: translateX(4%);
+    }
+  }
+  @keyframes sprache-raus-rechts {
+    to {
+      opacity: 0;
+      transform: translateX(4%);
+    }
+  }
+  @keyframes sprache-rein-links {
+    from {
+      opacity: 0;
+      transform: translateX(-4%);
+    }
+  }
+</style>
 
 <style>
   /* Spiegelbild des Theme-Umschalters: dort top:88 right:24, hier

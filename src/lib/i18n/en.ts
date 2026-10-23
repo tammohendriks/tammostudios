@@ -39,6 +39,12 @@ export const en: Shape<typeof de> = {
     kurzEn: 'EN',
   },
 
+  thema: {
+    umschalten: 'Switch colour theme (dark / light)',
+    aktuellHell: 'Switch colour theme (currently light)',
+    aktuellDunkel: 'Switch colour theme (currently dark)',
+  },
+
   footer: {
     copyright: '© 2026 Tammo Studios',
     impressum: 'Imprint (German)',

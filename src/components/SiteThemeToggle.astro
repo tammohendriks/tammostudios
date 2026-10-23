@@ -18,14 +18,25 @@
  * Legacy: fruehere JournalThemeToggle-Component nutzte localStorage-Key
  * 'journal-theme'. BaseLayout inline-script migriert den Key nach
  * 'site-theme' bevor er ausgewertet wird → nahtloser Upgrade.
+ *
+ * Uebergang: der neue Zustand wird als Kreis vom Knopf aus aufgezogen,
+ * ueber dem alten. Das Bild dahinter ist ein Lichtschalter — Helligkeit
+ * breitet sich von der Stelle aus, an der man sie eingeschaltet hat.
+ * Technisch ueber die View-Transitions-API; wo die fehlt, schaltet es
+ * wie vorher sofort um.
  */
+import { t } from '../lib/i18n';
+
+const d = t(Astro.url.pathname);
 ---
 
 <button
   type="button"
   class="site-theme-toggle"
   data-site-theme-toggle
-  aria-label="Farbthema umschalten (Dark / Light)"
+  aria-label={d.thema.umschalten}
+  data-label-hell={d.thema.aktuellHell}
+  data-label-dunkel={d.thema.aktuellDunkel}
 >
   <span class="site-theme-track" aria-hidden="true">
     <span class="site-theme-icon site-theme-icon-moon">
@@ -55,7 +66,11 @@
     '[data-site-theme-toggle]'
   );
   if (btn) {
-    btn.addEventListener('click', () => {
+    // Der eigentliche Umschaltvorgang. Steht als eigene Funktion da,
+    // weil die View-Transitions-API ihn als Rueckruf braucht: sie macht
+    // vorher eine Aufnahme der Seite, ruft dann das hier, macht danach
+    // eine zweite Aufnahme und blendet zwischen beiden.
+    const umschalten = () => {
       const html = document.documentElement;
       const current = html.getAttribute('data-site-theme');
       const next = current === 'light' ? 'dark' : 'light';
@@ -69,15 +84,76 @@
       } catch (_) {
         // private-mode etc. — no persistence, but toggle still works session
       }
-      btn.setAttribute(
-        'aria-label',
-        next === 'light'
-          ? 'Farbthema umschalten (aktuell: Light)'
-          : 'Farbthema umschalten (aktuell: Dark)'
+      const label =
+        next === 'light' ? btn.dataset.labelHell : btn.dataset.labelDunkel;
+      if (label) btn.setAttribute('aria-label', label);
+    };
+
+    btn.addEventListener('click', () => {
+      const html = document.documentElement;
+      const reduziert = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // Ohne die API oder bei reduzierter Bewegung schaltet es sofort
+      // um, genau wie vorher. Der Uebergang ist Zierde, nicht Funktion.
+      if (reduziert || typeof document.startViewTransition !== 'function') {
+        umschalten();
+        return;
+      }
+
+      // Mitte des Knopfes als Ursprung des Kreises, dazu der Radius bis
+      // zur entferntesten Ecke des Fensters — sonst bliebe eine Ecke
+      // unbedeckt, wenn der Kreis fertig aufgezogen ist.
+      const kasten = btn.getBoundingClientRect();
+      const x = kasten.left + kasten.width / 2;
+      const y = kasten.top + kasten.height / 2;
+      const radius = Math.hypot(
+        Math.max(x, window.innerWidth - x),
+        Math.max(y, window.innerHeight - y)
       );
+      html.style.setProperty('--thema-x', `${x}px`);
+      html.style.setProperty('--thema-y', `${y}px`);
+      html.style.setProperty('--thema-r', `${radius}px`);
+      html.dataset.themaWechsel = '';
+
+      const uebergang = document.startViewTransition(umschalten);
+      uebergang.finished.finally(() => {
+        delete html.dataset.themaWechsel;
+      });
     });
   }
 </script>
+
+<style is:global>
+  /*
+   * Der Uebergang laeuft auf Pseudo-Elementen am Wurzel-Element, nicht
+   * auf etwas in dieser Komponente — deshalb is:global. Mit einer
+   * Astro-Kennung am Selektor griffe keine dieser Regeln.
+   *
+   * Der ALTE Zustand bleibt liegen, der neue wird als Kreis darueber
+   * gezogen. Umgekehrt (alten wegwischen) saehe aus wie ein Loch in der
+   * Seite.
+   */
+  html[data-thema-wechsel]::view-transition-old(root) {
+    animation: none;
+    mix-blend-mode: normal;
+    z-index: 0;
+  }
+
+  html[data-thema-wechsel]::view-transition-new(root) {
+    animation: thema-kreis 560ms cubic-bezier(0.33, 0, 0.2, 1) both;
+    mix-blend-mode: normal;
+    z-index: 1;
+  }
+
+  @keyframes thema-kreis {
+    from {
+      clip-path: circle(0 at var(--thema-x) var(--thema-y));
+    }
+    to {
+      clip-path: circle(var(--thema-r) at var(--thema-x) var(--thema-y));
+    }
+  }
+</style>
 
 <style>
   .site-theme-toggle {

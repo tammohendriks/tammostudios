@@ -332,6 +332,34 @@ const jsonLdGraph = {
         }
       } catch (e) {}
     </script>
+    <style is:global>
+      /*
+       * Uebergaenge zwischen zwei Dokumenten erlauben. Das gilt fuer
+       * JEDE Navigation von dieser Seite aus — animiert werden soll
+       * aber nur der Sprachwechsel. Die Weiche dafuer steht im Skript
+       * am Fuss dieses Layouts.
+       *
+       * Die Regel steht hier und nicht im Sprach-Umschalter: dessen
+       * Stile landen im geteilten CSS-Bundle und damit auch auf Seiten
+       * ohne Umschalter (Journal, Rechtstexte). Dort liefe dann die
+       * eingebaute Ueberblendung bei jedem Klick, ohne dass ein Skript
+       * sie abbricht.
+       */
+      @view-transition {
+        navigation: auto;
+      }
+
+      /*
+       * Letzte Absicherung: ohne gesetzte Richtung keine Bewegung. Wenn
+       * das Skript unten den Uebergang aus irgendeinem Grund nicht
+       * abbricht, bleibt der Wechsel wenigstens ohne Ueberblendung —
+       * genau wie vorher.
+       */
+      html:not([data-sprach-richtung]):not([data-thema-wechsel])::view-transition-old(root),
+      html:not([data-sprach-richtung]):not([data-thema-wechsel])::view-transition-new(root) {
+        animation: none;
+      }
+    </style>
     <slot name="head" />
   </head>
   <body class="min-h-screen bg-ts-bg text-ts-fg">
@@ -342,6 +370,92 @@ const jsonLdGraph = {
         Routen-Tabelle, nicht ins Layout. */}
     <SiteLangToggle />
     <slot />
+    <script>
+      // Weiche fuer die Uebergaenge zwischen Dokumenten (siehe
+      // @view-transition im Kopf). Ein Uebergang laeuft nur, wenn der
+      // Sprach-Umschalter vorher einen Vormerker gesetzt hat; alles
+      // andere wird abgebrochen und wechselt wie immer sofort.
+      //
+      // Steht hier im Layout, weil die Entscheidung das ganze Dokument
+      // betrifft — auch Seiten, auf denen es gar keinen Umschalter
+      // gibt. Wie ein Sprachwechsel dann AUSSIEHT, steht im Umschalter.
+      {
+        const SCHLUESSEL = 'sprachwechsel';
+
+        // Vormerker lesen: "<richtung> <zielpfad>".
+        const vormerker = () => {
+          try {
+            const roh = sessionStorage.getItem(SCHLUESSEL);
+            if (!roh) return null;
+            const [richtung, ziel] = roh.split(' ');
+            return richtung && ziel ? { richtung, ziel } : null;
+          } catch (_) {
+            return null;
+          }
+        };
+
+        const vergessen = () => {
+          try {
+            sessionStorage.removeItem(SCHLUESSEL);
+          } catch (_) {
+            // kein Speicher, also auch nichts zu vergessen
+          }
+        };
+
+        const reduziert = () =>
+          window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        const pfadVon = (url: string | null | undefined) => {
+          if (!url) return null;
+          try {
+            return new URL(url).pathname;
+          } catch (_) {
+            return null;
+          }
+        };
+
+        // Verlassende Seite.
+        window.addEventListener('pageswap', (e) => {
+          const ereignis = e as PageSwapEvent;
+          const uebergang = ereignis.viewTransition;
+          if (!uebergang) return;
+          const merker = vormerker();
+          // Geht die Navigation woanders hin als der Umschalter zeigte,
+          // ist der Vormerker von einem abgebrochenen Wechsel uebrig.
+          // Weg damit, sonst animiert der naechste beliebige Klick.
+          const ziel = pfadVon(ereignis.activation?.entry?.url);
+          if (!merker || merker.ziel !== ziel) {
+            vergessen();
+            uebergang.skipTransition();
+            return;
+          }
+          if (reduziert()) {
+            uebergang.skipTransition();
+            return;
+          }
+          document.documentElement.dataset.sprachRichtung = merker.richtung;
+        });
+
+        // Ankommende Seite. Hier wird der Vormerker geloescht: er hat
+        // seinen Zweck erfuellt, und beim Zurueckblaettern soll er
+        // nicht ein zweites Mal greifen.
+        window.addEventListener('pagereveal', (e) => {
+          const uebergang = (e as PageRevealEvent).viewTransition;
+          if (!uebergang) return;
+          const merker = vormerker();
+          vergessen();
+          if (!merker || merker.ziel !== location.pathname || reduziert()) {
+            uebergang.skipTransition();
+            return;
+          }
+          const html = document.documentElement;
+          html.dataset.sprachRichtung = merker.richtung;
+          uebergang.finished.finally(() => {
+            delete html.dataset.sprachRichtung;
+          });
+        });
+      }
+    </script>
     <script>
       // Site-weiter Scroll-Reveal: alle [data-reveal] Elemente werden
       // beim Eintritt in den Viewport (15% sichtbar) eingefadet. Pro

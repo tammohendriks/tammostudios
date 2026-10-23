@@ -39,6 +39,12 @@ export const de = {
     kurzEn: 'EN',
   },
 
+  thema: {
+    umschalten: 'Farbthema umschalten (Dark / Light)',
+    aktuellHell: 'Farbthema umschalten (aktuell: Light)',
+    aktuellDunkel: 'Farbthema umschalten (aktuell: Dark)',
+  },
+
   footer: {
     copyright: '© 2026 Tammo Studios',
     impressum: 'Impressum',
