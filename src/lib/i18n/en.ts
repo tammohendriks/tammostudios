@@ -90,4 +90,5 @@ export const en: Shape<typeof de> = {
   },
 
   scrollCue: 'SCROLL',
+  scrollCueLabel: 'Scroll down',
 } as const;

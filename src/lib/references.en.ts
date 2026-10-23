@@ -21,6 +21,28 @@ export const REFERENCE_SUBTITLES_EN: Record<Slug, string> = {
   'kirsch-dach-fassade': 'Roofing and facades in Bremen',
 };
 
+type Kategorie = (typeof REFERENCES)[number]['category'];
+
+/**
+ * Englische Beschriftung der Kategorien.
+ *
+ * Im Deutschen ist die Beschriftung der Wert selbst, deshalb gibt es
+ * nur diese eine Tabelle. Der WERT bleibt in beiden Sprachen derselbe:
+ * er steht als data-Attribut an den Filter-Chips und landet als
+ * #handwerk in der Adresse.
+ */
+export const CATEGORY_LABELS_EN: Record<Kategorie, string> = {
+  Handwerk: 'Contractors',
+  Medizin: 'Medical',
+  Gastronomie: 'Restaurants',
+  Medien: 'Media',
+};
+
+/** Beschriftung einer Kategorie in der gewuenschten Sprache. */
+export function categoryLabel(kategorie: Kategorie, locale: 'de' | 'en'): string {
+  return locale === 'en' ? CATEGORY_LABELS_EN[kategorie] : kategorie;
+}
+
 /** Unterzeile einer Referenz in der gewuenschten Sprache. */
 export function subtitleFor(
   ref: { slug: Slug; subtitle: string },

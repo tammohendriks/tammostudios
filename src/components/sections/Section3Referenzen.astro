@@ -1,6 +1,14 @@
 ---
 import { REFERENCES } from '../../lib/references';
+import { categoryLabel } from '../../lib/references.en';
 import ReferenzModal from '../ReferenzModal.astro';
+import { localeOf, path } from '../../lib/routes.mjs';
+import { STARTSEITE } from '../../lib/i18n/seiten/startseite';
+
+const locale = localeOf(Astro.url.pathname);
+const d = STARTSEITE[locale];
+
+const referenzenPfad = path('referenzen', locale);
 
 // User-definierte Reihenfolge: Samedos, Wärmepower, Er & Sie, IBI.
 const TEASER_SLUGS = ['samedos', 'waermepower', 'er-und-sie', 'ibi-doc'] as const;
@@ -45,11 +53,9 @@ const dots = [
 
   <div class="section-3-sticky">
     <header class="section-3-header reveal-slot">
-      <p class="section-3-eyebrow">AUSGEWÄHLTE PROJEKTE</p>
-      <h2 class="section-3-headline">Zuletzt gebaut.</h2>
-      <p class="section-3-sub">
-        Vier Sites, drei Branchen. Alle handgemacht, alle online.
-      </p>
+      <p class="section-3-eyebrow">{d.projekte.eyebrow}</p>
+      <h2 class="section-3-headline">{d.projekte.headline}</h2>
+      <p class="section-3-sub">{d.projekte.sub}</p>
     </header>
 
     <div class="ref-teaser-grid">
@@ -62,12 +68,12 @@ const dots = [
           data-title={ref.title}
           tabindex="-1"
           aria-hidden="true"
-          aria-label={`${'shortTitle' in ref ? ref.shortTitle : ref.title} — im Modal öffnen`}
+          aria-label={`${'shortTitle' in ref ? ref.shortTitle : ref.title} — ${d.projekte.modalOeffnen}`}
         >
           <span class="ref-teaser-thumb">
             <img
               src={ref.preview}
-              alt={`Vorschau von ${ref.title}`}
+              alt={`${d.projekte.vorschauVon} ${ref.title}`}
               loading="lazy"
               width="1200"
               height="600"
@@ -77,7 +83,7 @@ const dots = [
             <span class="ref-teaser-title">
               {'shortTitle' in ref ? ref.shortTitle : ref.title}
             </span>
-            <span class="ref-teaser-category">{ref.category}</span>
+            <span class="ref-teaser-category">{categoryLabel(ref.category, locale)}</span>
           </span>
         </button>
       ))}
@@ -97,14 +103,15 @@ const dots = [
       </style>
     </noscript>
 
+    {referenzenPfad && (
     <div class="section-3-cta-wrap">
       <a
         class="section-3-cta reveal-slot"
-        href="/referenzen"
+        href={referenzenPfad}
         tabindex="-1"
         aria-hidden="true"
       >
-        <span>Alle Referenzen ansehen</span>
+        <span>{d.projekte.cta}</span>
         <svg
           width="16"
           height="16"
@@ -120,6 +127,7 @@ const dots = [
         </svg>
       </a>
     </div>
+    )}
   </div>
 
   <ReferenzModal />

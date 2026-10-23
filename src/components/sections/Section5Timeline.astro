@@ -21,11 +21,24 @@
 // Kein Video, kein Glow-Overkill. Amber-Akzent in amber-700 (#f59e0b)
 // fuer Kontrast auf Cream statt amber-500 im Dark-Kontext.
 
-import { SECTION4 } from '../../lib/constants';
+import { localeOf, path } from '../../lib/routes.mjs';
+import { STARTSEITE } from '../../lib/i18n/seiten/startseite';
 
-// Phase 06 ("Und jetzt du") lebt in Section 6 als Closing-Moment.
-// Section 5 zeigt Phasen 01-05.
-const phases = SECTION4.phases.slice(0, 5);
+const locale = localeOf(Astro.url.pathname);
+const d = STARTSEITE[locale];
+
+// Ziele der Phasen-Verweise. Die Reihenfolge entspricht fahrplan.phasen;
+// die letzten zwei Phasen haben keinen Verweis. Fehlt eine Seite in
+// dieser Sprache, faellt der Verweis weg.
+const phasenZiele = [
+  path('preise', locale),
+  path('referenzen', locale),
+  path('software', locale),
+  null,
+  null,
+];
+
+const phases = d.fahrplan.phasen.map((phase, i) => ({ ...phase, href: phasenZiele[i] }));
 ---
 
 <section class="section-5" aria-labelledby="section-5-headline">
@@ -43,8 +56,8 @@ const phases = SECTION4.phases.slice(0, 5);
     <!-- Werkstatt-Content: 3-Row Grid (Header / Stage / Rail) -->
     <div class="werkstatt-content">
       <header class="werkstatt-header">
-        <p class="werkstatt-eyebrow">{SECTION4.eyebrow}</p>
-        <h2 class="werkstatt-headline" id="section-5-headline">{SECTION4.title}</h2>
+        <p class="werkstatt-eyebrow">{d.fahrplan.eyebrow}</p>
+        <h2 class="werkstatt-headline" id="section-5-headline">{d.fahrplan.title}</h2>
       </header>
 
       <div class="phase-stage">
@@ -53,9 +66,9 @@ const phases = SECTION4.phases.slice(0, 5);
             <p class="phase-label" aria-hidden="true">{phase.label}</p>
             <h3 class="phase-title">{phase.title}</h3>
             <p class="phase-body">{phase.body}</p>
-            {'link' in phase && phase.link && (
-              <a class="phase-link" href={phase.link.href}>
-                {phase.link.label} →
+            {phase.href && phase.linkLabel && (
+              <a class="phase-link" href={phase.href}>
+                {phase.linkLabel} →
               </a>
             )}
           </article>

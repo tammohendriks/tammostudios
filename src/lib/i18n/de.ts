@@ -107,4 +107,5 @@ export const de = {
   },
 
   scrollCue: 'SCROLLEN',
+  scrollCueLabel: 'Nach unten scrollen',
 } as const;

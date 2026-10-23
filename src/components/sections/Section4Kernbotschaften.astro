@@ -1,5 +1,25 @@
 ---
-import { SECTION3 } from '../../lib/constants';
+import { localeOf, path } from '../../lib/routes.mjs';
+import { STARTSEITE } from '../../lib/i18n/seiten/startseite';
+
+const locale = localeOf(Astro.url.pathname);
+const d = STARTSEITE[locale];
+
+// Die drei Ziele, in der Reihenfolge der Punkte: Beweis, Moeglichkeiten,
+// Bedingungen. Fehlt eine Seite in dieser Sprache, faellt ihr Verweis
+// weg — die Nummer und der Text bleiben.
+const ziele = [
+  path('referenzen', locale),
+  path('software', locale),
+  path('preise', locale),
+];
+
+const punkte = d.warum.punkte.map((punkt, i) => ({
+  ...punkt,
+  // 01, 02, 03 — aus dem Index statt dreimal hingeschrieben.
+  nummer: String(i + 1).padStart(2, '0'),
+  href: ziele[i],
+}));
 ---
 
 <section class="section-4">
@@ -8,21 +28,24 @@ import { SECTION3 } from '../../lib/constants';
   <div class="section-4-sticky">
     <div class="section-4-content">
       <header class="section-4-header">
-        <p class="section-4-eyebrow">{SECTION3.eyebrow}</p>
-        <h2 class="section-4-headline">Kein Zufall.</h2>
+        <p class="section-4-eyebrow">{d.warum.eyebrow}</p>
+        <h2 class="section-4-headline">{d.warum.headline}</h2>
       </header>
 
       <div class="differentiators">
-        {SECTION3.items.map((item, i) => {
-          const link = 'link' in item ? item.link : null;
+        {punkte.map((item, i) => {
           return (
             <article class="diff-item" style={`--item-index: ${i};`}>
-              <span class="diff-number">{item.number}</span>
+              <span class="diff-number">{item.nummer}</span>
               <h3 class="diff-title">{item.title}</h3>
+              {/* set:html ist hier richtig: die Regel fuer die fett
+                  gesetzten Betraege steht als `.diff-body
+                  :global(strong)` weiter unten und trifft damit auch
+                  Elemente ohne Astro-Kennung. */}
               <p class="diff-body" set:html={item.body} />
-              {link && (
-                <a class="diff-link" href={link.href}>
-                  <span>{link.label}</span>
+              {item.href && (
+                <a class="diff-link" href={item.href}>
+                  <span>{item.linkLabel}</span>
                   <svg
                     width="14"
                     height="14"

@@ -30,14 +30,9 @@ export const de = {
     // genauso falsch klingt wie es aussieht.
     einheit: 'Referenzen',
     einheitEinzahl: 'Referenz',
-    // Beschriftungen der Kategorien. Die Schluessel sind die Werte aus
-    // references.ts und bleiben deutsch.
-    kategorien: {
-      Handwerk: 'Handwerk',
-      Medizin: 'Medizin',
-      Gastronomie: 'Gastronomie',
-      Medien: 'Medien',
-    },
+    // Die Beschriftungen der Kategorien stehen NICHT hier, sondern in
+    // references.en.ts — direkt neben den Werten, die sie beschriften.
+    // Im Deutschen ist die Beschriftung der Wert selbst.
   },
 
   karte: {
@@ -81,12 +76,6 @@ export const en: Shape<typeof de> = {
     alle: 'All',
     einheit: 'projects',
     einheitEinzahl: 'project',
-    kategorien: {
-      Handwerk: 'Contractors',
-      Medizin: 'Medical',
-      Gastronomie: 'Restaurants',
-      Medien: 'Media',
-    },
   },
 
   karte: {

@@ -36,7 +36,7 @@ export const LOCALES = /** @type {const} */ (['de', 'en']);
  * @type {Record<string, { de: string, en: string | null }>}
  */
 export const ROUTES = {
-  home:         { de: '/',                      en: null }, // → /en
+  home:         { de: '/',                      en: '/en' },
   ueber:        { de: '/ueber',                 en: '/en/about' },
   website:      { de: '/website',               en: '/en/website' },
   software:     { de: '/software',              en: '/en/software' },

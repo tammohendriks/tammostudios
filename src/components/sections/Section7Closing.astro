@@ -7,17 +7,21 @@
 // den dunklen Amber-CTA-Block. Kein Video, keine Cosmic-Aurora, keine
 // orbital breathing frame — Typography + eine bewusste Farbfrucht.
 //
-// Content aus SECTION5 constants (eyebrow/headline/subtext/cta bleiben
-// gleich, nur visuelle Umsetzung wechselt komplett).
+// Die Ueberschrift steht in zwei Teilen im Woerterbuch, weil der
+// zweite ("Phase 01?") einen eigenen Span mit Marker-Strich bekommt.
 
-import { SECTION5 } from '../../lib/constants';
+import { SITE } from '../../lib/constants';
 import SiteFooter from '../SiteFooter.astro';
+import { t } from '../../lib/i18n';
+import { localeOf, pathOr } from '../../lib/routes.mjs';
+import { STARTSEITE } from '../../lib/i18n/seiten/startseite';
 
-// headline + primaryCta.label werden bewusst NICHT destructured —
-// Section 6 hardcodet Headline ("Bereit für [Phase 01?]" mit Highlight-
-// Span um "Phase 01?") und CTA-Text ("Lass uns sprechen", matcht
-// /preise-Sprache), beide nicht via einfacher Interpolation abbildbar.
-const { eyebrow, subtext, secondaryEmail } = SECTION5;
+const locale = localeOf(Astro.url.pathname);
+const d = STARTSEITE[locale];
+// Abschluss-Knopf und die drei Zusagen kommen aus dem GETEILTEN
+// Woerterbuch: dieselben Texte stehen im ClosingCta jeder Unterseite,
+// und zwei Orte fuer denselben Satz laufen irgendwann auseinander.
+const g = t(Astro.url.pathname);
 
 ---
 
@@ -49,12 +53,12 @@ const { eyebrow, subtext, secondaryEmail } = SECTION5;
   </div>
 
   <div class="closing">
-    <p class="closing-eyebrow" data-reveal>{eyebrow}</p>
+    <p class="closing-eyebrow" data-reveal>{d.abschluss.eyebrow}</p>
 
     <h2 class="closing-headline" id="closing-headline" data-reveal>
-      Bereit für
+      {d.abschluss.headlineVor}
       <span class="closing-highlight">
-        Phase 01?
+        {d.abschluss.headlineHighlight}
         <svg
           class="closing-highlight-underline"
           viewBox="0 0 200 12"
@@ -69,7 +73,7 @@ const { eyebrow, subtext, secondaryEmail } = SECTION5;
       </span>
     </h2>
 
-    <p class="closing-sub text-lines" data-reveal>{subtext}</p>
+    <p class="closing-sub text-lines" data-reveal>{d.abschluss.subtext}</p>
 
     <div class="closing-cta-wrap" data-reveal>
       <!-- Inline-Link-CTA (matcht /preise Pattern): grosser Text mit
@@ -77,9 +81,9 @@ const { eyebrow, subtext, secondaryEmail } = SECTION5;
            Glow — leiseres, editorialeres Statement passend zum Cream. -->
       <a
         class="closing-cta-link"
-        href="/kontakt"
+        href={pathOr('kontakt', locale)}
       >
-        <span>Lass uns sprechen</span>
+        <span>{g.abschluss.cta}</span>
         <svg
           width="18"
           height="18"
@@ -97,13 +101,13 @@ const { eyebrow, subtext, secondaryEmail } = SECTION5;
     </div>
 
     <p class="closing-secondary" data-reveal>
-      Oder direkt:
+      {d.abschluss.oderDirekt}
       {' '}
-      <a href={`mailto:${secondaryEmail}`}>{secondaryEmail}</a>
+      <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
     </p>
   </div>
 
-  <ul class="trust-trio" aria-label="Was du erwarten kannst" data-reveal>
+  <ul class="trust-trio" aria-label={g.abschluss.zusagenLabel} data-reveal>
     <li>
       <svg
         width="16"
@@ -119,7 +123,7 @@ const { eyebrow, subtext, secondaryEmail } = SECTION5;
         <circle cx="12" cy="12" r="10" />
         <polyline points="12 6 12 12 15 14" />
       </svg>
-      <span>Antwort &lt; 24 h</span>
+      <span>{g.abschluss.zusagen[0]}</span>
     </li>
     <li>
       <svg
@@ -135,7 +139,7 @@ const { eyebrow, subtext, secondaryEmail } = SECTION5;
       >
         <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
       </svg>
-      <span>Erstgespräch gratis</span>
+      <span>{g.abschluss.zusagen[1]}</span>
     </li>
     <li>
       <svg
@@ -153,7 +157,7 @@ const { eyebrow, subtext, secondaryEmail } = SECTION5;
         <line x1="2" y1="12" x2="22" y2="12" />
         <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
       </svg>
-      <span>DE &amp; EN</span>
+      <span>{g.abschluss.zusagen[2]}</span>
     </li>
   </ul>
 

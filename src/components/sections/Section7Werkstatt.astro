@@ -17,6 +17,13 @@
 // den Websites auch Sachen aus Spass entstehen.
 
 import SpaceBackground from '../SpaceBackground.astro';
+import { localeOf, path } from '../../lib/routes.mjs';
+import { STARTSEITE } from '../../lib/i18n/seiten/startseite';
+
+const locale = localeOf(Astro.url.pathname);
+const d = STARTSEITE[locale];
+
+const werkstattPfad = path('werkstatt', locale);
 
 const GAME_URL = 'https://asteroid.tammostudios.de';
 ---
@@ -28,10 +35,8 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
 
       <div class="spielplatz__inner">
       <header class="spielplatz__header">
-        <p class="spielplatz__eyebrow">Aus der Werkstatt</p>
-        <h2 id="spielplatz-headline" class="spielplatz__headline">
-          Und manchmal baue ich einfach, worauf ich Lust habe.
-        </h2>
+        <p class="spielplatz__eyebrow">{d.spielplatz.eyebrow}</p>
+        <h2 id="spielplatz-headline" class="spielplatz__headline">{d.spielplatz.headline}</h2>
       </header>
 
       <!-- Der iframe bleibt bis zum bewussten Klick fuer Zeiger-Events
@@ -42,7 +47,7 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
       <figure class="spielplatz__cabinet" data-game-frame>
         <iframe
           src={GAME_URL}
-          title="ASTEROID//01 — Arcade-Spiel, spielbar"
+          title={d.spielplatz.rahmenTitel}
           allow="fullscreen; autoplay"
           loading="lazy"
           class="spielplatz__iframe"
@@ -50,23 +55,30 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
 
         <figcaption class="spielplatz__cover" data-game-cover>
           <p class="spielplatz__cover-title">ASTEROID//01</p>
-          <p class="spielplatz__cover-sub">Ein Nachmittagsprojekt, das ausgeufert ist</p>
-          <button type="button" class="spielplatz__play" data-game-start>
-            Hier spielen
+          <p class="spielplatz__cover-sub">{d.spielplatz.coverSub}</p>
+          <button
+            type="button"
+            class="spielplatz__play"
+            data-game-start
+            data-label-weiter={d.spielplatz.weiterspielen}
+          >
+            {d.spielplatz.spielen}
           </button>
         </figcaption>
 
         <button type="button" class="spielplatz__stop" data-game-stop hidden>
-          Pausieren &amp; weiterscrollen
+          {d.spielplatz.pausieren}
         </button>
       </figure>
 
-      <a class="spielplatz__cta" href="/werkstatt">
-        <span>Was sonst noch in der Werkstatt liegt</span>
+      {werkstattPfad && (
+      <a class="spielplatz__cta" href={werkstattPfad}>
+        <span>{d.spielplatz.cta}</span>
         <svg class="spielplatz__cta-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </a>
+      )}
       </div>
     </div>
   </div>
@@ -193,8 +205,11 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
       // Fokus in den iframe, damit die Tastatursteuerung sofort greift
       // statt erst nach einem zweiten Klick ins Spielfeld.
       iframe?.focus();
-      // Nach der ersten Runde heisst es nicht mehr "Hier spielen".
-      if (startButton) startButton.textContent = 'Weiterspielen';
+      // Nach der ersten Runde heisst es nicht mehr "Hier spielen". Der
+      // zweite Text steht am Knopf selbst, damit er nicht noch einmal
+      // in diesem Skript hinterlegt werden muss.
+      const weiter = startButton?.dataset.labelWeiter;
+      if (startButton && weiter) startButton.textContent = weiter;
     });
 
     stopButton?.addEventListener('click', () => {

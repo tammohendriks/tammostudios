@@ -20,14 +20,46 @@
 // Client-Tabs OBEN (prominenter): "Er&Sie · Restaurant", "Samedos ·
 // Gastronomie", "Kirsch · Handwerk". Aktiv = amber Border-Bottom.
 // Nach vollem Scroll rotiert Auto-Cycle alle 6s durch die 3.
+
+import { localeOf, pathOr } from '../../lib/routes.mjs';
+import { STARTSEITE } from '../../lib/i18n/seiten/startseite';
+
+const locale = localeOf(Astro.url.pathname);
+const d = STARTSEITE[locale];
+
+// Was an den nachgebauten Kunden nicht uebersetzbar ist: der Name und
+// welcher Reiter beim Wechsel aktiv wird. Die Reihenfolge entspricht
+// studio.kunden im Woerterbuch.
+const KUNDEN_STRUKTUR = [
+  { name: 'Er&Sie', activeIdx: 2 },
+  { name: 'Samedos', activeIdx: 3 },
+  { name: 'Kirsch', activeIdx: 1 },
+] as const;
+
+const kunden = d.studio.kunden.map((kunde, i) => ({
+  name: KUNDEN_STRUKTUR[i].name,
+  branch: kunde.branche,
+  activeIdx: KUNDEN_STRUKTUR[i].activeIdx,
+  tabs: kunde.reiter.map((reiter) => ({ label: reiter.label, typed: reiter.wert })),
+}));
+
+// Der erste Kunde ist auch der serverseitig gezeichnete Zustand der
+// Blaupause. Faende das Skript andere Beschriftungen vor als im SVG
+// stehen, blitzte beim ersten Wechsel die falsche Sprache auf.
+const start = kunden[0];
+const startReiter = start.tabs[start.activeIdx];
+
+// Das Skript wird gebuendelt und sieht dieses Frontmatter nicht, die
+// Daten gehen deshalb als JSON durchs DOM.
+const kundenJson = JSON.stringify(kunden).replace(/</g, '\\u003c');
 ---
 
 <section class="werkzeug" aria-labelledby="werkzeug-headline" data-section-bg="cream">
   <div class="werkzeug__outer">
     <div class="werkzeug__sticky">
       <header class="werkzeug__header">
-        <p class="werkzeug__eyebrow">Dein Studio</p>
-        <h2 id="werkzeug-headline" class="werkzeug__headline">So pflegst du deine Website selbst</h2>
+        <p class="werkzeug__eyebrow">{d.studio.eyebrow}</p>
+        <h2 id="werkzeug-headline" class="werkzeug__headline">{d.studio.headline}</h2>
       </header>
 
       <figure class="werkzeug__stage">
@@ -39,7 +71,7 @@
           class="werkzeug__blueprint"
           viewBox="0 0 720 440"
           role="img"
-          aria-label="Handgezeichnete Blaupause: Bearbeitungsansicht mit Ordnern in der Seitenleiste und Feldern im Inhaltsbereich, verbunden durch eine Trace-Linie."
+          aria-label={d.studio.blaupauseAlt}
           preserveAspectRatio="xMidYMid meet"
         >
           <!-- Millimeter-Guide-Grid (nur sichtbar wenn --p-grid > 0) -->
@@ -84,24 +116,24 @@
           <g class="wz-widget-tabs" data-role="widget-tabs">
             <g class="wz-wtab is-active" data-idx="0">
               <rect x="192" y="46" width="96" height="24" fill="transparent" pointer-events="all" style="cursor:pointer" />
-              <text class="wz-wtab-text" x="240" y="63" text-anchor="middle">Restaurant</text>
+              <text class="wz-wtab-text" x="240" y="63" text-anchor="middle">{kunden[0].branch}</text>
               <line class="wz-wtab-underline" x1="204" y1="71" x2="276" y2="71" stroke="#f59e0b" stroke-width="1.5" fill="none" />
             </g>
             <g class="wz-wtab" data-idx="1">
               <rect x="290" y="46" width="100" height="24" fill="transparent" pointer-events="all" style="cursor:pointer" />
-              <text class="wz-wtab-text" x="340" y="63" text-anchor="middle">Gastronomie</text>
+              <text class="wz-wtab-text" x="340" y="63" text-anchor="middle">{kunden[1].branch}</text>
               <line class="wz-wtab-underline" x1="302" y1="71" x2="378" y2="71" stroke="#f59e0b" stroke-width="1.5" fill="none" />
             </g>
             <g class="wz-wtab" data-idx="2">
               <rect x="392" y="46" width="96" height="24" fill="transparent" pointer-events="all" style="cursor:pointer" />
-              <text class="wz-wtab-text" x="440" y="63" text-anchor="middle">Handwerk</text>
+              <text class="wz-wtab-text" x="440" y="63" text-anchor="middle">{kunden[2].branch}</text>
               <line class="wz-wtab-underline" x1="410" y1="71" x2="470" y2="71" stroke="#f59e0b" stroke-width="1.5" fill="none" />
             </g>
           </g>
 
           <!-- Live-Indikator oben rechts INNERHALB Frame -->
           <circle class="wz-live-dot" cx="650" cy="58" r="4" fill="#f59e0b" />
-          <text class="wz-live-label" x="660" y="62">live</text>
+          <text class="wz-live-label" x="660" y="62">{d.studio.live}</text>
 
           <!-- 3. Sidebar-Column-Divider -->
           <path
@@ -117,31 +149,29 @@
                <g> hat transparentes rect fuer Click-Zone + text). Click
                triggert setSidebarTab() im JS → wechselt aktives Item,
                Content-H2 und Titel-Value (mit typing animation). -->
+          <!-- Die fuenf Eintraege kommen aus dem ersten Kunden. Die
+               Y-Werte bleiben feste Geometrie: 102 + 32 * i fuer die
+               Klickflaeche, 118 + 32 * i fuer die Grundlinie der
+               Schrift. Dieselben Werte stehen als SIDEBAR_Y im Skript
+               weiter unten — sie beschreiben das Bild, nicht den Text,
+               und aendern sich mit der Sprache nicht. -->
           <g class="wz-sidebar" data-role="sidebar">
-            <g class="wz-side-item" data-side-idx="0">
-              <rect x="20" y="102" width="150" height="26" fill="transparent" pointer-events="all" style="cursor:pointer" />
-              <text class="wz-side-label" style="--i:0" x="42" y="118">Team</text>
-            </g>
-            <g class="wz-side-item" data-side-idx="1">
-              <rect x="20" y="134" width="150" height="26" fill="transparent" pointer-events="all" style="cursor:pointer" />
-              <text class="wz-side-label" style="--i:1" x="42" y="150">Preise</text>
-            </g>
-            <g class="wz-side-item is-active" data-side-idx="2">
-              <rect x="20" y="166" width="150" height="26" fill="transparent" pointer-events="all" style="cursor:pointer" />
-              <text class="wz-side-label is-active" style="--i:2" x="42" y="182" data-role="active-label">Speisekarte</text>
-            </g>
-            <g class="wz-side-item" data-side-idx="3">
-              <rect x="20" y="198" width="150" height="26" fill="transparent" pointer-events="all" style="cursor:pointer" />
-              <text class="wz-side-label" style="--i:3" x="42" y="214">Termine</text>
-            </g>
-            <g class="wz-side-item" data-side-idx="4">
-              <rect x="20" y="230" width="150" height="26" fill="transparent" pointer-events="all" style="cursor:pointer" />
-              <text class="wz-side-label" style="--i:4" x="42" y="246">News</text>
-            </g>
+            {start.tabs.map((reiter, i) => (
+              <g class={`wz-side-item${i === start.activeIdx ? ' is-active' : ''}`} data-side-idx={i}>
+                <rect x="20" y={102 + 32 * i} width="150" height="26" fill="transparent" pointer-events="all" style="cursor:pointer" />
+                <text
+                  class={`wz-side-label${i === start.activeIdx ? ' is-active' : ''}`}
+                  style={`--i:${i}`}
+                  x="42"
+                  y={118 + 32 * i}
+                  data-role={i === start.activeIdx ? 'active-label' : undefined}
+                >{reiter.label}</text>
+              </g>
+            ))}
           </g>
 
           <!-- 5. Content-Pane: H2 + Unterstrich -->
-          <text class="wz-content-h2" data-role="content-h2" x="220" y="120">Speisekarte</text>
+          <text class="wz-content-h2" data-role="content-h2" x="220" y="120">{startReiter.label}</text>
           <path
             class="wz-path wz-content-underline"
             d="M220 130 H340"
@@ -152,7 +182,7 @@
           />
 
           <!-- 6. Feld: TITEL — Label + Input-Rechteck + getippter Text + Cursor -->
-          <text class="wz-field-label" style="--i:0" x="220" y="168">TITEL</text>
+          <text class="wz-field-label" style="--i:0" x="220" y="168">{d.studio.feldTitel}</text>
           <path
             class="wz-path wz-field-box"
             style="--i:0"
@@ -166,7 +196,7 @@
           <rect class="wz-caret" data-role="caret" x="234" y="184" width="2" height="20" fill="#f59e0b" />
 
           <!-- 7. Feld: BILD (Platzhalter mit Diagonalen) -->
-          <text class="wz-field-label" style="--i:1" x="220" y="240">BILD</text>
+          <text class="wz-field-label" style="--i:1" x="220" y="240">{d.studio.feldBild}</text>
           <path
             class="wz-path wz-field-box"
             style="--i:1"
@@ -178,7 +208,7 @@
           />
 
           <!-- 8. Feld: TEXT (4 Skeleton-Balken) -->
-          <text class="wz-field-label" style="--i:2" x="320" y="240">TEXT</text>
+          <text class="wz-field-label" style="--i:2" x="320" y="240">{d.studio.feldText}</text>
           <path class="wz-path wz-textbar" style="--i:0" d="M320 258 H600" pathLength="1" fill="none" stroke="#f59e0b" stroke-width="1" />
           <path class="wz-path wz-textbar" style="--i:1" d="M320 274 H560" pathLength="1" fill="none" stroke="#f59e0b" stroke-width="1" />
           <path class="wz-path wz-textbar" style="--i:2" d="M320 290 H610" pathLength="1" fill="none" stroke="#f59e0b" stroke-width="1" />
@@ -199,14 +229,17 @@
         </svg>
       </figure>
 
-      <a class="werkzeug__cta" href="/website#cms">
-        <span>So funktioniert dein Studio</span>
+      <a class="werkzeug__cta" href={`${pathOr('website', locale)}#cms`}>
+        <span>{d.studio.cta}</span>
         <svg class="werkzeug__cta-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </a>
     </div>
   </div>
+
+  <!-- Daten des nachgebauten Redaktionssystems fuer das Skript unten. -->
+  <script type="application/json" id="werkzeug-kunden" set:html={kundenJson}></script>
 </section>
 
 <script>
@@ -221,59 +254,37 @@
   // automatisch alle 6s durch Er&Sie / Samedos / Kirsch. Tab-Klick
   // resettet den Cycle-Timer.
 
-  type SidebarTab = { label: string; h2: string; typed: string };
+  // Die Daten kommen aus dem JSON-Block im Markup, in der Sprache der
+  // Seite. Dieses Skript wird gebuendelt und sieht das Frontmatter
+  // nicht.
+  //
+  // h2 gab es hier mal zusaetzlich zu label und war in allen fuenfzehn
+  // Eintraegen derselbe Text. Jetzt nur noch label, fuer beides.
+  type SidebarTab = { label: string; typed: string };
   type Client = {
     name: string;
     branch: string;
     activeIdx: number;
-    tabs: [SidebarTab, SidebarTab, SidebarTab, SidebarTab, SidebarTab];
+    tabs: SidebarTab[];
   };
 
-  const CLIENTS: Client[] = [
-    {
-      name: 'Er&Sie',
-      branch: 'Restaurant',
-      activeIdx: 2,
-      tabs: [
-        { label: 'Team',        h2: 'Team',        typed: 'Anna Klein · Küchenchef' },
-        { label: 'Preise',      h2: 'Preise',      typed: '3-Gang-Menu ab 42 €' },
-        { label: 'Speisekarte', h2: 'Speisekarte', typed: 'Weinkarte Frühling 2026' },
-        { label: 'Termine',     h2: 'Termine',     typed: 'Weinabend · 15.03.' },
-        { label: 'News',        h2: 'News',        typed: 'Neue Sommer-Terrasse' },
-      ],
-    },
-    {
-      name: 'Samedos',
-      branch: 'Gastronomie',
-      activeIdx: 3,
-      tabs: [
-        { label: 'Team',           h2: 'Team',           typed: '12 Kollegen · Familie' },
-        { label: 'Preise',         h2: 'Preise',         typed: 'Frühstück ab 6,80 €' },
-        { label: 'Stellen',        h2: 'Stellen',        typed: 'Barista m/w/d · Vollzeit' },
-        { label: 'Öffnungszeiten', h2: 'Öffnungszeiten', typed: 'Mo–Fr 08–18 Uhr' },
-        { label: 'News',           h2: 'News',           typed: 'Neu: Sonntags-Brunch' },
-      ],
-    },
-    {
-      name: 'Kirsch',
-      branch: 'Handwerk',
-      activeIdx: 1,
-      tabs: [
-        { label: 'Leistungen', h2: 'Leistungen', typed: 'Dach · Fassade · Sanierung' },
-        { label: 'Referenzen', h2: 'Referenzen', typed: 'Dach Aachen · 2024' },
-        { label: 'Karriere',   h2: 'Karriere',   typed: 'Dachdecker · Lehrjahr 3' },
-        { label: 'News',       h2: 'News',       typed: 'Winter-Terminplan 2025/26' },
-        { label: 'Kontakt',    h2: 'Kontakt',    typed: 'Werkstatt Aachen · 24/7' },
-      ],
-    },
-  ];
+  const kundenEl = document.getElementById('werkzeug-kunden');
+  let CLIENTS: Client[] = [];
+  try {
+    if (kundenEl?.textContent) CLIENTS = JSON.parse(kundenEl.textContent) as Client[];
+  } catch (err) {
+    console.error('[werkzeug] Kundendaten nicht lesbar:', err);
+  }
 
   // Y-Positionen der Sidebar-Items im SVG viewBox (fuer Trace-Line
   // Berechnung — die dashed Bezier von aktivem Sidebar-Item zum H2).
   const SIDEBAR_Y = [118, 150, 182, 214, 246];
 
   const section = document.querySelector<HTMLElement>('.werkzeug');
-  if (section) {
+  // Ohne Kundendaten bleibt die Blaupause stehen wie serverseitig
+  // gezeichnet: sie zeichnet sich dann nicht und wechselt nicht, ist
+  // aber auch nicht halb kaputt.
+  if (section && CLIENTS.length) {
     const outer = section.querySelector<HTMLElement>('.werkzeug__outer');
     const sidebarG = section.querySelector<SVGGElement>('[data-role="sidebar"]');
     const contentH2 = section.querySelector<SVGTextElement>('[data-role="content-h2"]');
@@ -473,7 +484,7 @@
       // Content-H2 swap
       const activeTab = c.tabs[c.activeIdx];
       fadeSwap(contentH2, () => {
-        if (contentH2) contentH2.textContent = activeTab.h2;
+        if (contentH2) contentH2.textContent = activeTab.label;
       });
 
       // Trace-Line auf neues aktives Item
@@ -510,7 +521,7 @@
 
       // Content-H2 swap
       fadeSwap(contentH2, () => {
-        if (contentH2) contentH2.textContent = tab.h2;
+        if (contentH2) contentH2.textContent = tab.label;
       });
 
       // Titel-Value: neu tippen

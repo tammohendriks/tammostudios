@@ -10,7 +10,7 @@ import ReferenzModal from './ReferenzModal.astro';
 import SiteFooter from './SiteFooter.astro';
 import ClosingCta from './ClosingCta.astro';
 import { REFERENCES } from '../lib/references';
-import { subtitleFor } from '../lib/references.en';
+import { categoryLabel, subtitleFor } from '../lib/references.en';
 import { VERTICAL_KEY_BY_CATEGORY } from '../lib/verticals';
 import { localeOf, path } from '../lib/routes.mjs';
 import { REFERENZEN } from '../lib/i18n/seiten/referenzen';
@@ -53,7 +53,7 @@ const CATEGORY_ORDER = ['Handwerk', 'Medizin', 'Gastronomie', 'Medien'] as const
 // Uebersetzt wird nur label.
 const categoryCounts = CATEGORY_ORDER.map((cat) => ({
   slug: cat.toLowerCase(),
-  label: d.filter.kategorien[cat],
+  label: categoryLabel(cat, locale),
   count: REFERENCES.filter((r) => r.category === cat).length,
 })).filter((c) => c.count > 0);
 

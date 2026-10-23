@@ -1,7 +1,11 @@
 ---
-import { SITE, SITE_LABELS } from '../../lib/constants';
+import { SITE } from '../../lib/constants';
 import Background from '../Background.astro';
 import ScrollCue from '../ScrollCue.astro';
+import { localeOf } from '../../lib/routes.mjs';
+import { STARTSEITE } from '../../lib/i18n/seiten/startseite';
+
+const d = STARTSEITE[localeOf(Astro.url.pathname)];
 
 // Floating Particles — pro Build neu randomisiert. deltaX/Y in vw/vh,
 // damit translate() in Viewport-Distanz arbeitet (transform: translate(%)
@@ -57,8 +61,8 @@ const particles = Array.from({ length: PARTICLE_COUNT }, () => {
       />
     </picture>
   </h1>
-  <p class="hero-service">{SITE_LABELS.serviceLine}</p>
-  <p class="intro text-lines">{SITE_LABELS.introText}</p>
+  <p class="hero-service">{d.hero.serviceLine}</p>
+  <p class="intro text-lines">{d.hero.intro}</p>
 
   <ScrollCue />
 </section>
@@ -79,6 +83,7 @@ const particles = Array.from({ length: PARTICLE_COUNT }, () => {
   .top-left,
   .nav,
   .cta,
+  .site-lang-toggle,
   .hero-service,
   .intro,
   .scroll-cue {
@@ -96,6 +101,7 @@ const particles = Array.from({ length: PARTICLE_COUNT }, () => {
   html[data-splash="ready"] .top-left,
   html[data-splash="ready"] .nav,
   html[data-splash="ready"] .cta,
+  html[data-splash="ready"] .site-lang-toggle,
   html[data-splash="ready"] .hero-service,
   html[data-splash="ready"] .intro,
   html[data-splash="ready"] .scroll-cue {
@@ -107,6 +113,7 @@ const particles = Array.from({ length: PARTICLE_COUNT }, () => {
   html[data-splash="ready"] .top-left      { transition-delay: 0ms;   }
   html[data-splash="ready"] .nav           { transition-delay: 80ms;  }
   html[data-splash="ready"] .cta           { transition-delay: 160ms; }
+  html[data-splash="ready"] .site-lang-toggle { transition-delay: 160ms; }
   html[data-splash="ready"] .hero-service  { transition-delay: 220ms; }
   html[data-splash="ready"] .intro         { transition-delay: 280ms; }
   html[data-splash="ready"] .scroll-cue    { transition-delay: 360ms; }
@@ -117,6 +124,7 @@ const particles = Array.from({ length: PARTICLE_COUNT }, () => {
   html.splash-skip .top-left,
   html.splash-skip .nav,
   html.splash-skip .cta,
+  html.splash-skip .site-lang-toggle,
   html.splash-skip .hero-service,
   html.splash-skip .intro,
   html.splash-skip .scroll-cue {

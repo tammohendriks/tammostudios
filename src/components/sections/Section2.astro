@@ -1,6 +1,9 @@
 ---
-import { SECTION2 } from '../../lib/constants';
 import AnimatedWordmark from '../AnimatedWordmark.astro';
+import { localeOf } from '../../lib/routes.mjs';
+import { STARTSEITE } from '../../lib/i18n/seiten/startseite';
+
+const d = STARTSEITE[localeOf(Astro.url.pathname)];
 ---
 
 <section class="section-2">
@@ -36,7 +39,7 @@ import AnimatedWordmark from '../AnimatedWordmark.astro';
             stroke-dashoffset="100"
           />
         </svg>
-        <h3 class="boom-headline">{SECTION2.boomHeadline}</h3>
+        <h3 class="boom-headline">{d.praezision.headline}</h3>
       </div>
     </div>
   </div>
