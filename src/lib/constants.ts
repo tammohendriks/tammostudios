@@ -22,6 +22,16 @@ export const SITE = {
   },
 } as const;
 
+/**
+ * Dieselbe Nummer in internationaler Schreibweise, fuer die englische
+ * Fassung: eine 0177 kann aus dem Ausland niemand waehlen.
+ *
+ * Abgeleitet statt ein zweites Mal hingeschrieben — die fuehrende Null
+ * ist die deutsche Verkehrsausscheidungsziffer und entfaellt hinter der
+ * Landesvorwahl. Aendert sich die Nummer, aendert sich beides.
+ */
+export const PHONE_INTERNATIONAL = `+49 ${SITE.phone.replace(/^0/, '')}`;
+
 export const SITE_LABELS = {
   establishedLine: 'EST. 2026 · BREMEN',
   // NEUE Positionierung ab Sep 2026: nicht mehr Websites-only, sondern

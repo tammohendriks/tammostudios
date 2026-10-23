@@ -43,7 +43,7 @@ export const ROUTES = {
   preise:       { de: '/preise',                en: null }, // → /en/pricing
   referenzen:   { de: '/referenzen',            en: null }, // → /en/work
   werkstatt:    { de: '/werkstatt',             en: null }, // → /en/lab
-  kontakt:      { de: '/kontakt',               en: null }, // → /en/contact
+  kontakt:      { de: '/kontakt',               en: '/en/contact' },
   handwerk:     { de: '/webdesign-handwerk',    en: '/en/web-design-contractors' },
   praxis:       { de: '/webdesign-praxis',      en: '/en/web-design-medical-practices' },
   gastronomie:  { de: '/webdesign-gastronomie', en: '/en/web-design-restaurants' },

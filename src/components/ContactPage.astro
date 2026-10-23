@@ -25,30 +25,46 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SubPageBackground from './SubPageBackground.astro';
 import SiteFooter from './SiteFooter.astro';
-import { SITE } from '../lib/constants';
+import { SITE, PHONE_INTERNATIONAL } from '../lib/constants';
+import { localeOf, pathOr } from '../lib/routes.mjs';
+import { KONTAKT } from '../lib/i18n/seiten/kontakt';
 
-const prepSteps = [
-  'Du erzählst kurz was du vorhast',
-  'Ich stelle Fragen zu Zielgruppe, Timing, Budget',
-  'Wir schauen ob\'s passt',
-  'Wenn ja: Angebot innerhalb 24h',
-];
+const locale = localeOf(Astro.url.pathname);
+const k = KONTAKT[locale];
 
-// Subject-Options — value matched mit API-Route Enum, label wird in
-// UI + in Placeholder-Templates via JS gemapped.
-const subjectOptions = [
-  { value: 'website-projekt', label: 'Website-Projekt' },
-  { value: 'online-shop', label: 'Online-Shop-Projekt' },
-  { value: 'wartung-support', label: 'Wartung / Support' },
-  { value: 'allgemein', label: 'Allgemeine Projektanfrage' },
-  { value: 'anderes', label: 'Anderes' },
-];
+// Diese Werte gehen so an die API und werden dort gegen ein Enum
+// geprueft — sie sind sprachunabhaengig. Uebersetzt wird nur die
+// Beschriftung, in derselben Reihenfolge. Haette die englische Liste
+// andere Werte, kaeme von der API eine Validierungsmeldung und niemand
+// wuesste, warum.
+const ANLIEGEN_WERTE = [
+  'website-projekt',
+  'online-shop',
+  'wartung-support',
+  'allgemein',
+  'anderes',
+] as const;
+
+const subjectOptions = ANLIEGEN_WERTE.map((value, i) => ({ value, label: k.anliegen[i] }));
+
+// Was das Formular-Skript braucht. Ein <script> ohne is:inline wird von
+// Astro gebuendelt und laeuft im Browser — es sieht das Frontmatter
+// nicht. Die Texte gehen deshalb als JSON durchs DOM. define:vars waere
+// der andere Weg, macht das Skript aber inline und damit untypisiert.
+const skriptTexte = {
+  vorlagen: Object.fromEntries(ANLIEGEN_WERTE.map((value, i) => [value, k.vorlagen[i]])),
+  sendenLaeuft: k.formular.sendenLaeuft,
+  fehler: k.formular.fehler,
+};
+// Ein '<' im Text koennte den script-Block beenden. Kommt in den Texten
+// nicht vor, kostet als Absicherung aber nichts.
+const skriptTexteJson = JSON.stringify(skriptTexte).replace(/</g, '\\u003c');
 ---
 
 <BaseLayout
-  pageTitle="Kontakt"
-  title="Kontakt — Webentwickler aus Bremen | Tammo Studios"
-  description="Anfrage, Rückruf oder 30-Minuten-Erstgespräch, Antwort innerhalb von 24 Stunden. Website 2.000 €, Online-Shop 3.000 €, aus Bremen und von Hand gebaut."
+  pageTitle={k.meta.pageTitle}
+  title={k.meta.title}
+  description={k.meta.description}
 >
   <!-- KEINE Preconnects auf Cal.com.
        Sie starteten DNS + TLS schon beim Parsen der Seite, also bevor
@@ -63,17 +79,15 @@ const subjectOptions = [
     <SubPageBackground />
 
     <header class="kontakt-hero">
-      <h1 class="subpage-hero-title">Sprechen wir.</h1>
-      <p class="subpage-hero-subtitle text-lines">
-        {'Antwort innerhalb 24 Stunden.\nSchreib mir kurz, was du vorhast.'}
-      </p>
+      <h1 class="subpage-hero-title">{k.hero.headline}</h1>
+      <p class="subpage-hero-subtitle text-lines">{k.hero.sub}</p>
     </header>
 
     <!-- ================================================================
          KONTAKTFORMULAR (primary CTA)
          POST → /api/kontakt (siehe src/pages/api/kontakt.ts)
          ============================================================== -->
-    <section class="kontakt-form-section" data-reveal aria-label="Kontaktformular">
+    <section class="kontakt-form-section" data-reveal aria-label={k.formular.label}>
       <form
         class="kontakt-form"
         id="kontakt-form"
@@ -82,7 +96,7 @@ const subjectOptions = [
       >
         <div class="form-row">
           <div class="form-field">
-            <label for="kontakt-name">Name <span class="req" aria-hidden="true">*</span></label>
+            <label for="kontakt-name">{k.formular.name} <span class="req" aria-hidden="true">*</span></label>
             <input
               type="text"
               id="kontakt-name"
@@ -90,25 +104,25 @@ const subjectOptions = [
               required
               minlength="2"
               autocomplete="name"
-              placeholder="Max Mustermann"
+              placeholder={k.formular.platzhalterName}
             />
           </div>
           <div class="form-field">
-            <label for="kontakt-email">Email <span class="req" aria-hidden="true">*</span></label>
+            <label for="kontakt-email">{k.formular.email} <span class="req" aria-hidden="true">*</span></label>
             <input
               type="email"
               id="kontakt-email"
               name="email"
               required
               autocomplete="email"
-              placeholder="max@beispiel.de"
+              placeholder={k.formular.platzhalterEmail}
             />
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-field">
-            <label for="kontakt-phone">Telefon <span class="req" aria-hidden="true">*</span></label>
+            <label for="kontakt-phone">{k.formular.telefon} <span class="req" aria-hidden="true">*</span></label>
             <input
               type="tel"
               id="kontakt-phone"
@@ -116,23 +130,23 @@ const subjectOptions = [
               required
               minlength="6"
               autocomplete="tel"
-              placeholder="z.B. +49 177 1962704"
+              placeholder={k.formular.platzhalterTelefon}
             />
           </div>
           <div class="form-field">
-            <label for="kontakt-company">Firmenname <span class="opt">(optional)</span></label>
+            <label for="kontakt-company">{k.formular.firma} <span class="opt">{k.formular.optional}</span></label>
             <input
               type="text"
               id="kontakt-company"
               name="company"
               autocomplete="organization"
-              placeholder="Firma / Betrieb"
+              placeholder={k.formular.platzhalterFirma}
             />
           </div>
         </div>
 
         <div class="form-field">
-          <label for="kontakt-subject">Anliegen <span class="req" aria-hidden="true">*</span></label>
+          <label for="kontakt-subject">{k.formular.anliegen} <span class="req" aria-hidden="true">*</span></label>
           <select id="kontakt-subject" name="subject" required>
             {subjectOptions.map((opt) => (
               <option value={opt.value}>{opt.label}</option>
@@ -141,7 +155,7 @@ const subjectOptions = [
         </div>
 
         <div class="form-field">
-          <label for="kontakt-message">Nachricht <span class="req" aria-hidden="true">*</span></label>
+          <label for="kontakt-message">{k.formular.nachricht} <span class="req" aria-hidden="true">*</span></label>
           <textarea
             id="kontakt-message"
             name="message"
@@ -154,7 +168,7 @@ const subjectOptions = [
         <!-- Honeypot — hidden via CSS, sichtbar fuer Bots. Server-Route
              checkt: wenn ausgefuellt → 200 zurueck ohne Mail. -->
         <div class="hp-field" aria-hidden="true">
-          <label for="kontakt-website">Website (bitte nicht ausfuellen)</label>
+          <label for="kontakt-website">{k.formular.honeypot}</label>
           <input
             type="text"
             id="kontakt-website"
@@ -172,8 +186,9 @@ const subjectOptions = [
             required
           />
           <label for="kontakt-datenschutz">
-            Ich habe die <a href="/datenschutz">Datenschutzerklärung</a>
-            gelesen und akzeptiere die Verarbeitung meiner Anfrage.
+            {k.formular.datenschutzVor}<a href={pathOr('datenschutz', locale)}
+              >{k.formular.datenschutzLink}</a
+            >{k.formular.datenschutzNach}
             <span class="req" aria-hidden="true">*</span>
           </label>
         </div>
@@ -187,18 +202,15 @@ const subjectOptions = [
         ></div>
 
         <button type="submit" class="form-submit" id="kontakt-submit">
-          <span class="form-submit-label">Anfrage senden →</span>
+          <span class="form-submit-label">{k.formular.senden}</span>
         </button>
       </form>
 
       <!-- Success-State wird per JS gefuellt + eingeblendet nach 200. -->
       <div class="form-success" id="kontakt-success" hidden>
         <span class="form-success-icon" aria-hidden="true">✓</span>
-        <h2 class="form-success-headline">Danke!</h2>
-        <p class="form-success-body">
-          Ich melde mich innerhalb 24h bei dir. Eine Bestätigungs-Mail
-          ist auch schon in deinem Postfach.
-        </p>
+        <h2 class="form-success-headline">{k.formular.dankeTitel}</h2>
+        <p class="form-success-body">{k.formular.dankeText}</p>
       </div>
     </section>
 
@@ -206,7 +218,7 @@ const subjectOptions = [
          Alternative Kontakte
          ============================================================== -->
     <section class="kontakt-alternatives">
-      <p class="kontakt-eyebrow" data-reveal>LIEBER ANDERS?</p>
+      <p class="kontakt-eyebrow" data-reveal>{k.alternativen.eyebrow}</p>
       <div class="contact-cards">
         <a class="contact-card" data-reveal href={SITE.phoneHref}>
           <span class="contact-card-icon" aria-hidden="true">
@@ -214,8 +226,10 @@ const subjectOptions = [
               <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" />
             </svg>
           </span>
-          <span class="contact-card-label">Telefon</span>
-          <span class="contact-card-value">{SITE.phone}</span>
+          <span class="contact-card-label">{k.alternativen.telefon}</span>
+          <span class="contact-card-value">
+            {locale === 'en' ? PHONE_INTERNATIONAL : SITE.phone}
+          </span>
         </a>
 
         <a class="contact-card" data-reveal href={`mailto:${SITE.email}`}>
@@ -225,7 +239,7 @@ const subjectOptions = [
               <polyline points="22,6 12,13 2,6" />
             </svg>
           </span>
-          <span class="contact-card-label">E-Mail</span>
+          <span class="contact-card-label">{k.alternativen.email}</span>
           <span class="contact-card-value">{SITE.email}</span>
         </a>
 
@@ -237,7 +251,7 @@ const subjectOptions = [
               <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
             </svg>
           </span>
-          <span class="contact-card-label">Instagram</span>
+          <span class="contact-card-label">{k.alternativen.instagram}</span>
           <span class="contact-card-value">@tammostudios</span>
         </a>
       </div>
@@ -246,14 +260,11 @@ const subjectOptions = [
     <!-- ================================================================
          Cal.com Accordion — lazy-loaded on first open
          ============================================================== -->
-    <section class="kontakt-cal-accordion" data-reveal aria-label="Termin direkt buchen">
+    <section class="kontakt-cal-accordion" data-reveal aria-label={k.kalender.label}>
       <div class="cal-accordion-header">
-        <p class="cal-accordion-eyebrow">LIEBER DIREKT EINEN TERMIN?</p>
-        <h2 class="cal-accordion-headline">30 Min Erstgespräch buchen</h2>
-        <p class="cal-accordion-sub">
-          Wähl dir einen Slot im Kalender, ohne den Umweg über das
-          Formular.
-        </p>
+        <p class="cal-accordion-eyebrow">{k.kalender.eyebrow}</p>
+        <h2 class="cal-accordion-headline">{k.kalender.headline}</h2>
+        <p class="cal-accordion-sub">{k.kalender.sub}</p>
         <button
           type="button"
           class="cal-accordion-toggle"
@@ -261,8 +272,8 @@ const subjectOptions = [
           aria-expanded="false"
           aria-controls="cal-panel"
         >
-          <span class="cal-toggle-open">Termin-Kalender öffnen ↓</span>
-          <span class="cal-toggle-close">Kalender einklappen ↑</span>
+          <span class="cal-toggle-open">{k.kalender.oeffnen}</span>
+          <span class="cal-toggle-close">{k.kalender.schliessen}</span>
         </button>
       </div>
 
@@ -274,7 +285,7 @@ const subjectOptions = [
               <span class="cal-loading-dot"></span>
               <span class="cal-loading-dot"></span>
             </div>
-            <p class="cal-loading-text">Kalender lädt …</p>
+            <p class="cal-loading-text">{k.kalender.laedt}</p>
           </div>
         </div>
       </div>
@@ -284,15 +295,19 @@ const subjectOptions = [
          Was im Erstgespraech passiert — Prep-Info
          ============================================================== -->
     <section class="kontakt-prep">
-      <h2 class="kontakt-prep-headline" data-reveal>Was im Erstgespräch passiert</h2>
+      <h2 class="kontakt-prep-headline" data-reveal>{k.ablauf.headline}</h2>
       <ol class="prep-list">
-        {prepSteps.map((step) => (
+        {k.ablauf.schritte.map((step) => (
           <li data-reveal>
             <span class="prep-list-text">{step}</span>
           </li>
         ))}
       </ol>
     </section>
+
+    <!-- Texte fuer den Formular-Controller weiter unten. Siehe
+         skriptTexte im Frontmatter. -->
+    <script type="application/json" id="kontakt-texte" set:html={skriptTexteJson}></script>
   </main>
 
   <SiteFooter />
@@ -302,21 +317,33 @@ const subjectOptions = [
      FORM-CONTROLLER — Reactive Placeholder + Submit-Handler
      ================================================================== -->
 <script>
-  // Placeholder-Templates pro Anliegen. Wird beim <select>-change auf
-  // das <textarea> gesetzt — aber NUR wenn Textarea noch leer ist,
-  // sonst uebermalen wir User-Input.
-  const PLACEHOLDERS: Record<string, string> = {
-    'website-projekt':
-      'Hallo Tammo, ich brauche eine neue Website für meinen Betrieb [Betriebsart]. Aktuell habe ich [keine Site / eine veraltete Site unter www.beispiel.de]. Wichtig für mich wäre: [z.B. Referenzen, Kontaktformular, mobile Optimierung]. Wann könnten wir sprechen?',
-    'online-shop':
-      'Hallo Tammo, ich plane einen Online-Shop für [Produktkategorie]. Aktuell verkaufe ich [im Ladengeschäft / gar nicht online]. Wichtige Features wären: [z.B. Zahlungsanbieter, Lagerverwaltung, Versand-Abwicklung]. Können wir das kurz besprechen?',
-    'wartung-support':
-      'Hallo Tammo, meine bestehende Website unter [www.beispiel.de] braucht [Aktualisierung / Erweiterung / Bug-Fix]. Konkret geht es um: [kurze Beschreibung]. Wann hast du Zeit?',
-    'allgemein':
-      'Hallo Tammo, ich habe eine Projektanfrage: [kurze Beschreibung deines Vorhabens]. Ich bin mir noch nicht sicher was ich genau brauche, aber [Kontext / Ziel]. Können wir das kurz besprechen?',
-    'anderes':
-      'Hallo Tammo, [dein Anliegen hier]...',
+  // Die Texte kommen aus dem JSON-Block, den die Komponente in der
+  // Sprache der Seite gerendert hat. Dieses Skript wird gebuendelt und
+  // sieht das Frontmatter nicht.
+  //
+  // Hier stehen BEWUSST keine deutschen Rueckfall-Texte: das waere ein
+  // zweiter Ort fuer dieselben Saetze, und auf der englischen Seite
+  // stuende im Fehlerfall ploetzlich Deutsch. Bleiben die Texte leer,
+  // sendet das Formular weiterhin — nur ohne Vorbelegung, und die
+  // Fehlermeldung kommt dann von der API, die ihre Meldungen selbst in
+  // der richtigen Sprache liefert.
+  type FormularTexte = {
+    vorlagen: Record<string, string>;
+    sendenLaeuft: string;
+    fehler: string;
   };
+  const texteEl = document.getElementById('kontakt-texte');
+  let texte: FormularTexte = { vorlagen: {}, sendenLaeuft: '…', fehler: '' };
+  try {
+    if (texteEl?.textContent) texte = JSON.parse(texteEl.textContent) as FormularTexte;
+  } catch (err) {
+    console.error('[kontakt-form] Texte nicht lesbar:', err);
+  }
+
+  // Vorbelegung des Nachrichtenfeldes pro Anliegen. Wird beim
+  // <select>-change auf das <textarea> gesetzt — aber NUR wenn die
+  // Textarea noch leer ist, sonst uebermalen wir User-Input.
+  const PLACEHOLDERS: Record<string, string> = texte.vorlagen;
 
   const form = document.getElementById('kontakt-form') as HTMLFormElement | null;
   const subjectSelect = document.getElementById('kontakt-subject') as HTMLSelectElement | null;
@@ -325,6 +352,11 @@ const subjectOptions = [
   const submitBtn = document.getElementById('kontakt-submit') as HTMLButtonElement | null;
   const submitLabel = submitBtn?.querySelector('.form-submit-label') as HTMLElement | null;
   const successEl = document.getElementById('kontakt-success') as HTMLElement | null;
+
+  // Die Beschriftung des Knopfes steht schon im Markup, in der richtigen
+  // Sprache. Nach einem Fehlversuch wird genau sie wieder eingesetzt,
+  // statt sie ein zweites Mal irgendwo zu hinterlegen.
+  const knopfBeschriftung = submitLabel?.textContent ?? '';
 
   // Textarea VORFUELLEN mit Template (nicht nur als placeholder) — User
   // kann seine Infos direkt in die eckigen [Klammern] tippen statt
@@ -385,10 +417,15 @@ const subjectOptions = [
     });
     // Checkbox: FormData enthaelt nur checked keys als 'on' — konvertieren
     payload.datenschutz = (document.getElementById('kontakt-datenschutz') as HTMLInputElement)?.checked;
+    // Sprache der Seite. Die API richtet ihre Fehlermeldungen und die
+    // Bestaetigungsmail danach, und die Benachrichtigung an Tammo
+    // bekommt bei 'en' einen Hinweis. Das lang-Attribut setzt das
+    // BaseLayout aus dem Pfad — dieselbe Quelle wie fuer alles andere.
+    payload.locale = document.documentElement.lang === 'en' ? 'en' : 'de';
 
     // Loading state
     submitBtn.disabled = true;
-    submitLabel.textContent = 'Wird gesendet …';
+    submitLabel.textContent = texte.sendenLaeuft;
     setStatus('', '');
 
     try {
@@ -406,22 +443,15 @@ const subjectOptions = [
         // Scroll zum Success-Panel damit User Feedback sieht
         successEl?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } else {
-        setStatus(
-          data.error ||
-            'Fehler beim Senden. Ruf mich alternativ direkt an: 0177 1962704.',
-          'error'
-        );
+        setStatus(data.error || texte.fehler, 'error');
         submitBtn.disabled = false;
-        submitLabel.textContent = 'Anfrage senden →';
+        submitLabel.textContent = knopfBeschriftung;
       }
     } catch (err) {
       console.error('[kontakt-form] submit error:', err);
-      setStatus(
-        'Fehler beim Senden. Ruf mich alternativ direkt an: 0177 1962704.',
-        'error'
-      );
+      setStatus(texte.fehler, 'error');
       submitBtn.disabled = false;
-      submitLabel.textContent = 'Anfrage senden →';
+      submitLabel.textContent = knopfBeschriftung;
     }
   });
 </script>
