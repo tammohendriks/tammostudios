@@ -32,6 +32,12 @@ import { KONTAKT } from '../lib/i18n/seiten/kontakt';
 const locale = localeOf(Astro.url.pathname);
 const k = KONTAKT[locale];
 
+// Die Terminbuchung steht nur auf der deutschen Seite. Auf der
+// englischen fuehrt der Weg ueber das Formular; die Texte dafuer
+// bleiben trotzdem im Woerterbuch, damit beide Sprachfassungen
+// dieselbe Struktur haben.
+const zeigeKalender = locale === 'de';
+
 // Diese Werte gehen so an die API und werden dort gegen ein Enum
 // geprueft — sie sind sprachunabhaengig. Uebersetzt wird nur die
 // Beschriftung, in derselben Reihenfolge. Haette die englische Liste
@@ -258,8 +264,12 @@ const skriptTexteJson = JSON.stringify(skriptTexte).replace(/</g, '\\u003c');
     </section>
 
     <!-- ================================================================
-         Cal.com Accordion — lazy-loaded on first open
+         Cal.com Accordion — lazy-loaded on first open.
+         Nur deutsch, siehe zeigeKalender im Frontmatter. Das Skript
+         weiter unten haengt an #cal-toggle und laeuft ohne den
+         Abschnitt einfach nicht.
          ============================================================== -->
+    {zeigeKalender && (
     <section class="kontakt-cal-accordion" data-reveal aria-label={k.kalender.label}>
       <div class="cal-accordion-header">
         <p class="cal-accordion-eyebrow">{k.kalender.eyebrow}</p>
@@ -290,6 +300,7 @@ const skriptTexteJson = JSON.stringify(skriptTexte).replace(/</g, '\\u003c');
         </div>
       </div>
     </section>
+    )}
 
     <!-- ================================================================
          Was im Erstgespraech passiert — Prep-Info
