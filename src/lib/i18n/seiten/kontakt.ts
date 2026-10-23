@@ -109,7 +109,7 @@ export const de = {
 export const en: Shape<typeof de> = {
   meta: {
     pageTitle: 'Contact',
-    title: 'Contact — Web developer from Bremen | Tammo Studios',
+    title: 'Contact — web developer from Bremen | Tammo Studios',
     description:
       'An inquiry, a callback, or a 30-minute intro call, answered within 24 hours. Website €2,000, online store €3,000, built by hand in Bremen.',
   },
@@ -155,8 +155,8 @@ export const en: Shape<typeof de> = {
   ],
 
   vorlagen: [
-    'Hi Tammo, I need a new website for my business [type of business]. Right now I have [no site / an outdated site at www.example.com]. What matters to me: [references, a contact form, mobile for example]. When could we talk?',
-    "Hi Tammo, I'm planning an online store for [product category]. Right now I sell [in the shop / not online at all]. Important features would be: [payment provider, inventory, shipping for example]. Can we talk this through?",
+    'Hi Tammo, I need a new website for my business [type of business]. Right now I have [no site / an outdated site at www.example.com]. What matters to me: [e.g. past work, a contact form, mobile]. When could we talk?',
+    "Hi Tammo, I'm planning an online store for [product category]. Right now I sell [in the shop / not online at all]. Important features would be: [e.g. payment provider, inventory, shipping]. Can we talk this through?",
     'Hi Tammo, my existing website at [www.example.com] needs [an update / an addition / a bug fix]. Specifically: [short description]. When do you have time?',
     "Hi Tammo, I have a project inquiry: [a short description of what you have in mind]. I'm not sure yet what exactly I need, but [context / goal]. Can we talk this through?",
     'Hi Tammo, [your inquiry here]...',

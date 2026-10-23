@@ -176,14 +176,14 @@ export const en: Shape<typeof de> = {
     pageTitle: 'Software',
     title: 'App and software development from Bremen | Tammo Studios',
     description:
-      'Software development from Bremen: price calculators, configurators, forms that think along, apps of your own. One application is included in the website price.',
+      'Software development from Bremen: price calculators, configurators, forms that adapt as you answer, apps of your own. One application is in the website price.',
   },
 
   hero: {
     headline: 'A website can do more than just be there.',
-    sub: 'Price calculators, inquiry forms that think along, configurators, automatic PDFs. One of them is already part of the website price.',
+    sub: 'Price calculators, inquiry forms that ask the right questions, configurators, automatic PDFs. One of them is already part of the website price.',
     cta: 'Request an intro call',
-    notiz: 'One application included · every further one €500',
+    notiz: 'One application included · each additional one €500',
   },
 
   positionierung: {
@@ -195,7 +195,7 @@ export const en: Shape<typeof de> = {
     ],
     absatz2: [
       'That part is exactly my craft. No ready-made template.',
-      'No bought-in module, but your own processes as the basis.',
+      'No off-the-shelf module, but your own processes as the basis.',
     ],
   },
 
@@ -207,12 +207,12 @@ export const en: Shape<typeof de> = {
         body: 'A few key figures in, a number you can use out: a recommendation, an investment range, a subsidy amount.',
       },
       {
-        title: 'Forms that think along',
-        body: 'Not "name, mail, message". Forms that take a different path depending on the answer and put a finished PDF in your inbox at the end.',
+        title: 'Forms that ask the right questions',
+        body: 'Not "name, email, message". Forms that take a different path depending on the answer and put a finished PDF in your inbox at the end.',
       },
       {
         title: 'Configurators',
-        body: 'Services, variants, options: clickable together, with a price or a summary at the end. Saves you the first clarifying phone call.',
+        body: 'Services, variants, options: you put them together with a few clicks, with a price or a summary at the end. Saves you the first clarifying phone call.',
       },
       {
         title: 'Content that publishes itself',
@@ -226,21 +226,21 @@ export const en: Shape<typeof de> = {
     ansehen: 'Take a look',
     eintraege: [
       {
-        full: 'Institute for occupational medicine',
-        branch: 'Occupational medicine, Isernhagen',
+        full: 'Institut für Betriebsmedizin',
+        branch: 'Occupational health, Isernhagen',
         body: 'An inquiry system for checkups with three paths through the form. Companies enter their staff, pick the examinations, and out of that a PDF is produced automatically that lands directly at the practice. The sender gets a confirmation. The whole site also switches to English, for international workforces.',
         tags: ['A form with three paths', 'PDF automatically', 'German / English'],
       },
       {
-        full: 'Occupational medicine practice',
-        branch: 'Occupational medicine, Bremen',
-        body: 'A 360° tour through the practice, walkable right on the page. Anyone coming in for a checkup knows beforehand where they will end up. Plus a complete English version of the site at the push of a button, without a second website and without maintaining everything twice.',
+        full: 'Occupational health practice',
+        branch: 'Occupational health, Bremen',
+        body: 'A 360° tour through the practice, walkable right on the page. Anyone coming in for a checkup knows what the place looks like before they arrive. Plus a complete English version of the site at the push of a button, without a second website and without maintaining everything twice.',
         tags: ['360° tour', 'German / English', 'A CMS of its own'],
       },
       {
         full: 'Heating, heat pumps, plumbing',
-        branch: 'Trades, Bremen',
-        body: 'Six questions about floor space, year of construction, number of people, and hot water. Out of that comes a recommendation: heat pump, hybrid, or a gas condensing boiler. With an investment range, the possible BEG subsidy, and the share left to pay. WärmePower gets the completed form as mail and PDF, the customer gets a confirmation. Twice a month real inquiries come in through it.',
+        branch: 'Contractors, Bremen',
+        body: 'Six questions about floor space, year of construction, number of people, and hot water. Out of that comes a recommendation: heat pump, hybrid, or a gas condensing boiler. With an investment range, the government subsidy it may qualify for (the German BEG program), and the share left to pay. WärmePower gets the completed form as an email with a PDF, the customer gets a confirmation. Twice a month real inquiries come in through it.',
         tags: ['Recommendation logic', 'PDF automatically', 'Subsidy calculation'],
       },
       {
@@ -296,7 +296,7 @@ export const en: Shape<typeof de> = {
       'One application of your choice is included, at no extra charge and with no longer build time:',
     entstehtVor: 'it comes together within the same ',
     tage: '14 days',
-    weitereVor: '. Every further one costs ',
+    weitereVor: '. Each additional one costs ',
     weiterePreis: '€500',
     darueber:
       'If it goes beyond a website, an app of your own for instance, I will not name a number beforehand. That depends too much on the scope. After the intro call you get a fixed one.',

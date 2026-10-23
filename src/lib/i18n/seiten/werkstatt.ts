@@ -90,7 +90,7 @@ export const en: Shape<typeof de> = {
     punkte: [
       {
         title: 'Game mechanics by hand',
-        body: 'The pixel art is bought in, nothing else is. Controls, collisions, enemy behavior, and the game loop are all my own code, at 60 frames per second on a phone too.',
+        body: 'The pixel art is off the shelf, nothing else is. Controls, collisions, enemy behavior, and the game loop are all my own code, at 60 frames per second on a phone too.',
       },
       {
         title: 'Music that did not exist before',

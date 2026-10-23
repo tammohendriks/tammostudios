@@ -130,7 +130,7 @@ export const en: Shape<typeof de> = {
     absatz1:
       'It all started with a vocational apprenticeship in digitalization management at a savings bank subsidiary. After that I stayed on there for a year as an online marketing manager. On the side I noticed that something was missing: programming. Exactly the thing that had gripped me most at the beginning.',
     absatz2:
-      'In May 2026 I founded Tammo Studios, at first on the side. By now I have given up the job and work fully self-employed. The jump into the cold, to see it through on my own. From August I am traveling through Asia for a longer stretch. Videos are hard to shoot from 9,000 kilometers away. Websites are not.',
+      'In May 2026 I founded Tammo Studios, at first on the side. By now I have given up the job and work fully self-employed. Jumping in at the deep end, all in on my own. From August I am traveling through Asia for a longer stretch. Videos are hard to shoot from 9,000 kilometers away. Websites are not.',
   },
 
   wieIchArbeite: {
@@ -140,7 +140,7 @@ export const en: Shape<typeof de> = {
     absatz2:
       'I work fully remote, in German or English. Where you sit does not matter to me. A good internet connection is enough.',
     absatz3:
-      'What matters to me: patience with feedback and a feel for the right tone. A bar website should not look clean like a SaaS startup. It is allowed to be dark, a little rough, vintage. A yoga studio is allowed to breathe softly. I listen to who you are and then build exactly that.',
+      'What matters to me: patience with feedback and a feel for the right tone. A bar website should not look clean like a SaaS startup. It can be dark, a little rough, vintage. A yoga studio can breathe softly. I listen to who you are and then build exactly that.',
     dauerVor: 'A normal website is up in at most',
     dauerTage: '14 days',
     dauerMitte: '. An online store in at most',
@@ -155,14 +155,14 @@ export const en: Shape<typeof de> = {
     shopVor: '. An online store',
     shopPreis: '€3,000',
     nach:
-      '. Both include one custom application: a price calculator, an inquiry form that thinks along. No hidden hourly rates, no packages with fine print.',
+      '. Both include one custom application: a price calculator, an inquiry form that asks the right questions. No hidden hourly rates, no packages with fine print.',
     cta: 'See the full price list',
   },
 
   ausserhalb: {
     headline: 'Outside the code',
     absatz1:
-      'When I am not working I am usually doing sport or out somewhere. Traveling is what gives me energy. And the reason I set all this up the way I set it up.',
+      'When I am not working I am usually at the gym or out somewhere. Traveling is what gives me energy. And the reason I set all this up the way I set it up.',
     absatz2:
       'Sometimes I build things no client ordered. Most recently an arcade game with music that is generated in the browser and a worldwide leaderboard.',
     cta: 'Play in the Lab',

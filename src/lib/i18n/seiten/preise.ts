@@ -211,9 +211,9 @@ export const en: Shape<typeof de> = {
     headline: 'Add-ons.',
     punkte: [
       {
-        label: 'Every further application:',
+        label: 'Each additional application:',
         wert: '€500',
-        body: 'The first one is part of the package price and gets built within the 14 days. Subsidy calculators, fillable PDF forms, configurators, AI chatbots, booking tools. Every further one at the same fixed price.',
+        body: 'The first one is part of the package price and gets built within the 14 days. Subsidy calculators, fillable PDF forms, configurators, AI chatbots, booking tools. Each additional one at the same fixed price.',
       },
       {
         label: 'An app of your own or a larger system:',
@@ -235,7 +235,7 @@ export const en: Shape<typeof de> = {
     preis: '€30/month',
     tag: 'month to month',
     punkte: [
-      'Performance and uptime monitoring (you hear about it before anything jams)',
+      'Performance and uptime monitoring (you hear about it before anything breaks)',
       'Priority support, usually within a few hours',
       'Smaller technical fixes without a separate invoice',
       'A site check every six months plus a strategy call',
@@ -244,7 +244,7 @@ export const en: Shape<typeof de> = {
 
   manifest: {
     headline: 'Why are the prices this clear?',
-    body: 'I believe in simple arrangements. You should know what your website costs beforehand, not be surprised by extra line items afterwards. What is written here is what you pay. Nothing else.',
+    body: 'I believe in keeping things straightforward. You should know what your website costs beforehand, not be surprised by extra line items afterward. What is written here is what you pay. Nothing else.',
   },
 
   empfehlung: {

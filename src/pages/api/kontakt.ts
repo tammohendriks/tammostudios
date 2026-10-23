@@ -89,7 +89,7 @@ const meldungenEn: typeof meldungenDe = {
   contentType: 'Invalid content type. JSON or form data expected.',
   rateLimit: (sekunden: number) => `Too many requests. Please try again in ${sekunden}s.`,
   konfiguration: 'Server configuration incomplete. Please get in touch directly.',
-  versand: 'Sending the mail failed. Please get in touch directly.',
+  versand: 'Sending the email failed. Please get in touch directly.',
   serverFehler: 'Server error while sending. Please try again later.',
 };
 
@@ -222,7 +222,7 @@ const antwortZeilenEn: (vorname: string) => Gleichlang<
   string
 > = (vorname) => [
   `Hi ${vorname},`,
-  'thanks for your inquiry.',
+  'Thanks for your inquiry.',
   "I'll get back to you within 24 hours.",
   'If it is urgent, you can also reach me on WhatsApp:',
 ];

@@ -27,7 +27,6 @@
 export const SITE_URL = 'https://tammostudios.de';
 
 export const DEFAULT_LOCALE = 'de';
-export const LOCALES = /** @type {const} */ (['de', 'en']);
 
 /**
  * Schluessel sind sprachunabhaengig und bleiben deutsch, damit der Code

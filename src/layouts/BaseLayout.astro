@@ -57,7 +57,11 @@ const d = t(Astro.url.pathname);
 //
 // Was die beiden Uebergaenge zeigen:
 //   Sprachwechsel — die alte Fassung zieht zur Seite ab, die neue kommt
-//   von der anderen nach, in Richtung des Daumens am Umschalter.
+//   von der anderen nach. Das Bild ist Umblaettern: der Daumen am
+//   Umschalter laeuft nach rechts, der Blick wandert also nach rechts
+//   und der Inhalt entgegen, nach links. (Nicht "in Richtung des
+//   Daumens" — so stand es hier und war falsch herum beschrieben,
+//   obwohl der Code es die ganze Zeit richtig gemacht hat.)
 //   Der Weg war zuerst auf vier Prozent gesetzt, aus Sorge vor einer
 //   Diashow. Das war zu wenig: die beiden Sprachfassungen sehen bis auf
 //   den Text gleich aus, und bei vier Prozent in 220 ms war die
@@ -226,7 +230,10 @@ const jsonLdGraph = {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonicalURL} />
+    {/* Kein canonical auf der Fehlerseite: die Adresse, unter der sie
+        ausgeliefert wird, ist nicht die, die hier stuende — und eine
+        Seite auf noindex braucht keine kanonische Fassung. */}
+    {!noindex && <link rel="canonical" href={canonicalURL} />}
     {alternateLinks.map((l) => (
       <link rel="alternate" hreflang={l.hreflang} href={l.href} />
     ))}
@@ -244,6 +251,15 @@ const jsonLdGraph = {
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={d.schema.bildAlt} />
+    {/* Die jeweils andere Sprachfassung. Facebook und LinkedIn lesen
+        das, um beim Teilen die passende Fassung anzubieten. Nur wo es
+        eine gibt — auf Journal und Rechtstexten fehlt sie zu Recht. */}
+    {alternateLinks.length > 0 && (
+      <meta
+        property="og:locale:alternate"
+        content={locale === 'en' ? 'de_DE' : 'en_US'}
+      />
+    )}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
@@ -370,10 +386,10 @@ const jsonLdGraph = {
            reine Verschwendung. */
         @view-transition { navigation: auto; }
 
-        /* Sprachwechsel: Schub in Richtung des Daumens am Umschalter.
-           Die alte Fassung zieht ab und faded schnell weg, die neue
-           kommt langsamer nach — so ist die Ueberlappung kurz und das
-           Bild bleibt klar. */
+        /* Sprachwechsel wie Umblaettern: nach Englisch laeuft der Daumen
+           nach rechts, der Inhalt also nach links. Die alte Fassung
+           zieht ab und faded schnell weg, die neue kommt langsamer
+           nach — so ist die Ueberlappung kurz und das Bild klar. */
         html[data-sprach-richtung='en']::view-transition-old(root) {
           animation: sprache-raus-links 300ms cubic-bezier(0.5, 0, 0.75, 0) both;
         }
@@ -458,6 +474,11 @@ const jsonLdGraph = {
           if (!uebergang) return;
           var merker = vormerker();
           if (!merker || reduziert()) {
+            // Auch hier wegwerfen. Wird hier abgebrochen, feuert
+            // pagereveal auf der naechsten Seite ohne Uebergang, und
+            // der Merker bliebe sonst liegen — bei dauerhaft
+            // reduzierter Bewegung fuer immer.
+            vergessen();
             uebergang.skipTransition();
             return;
           }
@@ -480,10 +501,13 @@ const jsonLdGraph = {
         // seinen Zweck erfuellt, und beim Zurueckblaettern soll er nicht
         // ein zweites Mal greifen.
         window.addEventListener('pagereveal', function (e) {
-          var uebergang = e.viewTransition;
-          if (!uebergang) return;
+          // Erst lesen, dann sofort wegwerfen — vor jeder Abbruch-
+          // Bedingung. Sonst ueberlebt der Merker den Fall, in dem es
+          // hier gar keinen Uebergang gibt.
           var merker = vormerker();
           vergessen();
+          var uebergang = e.viewTransition;
+          if (!uebergang) return;
           if (!merker || merker.ziel !== location.pathname || reduziert()) {
             uebergang.skipTransition();
             return;
@@ -506,6 +530,9 @@ const jsonLdGraph = {
         // animiert, ohne ein Sprachwechsel zu sein.
         window.addEventListener('pageshow', function (e) {
           if (e.persisted) delete document.documentElement.dataset.sprachRichtung;
+          // Letzte Reinigung fuer Browser ohne pagereveal: dort wird der
+          // Merker nie gelesen und bliebe sonst dauerhaft im Speicher.
+          vergessen();
         });
       })();
     </script>

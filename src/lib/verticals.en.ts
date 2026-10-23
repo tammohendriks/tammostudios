@@ -68,7 +68,7 @@ export type VerticalTexte = { [S in Slug]: Uebersetzbar<Deutsch<S>> };
 export const VERTICAL_TEXT_EN: VerticalTexte = {
   handwerk: {
     meta: {
-      title: 'Websites for Contractors',
+      title: 'Websites for contractors',
       description:
         'Handcrafted websites for contractors in Bremen. From €2,000, ' +
         'live in 14 days. With an emergency call button and a ' +
@@ -86,14 +86,14 @@ export const VERTICAL_TEXT_EN: VerticalTexte = {
     checklist: [
       'Direct contact (call button, WhatsApp, emergency service)',
       'A clear service area: which towns you cover',
-      'Local references as proof of trust',
+      'Local work that proves it',
       'An inquiry form without 15 required fields',
       'Mobile optimized (80% of your callers are on the road)',
       'Google Maps and Google Business integration',
       'Emergency button up front, one tap to call',
     ],
     pricingParagraphs: [
-      'A website: €2,000.\nAn online store for accessories: €3,000.\nOne custom application is included either way, a quote calculator for example.\nNo hourly rates, no fine print. Done in 14 days.',
+      'A website: €2,000.\nAn online store for accessories: €3,000.\nOne custom application is included either way, for example a quote calculator.\nNo hourly rates, no fine print. Done in 14 days.',
       'For €30 a month I handle maintenance, security updates, and priority support when something breaks.\nOptional, month to month.',
     ],
     caseStudy: {
@@ -140,7 +140,7 @@ export const VERTICAL_TEXT_EN: VerticalTexte = {
       // Gekuerzt auf 41 Zeichen: mit dem ' — Tammo Studios' des Layouts
       // dahinter bleibt der Titel unter 60. Die Substantivgruppe vorn
       // ist auch die, nach der gesucht wird ("medical practice website").
-      title: 'Medical Practice Websites: GDPR Compliant',
+      title: 'GDPR-compliant medical practice websites',
       // Die Beschreibung lag bei 172 Zeichen. Google schnitt damit genau
       // den Teil ab, der den Beweis traegt — die beiden Referenzen.
       description:
@@ -149,14 +149,14 @@ export const VERTICAL_TEXT_EN: VerticalTexte = {
         'From €2,000. Recent work: Samedos and IBI.',
     },
     hero: {
-      eyebrow: 'WEBSITE FOR PRACTICES',
-      headlineLines: ['Your', 'practice website.', 'Discreet, clear, professional.'],
+      eyebrow: 'WEBSITE FOR MEDICAL PRACTICES',
+      headlineLines: ['Your', 'medical practice website.', 'Discreet, clear, professional.'],
       subheadline:
         'GDPR compliant. From €2,000.\nBuilt in Bremen for practices all over Germany.',
     },
     intro:
       'Patients look up your practice online first.\nThey want to know: is this the right approach?\nWho works there?\nHow do they get an appointment?\nYour website has to answer those questions in seconds, without jargon and without red tape.',
-    checklistTitle: 'What belongs on a practice website',
+    checklistTitle: 'What belongs on a medical practice website',
     checklist: [
       'A GDPR-compliant build (critical in a medical context)',
       'Appointment requests, simple and discreet',
@@ -164,16 +164,16 @@ export const VERTICAL_TEXT_EN: VerticalTexte = {
       'Team profiles with photos (this is where trust starts)',
       'Directions and office hours up front',
       'Secure contact forms (encrypted transmission)',
-      'Low-barrier operation',
+      'Built for accessibility',
     ],
     pricingParagraphs: [
-      'A practice website: €2,000, including one custom application, an inquiry form that asks for the type of checkup right away for example.\nWith extended features like online booking or a patient portal: €3,000 (base setup).\nEvery standard included: data protection, encryption, and GDPR compliance are mandatory, not an add-on.',
+      'A practice website: €2,000, including one custom application, for example an inquiry form that asks for the type of checkup right away.\nWith extended features like online booking or a patient portal: €3,000 (base setup).\nEvery standard included: data protection, encryption, and GDPR compliance are mandatory, not an add-on.',
       'For €30 a month I handle maintenance, security updates, and priority support.\nOptional, month to month.',
     ],
     caseStudy: {
       eyebrow: 'REAL PROJECTS: SAMEDOS + IBI',
       paragraphs: [
-        'Samedos is an occupational medicine practice in Bremen with a clear focus on DGUV Regulation 2.\nThe Institut für Betriebsmedizin Isernhagen (IBI) provides occupational health care and offshore fitness-to-work exams.',
+        'Samedos is an occupational health practice in Bremen with a clear focus on DGUV 2, the German occupational health regulation.\nThe Institut für Betriebsmedizin Isernhagen (IBI) provides occupational health care and offshore fitness-to-work exams.',
         'Both sites show the team, the services, and the ways to get in touch, without medical marketing speak.',
       ],
       references: [
@@ -207,7 +207,7 @@ export const VERTICAL_TEXT_EN: VerticalTexte = {
 
   gastronomie: {
     meta: {
-      title: 'Websites for Restaurants',
+      title: 'Websites for restaurants',
       description:
         'Handcrafted websites for restaurants, cafes, and bars in ' +
         'Bremen: edit the menu yourself, reservation requests, an ' +
@@ -231,13 +231,13 @@ export const VERTICAL_TEXT_EN: VerticalTexte = {
       'Photos of the place, the team, the food: real photos, no stock images',
     ],
     pricingParagraphs: [
-      'A restaurant website: €2,000, including one custom application, a reservation request that asks for party size and occasion right away for example.\nWith an online store for merchandise or gift cards: €3,000.\nYou keep the menu current yourself. No phone call needed when the weekly special changes.',
+      'A restaurant website: €2,000, including one custom application, for example a reservation request that asks for party size and occasion right away.\nWith an online store for merchandise or gift cards: €3,000.\nYou keep the menu current yourself. No phone call needed when the weekly special changes.',
       'For €30 a month I handle maintenance, security updates, and priority support.\nOptional, month to month.',
     ],
     caseStudy: {
       eyebrow: 'REAL PROJECTS: ER & SIE',
       paragraphs: [
-        'Er & Sie is a corner bar in Bremen Walle. Dark, vintage, with a history.\nThe website had to carry exactly that atmosphere: not clean startup design, but a warm room focused on what matters, who we are, when we are open, how you get here.',
+        'Er & Sie is a corner bar in Bremen Walle. Dark, vintage, with a history.\nThe website had to carry exactly that atmosphere. Not clean startup design but a warm room, focused on three things: who we are, when we are open, how you get here.',
       ],
       references: [{ alt: 'Preview of the Er & Sie website', linkLabel: 'Visit erundsiebremen.de' }],
     },

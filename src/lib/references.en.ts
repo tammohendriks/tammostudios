@@ -13,7 +13,7 @@ import type { REFERENCES } from './references';
 type Slug = (typeof REFERENCES)[number]['slug'];
 
 export const REFERENCE_SUBTITLES_EN: Record<Slug, string> = {
-  samedos: 'Occupational medicine practice',
+  samedos: 'Occupational health practice',
   'er-und-sie': 'Corner bar in Bremen Walle',
   waermepower: 'Heating, heat pumps, plumbing',
   'ibi-doc': 'Occupational health practice',

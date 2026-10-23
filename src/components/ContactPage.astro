@@ -491,6 +491,12 @@ const skriptTexteJson = JSON.stringify(skriptTexte).replace(/</g, '\\u003c');
      beim erneuten Aufklappen — Cal handled Session-State intern).
      ================================================================== -->
 <script>
+  // Auf der englischen Seite gibt es das Accordion nicht (siehe
+  // zeigeKalender im Frontmatter). Das Skript wird trotzdem
+  // ausgeliefert, weil Astro es pro Komponente buendelt und beide
+  // Routen dieselbe Komponente sind. Ohne den Knopf tut es nichts, aber
+  // der fruehe Ausstieg macht das ausdruecklich statt es dem Zufall der
+  // Optional-Chaining-Operatoren weiter unten zu ueberlassen.
   const toggleBtn = document.getElementById('cal-toggle') as HTMLButtonElement | null;
   const panelEl = document.getElementById('cal-panel') as HTMLElement | null;
   let calLoaded = false;

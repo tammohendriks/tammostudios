@@ -248,7 +248,7 @@ export const en: Shape<typeof de> = {
       {
         title: 'It can do more than stand there',
         body:
-          'A price calculator, an inquiry form that thinks along, a ' +
+          'A price calculator, an inquiry form that asks the right questions, a ' +
           'configurator. One custom application is part of the price, at no ' +
           'extra charge and with no longer build time.',
         linkLabel: 'What is possible',
@@ -258,7 +258,7 @@ export const en: Shape<typeof de> = {
         body:
           '<strong>€2,000</strong> for a website, <strong>€3,000</strong> ' +
           'for an online store. Live in 14 days at most. No hourly rates, ' +
-          'no add-on invoices, no packages with fine print.',
+          'no surprise invoices, no packages with fine print.',
         linkLabel: 'The full price list',
       },
     ],
@@ -281,7 +281,7 @@ export const en: Shape<typeof de> = {
         title: 'I design your website',
         body:
           'First drafts: structure, colors, style. ' +
-          'We keep turning the dial until it hits your brand.',
+          'We keep adjusting until it feels like your brand.',
         linkLabel: 'See finished work',
       },
       {
@@ -345,7 +345,7 @@ export const en: Shape<typeof de> = {
         ],
       },
       {
-        branche: 'Trades',
+        branche: 'Contractors',
         reiter: [
           { label: 'Services', wert: 'Roof · facade · renovation' },
           { label: 'Work', wert: 'Roof in Aachen · 2024' },

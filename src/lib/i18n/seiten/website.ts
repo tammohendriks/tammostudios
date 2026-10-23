@@ -168,7 +168,7 @@ export const en: Shape<typeof de> = {
       {
         label: 'Keeping it current yourself',
         body:
-          'Opening hours, prices, new references, a job posting. You change ' +
+          'Opening hours, prices, new project photos, a job posting. You change ' +
           'that yourself, in 30 seconds, without a ticket and without me.',
         linkLabel: 'What that looks like',
       },
@@ -189,7 +189,7 @@ export const en: Shape<typeof de> = {
       'Text, images, and prices without technical know-how',
       'A live preview before you save',
       'New team members, new opening hours, new prices changed in 30 seconds',
-      'If you have questions: you reach me by mail or WhatsApp',
+      'If you have questions: you can reach me by email or WhatsApp',
     ],
     beispieleLabel: 'Examples:',
     beispiele:
@@ -235,7 +235,7 @@ export const en: Shape<typeof de> = {
     shopPreis: '€3,000',
     shopLabel: 'Online store',
     inklusive:
-      'Both prices include one custom application: a price calculator, a well-thought-out inquiry form, a configurator. It gets built within the same 14 days. Every further one costs €500.',
+      'Both prices include one custom application: a price calculator, a well-thought-out inquiry form, a configurator. It gets built within the same 14 days. Each additional one costs €500.',
     cta: 'See the full price list',
   },
 

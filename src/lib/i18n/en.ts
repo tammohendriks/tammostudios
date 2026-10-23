@@ -118,7 +118,7 @@ export const en: Shape<typeof de> = {
         beschreibung:
           'A price calculator, a configurator, an inquiry form that ' +
           'thinks along and produces a PDF. The first application is part ' +
-          'of the website or store price, every further one costs €500.',
+          'of the website or store price, each additional one costs €500.',
       },
     ],
     kannUeber: [
@@ -135,7 +135,7 @@ export const en: Shape<typeof de> = {
   referenzModal: {
     neuerTab: 'In a new tab',
     schliessen: 'Close the preview',
-    rahmenTitel: 'Reference preview',
+    rahmenTitel: 'Work preview',
     nichtEinbettbar: 'This site cannot be embedded directly.',
     neuerTabOeffnen: 'Open in a new tab',
   },
