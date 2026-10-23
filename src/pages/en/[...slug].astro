@@ -1,0 +1,22 @@
+---
+// Fehlerseite fuer alles unter /en, das es nicht gibt.
+//
+// Vercel liefert fuer unbekannte Pfade die statische 404.html aus, und
+// die ist deutsch — ein englischer Besucher landete damit auf einer
+// deutschen Fehlerseite mit deutscher Navigation.
+//
+// Diese Sammelroute laeuft serverseitig (prerender false) und kann
+// deshalb einen echten 404-Status setzen. Eine Umschreibung in
+// vercel.json koennte das nicht: die liefert 200, und Google wertet so
+// etwas als "soft 404".
+//
+// Statische Routen haben in Astro Vorrang, /en/about landet also
+// weiterhin bei about.astro und nur der Rest hier.
+export const prerender = false;
+
+import NotFoundPage from '../../components/NotFoundPage.astro';
+
+Astro.response.status = 404;
+---
+
+<NotFoundPage />

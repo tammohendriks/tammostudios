@@ -48,11 +48,16 @@ export default defineConfig({
       name: 'i18n-routen-guard',
       hooks: {
         'astro:routes:resolved': ({ routes, logger }) => {
-          const vorhanden = new Set(
-            routes
-              .filter((r) => r.type === 'page')
-              .map((r) => (r.pathname ?? '').replace(/\/$/, '') || '/')
-          );
+          // Nur Seiten mit festem Pfad. Sammelrouten wie
+          // /en/[...slug] haben kein pathname; waeren sie dabei,
+          // zaehlte der Rueckfall unten sie als '/' und der Guard
+          // uebersaehe eine fehlende Startseite.
+          const vorhanden = new Set();
+          for (const route of routes) {
+            if (route.type !== 'page') continue;
+            if (typeof route.pathname !== 'string') continue;
+            vorhanden.add(route.pathname.replace(/\/$/, '') || '/');
+          }
           const fehlend = [];
           for (const [key, eintrag] of Object.entries(ROUTES)) {
             for (const locale of /** @type {const} */ (['de', 'en'])) {
