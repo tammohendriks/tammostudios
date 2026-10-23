@@ -461,8 +461,14 @@ const skriptTexteJson = JSON.stringify(skriptTexte).replace(/</g, '\\u003c');
         // Success: Formular ausblenden, Success-State zeigen
         form.hidden = true;
         if (successEl) successEl.hidden = false;
-        // Scroll zum Success-Panel damit User Feedback sieht
-        successEl?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Scroll zum Success-Panel damit User Feedback sieht. Bei
+        // reduzierter Bewegung ohne Animation — 'smooth' ist genau die
+        // Art Bewegung, die damit abgewaehlt wird.
+        const sanft = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        successEl?.scrollIntoView({
+          behavior: sanft ? 'smooth' : 'auto',
+          block: 'center',
+        });
         // Und den Fokus hinterher. Der lag auf dem Absende-Knopf, der
         // gerade mit dem Formular verschwunden ist — ohne diesen Schritt
         // sitzt er am Seitenanfang und die Bestaetigung bleibt

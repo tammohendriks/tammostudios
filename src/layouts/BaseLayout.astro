@@ -540,11 +540,14 @@ const jsonLdGraph = {
   </head>
   <body class="min-h-screen bg-ts-bg text-ts-fg">
     <TopBar />
-    {!hideThemeToggle && <SiteThemeToggle />}
+    {/* Der Sprach-Umschalter sitzt LINKS, der fuer das Thema rechts —
+        und steht deshalb auch im DOM zuerst. Wer mit der Tastatur
+        wandert, folgt damit derselben Reihenfolge wie das Auge. */}
     {/* Rendert sich selbst nur, wenn es eine Gegenseite gibt. Kein
         Ausblenden per Bedingung hier — die Entscheidung gehoert in die
         Routen-Tabelle, nicht ins Layout. */}
     <SiteLangToggle />
+    {!hideThemeToggle && <SiteThemeToggle />}
     <slot />
     <script>
       // Site-weiter Scroll-Reveal: alle [data-reveal] Elemente werden

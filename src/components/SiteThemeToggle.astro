@@ -66,6 +66,18 @@ const d = t(Astro.url.pathname);
     '[data-site-theme-toggle]'
   );
   if (btn) {
+    // Beschriftung gleich beim Laden auf den aktuellen Zustand setzen.
+    // Vorher stand dort die allgemeine Fassung ("Dark / Light") und
+    // erst nach dem ersten Klick die mit Zustand — derselbe Knopf hat
+    // sich also unterschiedlich gemeldet, je nachdem ob man ihn schon
+    // benutzt hatte.
+    const zustandMelden = () => {
+      const hell = document.documentElement.getAttribute('data-site-theme') === 'light';
+      const label = hell ? btn.dataset.labelHell : btn.dataset.labelDunkel;
+      if (label) btn.setAttribute('aria-label', label);
+    };
+    zustandMelden();
+
     // Zaehler fuer die laufenden Wechsel. Wer zweimal schnell klickt,
     // bricht den ersten Uebergang ab; dessen Aufraeumen darf dann nicht
     // das Merkmal des zweiten wegnehmen, sonst laeuft der zweite ohne
@@ -89,9 +101,7 @@ const d = t(Astro.url.pathname);
       } catch (_) {
         // private-mode etc. — no persistence, but toggle still works session
       }
-      const label =
-        next === 'light' ? btn.dataset.labelHell : btn.dataset.labelDunkel;
-      if (label) btn.setAttribute('aria-label', label);
+      zustandMelden();
     };
 
     btn.addEventListener('click', () => {

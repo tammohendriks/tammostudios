@@ -17,8 +17,12 @@
 // CTA-Links zeigen auf /kontakt (Cal.com-Terminbuchung + alternative
 // Kontakte). Kein Modal mehr — direkter Seiten-Wechsel.
 //
-// FAQ-Section bekommt zusaetzlich FAQPage JSON-LD via additionalSchema —
-// Google kann daraus Rich-Snippets im Suchergebnis machen.
+// FAQ-Section bekommt zusaetzlich FAQPage JSON-LD via additionalSchema.
+// NICHT fuer Rich Snippets: die hat Google 2023 auf Behoerden- und
+// Gesundheitsseiten beschraenkt, eine Freelancer-Seite bekommt sie
+// nicht. Das Markup bleibt trotzdem — es beschreibt den Inhalt korrekt
+// und wird von anderen Diensten gelesen. Der Kommentar stand hier mal
+// anders und hat etwas versprochen, was nicht mehr eintritt.
 
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SiteFooter from './SiteFooter.astro';
