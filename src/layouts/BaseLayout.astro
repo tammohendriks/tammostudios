@@ -51,8 +51,12 @@ const canonicalURL = absUrl(Astro.url.pathname);
 //
 // Was die beiden Uebergaenge zeigen:
 //   Sprachwechsel — die alte Fassung zieht zur Seite ab, die neue kommt
-//   von der anderen nach, in Richtung des Daumens am Umschalter. Vier
-//   Prozent Weg; mehr sieht nach Diashow aus.
+//   von der anderen nach, in Richtung des Daumens am Umschalter.
+//   Der Weg war zuerst auf vier Prozent gesetzt, aus Sorge vor einer
+//   Diashow. Das war zu wenig: die beiden Sprachfassungen sehen bis auf
+//   den Text gleich aus, und bei vier Prozent in 220 ms war die
+//   Bewegung nachweislich da, aber nicht zu sehen. Jetzt achtzehn
+//   Prozent und etwas mehr Zeit — genug, dass das Auge dem Schub folgt.
 //   Themenwechsel — der neue Zustand wird als Kreis vom Knopf aus ueber
 //   den alten gezogen, wie Licht, das von einem Schalter ausgeht. Den
 //   alten wegzuwischen saehe aus wie ein Loch in der Seite.
@@ -362,31 +366,11 @@ const jsonLdGraph = {
          @view-transition beim Ankommen der neuen Seite schon braucht —
          die Begruendung steht im Frontmatter. -->
     <style is:inline>
-      @view-transition { navigation: auto; }
-
       /* Normalfall: keine Richtung gesetzt, keine Bewegung. */
       html:not([data-sprach-richtung]):not([data-thema-wechsel])::view-transition-old(root),
       html:not([data-sprach-richtung]):not([data-thema-wechsel])::view-transition-new(root) {
         animation: none;
       }
-
-      /* Sprachwechsel: Schub in Richtung des Daumens am Umschalter. */
-      html[data-sprach-richtung='en']::view-transition-old(root) {
-        animation: sprache-raus-links 220ms cubic-bezier(0.4, 0, 1, 1) both;
-      }
-      html[data-sprach-richtung='en']::view-transition-new(root) {
-        animation: sprache-rein-rechts 320ms cubic-bezier(0, 0, 0.2, 1) both;
-      }
-      html[data-sprach-richtung='de']::view-transition-old(root) {
-        animation: sprache-raus-rechts 220ms cubic-bezier(0.4, 0, 1, 1) both;
-      }
-      html[data-sprach-richtung='de']::view-transition-new(root) {
-        animation: sprache-rein-links 320ms cubic-bezier(0, 0, 0.2, 1) both;
-      }
-      @keyframes sprache-raus-links  { to   { opacity: 0; transform: translateX(-4%); } }
-      @keyframes sprache-rein-rechts { from { opacity: 0; transform: translateX(4%);  } }
-      @keyframes sprache-raus-rechts { to   { opacity: 0; transform: translateX(4%);  } }
-      @keyframes sprache-rein-links  { from { opacity: 0; transform: translateX(-4%); } }
 
       /* Themenwechsel: Lichtkegel vom Knopf aus ueber den alten Stand.
          mix-blend-mode hebt die eingebaute Vorgabe auf, die die
@@ -403,6 +387,49 @@ const jsonLdGraph = {
         to   { clip-path: circle(var(--thema-r) at var(--thema-x) var(--thema-y)); }
       }
     </style>
+    {alternateLinks.length > 0 && (
+      <style is:inline>
+        /* Nur auf Seiten mit Gegenseite. Auf Journal und Rechtstexten
+           kann es keinen Sprachwechsel geben — dort waeren die Regel und
+           der dafuer vorbereitete, gleich wieder abgebrochene Uebergang
+           reine Verschwendung. */
+        @view-transition { navigation: auto; }
+
+        /* Sprachwechsel: Schub in Richtung des Daumens am Umschalter.
+           Die alte Fassung zieht ab und faded schnell weg, die neue
+           kommt langsamer nach — so ist die Ueberlappung kurz und das
+           Bild bleibt klar. */
+        html[data-sprach-richtung='en']::view-transition-old(root) {
+          animation: sprache-raus-links 300ms cubic-bezier(0.5, 0, 0.75, 0) both;
+        }
+        html[data-sprach-richtung='en']::view-transition-new(root) {
+          animation: sprache-rein-rechts 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        html[data-sprach-richtung='de']::view-transition-old(root) {
+          animation: sprache-raus-rechts 300ms cubic-bezier(0.5, 0, 0.75, 0) both;
+        }
+        html[data-sprach-richtung='de']::view-transition-new(root) {
+          animation: sprache-rein-links 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        @keyframes sprache-raus-links {
+          from { opacity: 1; transform: translateX(0); }
+          to   { opacity: 0; transform: translateX(-18%); }
+        }
+        @keyframes sprache-rein-rechts {
+          from { opacity: 0; transform: translateX(18%); }
+          to   { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes sprache-raus-rechts {
+          from { opacity: 1; transform: translateX(0); }
+          to   { opacity: 0; transform: translateX(18%); }
+        }
+        @keyframes sprache-rein-links {
+          from { opacity: 0; transform: translateX(-18%); }
+          to   { opacity: 1; transform: translateX(0); }
+        }
+      </style>
+    )}
     <slot name="head" />
   </head>
   <body class="min-h-screen bg-ts-bg text-ts-fg">
