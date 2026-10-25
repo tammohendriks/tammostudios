@@ -357,6 +357,39 @@ const jsonLdGraph = {
          @view-transition beim Ankommen der neuen Seite schon braucht —
          die Begruendung steht im Frontmatter. -->
     <style is:inline>
+      /*
+       * Die GRUPPE des Wurzel-Schnappschusses bleibt stehen. Der
+       * Browser verformt sie sonst mit einer eigenen Animation
+       * (-ua-view-transition-group-anim-root, 250ms) von der alten zur
+       * neuen Geometrie.
+       *
+       * Am Desktop sieht man davon nichts, weil beide Schnappschuesse
+       * gleich gross sind. Auf dem Handy nicht: dort faehrt der
+       * Adressbalken beim Seitenwechsel ein oder aus, die beiden
+       * Schnappschuesse sind dadurch verschieden HOCH, und die Gruppe
+       * interpoliert zwischen den Hoehen. Das war der kurze Ruck nach
+       * unten und zurueck.
+       *
+       * Dazu beide Schnappschuesse oben verankert und auf Fensterhoehe
+       * beschnitten: ein Hoehenunterschied faellt damit unten heraus,
+       * statt den ganzen Inhalt zu verschieben. Ohne das wuerde das
+       * alte Bild bei block-size:auto sein Seitenverhaeltnis halten und
+       * ueber den unteren Rand hinauswachsen.
+       */
+      html[data-sprach-richtung]::view-transition-group(root),
+      html[data-thema-wechsel]::view-transition-group(root) {
+        animation: none;
+      }
+
+      html[data-sprach-richtung]::view-transition-old(root),
+      html[data-sprach-richtung]::view-transition-new(root),
+      html[data-thema-wechsel]::view-transition-old(root),
+      html[data-thema-wechsel]::view-transition-new(root) {
+        block-size: 100%;
+        object-fit: cover;
+        object-position: top center;
+      }
+
       /* Normalfall: keine Richtung gesetzt, keine Bewegung. */
       html:not([data-sprach-richtung]):not([data-thema-wechsel])::view-transition-old(root),
       html:not([data-sprach-richtung]):not([data-thema-wechsel])::view-transition-new(root) {
