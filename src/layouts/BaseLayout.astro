@@ -73,6 +73,22 @@ const d = t(Astro.url.pathname);
 //
 // Ohne gesetzte Richtung laeuft nichts: jede andere Navigation wechselt
 // ohne Ueberblendung. Die Weiche dafuer steht im Skript am Fuss.
+//
+// WARUM DIE GRUPPE FESTSTEHT: der Browser verformt die Gruppe des
+// Wurzel-Schnappschusses mit einer eigenen Animation
+// (-ua-view-transition-group-anim-root, 250 ms) von der alten zur neuen
+// Geometrie. Am Desktop sieht man davon nichts, weil beide
+// Schnappschuesse gleich gross sind. Auf dem Handy nicht: dort faehrt
+// der Adressbalken beim Seitenwechsel ein oder aus, die beiden
+// Schnappschuesse sind dadurch verschieden HOCH, und die Gruppe
+// interpoliert zwischen den Hoehen — ein kurzer Ruck nach unten und
+// zurueck, mitten in einer Bewegung, die eigentlich nur seitwaerts geht.
+//
+// Dazu sind beide Schnappschuesse auf Fensterhoehe beschnitten und oben
+// verankert. Ein Hoehenunterschied faellt damit unten heraus, statt den
+// ganzen Inhalt zu verschieben: ohne das haelt das alte Bild bei
+// block-size:auto sein Seitenverhaeltnis und waechst ueber den unteren
+// Rand hinaus.
 const alternateLinks = hreflangs(Astro.url.pathname);
 // Seitenart ueber die Routen-Tabelle statt ueber Pfad-Vergleiche. Die
 // alten Pruefungen (pathname === '/' und /^\/webdesign-/) waeren fuer
@@ -357,25 +373,9 @@ const jsonLdGraph = {
          @view-transition beim Ankommen der neuen Seite schon braucht —
          die Begruendung steht im Frontmatter. -->
     <style is:inline>
-      /*
-       * Die GRUPPE des Wurzel-Schnappschusses bleibt stehen. Der
-       * Browser verformt sie sonst mit einer eigenen Animation
-       * (-ua-view-transition-group-anim-root, 250ms) von der alten zur
-       * neuen Geometrie.
-       *
-       * Am Desktop sieht man davon nichts, weil beide Schnappschuesse
-       * gleich gross sind. Auf dem Handy nicht: dort faehrt der
-       * Adressbalken beim Seitenwechsel ein oder aus, die beiden
-       * Schnappschuesse sind dadurch verschieden HOCH, und die Gruppe
-       * interpoliert zwischen den Hoehen. Das war der kurze Ruck nach
-       * unten und zurueck.
-       *
-       * Dazu beide Schnappschuesse oben verankert und auf Fensterhoehe
-       * beschnitten: ein Hoehenunterschied faellt damit unten heraus,
-       * statt den ganzen Inhalt zu verschieben. Ohne das wuerde das
-       * alte Bild bei block-size:auto sein Seitenverhaeltnis halten und
-       * ueber den unteren Rand hinauswachsen.
-       */
+      /* Gruppe feststellen, Schnappschuesse oben verankern — sonst
+         verformt der Browser die Geometrie und es ruckt vertikal.
+         Begruendung im Frontmatter. */
       html[data-sprach-richtung]::view-transition-group(root),
       html[data-thema-wechsel]::view-transition-group(root) {
         animation: none;
