@@ -23,7 +23,13 @@ interface Props {
 
 const { pageTitle, title, description = `${SITE.name} — Webentwicklung aus ${SITE.location}.`, noindex = false, additionalSchema } = Astro.props;
 
-const fullTitle = title ?? `${pageTitle} — ${SITE.name}`;
+// Die Marke nur anhaengen, wenn sie nicht schon drinsteht. Drei
+// Journal-Beitraege tragen sie bereits im seoTitle-Feld aus Sanity, und
+// der Titel lautete dadurch live "… | Tammo Studios — Tammo Studios".
+// Die Sperre gehoert hierher und nicht in die Inhalte: ueber Sanity
+// kaeme der Fehler sonst beim naechsten Beitrag wieder.
+const fullTitle =
+  title ?? (pageTitle.includes(SITE.name) ? pageTitle : `${pageTitle} — ${SITE.name}`);
 // Default Allow: nur PUBLIC_ALLOW_INDEXING="false" rendert das
 // noindex-Meta-Tag. Dieselbe Inversion wie in src/pages/robots.txt.ts —
 // schützt gegen Env-Var-Fehlkonfiguration in Production. Plus: Pages

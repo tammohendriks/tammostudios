@@ -6,7 +6,7 @@ import SiteFooter from '../components/SiteFooter.astro';
 
 <BaseLayout
   pageTitle="Impressum"
-  description="Anbieterkennzeichnung gemäß § 5 TMG für Tammo Studios."
+  description="Anbieterkennzeichnung gemäß § 5 DDG für Tammo Studios."
 >
   <main class="legal-page">
     <SubPageBackground />
@@ -17,8 +17,17 @@ import SiteFooter from '../components/SiteFooter.astro';
 
     <article class="legal-content">
       <section>
-        <h2>Angaben gemäß § 5 TMG</h2>
+        {/* Das Telemediengesetz ist am 14. Mai 2024 vom
+            Digitale-Dienste-Gesetz abgeloest worden. Die
+            Anbieterkennzeichnung steht seitdem in § 5 DDG — inhaltlich
+            unveraendert, nur "Telemedien" heisst jetzt "digitale
+            Dienste". */}
+        <h2>Angaben gemäß § 5 DDG</h2>
+        {/* Firmierung UEBER dem Namen: der Betrieb tritt als "Tammo
+            Studios" auf, und Name und Anschrift begegneten sich bisher
+            auf keiner Seite gemeinsam. */}
         <p class="legal-address">
+          Tammo Studios<br />
           Tammo Hendriks<br />
           Eckernförder Straße 6<br />
           28219 Bremen<br />
@@ -82,10 +91,12 @@ import SiteFooter from '../components/SiteFooter.astro';
       <section>
         <h2>Haftung für Inhalte</h2>
         <p>
-          Als Diensteanbieter bin ich gemäß § 7 Abs. 1 TMG für
-          eigene Inhalte auf diesen Seiten nach den allgemeinen
-          Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG bin ich
-          als Diensteanbieter jedoch nicht verpflichtet,
+          Als Diensteanbieter bin ich für eigene Inhalte auf
+          diesen Seiten nach den allgemeinen Gesetzen
+          verantwortlich. Nach den Vorschriften des
+          Digitale-Dienste-Gesetzes zur beschränkten
+          Verantwortlichkeit bin ich als Diensteanbieter jedoch
+          nicht verpflichtet,
           übermittelte oder gespeicherte fremde Informationen zu
           überwachen oder nach Umständen zu forschen, die auf
           eine rechtswidrige Tätigkeit hinweisen. Verpflichtungen

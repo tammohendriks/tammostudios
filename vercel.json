@@ -69,6 +69,11 @@
       "statusCode": 301
     },
     {
+      "source": "/journal/recruiting-handwerk-website",
+      "destination": "/journal/recruiting-mit-website",
+      "statusCode": 301
+    },
+    {
       "source": "/en/journal",
       "destination": "/journal",
       "statusCode": 301

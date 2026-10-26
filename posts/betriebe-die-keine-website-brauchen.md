@@ -86,7 +86,7 @@ Positive Kehrseite: eine Website ist Investment wert wenn:
 - Deine Zielgruppe googlet aktiv nach dir oder deinem Angebot
 - Du willst dich professionell positionieren gegenüber größeren Wettbewerbern
 - Du willst Kontroll über dein Marketing (nicht abhängig von Plattform-Algorithmen)
-- Du willst Recruiting-Support (siehe [Handwerk-Recruiting-Artikel](/journal/recruiting-handwerk-website))
+- Du willst Recruiting-Support (siehe [Handwerk-Recruiting-Artikel](/journal/recruiting-mit-website))
 - Du willst 24/7 verfügbar sein ohne Menschen zu blockieren
 
 Wenn davon 3+ zutreffen: Website macht Sinn.
