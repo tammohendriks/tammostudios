@@ -85,15 +85,6 @@ export const de = {
     instagram: 'Instagram',
   },
 
-  kalender: {
-    label: 'Termin direkt buchen',
-    eyebrow: 'LIEBER DIREKT EINEN TERMIN?',
-    headline: '30 Min Erstgespräch buchen',
-    sub: 'Wähl dir einen Slot im Kalender, ohne den Umweg über das Formular.',
-    oeffnen: 'Termin-Kalender öffnen ↓',
-    schliessen: 'Kalender einklappen ↑',
-    laedt: 'Kalender lädt …',
-  },
 
   ablauf: {
     headline: 'Was im Erstgespräch passiert',
@@ -169,15 +160,6 @@ export const en: Shape<typeof de> = {
     instagram: 'Instagram',
   },
 
-  kalender: {
-    label: 'Book a time directly',
-    eyebrow: 'PREFER TO BOOK A TIME RIGHT AWAY?',
-    headline: 'Book a 30-minute intro call',
-    sub: 'Pick a slot in the calendar, without going through the form.',
-    oeffnen: 'Open the calendar ↓',
-    schliessen: 'Collapse the calendar ↑',
-    laedt: 'Calendar loading …',
-  },
 
   ablauf: {
     headline: 'What happens in the intro call',

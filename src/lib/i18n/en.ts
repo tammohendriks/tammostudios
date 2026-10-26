@@ -51,9 +51,8 @@ export const en: Shape<typeof de> = {
     impressum: 'Imprint (German)',
     datenschutz: 'Privacy (German)',
     datenschutzHinweis:
-      'This site sets no cookies of its own and uses no tracking ' +
-      'tools. Only anonymous server logs are evaluated. Cookies can ' +
-      'only appear if you actively open the booking calendar.',
+      'This site sets no cookies and uses no tracking tools. Only ' +
+      'anonymous server logs are evaluated.',
     datenschutzDetails: 'Details',
     socialsLabel: 'Social media',
     neuerTab: '(opens in a new tab)',

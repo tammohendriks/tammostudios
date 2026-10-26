@@ -1,8 +1,12 @@
 ---
 /**
- * Kontakt-Seite mit Kontaktformular (POST /api/kontakt via Resend) und
- * Cal.com als collapsibles Accordion. Ersetzt das direkt sichtbare
- * Cal-Widget mit einem Formular als primaerem CTA.
+ * Kontakt-Seite mit Kontaktformular (POST /api/kontakt via Resend).
+ *
+ * Hier stand mal zusaetzlich ein Cal.com-Kalender zum Buchen eines
+ * Erstgespraechs. Der ist raus: zwei Wege zum selben Ziel haben mehr
+ * verwirrt als geholfen. Damit setzt die Seite jetzt ueberhaupt keine
+ * Cookies mehr — der Datenschutz-Hinweis in der Fussleiste und
+ * Abschnitt 5 der Datenschutzerklaerung sagen das entsprechend.
  *
  * Liegt als Komponente und nicht als Seite in src/pages, weil es zwei
  * Routen darauf gibt: /kontakt und /en/contact. Markup und der
@@ -14,12 +18,7 @@
  *   1. Hero — Headline + Einladung
  *   2. Kontaktformular (NEU, primaer)
  *   3. Alternative Kontakte — Telefon/Email/Instagram-Cards
- *   4. Cal.com Accordion (NEU — collapsed by default, lazy-loaded)
- *   5. Was im Erstgespraech passiert — 4-Schritte Prep-Info
- *
- * Wichtig: Cal-Init-Script laedt jetzt LAZY nach User-Klick statt on
- * page load. Spart ~120KB embed.js + iframe cost fuer alle User die
- * das Formular nutzen (Mehrheit erwartet).
+ *   4. Was im Erstgespraech passiert — 4-Schritte Prep-Info
  */
 
 import BaseLayout from '../layouts/BaseLayout.astro';
@@ -33,11 +32,6 @@ import type { Gleichlang } from '../lib/i18n/shape';
 const locale = localeOf(Astro.url.pathname);
 const k = KONTAKT[locale];
 
-// Die Terminbuchung steht nur auf der deutschen Seite. Auf der
-// englischen fuehrt der Weg ueber das Formular; die Texte dafuer
-// bleiben trotzdem im Woerterbuch, damit beide Sprachfassungen
-// dieselbe Struktur haben.
-const zeigeKalender = locale === 'de';
 
 // Diese Werte gehen so an die API und werden dort gegen ein Enum
 // geprueft — sie sind sprachunabhaengig. Uebersetzt wird nur die
@@ -78,15 +72,6 @@ const skriptTexteJson = JSON.stringify(skriptTexte).replace(/</g, '\\u003c');
   title={k.meta.title}
   description={k.meta.description}
 >
-  <!-- KEINE Preconnects auf Cal.com.
-       Sie starteten DNS + TLS schon beim Parsen der Seite, also bevor
-       jemand das Accordion oeffnet. Damit ging die IP jedes Besuchers
-       ohne Einwilligung an Cal.com in die USA — waehrend die
-       Datenschutzerklaerung sagte, es werde nichts von Dritten geladen.
-       embed.js wird ohnehin erst im Klick-Handler nachgeladen
-       (loadCal, weiter unten); die Preconnects sparten nur einen
-       Handshake und haben das nicht wert. -->
-
   <main class="kontakt-page">
     <SubPageBackground />
 
@@ -278,45 +263,6 @@ const skriptTexteJson = JSON.stringify(skriptTexte).replace(/</g, '\\u003c');
     </section>
 
     <!-- ================================================================
-         Cal.com Accordion — lazy-loaded on first open.
-         Nur deutsch, siehe zeigeKalender im Frontmatter. Das Skript
-         weiter unten haengt an #cal-toggle und laeuft ohne den
-         Abschnitt einfach nicht.
-         ============================================================== -->
-    {zeigeKalender && (
-    <section class="kontakt-cal-accordion" data-reveal aria-label={k.kalender.label}>
-      <div class="cal-accordion-header">
-        <p class="cal-accordion-eyebrow">{k.kalender.eyebrow}</p>
-        <h2 class="cal-accordion-headline">{k.kalender.headline}</h2>
-        <p class="cal-accordion-sub">{k.kalender.sub}</p>
-        <button
-          type="button"
-          class="cal-accordion-toggle"
-          id="cal-toggle"
-          aria-expanded="false"
-          aria-controls="cal-panel"
-        >
-          <span class="cal-toggle-open">{k.kalender.oeffnen}</span>
-          <span class="cal-toggle-close">{k.kalender.schliessen}</span>
-        </button>
-      </div>
-
-      <div class="cal-accordion-panel" id="cal-panel" hidden>
-        <div id="my-cal-inline-erstgespraech" class="cal-embed" aria-busy="true">
-          <div class="cal-loading">
-            <div class="cal-loading-dots">
-              <span class="cal-loading-dot"></span>
-              <span class="cal-loading-dot"></span>
-              <span class="cal-loading-dot"></span>
-            </div>
-            <p class="cal-loading-text">{k.kalender.laedt}</p>
-          </div>
-        </div>
-      </div>
-    </section>
-    )}
-
-    <!-- ================================================================
          Was im Erstgespraech passiert — Prep-Info
          ============================================================== -->
     <section class="kontakt-prep">
@@ -485,117 +431,6 @@ const skriptTexteJson = JSON.stringify(skriptTexte).replace(/</g, '\\u003c');
       setStatus(texte.fehler, 'error');
       submitBtn.disabled = false;
       submitLabel.textContent = knopfBeschriftung;
-    }
-  });
-</script>
-
-<!-- ==================================================================
-     CAL.COM ACCORDION — Lazy-Load auf ersten Klick
-     Cal.com embed.js + iframe werden ERST geladen wenn User das
-     Accordion oeffnet. Spart ~120KB fuer alle User die das Formular
-     nutzen. Nach erstem Load bleibt das Widget aktiv (nicht re-init'd
-     beim erneuten Aufklappen — Cal handled Session-State intern).
-     ================================================================== -->
-<script>
-  // Auf der englischen Seite gibt es das Accordion nicht (siehe
-  // zeigeKalender im Frontmatter). Das Skript wird trotzdem
-  // ausgeliefert, weil Astro es pro Komponente buendelt und beide
-  // Routen dieselbe Komponente sind. Ohne den Knopf tut es nichts, aber
-  // der fruehe Ausstieg macht das ausdruecklich statt es dem Zufall der
-  // Optional-Chaining-Operatoren weiter unten zu ueberlassen.
-  const toggleBtn = document.getElementById('cal-toggle') as HTMLButtonElement | null;
-  const panelEl = document.getElementById('cal-panel') as HTMLElement | null;
-  let calLoaded = false;
-
-  const loadCal = () => {
-    if (calLoaded) return;
-    calLoaded = true;
-
-    // Cal.com Init-Snippet — original vom User geliefert. Baut window.Cal
-    // Queue auf, injiziert embed.js, initialisiert Namespace + Inline-Embed.
-    // Muss ohne is:inline-Modifier laufen weil hier bereits in <script>
-    // Astro-scope. IIFE bleibt selbstaendig.
-    (function (C: any, A: string, L: string) {
-      let p = function (a: any, ar: any) { a.q.push(ar); };
-      let d = C.document;
-      C.Cal = C.Cal || function () {
-        let cal = C.Cal;
-        let ar = arguments as any;
-        if (!cal.loaded) {
-          cal.ns = {};
-          cal.q = cal.q || [];
-          d.head.appendChild(d.createElement('script')).src = A;
-          cal.loaded = true;
-        }
-        if (ar[0] === L) {
-          const api: any = function () { p(api, arguments); };
-          const namespace = ar[1];
-          api.q = api.q || [];
-          if (typeof namespace === 'string') {
-            cal.ns[namespace] = cal.ns[namespace] || api;
-            p(cal.ns[namespace], ar);
-            p(cal, ['initNamespace', namespace]);
-          } else {
-            p(cal, ar);
-          }
-          return;
-        }
-        p(cal, ar);
-      };
-    })(window as any, 'https://app.cal.com/embed/embed.js', 'init');
-
-    const CalRef = (window as any).Cal;
-    CalRef('init', 'erstgespraech', { origin: 'https://app.cal.com' });
-    CalRef.config = CalRef.config || {};
-    CalRef.config.forwardQueryParams = true;
-
-    CalRef.ns.erstgespraech('inline', {
-      elementOrSelector: '#my-cal-inline-erstgespraech',
-      config: { layout: 'month_view', useSlotsViewOnSmallScreen: 'true', theme: 'auto' },
-      calLink: 'tammo.studios/erstgespraech',
-    });
-
-    CalRef.ns.erstgespraech('ui', {
-      cssVarsPerTheme: {
-        light: { 'cal-brand': '#f59e0b' },
-        dark: { 'cal-brand': '#f59e0b' },
-      },
-      hideEventTypeDetails: false,
-      layout: 'month_view',
-    });
-
-    // Loading-Skeleton verstecken sobald iframe erscheint
-    const target = document.getElementById('my-cal-inline-erstgespraech');
-    if (target) {
-      const hideLoading = () => {
-        target.setAttribute('aria-busy', 'false');
-        const loading = target.querySelector('.cal-loading') as HTMLElement | null;
-        if (loading) loading.style.display = 'none';
-      };
-      const check = () => {
-        const iframe = target.querySelector('iframe');
-        if (!iframe) return;
-        if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete') {
-          hideLoading();
-        } else {
-          iframe.addEventListener('load', hideLoading, { once: true });
-        }
-      };
-      setTimeout(check, 800);
-      setTimeout(check, 2500);
-    }
-  };
-
-  toggleBtn?.addEventListener('click', () => {
-    if (!panelEl || !toggleBtn) return;
-    const expanded = toggleBtn.getAttribute('aria-expanded') === 'true';
-    if (expanded) {
-      panelEl.hidden = true;
-      toggleBtn.setAttribute('aria-expanded', 'false');
-    } else {
-      panelEl.hidden = false;
-      toggleBtn.setAttribute('aria-expanded', 'true');
-      loadCal();
     }
   });
 </script>
@@ -986,146 +821,6 @@ const skriptTexteJson = JSON.stringify(skriptTexte).replace(/</g, '\\u003c');
     color: #f5f5f4;
   }
 
-  /* === Cal-Accordion === */
-  .kontakt-cal-accordion {
-    margin-bottom: 64px;
-    padding: 32px;
-    background: rgba(15, 15, 18, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 14px;
-  }
-
-  @media (max-width: 640px) {
-    .kontakt-cal-accordion {
-      padding: 24px 20px;
-    }
-  }
-
-  .cal-accordion-header {
-    text-align: center;
-  }
-
-  .cal-accordion-eyebrow {
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-weight: 500;
-    font-size: 0.75rem;
-    letter-spacing: 0.28em;
-    color: rgba(245, 158, 11, 0.85);
-    text-transform: uppercase;
-    margin: 0 0 12px;
-  }
-
-  .cal-accordion-headline {
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-weight: 700;
-    font-size: clamp(1.35rem, 2.4vw, 1.75rem);
-    line-height: 1.2;
-    color: #f5f5f4;
-    margin: 0 0 12px;
-  }
-
-  .cal-accordion-sub {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.98rem;
-    line-height: 1.5;
-    color: rgba(245, 245, 244, 0.7);
-    margin: 0 0 24px;
-    max-width: 480px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .cal-accordion-toggle {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px 24px;
-    background: transparent;
-    color: rgba(245, 158, 11, 0.95);
-    border: 1px solid rgba(245, 158, 11, 0.4);
-    border-radius: 999px;
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-size: 0.95rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 200ms ease, border-color 200ms ease, color 200ms ease;
-  }
-
-  .cal-accordion-toggle:hover {
-    background: rgba(245, 158, 11, 0.08);
-    border-color: rgba(245, 158, 11, 0.7);
-    color: rgba(252, 211, 77, 1);
-  }
-
-  .cal-accordion-toggle:focus-visible {
-    outline: 2px solid rgba(245, 158, 11, 0.7);
-    outline-offset: 3px;
-  }
-
-  .cal-toggle-close { display: none; }
-  .cal-accordion-toggle[aria-expanded='true'] .cal-toggle-open { display: none; }
-  .cal-accordion-toggle[aria-expanded='true'] .cal-toggle-close { display: inline; }
-
-  .cal-accordion-panel {
-    margin-top: 24px;
-    padding-top: 24px;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
-  }
-
-  .cal-embed {
-    position: relative;
-    width: 100%;
-    min-height: 640px;
-    height: 100%;
-  }
-
-  .cal-loading {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    z-index: 0;
-    pointer-events: none;
-  }
-
-  .cal-loading-dots {
-    display: flex;
-    gap: 8px;
-  }
-
-  .cal-loading-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: rgba(245, 158, 11, 0.6);
-    animation: cal-loading-pulse 1.4s ease-in-out infinite;
-  }
-
-  .cal-loading-dot:nth-child(2) { animation-delay: 0.2s; }
-  .cal-loading-dot:nth-child(3) { animation-delay: 0.4s; }
-
-  .cal-loading-text {
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-size: 0.82rem;
-    font-weight: 500;
-    letter-spacing: 0.05em;
-    color: rgba(245, 245, 244, 0.5);
-    margin: 0;
-  }
-
-  @keyframes cal-loading-pulse {
-    0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
-    40% { opacity: 1; transform: scale(1.2); }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .cal-loading-dot { animation: none; opacity: 0.6; }
-  }
-
   /* === Prep-Info === */
   .kontakt-prep {
     text-align: center;
@@ -1214,9 +909,7 @@ const skriptTexteJson = JSON.stringify(skriptTexte).replace(/</g, '\\u003c');
     .kontakt-hero { margin-bottom: 48px; }
     .kontakt-form-section { margin-bottom: 56px; }
     .kontakt-alternatives { margin-bottom: 48px; }
-    .kontakt-cal-accordion { margin-bottom: 48px; }
     .contact-card { padding: 22px 18px 20px; }
     .prep-list li { padding: 14px 16px; gap: 14px; }
-    .cal-embed { min-height: 560px; }
   }
 </style>

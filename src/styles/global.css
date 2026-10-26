@@ -213,7 +213,6 @@ html[data-site-theme='light'] .showcase-summary,
 html[data-site-theme='light'] .shot-wrap,
 html[data-site-theme='light'] .ref-card,
 html[data-site-theme='light'] .kontakt-form-section,
-html[data-site-theme='light'] .kontakt-cal-accordion,
 html[data-site-theme='light'] .contact-card,
 html[data-site-theme='light'] .prep-list li,
 html[data-site-theme='light'] .featured-post,
@@ -378,17 +377,6 @@ html[data-site-theme='light'] .form-success-body {
   color: var(--theme-text-dim) !important;
 }
 
-/* .kontakt-cal-accordion — Header-Text auf light theme */
-html[data-site-theme='light'] .kontakt-cal-accordion .cal-accordion-headline {
-  color: var(--theme-text-strong) !important;
-}
-html[data-site-theme='light'] .kontakt-cal-accordion .cal-accordion-sub {
-  color: var(--theme-text-dim) !important;
-}
-html[data-site-theme='light'] .kontakt-cal-accordion .cal-accordion-panel {
-  border-top-color: rgba(0, 0, 0, 0.08) !important;
-}
-
 /* /impressum + /datenschutz Hero-Title
    "Datenschutzerklaerung" ist 20 Zeichen — bei clamp(48,8vw,96) auf
    Desktop ~1000px breit, sprengt .legal-hero max-width:720 → Overflow
@@ -519,11 +507,6 @@ html[data-site-theme='light'] .ref-card .ref-card-title {
 }
 html[data-site-theme='light'] .ref-card .ref-card-subtitle {
   color: var(--theme-text-dim) !important;
-}
-
-/* .kontakt-cal (kontakt) */
-html[data-site-theme='light'] .kontakt-cal .cal-loading-text {
-  color: var(--theme-text-muted) !important;
 }
 
 /* .contact-card (kontakt) */

@@ -53,14 +53,13 @@ export const de = {
     copyright: '© 2026 Tammo Studios',
     impressum: 'Impressum',
     datenschutz: 'Datenschutz',
-    // Der Datenschutz-Kurzhinweis. Die Cal.com-Einschränkung muss
-    // erhalten bleiben: ohne sie wäre der Satz nachweislich falsch,
-    // sobald jemand den Kalender öffnet.
+    // Der Datenschutz-Kurzhinweis. Der Satz nannte früher eine
+    // Ausnahme für die Terminbuchung — die gibt es nicht mehr, seit der
+    // Kalender von der Kontaktseite weg ist. Damit stimmt jetzt die
+    // kurze, starke Fassung: keine Cookies, Punkt.
     datenschutzHinweis:
-      'Diese Website setzt von sich aus keine Cookies und nutzt keine ' +
-      'Tracking-Tools. Ausgewertet werden nur anonyme Server-Logs. ' +
-      'Cookies können nur entstehen, wenn du die Terminbuchung aktiv ' +
-      'öffnest.',
+      'Diese Website setzt keine Cookies und nutzt keine ' +
+      'Tracking-Tools. Ausgewertet werden nur anonyme Server-Logs.',
     datenschutzDetails: 'Details',
     socialsLabel: 'Social Media',
     // Wird dem Namen und dem Konto nachgestellt:
