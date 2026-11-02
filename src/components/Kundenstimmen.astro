@@ -1,0 +1,206 @@
+---
+/**
+ * Drei echte Kundenstimmen, Reihenfolge nach Branche.
+ *
+ * Steht auf den Branchen-Landingpages zwischen FAQ und Abschluss: nach
+ * allen Argumenten, vor der Aufforderung. Wer bis hierhin gelesen hat,
+ * weiß was es kostet und wie es abläuft — was fehlt, ist jemand
+ * anderes, der es schon gemacht hat.
+ *
+ * Die Breite steht hier und nicht in der Elternseite: deren Regel
+ * `.vertical-page > *:not(:first-child)` ist auf die Komponenten-
+ * Kennung der Elternseite gebunden und greift bei einer eigenen
+ * Komponente nicht (nachgemessen im gebauten CSS). Dasselbe macht
+ * ClosingCta.astro, aus demselben Grund.
+ *
+ * Kein helles Thema: auf /webdesign-* setzt BaseLayout data-no-theme,
+ * der Umschalter erscheint dort gar nicht.
+ */
+import { localeOf } from '../lib/routes.mjs';
+import { SKIZZE } from '../lib/i18n/seiten/skizze';
+import { testimonialsFuer, type TestimonialBranche } from '../lib/testimonials';
+
+interface Props {
+  branche: TestimonialBranche;
+}
+
+const { branche } = Astro.props;
+const locale = localeOf(Astro.url.pathname);
+const s = SKIZZE[locale as 'de' | 'en'];
+const stimmen = testimonialsFuer(branche);
+---
+
+<section class="ks" data-reveal aria-labelledby="ks-titel">
+  <p class="ks-eyebrow">{s.stimmen.titel}</p>
+  <h2 class="ks-headline" id="ks-titel">{s.stimmen.unter}</h2>
+
+  <ul class="ks-raster">
+    {stimmen.map((stimme) => (
+      <li class="ks-karte">
+        {/* Fuenf gemalte Sterne sind fuer ein Vorleseprogramm fuenf
+            bedeutungslose Zeichen — deshalb der Text daneben, und die
+            Sterne selbst aria-hidden. */}
+        <p class="ks-sterne" aria-hidden="true">★★★★★</p>
+        <span class="ks-sterne-text">{s.stimmen.sterne}</span>
+        <blockquote class="ks-zitat">{stimme.zitat}</blockquote>
+        <figcaption class="ks-autor">
+          <span class="ks-initialen" aria-hidden="true">{stimme.initialen}</span>
+          <span class="ks-autor-text">
+            <strong>{stimme.autor}</strong>
+            <span>{stimme.betrieb}</span>
+          </span>
+        </figcaption>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .ks {
+    position: relative;
+    z-index: 1;
+    max-width: 880px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 96px;
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+
+  .ks-eyebrow {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(245, 158, 11, 0.85);
+    margin: 0 0 18px;
+  }
+  .ks-headline {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.6rem, 2.6vw, 2.1rem);
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    color: #f5f5f4;
+    margin: 0 0 32px;
+  }
+
+  .ks-raster {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    /* stretch, damit die drei Karten gleich hoch sind. Die
+       Autorenzeile haengt per margin-top:auto unten fest, sonst
+       klebte sie bei kurzen Zitaten mitten in der Karte. */
+    align-items: stretch;
+  }
+
+  .ks-karte {
+    display: flex;
+    flex-direction: column;
+    padding: 22px 20px 20px;
+    border: 1px solid rgba(245, 245, 244, 0.1);
+    border-radius: 14px;
+    background: rgba(245, 245, 244, 0.03);
+    transition: border-color 220ms ease, background 220ms ease, transform 220ms ease;
+  }
+  .ks-karte:hover {
+    border-color: rgba(245, 158, 11, 0.45);
+    background: rgba(245, 158, 11, 0.04);
+    transform: translateY(-2px);
+  }
+
+  .ks-sterne {
+    margin: 0 0 14px;
+    font-size: 0.92rem;
+    letter-spacing: 0.14em;
+    color: rgba(245, 158, 11, 0.95);
+  }
+  /* Nur fuer Vorleseprogramme. clip-path statt display:none, sonst
+     faellt der Satz auch dort heraus. */
+  .ks-sterne-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .ks-zitat {
+    margin: 0 0 20px;
+    /* Echter Kursiv-Schnitt, deklariert in styles/fonts.css. Die Datei
+       lag laengst unter public/fonts und war nur nie angemeldet —
+       ohne sie schraegt der Browser den Fettschnitt, und das sieht
+       man. */
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-style: italic;
+    font-size: 0.98rem;
+    line-height: 1.55;
+    color: rgba(245, 245, 244, 0.88);
+  }
+
+  .ks-autor {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: auto;
+    padding-top: 16px;
+    /* Feste Mindesthoehe, damit die Trennlinien der drei Karten auf
+       einer Linie sitzen. Ohne sie richtet sich jede nach ihrem
+       eigenen Namensblock, und „Institut fuer Betriebsmedizin
+       Isernhagen" laeuft ueber drei Zeilen — die Linie saesse dort
+       28 px hoeher als nebenan. 90 px sind gemessen, nicht geraten:
+       der laengste Block braucht 89. */
+    min-height: 90px;
+    border-top: 1px solid rgba(245, 245, 244, 0.08);
+  }
+  .ks-initialen {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.9), rgba(217, 119, 6, 0.75));
+    color: #141414;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .ks-autor-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+    line-height: 1.35;
+  }
+  .ks-autor-text strong {
+    font-weight: 600;
+    color: rgba(245, 245, 244, 0.92);
+  }
+  .ks-autor-text span { color: rgba(245, 245, 244, 0.5); }
+
+  @media (max-width: 860px) {
+    /* Drei Spalten waeren hier drei Streifen von je 100 px. */
+    .ks-raster { grid-template-columns: 1fr; gap: 14px; }
+  }
+  @media (max-width: 768px) {
+    .ks {
+      padding-left: 20px;
+      padding-right: 20px;
+      margin-bottom: 72px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ks-karte { transition: none; }
+    .ks-karte:hover { transform: none; }
+  }
+</style>
