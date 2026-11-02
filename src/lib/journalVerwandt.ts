@@ -26,7 +26,7 @@
  * ohne dass irgendwo eine Liste auszunehmender Tags gepflegt werden
  * muss.
  */
-import { normalisieren } from './journalSuche';
+import { normalisieren } from './journalSuche.ts';
 
 /** Ein Beitrag, wie ihn die Berechnung braucht. */
 export type VerwandtEingabe = {

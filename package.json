@@ -13,7 +13,8 @@
     "astro": "astro",
     "sanity": "sanity",
     "sanity:deploy": "sanity deploy",
-    "publish-post": "node --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/publish-post.mjs"
+    "publish-post": "node --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/publish-post.mjs",
+    "querverweise": "node --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/querverweise.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^6.0.2",
