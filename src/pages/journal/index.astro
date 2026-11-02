@@ -109,12 +109,16 @@ const TAG_FILTERS = ['Alle', ...TAG_REIHENFOLGE];
             <circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.6" />
             <line x1="12.8" y1="12.8" x2="17" y2="17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
           </svg>
+          {/* Platzhalter kurz genug fuers Handy: bei 390 px Breite hat
+              das Feld rund 32 Zeichen Platz, laengeres schneidet ab.
+              „Zahnarzt" steht da mit Absicht — es zeigt, dass die Suche
+              Kundenwoerter auf Tammos Woerter uebersetzt. */}
           <input
             type="search"
             id="journal-suche"
             name="q"
             class="journal-suche-eingabe"
-            placeholder="z.B. Bearbeitungssystem, Preise, DSGVO"
+            placeholder="z.B. Preise, DSGVO, Zahnarzt"
             autocomplete="off"
             enterkeyhint="search"
           />
@@ -286,7 +290,8 @@ const TAG_FILTERS = ['Alle', ...TAG_REIHENFOLGE];
     // Ohne Anfrage oder ohne Index wird nicht gesucht, nur nach Tag
     // gefiltert. Das ist der Zustand, solange der Index noch laedt —
     // und der Zustand fuer immer, falls er nicht ankommt.
-    const treffer = anfrage && index ? suchen(index, anfrage) : null;
+    const ergebnis = anfrage && index ? suchen(index, anfrage) : null;
+    const treffer = ergebnis?.slugs ?? null;
 
     let sichtbar = 0;
     cards.forEach((card) => {
@@ -306,6 +311,13 @@ const TAG_FILTERS = ['Alle', ...TAG_REIHENFOLGE];
         statusEl.textContent = '';
       } else if (!index) {
         statusEl.textContent = 'Suche wird geladen …';
+      } else if (ergebnis && !ergebnis.eingrenzend) {
+        // Sonst sieht der ganze Bestand aus wie ein Treffer-Haufen und
+        // der Besucher haelt die Suche fuer kaputt.
+        statusEl.textContent =
+          anfrage.includes(' ')
+            ? 'Diese Wörter stehen in allen Beiträgen — probier etwas Genaueres.'
+            : `„${anfrage}“ steht in allen Beiträgen — probier etwas Genaueres.`;
       } else if (sichtbar === 0) {
         // Kurz, weil das Feld unten den ganzen Satz samt Zurücksetzen
         // zeigt. Zweimal dasselbe wäre doppelt — aber ganz zu schweigen
@@ -642,6 +654,21 @@ const TAG_FILTERS = ['Alle', ...TAG_REIHENFOLGE];
   @media (max-width: 768px) {
     .journal-suche {
       margin-bottom: 22px;
+    }
+  }
+  /* Auf den schmalsten Geraeten (iPhone SE, 320 px) blieb vom
+     Platzhalter 1 px Spielraum — gemessen, nicht geschaetzt. Statt den
+     Text zu kuerzen lieber das Feld enger fassen: die Schriftgroesse
+     muss bei 16px bleiben, sonst zoomt iOS Safari beim Antippen hinein.
+     Das bringt 14 px und gilt nur dort, wo es gebraucht wird. */
+  @media (max-width: 360px) {
+    .journal-suche-feld {
+      padding: 0 10px;
+      gap: 8px;
+    }
+    .journal-suche-lupe {
+      width: 16px;
+      height: 16px;
     }
     .journal-filters {
       margin-left: -20px;

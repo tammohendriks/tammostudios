@@ -161,25 +161,53 @@ export type Indexeintrag = {
 const TEILWORT_AB = 4;
 
 /**
- * Wie oft kommt das Wort vor — ganzes Wort bei kurzen, Teilkette bei
- * langen Suchwörtern (siehe TEILWORT_AB).
+ * Was ein Treffer mitten im Wort zählt, verglichen mit einem am
+ * Wortanfang.
+ *
+ * Der Grund ist das deutsche Du: Tammo schreibt „solltest",
+ * „anbietest", „arbeitest", „beantwortest", „wartest" — und in jedem
+ * dieser Wörter steckt „test". Gemessen traf die Suche nach „test"
+ * damit 10 von 20 Beiträgen, obwohl nur vier das Wort wirklich
+ * benutzen. Dasselbe gilt für jede Endung auf -est und -test.
+ *
+ * Ganz verwerfen darf man Treffer im Wortinneren aber nicht, sonst
+ * findet „formular" kein „Kontaktformular" und „zeit" keine
+ * „Ladezeit" — im Deutschen steht das gesuchte Wort oft hinten im
+ * Kompositum. Also zählen sie, nur schwächer.
+ *
+ * Bei einer Anfrage aus einem einzigen Wort ändert der Faktor nichts:
+ * trifft es überall nur im Wortinneren, werden alle Beiträge gleich
+ * skaliert, und die Schwelle unten ist ein Verhältnis. Er wirkt genau
+ * da, wo er soll — wenn echte Treffer gegen Endungs-Zufall antreten.
+ */
+const MITTENWORT = 0.2;
+
+/**
+ * Wie oft kommt das Wort vor — ganzes Wort bei kurzen Suchwörtern, bei
+ * langen auch als Wortanfang (voll) und im Wortinneren (schwächer,
+ * siehe MITTENWORT). Das Ergebnis ist deshalb keine ganze Zahl.
  */
 const zaehlen = (heu: string, nadel: string): number => {
   if (!nadel) return 0;
-  if (nadel.length >= TEILWORT_AB) {
-    let n = 0;
-    let i = heu.indexOf(nadel);
-    while (i !== -1) {
-      n += 1;
-      i = heu.indexOf(nadel, i + nadel.length);
+  // Der Text ist normalisiert: Wörter sind durch einzelne Leerzeichen
+  // getrennt, Wortgrenzen also schlicht die Leerzeichen.
+  let summe = 0;
+  for (const wort of heu.split(' ')) {
+    if (nadel.length < TEILWORT_AB) {
+      if (wort === nadel) summe += 1;
+      continue;
     }
-    return n;
+    if (wort.startsWith(nadel)) {
+      summe += 1;
+      continue;
+    }
+    let i = wort.indexOf(nadel, 1);
+    while (i !== -1) {
+      summe += MITTENWORT;
+      i = wort.indexOf(nadel, i + nadel.length);
+    }
   }
-  // Der Text ist normalisiert, Wörter sind durch einzelne Leerzeichen
-  // getrennt — Wortgrenzen sind also Leerzeichen oder Textanfang/-ende.
-  let n = 0;
-  for (const _ of heu.split(' ')) if (_ === nadel) n += 1;
-  return n;
+  return summe;
 };
 
 /** Treffer eines Suchworts in einem Beitrag, nach Fundort getrennt. */
@@ -246,6 +274,22 @@ export const punkte = (
  */
 export const ANTEIL = 0.25;
 
+/** Das Ergebnis einer Suche. */
+export type Suchergebnis = {
+  /** Die Beiträge, die bleiben. */
+  slugs: Set<string>;
+  /**
+   * Hat die Anfrage überhaupt etwas eingegrenzt?
+   *
+   * Falsch heißt: jedes eingegebene Wort steht in jedem Beitrag, es gab
+   * also nichts zu filtern. „was", „mehr" und „zeit" sind solche Wörter
+   * — alle drei kommen in allen 20 Beiträgen vor. Ohne diese
+   * Unterscheidung zeigt die Suche dann kommentarlos den ganzen Bestand
+   * und sieht aus, als sei sie kaputt.
+   */
+  eingrenzend: boolean;
+};
+
 /**
  * Welche Beiträge passen zur Anfrage?
  *
@@ -266,20 +310,21 @@ export const ANTEIL = 0.25;
 export const suchen = (
   index: Readonly<Record<string, Indexeintrag>>,
   eingabe: string
-): Set<string> => {
+): Suchergebnis => {
   const alle = new Set(Object.keys(index));
   const woerter = anfrageZerlegen(eingabe);
-  if (!woerter.length) return alle;
+  if (!woerter.length) return { slugs: alle, eingrenzend: true };
 
   const gewichtet: { wort: Suchwort; gewicht: number }[] = [];
   for (const wort of woerter) {
     const g = gewicht(index, wort);
-    if (g < 0) return new Set(); // ein Wort kommt nirgends vor
+    if (g < 0) return { slugs: new Set(), eingrenzend: true }; // Wort kommt nirgends vor
     if (g > 0) gewichtet.push({ wort, gewicht: g });
   }
   // Nur Wörter, die überall stehen: „website" auf einem Website-Blog.
-  // Dann ist jeder Beitrag eine ehrliche Antwort.
-  if (!gewichtet.length) return alle;
+  // Jeder Beitrag ist dann eine ehrliche Antwort — aber der Besucher
+  // soll erfahren, dass nicht gefiltert wurde.
+  if (!gewichtet.length) return { slugs: alle, eingrenzend: false };
 
   const bewertet: [string, number][] = [];
   for (const [slug, eintrag] of Object.entries(index)) {
@@ -297,8 +342,11 @@ export const suchen = (
     }
     if (alleDa && handeltDavon) bewertet.push([slug, summe]);
   }
-  if (!bewertet.length) return new Set();
+  if (!bewertet.length) return { slugs: new Set(), eingrenzend: true };
 
   const beste = Math.max(...bewertet.map(([, p]) => p));
-  return new Set(bewertet.filter(([, p]) => p >= beste * ANTEIL).map(([slug]) => slug));
+  return {
+    slugs: new Set(bewertet.filter(([, p]) => p >= beste * ANTEIL).map(([slug]) => slug)),
+    eingrenzend: true,
+  };
 };
