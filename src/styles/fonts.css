@@ -32,3 +32,18 @@
   font-style: italic;
   font-display: optional;
 }
+
+/* Echter Kursiv-Schnitt fuer Zitate (Kundenstimmen auf den
+   Branchen-Seiten). Die Datei liegt laengst unter public/fonts und
+   wurde nur nie deklariert — ohne diese Regel synthetisiert der
+   Browser aus dem Bold-Schnitt eine schiefgestellte Fettschrift, und
+   das sieht man. Kein neues Asset, keine Fremdschrift. */
+@font-face {
+  font-family: 'Neue Montreal';
+  src:
+    url('/fonts/montreal/NeueMontreal-Italic.woff2') format('woff2'),
+    url('/fonts/montreal/NeueMontreal-Italic.woff') format('woff');
+  font-weight: 400;
+  font-style: italic;
+  font-display: optional;
+}
