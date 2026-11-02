@@ -22,20 +22,48 @@ import SiteFooter from '../../components/SiteFooter.astro';
 import {
   getJournalPosts,
   getJournalPost,
+  getJournalSuchtexte,
   urlFor,
   formatJournalDate,
   countWords,
   extractToc,
   type JournalPost,
+  type JournalPostSummary,
 } from '../../lib/sanity';
+import { verwandteBerechnen } from '../../lib/journalVerwandt';
 import { renderPortableText } from '../../lib/portableText';
 import { SITE } from '../../lib/constants';
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const posts = await getJournalPosts();
-  return posts.map((p) => ({ params: { slug: p.slug } }));
+
+  // Die Aehnlichkeit aller gegen alle wird hier EINMAL gerechnet und als
+  // Prop weitergereicht. Im Seitenrumpf stuende dieselbe Rechnung
+  // zwanzigmal — einmal je Beitrag, jedesmal ueber den ganzen Bestand.
+  const suchtexte = await getJournalSuchtexte();
+  const karte = verwandteBerechnen(
+    suchtexte.map((b) => ({
+      slug: b.slug,
+      title: b.title,
+      excerpt: b.excerpt,
+      tags: b.tags ?? [],
+      volltext: b.volltext ?? '',
+    })),
+    3
+  );
+  const nachSlug = new Map(posts.map((p) => [p.slug, p]));
+
+  return posts.map((p) => ({
+    params: { slug: p.slug },
+    props: {
+      verwandte: (karte[p.slug] ?? [])
+        .map((s) => nachSlug.get(s))
+        .filter((x): x is JournalPostSummary => Boolean(x)),
+    },
+  }));
 };
 
+const { verwandte } = Astro.props as { verwandte: JournalPostSummary[] };
 const { slug } = Astro.params;
 const post: JournalPost | null = slug ? await getJournalPost(slug) : null;
 
@@ -179,6 +207,35 @@ const articleSchema = {
         </aside>
       </div>
     </div>
+
+    {verwandte.length > 0 && (
+      <section class="post-weiter" aria-labelledby="post-weiter-titel">
+        <div class="post-weiter-inner">
+          <h2 class="post-weiter-titel" id="post-weiter-titel">Weiterlesen</h2>
+          <ul class="post-weiter-liste">
+            {verwandte.map((v) => (
+              <li class="post-weiter-karte">
+                <a href={`/journal/${v.slug}`}>
+                  <span class="post-weiter-bild">
+                    <img
+                      src={urlFor(v.coverImage).width(480).height(320).fit('crop').auto('format').url()}
+                      alt=""
+                      loading="lazy"
+                      width="480"
+                      height="320"
+                    />
+                  </span>
+                  {v.tags && v.tags[0] && (
+                    <span class="post-weiter-tag">{v.tags[0]}</span>
+                  )}
+                  <span class="post-weiter-karten-titel">{v.title}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )}
 
     <section class="post-bottom-cta">
       <div class="bottom-cta-inner">
@@ -625,6 +682,123 @@ const articleSchema = {
      Editorial-Style inline-Link statt Amber-Pill-Button — matcht
      Preisrechner-Bottom-CTA. Ruhiger, textueller Abschluss statt
      visuell dominanter Call-to-Action Balken. */
+  /* === Weiterlesen ===
+     Steht VOR dem Kauf-Block, nicht dahinter. Wer unten ankommt, hat
+     den Beitrag gelesen und ist nicht automatisch kaufbereit — der
+     naechste Beitrag ist fuer die meisten der ehrlichere naechste
+     Schritt, und er soll zuerst kommen. */
+  .post-weiter {
+    padding: 72px 40px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    margin-top: 40px;
+  }
+  .post-weiter-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .post-weiter-titel {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(245, 245, 244, 0.45);
+    margin: 0 0 24px;
+  }
+  .post-weiter-liste {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .post-weiter-karte a {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+  }
+  .post-weiter-bild {
+    display: block;
+    overflow: hidden;
+    border-radius: 10px;
+    aspect-ratio: 3 / 2;
+    background: rgba(245, 245, 244, 0.05);
+  }
+  .post-weiter-bild img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 400ms ease;
+  }
+  .post-weiter-karte a:hover .post-weiter-bild img {
+    transform: scale(1.04);
+  }
+  /* Wer die Bewegung abbestellt hat, bekommt keine. */
+  @media (prefers-reduced-motion: reduce) {
+    .post-weiter-bild img,
+    .post-weiter-karte a:hover .post-weiter-bild img {
+      transition: none;
+      transform: none;
+    }
+  }
+  .post-weiter-tag {
+    display: inline-block;
+    margin: 14px 0 6px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(245, 158, 11, 0.9);
+  }
+  .post-weiter-karten-titel {
+    display: block;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 1.02rem;
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    color: rgba(245, 245, 244, 0.92);
+    transition: color 200ms ease;
+  }
+  .post-weiter-karte a:hover .post-weiter-karten-titel {
+    color: rgba(245, 158, 11, 0.95);
+  }
+  @media (max-width: 860px) {
+    .post-weiter {
+      padding: 56px 20px 0;
+    }
+    /* Nebeneinander waeren die Karten auf dem Handy drei schmale
+       Streifen. Untereinander bleibt das Bild lesbar gross. */
+    .post-weiter-liste {
+      grid-template-columns: 1fr;
+      gap: 28px;
+    }
+  }
+  /* Der Trennstrich gehoert jetzt ueber das Weiterlesen, nicht noch
+     einmal ueber den Kauf-Block — zwei Striche hintereinander
+     zerschneiden die Seite. */
+  .post-weiter + .post-bottom-cta {
+    border-top: 0;
+    margin-top: 0;
+    padding-top: 56px;
+  }
+
+  html[data-site-theme='light'] .post-weiter {
+    border-top-color: rgba(0, 0, 0, 0.08);
+  }
+  html[data-site-theme='light'] .post-weiter-titel {
+    color: rgba(26, 26, 28, 0.5);
+  }
+  html[data-site-theme='light'] .post-weiter-karten-titel {
+    color: rgba(26, 26, 28, 0.9);
+  }
+  html[data-site-theme='light'] .post-weiter-bild {
+    background: rgba(26, 26, 28, 0.05);
+  }
+
   .post-bottom-cta {
     padding: 80px 40px 60px;
     text-align: center;
