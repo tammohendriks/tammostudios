@@ -1,0 +1,1258 @@
+---
+/**
+ * Der Skizzen-Fragebogen als Overlay.
+ *
+ * Sechs Schritte, danach Absenden an /api/quiz-submit und weiter auf
+ * /danke-skizze. Liegt einmal pro Branchen-Landingpage im Markup; den
+ * Hero-CTA öffnet er über [data-skizze-oeffnen].
+ *
+ * WARUM <dialog> UND NICHT DAS MUSTER AUS ReferenzModal.astro:
+ * das dort ist ein <div role="dialog"> ohne Fokusfalle. Für ein
+ * Vorschaufenster mit zwei Knöpfen geht das. Hier sind es sechs
+ * Schritte mit Textfeldern, Auswahlen und einem Datei-Dialog — wer mit
+ * der Tastatur arbeitet, würde aus dem Overlay heraus in die Seite
+ * dahinter tabben und käme nicht zurück. <dialog>.showModal() bringt
+ * Fokusfalle, Inertisierung des Hintergrunds und ESC mit, ohne dass
+ * jemand sie pflegen muss. Die Optik bleibt dieselbe.
+ *
+ * Der Zustand liegt im Browser (localStorage, Schlüssel 'skizze-entwurf'),
+ * damit ein versehentliches Neuladen nicht sechs Schritte Arbeit
+ * kostet. Dateien liegen NICHT darin — die lassen sich nicht
+ * serialisieren, und das wäre auch der falsche Ort dafür.
+ */
+import { localeOf, pathOr } from '../lib/routes.mjs';
+import { SKIZZE } from '../lib/i18n/seiten/skizze';
+import { SITE, PHONE_INTERNATIONAL } from '../lib/constants';
+import {
+  ZIELE,
+  STILE,
+  FUNKTIONEN,
+  SCHRITTE,
+  UPLOAD,
+  UPLOAD_ACCEPT,
+  type SkizzeBranche,
+} from '../lib/skizze';
+
+interface Props {
+  /** Welche Branche — entscheidet über die Funktions-Auswahl in Schritt 3. */
+  branche: SkizzeBranche;
+}
+
+const { branche } = Astro.props;
+
+const locale = localeOf(Astro.url.pathname);
+const s = SKIZZE[locale as 'de' | 'en'];
+const q = s.quiz;
+
+const funktionen = FUNKTIONEN[branche];
+const funktionsNamen = q.funktionen.namen[branche];
+
+const datenschutzPfad = pathOr('datenschutz', locale);
+const telefonAnzeige = locale === 'en' ? PHONE_INTERNATIONAL : SITE.phone;
+---
+
+<dialog class="sk" id="skizze-dialog" aria-labelledby="sk-titel">
+  <form class="sk-panel" method="dialog" novalidate data-sk-form>
+    <!-- Kopf: Titel, Fortschritt, Schließen -->
+    <header class="sk-kopf">
+      <div class="sk-kopf-zeile">
+        <div>
+          <h2 class="sk-titel" id="sk-titel">{q.titel}</h2>
+          <p class="sk-untertitel">{q.untertitel}</p>
+        </div>
+        <button type="button" class="sk-schliessen" data-sk-schliessen aria-label={q.schliessen}>
+          <svg viewBox="0 0 20 20" aria-hidden="true">
+            <line x1="5.5" y1="5.5" x2="14.5" y2="14.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+            <line x1="14.5" y1="5.5" x2="5.5" y2="14.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+          </svg>
+        </button>
+      </div>
+      <div class="sk-fortschritt">
+        <p class="sk-fortschritt-text" data-sk-schrittzahl></p>
+        <div
+          class="sk-balken"
+          role="progressbar"
+          aria-label={q.fortschrittLabel}
+          aria-valuemin="1"
+          aria-valuemax={SCHRITTE}
+          aria-valuenow="1"
+          data-sk-balken
+        >
+          <span class="sk-balken-fuellung" data-sk-balken-fuellung></span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Die Schritte. Alle im Markup, nur einer sichtbar: so bleibt der
+         eingegebene Text erhalten, wenn jemand zurückgeht. -->
+    <div class="sk-koerper" data-sk-koerper>
+      <!-- 1 — Ziel -->
+      <section class="sk-schritt" data-sk-schritt="1">
+        <h3 class="sk-frage">{q.ziel.frage}</h3>
+        <div class="sk-karten">
+          {ZIELE.map((wert, i) => (
+            <label class="sk-karte">
+              <input type="radio" name="ziel" value={wert} required />
+              <span class="sk-karte-innen">
+                <span class="sk-karte-titel">{q.ziel.optionen[i].titel}</span>
+                <span class="sk-karte-text">{q.ziel.optionen[i].text}</span>
+              </span>
+            </label>
+          ))}
+        </div>
+      </section>
+
+      <!-- 2 — Bestehende Website -->
+      <section class="sk-schritt" data-sk-schritt="2" hidden>
+        <h3 class="sk-frage">{q.website.frage}</h3>
+        <div class="sk-karten sk-karten-zwei">
+          <label class="sk-karte">
+            <input type="radio" name="hatWebsite" value="ja" required />
+            <span class="sk-karte-innen"><span class="sk-karte-titel">{q.website.ja}</span></span>
+          </label>
+          <label class="sk-karte">
+            <input type="radio" name="hatWebsite" value="nein" required />
+            <span class="sk-karte-innen"><span class="sk-karte-titel">{q.website.nein}</span></span>
+          </label>
+        </div>
+        <div class="sk-feld sk-url" data-sk-url hidden>
+          <label for="sk-url-eingabe">{q.website.urlLabel}</label>
+          <input
+            type="text"
+            id="sk-url-eingabe"
+            name="url"
+            inputmode="url"
+            autocomplete="url"
+            placeholder={q.website.urlPlatzhalter}
+          />
+        </div>
+      </section>
+
+      <!-- 3 — Funktionen -->
+      <section class="sk-schritt" data-sk-schritt="3" hidden>
+        <h3 class="sk-frage">{q.funktionen.frage}</h3>
+        <p class="sk-hinweis">{q.funktionen.hinweis}</p>
+        <div class="sk-haken-liste">
+          {funktionen.map((wert, i) => (
+            <label class="sk-haken">
+              <input type="checkbox" name="funktionen" value={wert} />
+              <span class="sk-haken-kasten" aria-hidden="true">
+                <svg viewBox="0 0 16 16"><path d="M3.5 8.5L6.5 11.5L12.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              </span>
+              <span class="sk-haken-text">{funktionsNamen[i]}</span>
+            </label>
+          ))}
+        </div>
+      </section>
+
+      <!-- 4 — Stil -->
+      <section class="sk-schritt" data-sk-schritt="4" hidden>
+        <h3 class="sk-frage">{q.stil.frage}</h3>
+        <div class="sk-karten">
+          {STILE.map((wert, i) => (
+            <label class="sk-karte">
+              <input type="radio" name="stil" value={wert} required />
+              <span class="sk-karte-innen">
+                <span class="sk-karte-titel">{q.stil.optionen[i].titel}</span>
+                <span class="sk-karte-text">{q.stil.optionen[i].text}</span>
+              </span>
+            </label>
+          ))}
+        </div>
+      </section>
+
+      <!-- 5 — Dateien -->
+      <section class="sk-schritt" data-sk-schritt="5" hidden>
+        <h3 class="sk-frage">{q.upload.frage}</h3>
+        <p class="sk-hinweis">{q.upload.hinweis}</p>
+        <label class="sk-ablage" data-sk-ablage>
+          <input
+            type="file"
+            name="dateien"
+            multiple
+            accept={UPLOAD_ACCEPT}
+            data-sk-dateien
+            data-max-datei={UPLOAD.maxDateiBytes}
+            data-max-gesamt={UPLOAD.maxGesamtBytes}
+            data-max-anzahl={UPLOAD.maxAnzahl}
+          />
+          <svg class="sk-ablage-symbol" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 16V4M12 4L7.5 8.5M12 4l4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+          </svg>
+          <span class="sk-ablage-text">
+            <strong>{q.upload.waehlen}</strong>
+            <span>{q.upload.ablegen}</span>
+          </span>
+        </label>
+        <ul class="sk-dateiliste" data-sk-dateiliste></ul>
+      </section>
+
+      <!-- 6 — Kontakt -->
+      <section class="sk-schritt" data-sk-schritt="6" hidden>
+        <h3 class="sk-frage">{q.kontakt.frage}</h3>
+        <div class="sk-felder">
+          <div class="sk-feld">
+            <label for="sk-firma">{q.kontakt.firma}</label>
+            <input type="text" id="sk-firma" name="firma" required autocomplete="organization" placeholder={q.kontakt.firmaPlatzhalter} />
+          </div>
+          <div class="sk-feld">
+            <label for="sk-vorname">{q.kontakt.vorname}</label>
+            <input type="text" id="sk-vorname" name="vorname" required autocomplete="given-name" placeholder={q.kontakt.vornamePlatzhalter} />
+          </div>
+          <div class="sk-feld">
+            <label for="sk-email">{q.kontakt.email}</label>
+            <input type="email" id="sk-email" name="email" required autocomplete="email" placeholder={q.kontakt.emailPlatzhalter} />
+          </div>
+          <div class="sk-feld">
+            <label for="sk-telefon">
+              {q.kontakt.telefon} <span class="sk-optional">{q.kontakt.optional}</span>
+            </label>
+            <input type="tel" id="sk-telefon" name="telefon" autocomplete="tel" placeholder={q.kontakt.telefonPlatzhalter} />
+            <p class="sk-feld-hinweis">{q.kontakt.telefonHinweis}</p>
+          </div>
+          <div class="sk-feld sk-feld-breit">
+            <label for="sk-nachricht">
+              {q.kontakt.nachricht} <span class="sk-optional">{q.kontakt.optional}</span>
+            </label>
+            <textarea id="sk-nachricht" name="nachricht" rows="3" maxlength="500" placeholder={q.kontakt.nachrichtPlatzhalter}></textarea>
+          </div>
+        </div>
+
+        {/* Versteckt per CSS, nicht per hidden: ein hidden-Feld fuellt
+            kein Bot aus, und genau darum geht es. */}
+        <div class="sk-honigtopf" aria-hidden="true">
+          <label for="sk-website-hp">{q.kontakt.honeypot}</label>
+          <input type="text" id="sk-website-hp" name="website" tabindex="-1" autocomplete="off" />
+        </div>
+
+        <label class="sk-datenschutz">
+          <input type="checkbox" name="datenschutz" required />
+          <span class="sk-haken-kasten" aria-hidden="true">
+            <svg viewBox="0 0 16 16"><path d="M3.5 8.5L6.5 11.5L12.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          </span>
+          <span class="sk-datenschutz-text">
+            {q.kontakt.datenschutzVor}
+            <a href={datenschutzPfad} target="_blank" rel="noopener">{q.kontakt.datenschutzLink}</a>
+            {q.kontakt.datenschutzNach}
+          </span>
+        </label>
+      </section>
+    </div>
+
+    <!-- Fuß: Fehler, Zurück, Weiter/Senden -->
+    <footer class="sk-fuss">
+      <p class="sk-fehler" role="alert" data-sk-fehler hidden></p>
+      <div class="sk-fuss-knoepfe">
+        <button type="button" class="sk-knopf sk-knopf-still" data-sk-zurueck hidden>
+          {q.zurueck}
+        </button>
+        <button type="button" class="sk-knopf sk-knopf-still" data-sk-ueberspringen hidden>
+          {q.ueberspringen}
+        </button>
+        <button type="button" class="sk-knopf sk-knopf-haupt" data-sk-weiter>
+          <span data-sk-weiter-text>{q.weiter}</span>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+        </button>
+      </div>
+      {/* Der Ausgang fuer alle, denen sechs Schritte zu viel sind. Ohne
+          ihn ist das Modal eine Sackgasse mit genau einem Ausweg. */}
+      <p class="sk-fuss-ruf">
+        {s.hero.ctaZweit} <a href={SITE.phoneHref}>{telefonAnzeige}</a>
+      </p>
+    </footer>
+  </form>
+
+  <!-- Nachfrage beim Schließen. Ein zweites <dialog> waere sauberer,
+       verschachtelte Modal-Dialoge sind aber in Safari unzuverlaessig —
+       deshalb eine Ebene im selben Dialog. -->
+  <div class="sk-nachfrage" data-sk-nachfrage hidden>
+    <div class="sk-nachfrage-kasten" role="alertdialog" aria-labelledby="sk-nachfrage-text">
+      <p id="sk-nachfrage-text">{q.abbrechenFrage}</p>
+      <div class="sk-nachfrage-knoepfe">
+        <button type="button" class="sk-knopf sk-knopf-still" data-sk-nachfrage-nein>{q.abbrechenNein}</button>
+        <button type="button" class="sk-knopf sk-knopf-haupt" data-sk-nachfrage-ja>{q.abbrechenJa}</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Texte, die das Skript braucht. Im Markup statt im Skript, damit
+       sie durch dieselbe Uebersetzungspruefung laufen wie alles andere. -->
+  <script
+    type="application/json"
+    data-sk-texte
+    set:html={JSON.stringify({
+      schrittVon: q.schrittVon,
+      weiter: q.weiter,
+      senden: q.kontakt.senden,
+      sendenLaeuft: q.kontakt.sendenLaeuft,
+      bitteWaehlen: q.bitteWaehlen,
+      urlUngueltig: q.website.urlUngueltig,
+      zuGross: q.upload.zuGross,
+      gesamtZuGross: q.upload.gesamtZuGross,
+      zuViele: q.upload.zuViele,
+      falscherTyp: q.upload.falscherTyp,
+      entfernen: q.upload.entfernen,
+      fehler: q.fehler.allgemein,
+      erneut: q.fehler.erneut,
+      gesamt: SCHRITTE,
+      branche,
+      locale,
+      telefon: telefonAnzeige,
+      // Fester Pfad, kein ROUTES-Eintrag: die Danke-Seite ist auf
+      // noindex, und ein Eintrag im Routen-Verzeichnis wuerde
+      // hreflang-Paare darauf bauen. Praezedenz: 404 und die
+      // Journal-Beitraege stehen auch nicht drin.
+      dankeZiel: '/danke-skizze',
+    })}
+  />
+</dialog>
+
+<script>
+  // Steuerung des Fragebogens.
+  //
+  // Kein Framework, kein Store: sechs Abschnitte, von denen einer
+  // sichtbar ist, und ein Objekt, das den Stand hält. Was als
+  // Zustandsverwaltung gebraucht wird, sind zwei Zahlen und ein
+  // Formular — dafür eine Bibliothek zu laden hieße, jedem Besucher
+  // dieser Seite Code für etwas mitzuschicken, das der Browser schon
+  // kann.
+  //
+  // Die Eingaben leben im Formular selbst, nicht in einer Kopie
+  // daneben. Deshalb bleibt alles erhalten, wenn jemand zurückgeht,
+  // ohne dass irgendwo ein Abgleich stattfindet.
+
+  const dialog = document.getElementById('skizze-dialog') as HTMLDialogElement | null;
+  if (dialog) {
+    const form = dialog.querySelector<HTMLFormElement>('[data-sk-form]')!;
+    const koerper = dialog.querySelector<HTMLElement>('[data-sk-koerper]')!;
+    const schritte = [...dialog.querySelectorAll<HTMLElement>('[data-sk-schritt]')];
+    const zurueckBtn = dialog.querySelector<HTMLButtonElement>('[data-sk-zurueck]')!;
+    const weiterBtn = dialog.querySelector<HTMLButtonElement>('[data-sk-weiter]')!;
+    const weiterText = dialog.querySelector<HTMLElement>('[data-sk-weiter-text]')!;
+    const springBtn = dialog.querySelector<HTMLButtonElement>('[data-sk-ueberspringen]')!;
+    const schrittzahl = dialog.querySelector<HTMLElement>('[data-sk-schrittzahl]')!;
+    const balken = dialog.querySelector<HTMLElement>('[data-sk-balken]')!;
+    const fuellung = dialog.querySelector<HTMLElement>('[data-sk-balken-fuellung]')!;
+    const fehlerEl = dialog.querySelector<HTMLElement>('[data-sk-fehler]')!;
+    const nachfrage = dialog.querySelector<HTMLElement>('[data-sk-nachfrage]')!;
+    const dateiFeld = dialog.querySelector<HTMLInputElement>('[data-sk-dateien]')!;
+    const dateiListe = dialog.querySelector<HTMLElement>('[data-sk-dateiliste]')!;
+    const urlBlock = dialog.querySelector<HTMLElement>('[data-sk-url]')!;
+
+    const texte = JSON.parse(
+      dialog.querySelector<HTMLScriptElement>('[data-sk-texte]')!.textContent || '{}'
+    );
+
+    const GESAMT: number = texte.gesamt;
+    const SPEICHER = 'skizze-entwurf';
+    const sanfter = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let aktuell = 1;
+    /** Die gewählten Dateien. Das file-Input ist nicht beschreibbar, also eigene Liste. */
+    let dateien: File[] = [];
+
+    const einsetzen = (vorlage: string, werte: Record<string, string | number>) =>
+      Object.entries(werte).reduce(
+        (text, [k, v]) => text.replaceAll(`{${k}}`, String(v)),
+        vorlage
+      );
+
+    // --- Anzeige ---------------------------------------------------
+
+    const fehlerZeigen = (text: string | null) => {
+      fehlerEl.textContent = text ?? '';
+      fehlerEl.hidden = !text;
+    };
+
+    const zeichnen = () => {
+      schritte.forEach((abschnitt) => {
+        const n = Number(abschnitt.dataset.skSchritt);
+        abschnitt.hidden = n !== aktuell;
+      });
+      schrittzahl.textContent = einsetzen(texte.schrittVon, { n: aktuell, gesamt: GESAMT });
+      balken.setAttribute('aria-valuenow', String(aktuell));
+      fuellung.style.width = `${(aktuell / GESAMT) * 100}%`;
+      zurueckBtn.hidden = aktuell === 1;
+      // Nur der Datei-Schritt ist wirklich überspringbar. Bei den
+      // anderen wäre der Knopf eine Lüge: ohne Antwort geht es nicht
+      // weiter, und ein Knopf, der nichts tut, ist schlimmer als keiner.
+      springBtn.hidden = aktuell !== 5;
+      weiterText.textContent = aktuell === GESAMT ? texte.senden : texte.weiter;
+      fehlerZeigen(null);
+      // Oben anfangen: nach einem langen Schritt stünde man sonst
+      // mitten im nächsten.
+      koerper.scrollTop = 0;
+      // Fokus in den neuen Schritt. Ohne das bliebe er auf „Weiter",
+      // und wer die Seite vorlesen lässt, hört nicht, dass eine neue
+      // Frage dasteht.
+      const frage = schritte[aktuell - 1]?.querySelector<HTMLElement>('.sk-frage');
+      frage?.setAttribute('tabindex', '-1');
+      frage?.focus({ preventScroll: true });
+    };
+
+    // --- Prüfung je Schritt ----------------------------------------
+
+    const wertVon = (name: string) =>
+      (form.querySelector<HTMLInputElement>(`input[name="${name}"]:checked`) || {}).value ?? '';
+
+    const istUrl = (wert: string) => {
+      const roh = wert.trim();
+      if (!roh) return true; // leer ist erlaubt
+      try {
+        const u = new URL(/^https?:\/\//i.test(roh) ? roh : `https://${roh}`);
+        // Ein Punkt im Hostnamen, sonst ist "localhost" oder "abc" gültig.
+        return u.hostname.includes('.') && !u.hostname.startsWith('.');
+      } catch {
+        return false;
+      }
+    };
+
+    const pruefen = (): string | null => {
+      if (aktuell === 1 && !wertVon('ziel')) return texte.bitteWaehlen;
+      if (aktuell === 2) {
+        if (!wertVon('hatWebsite')) return texte.bitteWaehlen;
+        const url = form.querySelector<HTMLInputElement>('[name="url"]')!;
+        if (wertVon('hatWebsite') === 'ja' && !istUrl(url.value)) return texte.urlUngueltig;
+      }
+      if (aktuell === 4 && !wertVon('stil')) return texte.bitteWaehlen;
+      if (aktuell === 6) {
+        // Die Browser-Prüfung übernimmt Pflichtfelder und E-Mail-Form.
+        // Ein eigener Nachbau wäre eine zweite, schlechtere Wahrheit.
+        const ungueltig = schritte[5].querySelector<HTMLInputElement>(':invalid');
+        if (ungueltig) {
+          ungueltig.focus();
+          return ungueltig.validationMessage;
+        }
+      }
+      return null;
+    };
+
+    // --- Entwurf sichern -------------------------------------------
+    //
+    // Dateien bleiben draußen: sie lassen sich nicht in localStorage
+    // ablegen, und dort wäre auch der falsche Ort dafür.
+
+    const sichern = () => {
+      try {
+        const daten = new FormData(form);
+        daten.delete('dateien');
+        daten.delete('website'); // Honigtopf gehört nicht in den Entwurf
+        const objekt: Record<string, unknown> = {};
+        for (const [k, v] of daten.entries()) {
+          if (typeof v !== 'string') continue;
+          if (k === 'funktionen') {
+            const liste = (objekt.funktionen as string[] | undefined) ?? [];
+            liste.push(v);
+            objekt.funktionen = liste;
+          } else {
+            objekt[k] = v;
+          }
+        }
+        localStorage.setItem(SPEICHER, JSON.stringify({ schritt: aktuell, werte: objekt }));
+      } catch {
+        // Privater Modus, volle Quote, abgeschaltete Speicher: der
+        // Fragebogen funktioniert ohne Entwurf genauso, nur ohne Netz
+        // beim Neuladen.
+      }
+    };
+
+    const entwurfLaden = () => {
+      try {
+        const roh = localStorage.getItem(SPEICHER);
+        if (!roh) return;
+        const { schritt, werte } = JSON.parse(roh) as {
+          schritt: number;
+          werte: Record<string, unknown>;
+        };
+        for (const [name, wert] of Object.entries(werte)) {
+          if (Array.isArray(wert)) {
+            for (const w of wert) {
+              form.querySelector<HTMLInputElement>(
+                `input[name="${name}"][value="${w}"]`
+              )?.click();
+            }
+            continue;
+          }
+          const feld = form.querySelector<HTMLInputElement>(`[name="${name}"]`);
+          if (!feld) continue;
+          if (feld.type === 'radio') {
+            form.querySelector<HTMLInputElement>(
+              `input[name="${name}"][value="${wert}"]`
+            )?.click();
+          } else if (feld.type === 'checkbox') {
+            feld.checked = Boolean(wert);
+          } else {
+            feld.value = String(wert);
+          }
+        }
+        if (Number.isInteger(schritt) && schritt >= 1 && schritt <= GESAMT) aktuell = schritt;
+      } catch {
+        // Kaputter Entwurf: lieber von vorn als mit halbem Zustand.
+        try { localStorage.removeItem(SPEICHER); } catch { /* egal */ }
+      }
+    };
+
+    // --- Dateien ---------------------------------------------------
+
+    const maxDatei = Number(dateiFeld.dataset.maxDatei);
+    const maxGesamt = Number(dateiFeld.dataset.maxGesamt);
+    const maxAnzahl = Number(dateiFeld.dataset.maxAnzahl);
+    const accept = (dateiFeld.getAttribute('accept') || '').split(',').map((a) => a.trim());
+
+    const typPasst = (datei: File) =>
+      accept.some((a) =>
+        a.startsWith('.') ? datei.name.toLowerCase().endsWith(a) : datei.type === a
+      );
+
+    const groesse = (bytes: number) =>
+      bytes >= 1024 * 1024
+        ? `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+        : `${Math.max(1, Math.round(bytes / 1024))} KB`;
+
+    const dateienZeichnen = () => {
+      dateiListe.replaceChildren();
+      dateien.forEach((datei, i) => {
+        const li = document.createElement('li');
+        li.className = 'sk-datei';
+        const name = document.createElement('span');
+        name.className = 'sk-datei-name';
+        name.textContent = datei.name;
+        const gr = document.createElement('span');
+        gr.className = 'sk-datei-groesse';
+        gr.textContent = groesse(datei.size);
+        const weg = document.createElement('button');
+        weg.type = 'button';
+        weg.className = 'sk-datei-weg';
+        weg.setAttribute('aria-label', `${texte.entfernen}: ${datei.name}`);
+        weg.textContent = '×';
+        weg.addEventListener('click', () => {
+          dateien.splice(i, 1);
+          dateienZeichnen();
+          fehlerZeigen(null);
+        });
+        li.append(name, gr, weg);
+        dateiListe.append(li);
+      });
+    };
+
+    dateiFeld.addEventListener('change', () => {
+      const neue = [...(dateiFeld.files ?? [])];
+      // Das Feld selbst wird geleert: sonst zählt der Browser bei einer
+      // zweiten Auswahl die erste nicht mehr mit, und beim Absenden
+      // ginge nur die letzte Auswahl mit.
+      dateiFeld.value = '';
+      for (const datei of neue) {
+        if (dateien.length >= maxAnzahl) { fehlerZeigen(texte.zuViele); break; }
+        if (!typPasst(datei)) { fehlerZeigen(einsetzen(texte.falscherTyp, { name: datei.name })); continue; }
+        if (datei.size > maxDatei) { fehlerZeigen(einsetzen(texte.zuGross, { name: datei.name })); continue; }
+        if (dateien.reduce((s, d) => s + d.size, 0) + datei.size > maxGesamt) {
+          fehlerZeigen(texte.gesamtZuGross);
+          break;
+        }
+        dateien.push(datei);
+      }
+      dateienZeichnen();
+    });
+
+    // --- Öffnen und Schließen --------------------------------------
+
+    let ausloeser: HTMLElement | null = null;
+
+    const oeffnen = (von: HTMLElement | null) => {
+      ausloeser = von;
+      entwurfLaden();
+      zeichnen();
+      dialog.showModal();
+      // showModal() macht den Hintergrund inert, aber nicht
+      // scrollfrei — hinter dem Overlay ließe sich sonst weiterwischen.
+      document.documentElement.style.overflow = 'hidden';
+    };
+
+    const wirklichSchliessen = () => {
+      nachfrage.hidden = true;
+      dialog.close();
+      document.documentElement.style.overflow = '';
+      // Der auslösende Knopf kann inzwischen weg sein. Ohne diese
+      // Prüfung landet der Fokus stumm auf <body>.
+      if (ausloeser && document.contains(ausloeser)) ausloeser.focus();
+    };
+
+    const schliessenVersuchen = () => {
+      // Auf dem ersten Schritt ohne Eingabe gibt es nichts zu verlieren.
+      const etwasDrin =
+        aktuell > 1 ||
+        [...new FormData(form).entries()].some(([k, v]) => k !== 'website' && String(v).trim());
+      if (!etwasDrin) { wirklichSchliessen(); return; }
+      nachfrage.hidden = false;
+      dialog.querySelector<HTMLButtonElement>('[data-sk-nachfrage-nein]')?.focus();
+    };
+
+    dialog.querySelector('[data-sk-schliessen]')!.addEventListener('click', schliessenVersuchen);
+    dialog.querySelector('[data-sk-nachfrage-nein]')!.addEventListener('click', () => {
+      nachfrage.hidden = true;
+      weiterBtn.focus();
+    });
+    dialog.querySelector('[data-sk-nachfrage-ja]')!.addEventListener('click', () => {
+      try { localStorage.removeItem(SPEICHER); } catch { /* egal */ }
+      wirklichSchliessen();
+    });
+
+    // ESC: der Browser würde sofort schließen. Abfangen und dieselbe
+    // Nachfrage stellen wie beim X — sonst ist eine halb ausgefüllte
+    // Strecke mit einem Tastendruck weg.
+    dialog.addEventListener('cancel', (e) => {
+      e.preventDefault();
+      if (!nachfrage.hidden) { nachfrage.hidden = true; return; }
+      schliessenVersuchen();
+    });
+
+    // Klick auf die Fläche neben dem Panel. <dialog> liefert dafür kein
+    // eigenes Ereignis, also über die Koordinaten.
+    dialog.addEventListener('click', (e) => {
+      if (e.target !== dialog) return;
+      const kasten = form.getBoundingClientRect();
+      const drin =
+        e.clientX >= kasten.left && e.clientX <= kasten.right &&
+        e.clientY >= kasten.top && e.clientY <= kasten.bottom;
+      if (!drin) schliessenVersuchen();
+    });
+
+    // --- Navigation ------------------------------------------------
+
+    const weiter = async () => {
+      const fehler = pruefen();
+      if (fehler) { fehlerZeigen(fehler); return; }
+      if (aktuell < GESAMT) {
+        aktuell += 1;
+        zeichnen();
+        // NACH dem Hochzaehlen sichern, nicht davor: sonst merkt sich
+        // der Entwurf den Schritt, den man gerade verlassen hat, und
+        // ein Neuladen wirft den Besucher um eine Station zurueck.
+        sichern();
+        return;
+      }
+      sichern();
+      await absenden();
+    };
+
+    // Das Formular wird NIE auf dem ueblichen Weg abgeschickt — bei
+    // method="dialog" wuerde das den Dialog schliessen und die
+    // Eingaben verwerfen. Abgeschickt wird per fetch in absenden().
+    form.addEventListener('submit', (e) => e.preventDefault());
+
+    weiterBtn.addEventListener('click', weiter);
+    zurueckBtn.addEventListener('click', () => {
+      if (aktuell > 1) { aktuell -= 1; zeichnen(); sichern(); }
+    });
+    springBtn.addEventListener('click', () => {
+      dateien = [];
+      dateienZeichnen();
+      if (aktuell < GESAMT) { aktuell += 1; zeichnen(); sichern(); }
+    });
+
+    // Enter geht weiter, solange niemand in einem mehrzeiligen Feld
+    // tippt — dort heißt Enter Absatz.
+    form.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter') return;
+      const ziel = e.target as HTMLElement;
+      if (ziel.tagName === 'TEXTAREA') return;
+      if (ziel.tagName === 'A' || ziel.tagName === 'BUTTON') return;
+      e.preventDefault();
+      void weiter();
+    });
+
+    // Eine getroffene Auswahl ist die Antwort — nicht noch einmal auf
+    // „Weiter" klicken lassen. Nur dort, wo genau eine Antwort möglich
+    // ist; bei Mehrfachauswahl wäre es eine Falle.
+    form.querySelectorAll<HTMLInputElement>('input[type="radio"]').forEach((feld) => {
+      feld.addEventListener('change', () => {
+        fehlerZeigen(null);
+        if (feld.name === 'hatWebsite') {
+          urlBlock.hidden = feld.value !== 'ja';
+          if (feld.value === 'ja') {
+            urlBlock.querySelector('input')?.focus();
+            return;
+          }
+        }
+        if (feld.name === 'ziel' || feld.name === 'stil') {
+          window.setTimeout(() => void weiter(), sanfter ? 220 : 0);
+        }
+      });
+    });
+
+    // --- Absenden ---------------------------------------------------
+
+    const absenden = async () => {
+      weiterBtn.disabled = true;
+      weiterText.textContent = texte.sendenLaeuft;
+      fehlerZeigen(null);
+      try {
+        const daten = new FormData(form);
+        daten.delete('dateien');
+        for (const datei of dateien) daten.append('dateien', datei, datei.name);
+        daten.set('branche', texte.branche);
+        daten.set('locale', texte.locale);
+
+        const antwort = await fetch('/api/quiz-submit', { method: 'POST', body: daten });
+        const ergebnis = await antwort.json().catch(() => ({}));
+        if (!antwort.ok || !ergebnis.success) {
+          throw new Error(ergebnis.error || '');
+        }
+        try { localStorage.removeItem(SPEICHER); } catch { /* egal */ }
+        const name = String(daten.get('vorname') ?? '').trim();
+        window.location.href =
+          texte.dankeZiel + (name ? `?name=${encodeURIComponent(name)}` : '');
+      } catch (err) {
+        const grund = err instanceof Error && err.message ? err.message : '';
+        fehlerZeigen(grund || texte.fehler + texte.telefon);
+        weiterBtn.disabled = false;
+        weiterText.textContent = texte.senden;
+      }
+    };
+
+    // --- Auslöser auf der Seite -------------------------------------
+
+    document.querySelectorAll<HTMLElement>('[data-skizze-oeffnen]').forEach((knopf) => {
+      knopf.addEventListener('click', (e) => {
+        e.preventDefault();
+        oeffnen(knopf);
+      });
+    });
+
+    // Mit #skizze im Link direkt öffnen — für Werbeanzeigen, die
+    // mitten in den Fragebogen führen sollen.
+    if (window.location.hash === '#skizze') oeffnen(null);
+  }
+</script>
+
+<style>
+  /* Die Branchen-Landingpages laufen immer dunkel: BaseLayout setzt
+     dort data-no-theme (VERTICAL_KEYS), der Umschalter erscheint gar
+     nicht. Eine Hell-Variante waere toter Code — der gegenteilige
+     Kommentar in global.css:92 ist veraltet, nachgemessen am
+     gerenderten <html>-Tag. */
+
+  .sk {
+    width: min(680px, calc(100vw - 32px));
+    max-height: min(860px, calc(100dvh - 32px));
+    /* Browser zentrieren einen offenen <dialog> ueber margin:auto.
+       Die globale Zuruecksetzung in global.css setzt aber allem
+       margin:0 — ohne diese Zeile klebt das Fenster oben links. */
+    margin: auto;
+    padding: 0;
+    border: 1px solid rgba(245, 245, 244, 0.1);
+    border-radius: 18px;
+    background: #0d0d10;
+    color: rgba(245, 245, 244, 0.95);
+    overflow: hidden;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+  }
+  .sk::backdrop {
+    background: rgba(5, 5, 7, 0.78);
+    backdrop-filter: blur(6px);
+  }
+  /* Kein Rahmen vom Browser um den offenen Dialog. */
+  .sk:focus,
+  .sk:focus-visible {
+    outline: none;
+  }
+
+  .sk-panel {
+    display: flex;
+    flex-direction: column;
+    max-height: inherit;
+    min-height: 0;
+  }
+
+  /* === Kopf === */
+  .sk-kopf {
+    flex-shrink: 0;
+    padding: 24px 26px 18px;
+    border-bottom: 1px solid rgba(245, 245, 244, 0.08);
+  }
+  .sk-kopf-zeile {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .sk-titel {
+    margin: 0;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 1.22rem;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+  }
+  .sk-untertitel {
+    margin: 6px 0 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.86rem;
+    line-height: 1.45;
+    color: rgba(245, 245, 244, 0.55);
+  }
+  .sk-schliessen {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 1px solid rgba(245, 245, 244, 0.12);
+    border-radius: 50%;
+    background: transparent;
+    color: rgba(245, 245, 244, 0.7);
+    cursor: pointer;
+    transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+  }
+  .sk-schliessen svg { width: 17px; height: 17px; }
+  .sk-schliessen:hover {
+    background: rgba(245, 158, 11, 0.14);
+    border-color: rgba(245, 158, 11, 0.45);
+    color: rgba(245, 158, 11, 0.95);
+  }
+
+  .sk-fortschritt { margin-top: 18px; }
+  .sk-fortschritt-text {
+    margin: 0 0 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.74rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(245, 245, 244, 0.45);
+  }
+  .sk-balken {
+    height: 3px;
+    border-radius: 999px;
+    background: rgba(245, 245, 244, 0.1);
+    overflow: hidden;
+  }
+  .sk-balken-fuellung {
+    display: block;
+    height: 100%;
+    width: 0;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+    transition: width 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* === Körper === */
+  .sk-koerper {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 26px;
+    /* Momentum-Scrolling auf iOS, sonst ruckelt die lange Liste. */
+    -webkit-overflow-scrolling: touch;
+  }
+  .sk-frage {
+    margin: 0 0 6px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+  }
+  .sk-frage:focus { outline: none; }
+  .sk-hinweis {
+    margin: 0 0 16px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.84rem;
+    color: rgba(245, 245, 244, 0.5);
+  }
+  .sk-frage + .sk-karten,
+  .sk-frage + .sk-haken-liste,
+  .sk-frage + .sk-felder,
+  .sk-frage + .sk-ablage { margin-top: 18px; }
+
+  /* === Auswahlkarten (Schritt 1, 2, 4) === */
+  .sk-karten {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .sk-karten-zwei { grid-template-columns: 1fr 1fr; }
+  .sk-karte { display: block; cursor: pointer; }
+  /* Das Eingabefeld bleibt im Baum — nur unsichtbar. display:none
+     naehme es aus der Tastaturbedienung und aus der Formulardaten. */
+  .sk-karte input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .sk-karte-innen {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    height: 100%;
+    padding: 15px 16px;
+    border: 1px solid rgba(245, 245, 244, 0.12);
+    border-radius: 12px;
+    background: rgba(245, 245, 244, 0.03);
+    transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+  }
+  .sk-karte:hover .sk-karte-innen {
+    border-color: rgba(245, 158, 11, 0.4);
+    background: rgba(245, 158, 11, 0.05);
+  }
+  .sk-karte input:checked + .sk-karte-innen {
+    border-color: rgba(245, 158, 11, 0.8);
+    background: rgba(245, 158, 11, 0.1);
+  }
+  .sk-karte input:focus-visible + .sk-karte-innen {
+    outline: 2px solid rgba(245, 158, 11, 0.8);
+    outline-offset: 2px;
+  }
+  .sk-karte-titel {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.96rem;
+    font-weight: 500;
+  }
+  .sk-karte-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    color: rgba(245, 245, 244, 0.55);
+  }
+
+  /* === Mehrfachauswahl (Schritt 3) === */
+  .sk-haken-liste {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .sk-haken,
+  .sk-datenschutz {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 12px 14px;
+    border: 1px solid rgba(245, 245, 244, 0.12);
+    border-radius: 10px;
+    background: rgba(245, 245, 244, 0.03);
+    cursor: pointer;
+    transition: border-color 180ms ease, background 180ms ease;
+  }
+  .sk-haken input,
+  .sk-datenschutz input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .sk-haken-kasten {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    border: 1px solid rgba(245, 245, 244, 0.25);
+    border-radius: 6px;
+    color: transparent;
+    transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
+  }
+  .sk-haken-kasten svg { width: 14px; height: 14px; }
+  .sk-haken:hover,
+  .sk-datenschutz:hover { border-color: rgba(245, 158, 11, 0.4); }
+  .sk-haken input:checked ~ .sk-haken-kasten,
+  .sk-datenschutz input:checked ~ .sk-haken-kasten {
+    background: rgba(245, 158, 11, 0.95);
+    border-color: rgba(245, 158, 11, 0.95);
+    color: #141414;
+  }
+  .sk-haken:has(input:checked) {
+    border-color: rgba(245, 158, 11, 0.6);
+    background: rgba(245, 158, 11, 0.08);
+  }
+  .sk-haken:has(input:focus-visible),
+  .sk-datenschutz:has(input:focus-visible) {
+    outline: 2px solid rgba(245, 158, 11, 0.8);
+    outline-offset: 2px;
+  }
+  .sk-haken-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.88rem;
+    line-height: 1.35;
+  }
+
+  /* === Datei-Ablage (Schritt 5) === */
+  .sk-ablage {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 22px 20px;
+    border: 1px dashed rgba(245, 245, 244, 0.2);
+    border-radius: 12px;
+    background: rgba(245, 245, 244, 0.02);
+    cursor: pointer;
+    transition: border-color 180ms ease, background 180ms ease;
+  }
+  .sk-ablage:hover {
+    border-color: rgba(245, 158, 11, 0.5);
+    background: rgba(245, 158, 11, 0.04);
+  }
+  .sk-ablage:focus-within {
+    outline: 2px solid rgba(245, 158, 11, 0.8);
+    outline-offset: 2px;
+  }
+  .sk-ablage input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+  .sk-ablage-symbol {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    color: rgba(245, 158, 11, 0.85);
+  }
+  .sk-ablage-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.88rem;
+  }
+  .sk-ablage-text span { color: rgba(245, 245, 244, 0.5); font-size: 0.82rem; }
+
+  .sk-dateiliste {
+    list-style: none;
+    margin: 14px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .sk-datei {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 9px;
+    background: rgba(245, 245, 244, 0.05);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.84rem;
+  }
+  .sk-datei-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .sk-datei-groesse { flex-shrink: 0; color: rgba(245, 245, 244, 0.45); font-size: 0.78rem; }
+  .sk-datei-weg {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(245, 245, 244, 0.08);
+    color: rgba(245, 245, 244, 0.7);
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .sk-datei-weg:hover { background: rgba(239, 68, 68, 0.2); color: rgba(252, 165, 165, 1); }
+
+  /* === Kontaktfelder (Schritt 6) === */
+  .sk-felder {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .sk-feld { display: flex; flex-direction: column; gap: 6px; }
+  .sk-feld-breit { grid-column: 1 / -1; }
+  .sk-feld label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.02em;
+    color: rgba(245, 245, 244, 0.65);
+  }
+  .sk-optional { color: rgba(245, 245, 244, 0.4); }
+  .sk-feld input,
+  .sk-feld textarea {
+    /* 16px, sonst zoomt iOS Safari beim Antippen in die Seite. */
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    color: rgba(245, 245, 244, 0.95);
+    padding: 11px 13px;
+    border: 1px solid rgba(245, 245, 244, 0.14);
+    border-radius: 10px;
+    background: rgba(245, 245, 244, 0.04);
+    transition: border-color 160ms ease, background 160ms ease;
+  }
+  .sk-feld textarea { resize: vertical; min-height: 72px; }
+  .sk-feld input::placeholder,
+  .sk-feld textarea::placeholder { color: rgba(245, 245, 244, 0.32); }
+  .sk-feld input:focus,
+  .sk-feld textarea:focus {
+    outline: none;
+    border-color: rgba(245, 158, 11, 0.7);
+    background: rgba(245, 158, 11, 0.05);
+  }
+  .sk-feld-hinweis {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    color: rgba(245, 245, 244, 0.4);
+  }
+
+  .sk-datenschutz { margin-top: 16px; align-items: flex-start; }
+  .sk-datenschutz .sk-haken-kasten { margin-top: 1px; }
+  .sk-datenschutz-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.84rem;
+    line-height: 1.45;
+    color: rgba(245, 245, 244, 0.7);
+  }
+  .sk-datenschutz-text a { color: rgba(245, 158, 11, 0.95); }
+
+  /* Nur fuer Bots. Nicht hidden und nicht display:none — beides
+     fuellen sie nicht aus, und genau das ist der Zweck. */
+  .sk-honigtopf {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  /* === Fuß === */
+  .sk-fuss {
+    flex-shrink: 0;
+    padding: 16px 26px 20px;
+    border-top: 1px solid rgba(245, 245, 244, 0.08);
+    background: rgba(245, 245, 244, 0.02);
+  }
+  .sk-fehler {
+    margin: 0 0 12px;
+    padding: 10px 13px;
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    border-radius: 9px;
+    background: rgba(239, 68, 68, 0.1);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: rgba(254, 202, 202, 1);
+  }
+  .sk-fuss-knoepfe {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  /* Der Haupt-Knopf ganz rechts, alles andere links davon. */
+  .sk-knopf-haupt { margin-left: auto; }
+  .sk-knopf {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 11px 22px;
+    border-radius: 999px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.94rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background 180ms ease, color 180ms ease, border-color 180ms ease, opacity 180ms ease;
+  }
+  .sk-knopf:focus-visible {
+    outline: 2px solid rgba(245, 158, 11, 0.8);
+    outline-offset: 3px;
+  }
+  .sk-knopf-haupt {
+    background: linear-gradient(to bottom, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+    color: #1a1a1a;
+    font-weight: 600;
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 2px 10px rgba(0, 0, 0, 0.3);
+  }
+  .sk-knopf-haupt:hover { filter: brightness(1.06); }
+  .sk-knopf-haupt:disabled { opacity: 0.6; cursor: progress; }
+  .sk-knopf-still {
+    background: transparent;
+    color: rgba(245, 245, 244, 0.6);
+    border-color: rgba(245, 245, 244, 0.15);
+  }
+  .sk-knopf-still:hover {
+    color: rgba(245, 245, 244, 0.95);
+    border-color: rgba(245, 245, 244, 0.3);
+  }
+  .sk-fuss-ruf {
+    margin: 12px 0 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    color: rgba(245, 245, 244, 0.4);
+  }
+  .sk-fuss-ruf a { color: rgba(245, 158, 11, 0.9); }
+
+  /* === Nachfrage beim Schließen === */
+  .sk-nachfrage {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: rgba(5, 5, 7, 0.85);
+    backdrop-filter: blur(3px);
+  }
+  .sk-nachfrage[hidden] { display: none; }
+  .sk-nachfrage-kasten {
+    max-width: 380px;
+    padding: 24px;
+    border: 1px solid rgba(245, 245, 244, 0.12);
+    border-radius: 14px;
+    background: #141418;
+    text-align: center;
+  }
+  .sk-nachfrage-kasten p {
+    margin: 0 0 18px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  .sk-nachfrage-knoepfe {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+  .sk-nachfrage-knoepfe .sk-knopf-haupt { margin-left: 0; }
+
+  /* === Handy === */
+  @media (max-width: 640px) {
+    .sk {
+      width: 100vw;
+      max-width: 100vw;
+      max-height: 100dvh;
+      height: 100dvh;
+      border: 0;
+      border-radius: 0;
+    }
+    /* Auf dem Handy fuellt der Dialog den Bildschirm, das Panel muss
+       mit — sonst endet es nach dem Inhalt und darunter steht eine
+       leere dunkle Flaeche, in der der Fuss mitten im Bild haengt. */
+    .sk-panel { height: 100%; }
+    .sk-kopf { padding: 18px 20px 14px; }
+    .sk-koerper { padding: 20px; }
+    .sk-fuss { padding: 14px 20px 18px; }
+    .sk-untertitel { display: none; }
+    /* Nebeneinander waeren die Karten auf dem Handy zwei schmale
+       Streifen mit umgebrochenen Ueberschriften. */
+    .sk-karten,
+    .sk-haken-liste,
+    .sk-felder { grid-template-columns: 1fr; }
+    .sk-karten-zwei { grid-template-columns: 1fr 1fr; }
+    .sk-knopf { padding: 12px 18px; font-size: 0.92rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sk-balken-fuellung,
+    .sk-karte-innen,
+    .sk-haken,
+    .sk-knopf,
+    .sk-feld input,
+    .sk-feld textarea {
+      transition: none;
+    }
+  }
+</style>
