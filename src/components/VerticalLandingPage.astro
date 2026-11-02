@@ -30,6 +30,11 @@ import ClosingCta from './ClosingCta.astro';
 import { t } from '../lib/i18n';
 import { localeOf, path, pathOr } from '../lib/routes.mjs';
 import { getVertical, type VerticalSlug } from '../lib/verticals.i18n';
+import QuizModal from './QuizModal.astro';
+import Kundenstimmen from './Kundenstimmen.astro';
+import { SKIZZE } from '../lib/i18n/seiten/skizze';
+import { SLOT_KNAPPHEIT } from '../lib/constants';
+import { UMBAU_AKTIV, type SkizzeBranche } from '../lib/skizze';
 
 export interface Props {
   /**
@@ -78,6 +83,23 @@ const checkIcon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" a
 
 // Hero-Focal-Point fuer object-position (default center center).
 const heroFocalPoint = vertical.hero.background.focalPoint ?? 'center center';
+
+// --- Umbau fuer bezahlte Werbung ---------------------------------------
+//
+// Die neuen Teile erscheinen nur auf den Seiten, die in UMBAU_AKTIV
+// stehen. Alles andere bleibt unveraendert — eine Branche kommt dazu,
+// indem ihr Name dort eingetragen wird.
+const sk = SKIZZE[locale as 'de' | 'en'];
+const umgebaut = UMBAU_AKTIV.includes(slug as SkizzeBranche);
+
+const knappheitText = (() => {
+  if (!SLOT_KNAPPHEIT.aktiv) return null;
+  const vorlage =
+    SLOT_KNAPPHEIT.plaetze === 1 ? sk.hero.knappheitEiner : sk.hero.knappheit;
+  return vorlage
+    .replace('{n}', String(SLOT_KNAPPHEIT.plaetze))
+    .replace('{zeitraum}', SLOT_KNAPPHEIT.zeitraum[locale as 'de' | 'en']);
+})();
 ---
 
 <BaseLayout
@@ -97,6 +119,12 @@ const heroFocalPoint = vertical.hero.background.focalPoint ?? 'center center';
       style={`--hero-image: url('${vertical.hero.background.image}'); --hero-focal: ${heroFocalPoint};`}
     >
       <div class="v-hero-content">
+        {umgebaut && knappheitText && (
+          <p class="v-knappheit">
+            <span class="v-knappheit-punkt" aria-hidden="true"></span>
+            {knappheitText}
+          </p>
+        )}
         <p class="v-eyebrow v-hero-eyebrow">{vertical.hero.eyebrow}</p>
         <h1 class="v-hero-title">
           {vertical.hero.headlineLines.map((line, i) => (
@@ -125,13 +153,52 @@ const heroFocalPoint = vertical.hero.background.focalPoint ?? 'center center';
         </h1>
         <p class="v-hero-subtitle text-lines">{vertical.hero.subheadline}</p>
         <div class="v-hero-cta">
-          <a class="cta-orbital" href={pathOr('kontakt', locale)}>
-            <span>{d.branche.erstgespraech}</span>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M5 12h14M13 6l6 6-6 6" />
-            </svg>
-          </a>
+          {umgebaut ? (
+            <>
+              {/* Ein Knopf, kein Link: das Ziel ist kein Dokument,
+                  sondern ein Dialog auf derselben Seite. Als <a href="#">
+                  stuende im Verlauf ein Eintrag, der nirgendwohin
+                  fuehrt, und Vorleseprogramme kuendigten einen
+                  Seitenwechsel an, der nicht kommt. */}
+              <button type="button" class="cta-orbital" data-skizze-oeffnen>
+                <span>{sk.hero.cta}</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              </button>
+              {/* Bewusst leiser und bewusst vorhanden: wer lieber redet
+                  als tippt, braucht einen Weg, der nicht durch sechs
+                  Schritte fuehrt. */}
+              <a class="cta-link v-hero-cta-zweit" href={pathOr('kontakt', locale)}>
+                {sk.hero.ctaZweit}
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+              </a>
+            </>
+          ) : (
+            <a class="cta-orbital" href={pathOr('kontakt', locale)}>
+              <span>{d.branche.erstgespraech}</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+            </a>
+          )}
         </div>
+
+        {umgebaut && (
+          /* Keine Doppelung des Abschluss-Blocks: der verspricht
+             Reaktion (Antwort < 24 h, Erstgespraech gratis, DE & EN),
+             hier stehen die geschaeftlichen Zusagen. */
+          <ul class="v-zusagen">
+            {sk.hero.vertrauen.map((punkt) => (
+              <li>
+                <svg viewBox="0 0 16 16" aria-hidden="true" class="v-zusagen-haken">
+                  <path d="M3 8.5L6.2 11.7L13 4.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                {punkt}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </header>
 
@@ -212,6 +279,8 @@ const heroFocalPoint = vertical.hero.background.focalPoint ?? 'center center';
       </div>
     </section>
 
+    {umgebaut && <Kundenstimmen branche={slug as SkizzeBranche} />}
+
     <!-- FINAL CTA -->
     <ClosingCta
       recommendation={
@@ -227,6 +296,12 @@ const heroFocalPoint = vertical.hero.background.focalPoint ?? 'center center';
   </main>
 
   <SiteFooter />
+
+  {/* Ganz am Ende, hinter der Fusszeile: ein <dialog> wird per
+      showModal() in die oberste Ebene gehoben, seine Position im
+      Markup ist fuer die Darstellung belanglos — aber in der
+      Vorlese-Reihenfolge steht er so nicht mitten im Inhalt. */}
+  {umgebaut && <QuizModal branche={slug as SkizzeBranche} />}
 </BaseLayout>
 
 <style>
@@ -716,4 +791,106 @@ const heroFocalPoint = vertical.hero.background.focalPoint ?? 'center center';
     }
 
   }
+  /* === Umbau fuer bezahlte Werbung ============================== */
+
+  /* Knappheits-Pille, ganz oben im Hero. Leise: sie soll als Erstes
+     gelesen werden, aber nicht lauter sein als die Ueberschrift. */
+  .v-knappheit {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin: 0 0 22px;
+    padding: 8px 18px;
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(4px);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.81rem;
+    letter-spacing: 0.01em;
+    color: rgba(245, 245, 244, 0.88);
+  }
+  .v-knappheit-punkt {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(245, 158, 11, 1);
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
+    animation: v-knappheit-puls 2s ease-out infinite;
+  }
+  @keyframes v-knappheit-puls {
+    0%   { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+    70%  { box-shadow: 0 0 0 7px rgba(245, 158, 11, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+  }
+
+  /* Der Knopf traegt dieselbe globale Klasse wie der Link daneben.
+     .cta-orbital gehoert aber auch der Navigationsleiste — deshalb
+     hier ein Zusatz statt einer Aenderung in global.css. Ein <button>
+     erbt die Schrift des Browsers, nicht die der Seite. */
+  .v-hero-cta button.cta-orbital {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    text-align: left;
+  }
+  .v-hero-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .v-hero-cta-zweit {
+    font-size: 0.88rem;
+    color: rgba(245, 245, 244, 0.65);
+  }
+  .v-hero-cta-zweit:hover,
+  .v-hero-cta-zweit:focus-visible {
+    color: rgba(252, 211, 77, 1);
+  }
+
+  /* Zusagen-Zeile unter dem CTA. */
+  .v-zusagen {
+    list-style: none;
+    margin: 26px 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px 22px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    color: rgba(245, 245, 244, 0.6);
+  }
+  .v-zusagen li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .v-zusagen-haken {
+    width: 14px;
+    height: 14px;
+    color: rgba(245, 158, 11, 0.95);
+  }
+
+  @media (max-width: 768px) {
+    .v-knappheit {
+      font-size: 0.76rem;
+      padding: 7px 15px;
+      margin-bottom: 18px;
+    }
+    /* Vier Zusagen nebeneinander ergaeben auf dem Handy vier
+       Einzeiler. Zwei Spalten halten die Zeile kompakt. */
+    .v-zusagen {
+      display: grid;
+      grid-template-columns: repeat(2, auto);
+      justify-content: center;
+      gap: 9px 18px;
+      margin-top: 22px;
+      font-size: 0.76rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .v-knappheit-punkt { animation: none; }
+  }
+
 </style>
