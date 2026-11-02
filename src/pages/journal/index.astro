@@ -17,12 +17,24 @@ import SubPageBackground from '../../components/SubPageBackground.astro';
 import JournalAtmosphere from '../../components/JournalAtmosphere.astro';
 import SiteFooter from '../../components/SiteFooter.astro';
 import { getJournalPosts, urlFor, formatJournalDate } from '../../lib/sanity';
+// Dieselbe Quelle, aus der das Studio-Schema und das Veroeffentlichen-
+// Skript ihre Tag-Auswahl nehmen.
+import { TAG_OPTIONS } from '../../../sanity/schemaTypes/constants.js';
 
 const posts = await getJournalPosts();
 const [featured, ...rest] = posts;
 
-const TAG_FILTERS = [
-  'Alle',
+// Die REIHENFOLGE der Chips ist eine Gestaltungsfrage und steht
+// deshalb hier. Die MENGE darf aber nicht von den Tags abweichen, die
+// im Studio ueberhaupt vergeben werden koennen — sonst gibt es
+// entweder einen Tag ohne Chip (Beitraege darunter sind nicht
+// filterbar) oder einen Chip ohne Tag (bleibt fuer immer leer).
+//
+// Vorher stand die Liste hier doppelt, und zwar schon leicht anders:
+// Prozess und Preise waren gegenueber TAG_OPTIONS vertauscht. Das ist
+// harmlos, zeigt aber, wie zwei Listen auseinanderlaufen, sobald es
+// zwei sind.
+const TAG_REIHENFOLGE = [
   'Handwerk',
   'Praxis',
   'Gastronomie',
@@ -33,6 +45,20 @@ const TAG_FILTERS = [
   'SEO',
   'Design',
 ];
+
+const nurHier = TAG_REIHENFOLGE.filter((t) => !TAG_OPTIONS.includes(t));
+const nurImStudio = TAG_OPTIONS.filter((t) => !TAG_REIHENFOLGE.includes(t));
+if (nurHier.length || nurImStudio.length) {
+  throw new Error(
+    'Die Filter-Chips des Journals passen nicht zu den Tags im Studio.' +
+      (nurImStudio.length ? `\n  Tag ohne Chip: ${nurImStudio.join(', ')}` : '') +
+      (nurHier.length ? `\n  Chip ohne Tag: ${nurHier.join(', ')}` : '') +
+      '\nTAG_REIHENFOLGE hier und TAG_OPTIONS in' +
+      ' sanity/schemaTypes/constants.js in Deckung bringen.'
+  );
+}
+
+const TAG_FILTERS = ['Alle', ...TAG_REIHENFOLGE];
 ---
 
 <BaseLayout

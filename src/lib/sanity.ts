@@ -109,6 +109,13 @@ export const formatJournalDate = (iso: string): string => {
       day: 'numeric',
       month: 'long',
       year: 'numeric',
+      // Feste Zone, nicht die der BAUENDEN Maschine. Ohne sie haengt
+      // das angezeigte Datum davon ab, wo gebaut wird: Vercel baut in
+      // UTC, ein Rechner in Asien liegt acht Stunden davor. Ein Beitrag
+      // von 18:40 UTC erschien dadurch je nach Bauort am 31. Juli oder
+      // am 1. August — waehrend das datetime-Attribut daneben richtig
+      // blieb. Berlin ist die Zone, in der die Beitraege entstehen.
+      timeZone: 'Europe/Berlin',
     });
   } catch {
     return iso;

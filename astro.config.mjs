@@ -7,6 +7,10 @@ import sitemap from '@astrojs/sitemap';
 import react from '@astrojs/react';
 import vercel from '@astrojs/vercel';
 
+import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import { SITE_URL, sitemapAlternates, ROUTES } from './src/lib/routes.mjs';
 
 // https://astro.build/config
@@ -77,6 +81,114 @@ export default defineConfig({
         },
       },
     },
+    // Sicherung gegen toten Verweis von einem Journal-Beitrag auf einen
+    // anderen.
+    //
+    // Die Beitragstexte liegen in Sanity, die Verweise darin schreibt
+    // ein Mensch von Hand, und bisher prueft sie NICHTS: weder das
+    // Veroeffentlichen noch der Build. Genau so hat ein Verweis auf
+    // /journal/recruiting-handwerk-website monatelang live als 404
+    // ueberlebt — der Beitrag liegt unter recruiting-mit-website.
+    //
+    // Geprueft wird die GEBAUTE AusgabE, nicht ein Modell davon: jeder
+    // /journal/...-Verweis im fertigen HTML muss auf eine Seite zeigen,
+    // die es auch gibt. Damit faengt der Guard auch Verweise, die erst
+    // ueber Sanity hereinkommen und in keiner Quelldatei stehen.
+    //
+    // Eine Weiterleitung in vercel.json gilt als gueltiges Ziel. Ein 301
+    // auf die richtige Seite ist kein toter Verweis — der Besucher
+    // landet dort, wo er landen soll.
+    {
+      name: 'journal-verweis-guard',
+      hooks: {
+        'astro:build:done': ({ dir, logger }) => {
+          // fileURLToPath und nicht .pathname: der Projektpfad enthaelt
+          // ein kombiniertes Umlaut-Zeichen, und als URL kommt es
+          // prozentkodiert an ("Selbststa%CC%88ndigkeit"). readdirSync
+          // findet darunter nichts.
+          const wurzel = fileURLToPath(new URL('./', dir));
+
+          /**
+           * Alle gebauten Dateien einsammeln. ALLE, nicht nur HTML: das
+           * Journal hat auch einen Feed unter /journal/rss.xml, und der
+           * ist ein gueltiges Ziel. Gesucht wird spaeter nur in den
+           * HTML-Dateien, aber die Liste dessen, was es GIBT, muss
+           * vollstaendig sein — sonst meldet der Guard einen Fehlalarm
+           * auf jeden Pfad, der nicht auf .html endet.
+           * @type {string[]}
+           */
+          const dateien = [];
+          /** @param {string} ordner */
+          const gehen = (ordner) => {
+            for (const name of readdirSync(ordner)) {
+              const pfad = join(ordner, name);
+              if (statSync(pfad).isDirectory()) gehen(pfad);
+              else dateien.push(pfad);
+            }
+          };
+          gehen(wurzel);
+
+          /** Welche Journal-Pfade gibt es wirklich? */
+          const vorhanden = new Set(['/journal']);
+          for (const pfad of dateien) {
+            const rel = '/' + relative(wurzel, pfad).replace(/\/?index\.html$/, '');
+            if (rel.startsWith('/journal')) vorhanden.add(rel);
+          }
+
+          /**
+           * Weiterleitungen ohne Platzhalter aus vercel.json.
+           * @type {Map<string, string>}
+           */
+          const weiter = new Map();
+          try {
+            const conf = JSON.parse(readFileSync('vercel.json', 'utf8'));
+            for (const r of conf.redirects ?? []) {
+              if (r.source.includes(':') || r.has || r.missing) continue;
+              weiter.set(r.source.replace(/\/$/, ''), r.destination.replace(/\/$/, ''));
+            }
+          } catch (err) {
+            logger.warn('vercel.json nicht lesbar, Weiterleitungen bleiben unberuecksichtigt');
+          }
+
+          /** @param {string} ziel */
+          const gueltig = (ziel) =>
+            vorhanden.has(ziel) || vorhanden.has(weiter.get(ziel) ?? '\u0000');
+
+          /** @type {Map<string, Set<string>>} */
+          const tot = new Map();
+          for (const pfad of dateien) {
+            if (!pfad.endsWith('.html')) continue;
+            const html = readFileSync(pfad, 'utf8');
+            for (const treffer of html.matchAll(/href="(\/journal\/[^"#?]*)/g)) {
+              const ziel = treffer[1].replace(/\/$/, '');
+              if (gueltig(ziel)) continue;
+              const seite = '/' + relative(wurzel, pfad).replace(/\/?index\.html$/, '');
+              const bisher = tot.get(ziel) ?? new Set();
+              bisher.add(seite || '/');
+              tot.set(ziel, bisher);
+            }
+          }
+
+          if (tot.size) {
+            const liste = [...tot]
+              .map(([ziel, seiten]) => `${ziel}  (verlinkt von ${[...seiten].join(', ')})`)
+              .join('\n  ');
+            logger.error(
+              'Journal-Verweise zeigen auf Seiten, die es nicht gibt:\n  ' +
+                liste +
+                '\nDen Slug im Beitrag korrigieren, oder eine Weiterleitung in' +
+                ' vercel.json setzen, falls die alte Adresse schon im Umlauf ist.'
+            );
+            throw new Error(`journal-verweis-guard: ${tot.size} toter Verweis/toter Verweise`);
+          }
+
+          logger.info(
+            `${vorhanden.size - 1} Journal-Seiten, alle Verweise darauf zeigen ins Ziel`
+          );
+        },
+      },
+    },
+
     sitemap({
       // 404 nicht in die Sitemap aufnehmen — Google soll keine Fehler-
       // Seite indexieren.
