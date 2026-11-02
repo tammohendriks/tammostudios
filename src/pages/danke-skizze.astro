@@ -1,0 +1,254 @@
+---
+/**
+ * /danke-skizze — nach dem Skizzen-Fragebogen.
+ *
+ * Steht BEWUSST NICHT in src/lib/routes.mjs: ein Eintrag dort würde
+ * hreflang-Paare auf eine Seite bauen, die auf noindex steht, und der
+ * i18n-Guard im Build verlangt zu jedem Eintrag eine Datei in beiden
+ * Sprachen. Dieselbe Ausnahme gilt für 404 und die Journal-Beiträge —
+ * im Kommentar von keyOf() ausdrücklich so vorgesehen.
+ *
+ * Aus der Sitemap ist sie zusätzlich ausgeschlossen (astro.config.mjs).
+ * Beides zusammen, nicht eins davon: ein noindex in der Sitemap sind
+ * zwei widersprüchliche Signale an Google.
+ *
+ * Später soll diese Seite das Ziel der Conversion-Messung in Google
+ * Ads werden. Deshalb eine eigene Adresse und nicht ein Zustand im
+ * Modal — eine Zählung braucht einen Seitenaufruf.
+ *
+ * Der Vorname kommt aus ?name= in der Adresse. Ohne ihn, und bei
+ * direktem Aufruf ohne Absendung, steht eine Fassung ohne Anrede da —
+ * die Seite darf daran nicht scheitern.
+ *
+ * Anders als die Branchen-Landingpages trägt sie KEIN data-no-theme:
+ * der Umschalter erscheint hier, also braucht jede Farbe eine helle
+ * Entsprechung.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { SKIZZE } from '../lib/i18n/seiten/skizze';
+import { SITE } from '../lib/constants';
+import { path } from '../lib/routes.mjs';
+
+const s = SKIZZE.de;
+const journalPfad = path('journal');
+
+// Der Vorname wird NICHT serverseitig gelesen: die Seite ist statisch,
+// zur Build-Zeit gibt es keine Adresse. Das Skript unten setzt ihn.
+// Vorgerendert steht die Fassung ohne Anrede da — wer kein JavaScript
+// hat, liest einen vollständigen, richtigen Satz.
+---
+
+<BaseLayout
+  pageTitle={s.danke.pageTitle}
+  title={s.danke.title}
+  description={s.danke.description}
+  noindex
+>
+  <main class="danke-page">
+    <section class="danke-kopf">
+      <span class="danke-haken" aria-hidden="true">
+        <svg viewBox="0 0 48 48">
+          <circle cx="24" cy="24" r="21" fill="none" stroke="currentColor" stroke-width="2" opacity="0.35" />
+          <path d="M15 24.5L21.5 31L33 18.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </span>
+      <h1 class="danke-headline" data-danke-headline data-vorlage={s.danke.headline}>
+        {s.danke.headlineOhneName}
+      </h1>
+      <p class="danke-text">{s.danke.text}</p>
+    </section>
+
+    <section class="danke-schritte" aria-labelledby="danke-schritte-titel">
+      <h2 class="danke-schritte-titel" id="danke-schritte-titel">{s.danke.schritteTitel}</h2>
+      <ol class="danke-liste">
+        {s.danke.schritte.map((schritt, i) => (
+          <li>
+            <span class="danke-nummer" aria-hidden="true">{i + 1}</span>
+            <span>{schritt}</span>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <section class="danke-weiter">
+      <p class="danke-weiter-text">{s.danke.journalText}</p>
+      <a class="cta-link cta-link-lg" href={journalPfad}>
+        {s.danke.journalLabel}
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+      </a>
+
+      <p class="danke-weiter-text danke-folgen-text">{s.danke.folgenText}</p>
+      <ul class="danke-folgen">
+        {SITE.socials.map((profil) => (
+          <li>
+            <a href={profil.href} target="_blank" rel="noopener noreferrer">
+              {profil.label}
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" /></svg>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  </main>
+
+  <SiteFooter />
+</BaseLayout>
+
+<script>
+  // Vorname aus der Adresse in die Überschrift. Sie steht vorgerendert
+  // schon als vollständiger Satz da — hier wird sie nur persönlicher,
+  // nie erst gefüllt.
+  const kopf = document.querySelector<HTMLElement>('[data-danke-headline]');
+  const vorlage = kopf?.dataset.vorlage;
+  const roh = new URL(window.location.href).searchParams.get('name');
+  if (kopf && vorlage && roh) {
+    // Kürzen und säubern: der Wert steht in der Adresse und ist damit
+    // eine Angabe des Besuchers. textContent rendert kein Markup, der
+    // Weg ist also nicht gefährlich — aber eine 400 Zeichen lange
+    // Überschrift wäre trotzdem kaputt.
+    const name = roh.replace(/[\u0000-\u001f<>]/g, '').trim().slice(0, 40);
+    if (name) kopf.textContent = vorlage.replace('{name}', name);
+  }
+</script>
+
+<style>
+  .danke-page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 160px 24px 100px;
+    text-align: center;
+  }
+
+  .danke-haken {
+    display: inline-grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 26px;
+    color: rgba(245, 158, 11, 0.95);
+  }
+  .danke-haken svg { width: 100%; height: 100%; }
+
+  .danke-headline {
+    margin: 0 0 18px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.8rem, 4.5vw, 2.7rem);
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    color: #f5f5f4;
+  }
+  .danke-text {
+    margin: 0 auto;
+    max-width: 52ch;
+    font-family: 'Inter', sans-serif;
+    font-size: 1.02rem;
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.65);
+  }
+
+  .danke-schritte {
+    margin: 56px auto 0;
+    padding: 30px 28px;
+    max-width: 560px;
+    border: 1px solid rgba(245, 245, 244, 0.1);
+    border-radius: 16px;
+    background: rgba(245, 245, 244, 0.03);
+    text-align: left;
+  }
+  .danke-schritte-titel {
+    margin: 0 0 20px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: rgba(245, 158, 11, 0.85);
+  }
+  .danke-liste {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .danke-liste li {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.94rem;
+    line-height: 1.5;
+    color: rgba(245, 245, 244, 0.82);
+  }
+  .danke-nummer {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid rgba(245, 158, 11, 0.5);
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: rgba(245, 158, 11, 0.95);
+  }
+
+  .danke-weiter { margin-top: 48px; }
+  .danke-weiter-text {
+    margin: 0 0 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.92rem;
+    color: rgba(245, 245, 244, 0.55);
+  }
+  .danke-folgen-text { margin-top: 38px; }
+  .danke-folgen {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+  }
+  .danke-folgen a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    color: rgba(245, 245, 244, 0.75);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(245, 245, 244, 0.2);
+    padding-bottom: 2px;
+    transition: color 180ms ease, border-color 180ms ease;
+  }
+  .danke-folgen a:hover {
+    color: rgba(245, 158, 11, 0.95);
+    border-bottom-color: rgba(245, 158, 11, 0.6);
+  }
+
+  /* Heller Modus: hier erscheint der Umschalter, anders als auf den
+     Branchen-Landingpages. Jede Farbe oben braucht eine Entsprechung —
+     sonst steht schwarze Schrift auf schwarzem Grund. */
+  html[data-site-theme='light'] .danke-headline { color: #1a1a1c; }
+  html[data-site-theme='light'] .danke-text,
+  html[data-site-theme='light'] .danke-weiter-text { color: rgba(26, 26, 28, 0.62); }
+  html[data-site-theme='light'] .danke-schritte {
+    border-color: rgba(26, 26, 28, 0.12);
+    background: rgba(26, 26, 28, 0.03);
+  }
+  html[data-site-theme='light'] .danke-liste li { color: rgba(26, 26, 28, 0.82); }
+  html[data-site-theme='light'] .danke-folgen a {
+    color: rgba(26, 26, 28, 0.75);
+    border-bottom-color: rgba(26, 26, 28, 0.2);
+  }
+
+  @media (max-width: 768px) {
+    .danke-page { padding: 120px 20px 70px; }
+    .danke-schritte { padding: 24px 20px; margin-top: 44px; }
+    .danke-folgen { flex-direction: column; align-items: center; gap: 12px; }
+  }
+</style>
