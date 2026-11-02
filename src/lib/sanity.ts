@@ -78,6 +78,30 @@ export const getJournalPosts = async (): Promise<JournalPostSummary[]> =>
  * Einzelner Journal-Beitrag inkl. Body (Portable Text) + SEO-Felder.
  * Return null wenn Slug nicht existiert oder Datum in der Zukunft.
  */
+/**
+ * Suchtexte aller Beitraege, fuer den Index der Journal-Suche.
+ *
+ * pt::text(body) macht Sanity selbst: die Funktion liefert den
+ * Portable-Text-Body als Fliesstext. Das erspart einen eigenen
+ * Extraktor hier — und eine zweite Stelle, an der sich die Frage
+ * stellt, welche Block-Typen mitgezaehlt werden.
+ *
+ * Nur zur Build-Zeit benutzt (siehe src/pages/journal/suchindex.json.ts),
+ * nie im Browser.
+ */
+export const getJournalSuchtexte = async (): Promise<
+  { slug: string; title: string; excerpt: string; tags: string[]; volltext: string }[]
+> =>
+  sanityClient.fetch(
+    `*[_type == "post" && defined(slug.current) && publishedAt <= now()] | order(publishedAt desc) {
+      "slug": slug.current,
+      title,
+      "excerpt": coalesce(excerpt, ""),
+      "tags": coalesce(tags, []),
+      "volltext": pt::text(body)
+    }`
+  );
+
 export const getJournalPost = async (slug: string): Promise<JournalPost | null> =>
   sanityClient.fetch(
     `*[_type == "post" && slug.current == $slug && publishedAt <= now()][0] {

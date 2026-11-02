@@ -97,6 +97,48 @@ const TAG_FILTERS = ['Alle', ...TAG_REIHENFOLGE];
     </header>
 
     {posts.length > 0 && (
+      <div class="journal-suche">
+        {/* Kein <form>: es gibt nichts abzuschicken, gefiltert wird im
+            Browser. Ein form wuerde bei Enter die Seite neu laden und
+            die Eingabe verlieren. */}
+        <label class="journal-suche-label" for="journal-suche">
+          Beiträge durchsuchen
+        </label>
+        <div class="journal-suche-feld">
+          <svg class="journal-suche-lupe" viewBox="0 0 20 20" aria-hidden="true">
+            <circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.6" />
+            <line x1="12.8" y1="12.8" x2="17" y2="17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+          </svg>
+          <input
+            type="search"
+            id="journal-suche"
+            name="q"
+            class="journal-suche-eingabe"
+            placeholder="z.B. Bearbeitungssystem, Preise, DSGVO"
+            autocomplete="off"
+            enterkeyhint="search"
+          />
+          <button
+            type="button"
+            class="journal-suche-leeren"
+            data-suche-leeren
+            aria-label="Suche zurücksetzen"
+            hidden
+          >
+            <svg viewBox="0 0 20 20" aria-hidden="true">
+              <line x1="6" y1="6" x2="14" y2="14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+              <line x1="14" y1="6" x2="6" y2="14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+            </svg>
+          </button>
+        </div>
+        {/* role="status" statt stiller Umschaltung: wer die Seite vorlesen
+            laesst, bekommt sonst nicht mitgeteilt, dass sich unter dem
+            Feld gerade die halbe Seite geaendert hat. */}
+        <p class="journal-suche-status" role="status" data-suche-status></p>
+      </div>
+    )}
+
+    {posts.length > 0 && (
       <nav class="journal-filters" aria-label="Beiträge nach Kategorie filtern">
         <ul class="filter-chips">
           {TAG_FILTERS.map((tag) => (
@@ -122,7 +164,7 @@ const TAG_FILTERS = ['Alle', ...TAG_REIHENFOLGE];
       <>
         <div class="journal-filter-empty" data-filter-empty hidden>
           <p>
-            Keine Beiträge unter „<span data-filter-empty-tag></span>".
+            <span data-filter-empty-text></span>
             <button type="button" class="filter-reset" data-filter-reset>
               Alle anzeigen
             </button>
@@ -132,6 +174,7 @@ const TAG_FILTERS = ['Alle', ...TAG_REIHENFOLGE];
         {featured && (
           <article
             class="featured-post"
+            data-slug={featured.slug}
             data-tags={(featured.tags || []).join(',')}
           >
             <a class="featured-cover" href={`/journal/${featured.slug}`} aria-label={`Beitrag lesen: ${featured.title}`}>
@@ -163,6 +206,7 @@ const TAG_FILTERS = ['Alle', ...TAG_REIHENFOLGE];
             {rest.map((post) => (
               <article
                 class="post-card"
+                data-slug={post.slug}
                 data-tags={(post.tags || []).join(',')}
               >
                 <a class="post-card-link" href={`/journal/${post.slug}`} aria-label={`Beitrag lesen: ${post.title}`}>
@@ -198,18 +242,38 @@ const TAG_FILTERS = ['Alle', ...TAG_REIHENFOLGE];
 </BaseLayout>
 
 <script>
-  // Client-Filter — filtert Cards live nach data-tags. Kein Reload, kein
-  // History-Push (Deep-Link koennen wir spaeter nachziehen falls gebraucht).
-  // Zeigt Empty-State wenn Filter 0 sichtbare Cards uebrig laesst.
+  // Tag-Filter UND Suche, zusammen in einem Durchgang.
+  //
+  // Beide blenden dieselben Karten ein und aus, also darf es nur EINE
+  // Stelle geben, die das entscheidet — sonst ueberschreibt die zweite,
+  // was die erste gerade gesetzt hat. Der Zustand steht in zwei
+  // Variablen, anwenden() liest beide.
+  //
+  // Die Reihenfolge der Karten bleibt, wie sie ist. Nach Punktzahl zu
+  // sortieren waere naheliegend, wuerde aber den hervorgehobenen
+  // Beitrag aus seinem eigenen Layout reissen: der steht im Markup als
+  // breite Karte ueber dem Raster und kann nicht einfach dahinter
+  // rutschen.
+  import { suchen, type Indexeintrag } from '../../lib/journalSuche';
+
   const chips = document.querySelectorAll<HTMLButtonElement>('.filter-chip');
   const cards = document.querySelectorAll<HTMLElement>('[data-tags]');
   const emptyEl = document.querySelector<HTMLElement>('[data-filter-empty]');
-  const emptyTagEl = document.querySelector<HTMLElement>(
-    '[data-filter-empty-tag]'
+  const emptyTextEl = document.querySelector<HTMLElement>(
+    '[data-filter-empty-text]'
   );
   const resetBtn = document.querySelector<HTMLButtonElement>(
     '[data-filter-reset]'
   );
+  const sucheEl = document.querySelector<HTMLInputElement>('#journal-suche');
+  const leerenBtn = document.querySelector<HTMLButtonElement>('[data-suche-leeren]');
+  const statusEl = document.querySelector<HTMLElement>('[data-suche-status]');
+
+  let aktiverTag = 'Alle';
+  let anfrage = '';
+  /** Der Suchindex, erst geladen wenn jemand wirklich tippt. */
+  let index: Record<string, Indexeintrag> | null = null;
+  let ladefehler = false;
 
   const setActive = (tag: string) => {
     chips.forEach((c) => {
@@ -218,18 +282,54 @@ const TAG_FILTERS = ['Alle', ...TAG_REIHENFOLGE];
     });
   };
 
-  const applyFilter = (tag: string) => {
-    let visibleCount = 0;
+  const anwenden = () => {
+    // Ohne Anfrage oder ohne Index wird nicht gesucht, nur nach Tag
+    // gefiltert. Das ist der Zustand, solange der Index noch laedt —
+    // und der Zustand fuer immer, falls er nicht ankommt.
+    const treffer = anfrage && index ? suchen(index, anfrage) : null;
+
+    let sichtbar = 0;
     cards.forEach((card) => {
       const tags = (card.dataset.tags || '').split(',').filter(Boolean);
-      const match = tag === 'Alle' || tags.includes(tag);
-      card.style.display = match ? '' : 'none';
-      if (match) visibleCount++;
+      const tagPasst = aktiverTag === 'Alle' || tags.includes(aktiverTag);
+      const suchePasst = !treffer || treffer.has(card.dataset.slug || '');
+      const passt = tagPasst && suchePasst;
+      card.style.display = passt ? '' : 'none';
+      if (passt) sichtbar += 1;
     });
 
-    if (emptyEl && emptyTagEl) {
-      if (visibleCount === 0 && tag !== 'Alle') {
-        emptyTagEl.textContent = tag;
+    if (statusEl) {
+      if (ladefehler) {
+        statusEl.textContent =
+          'Die Suche konnte nicht geladen werden. Die Kategorien oben funktionieren weiter.';
+      } else if (!anfrage) {
+        statusEl.textContent = '';
+      } else if (!index) {
+        statusEl.textContent = 'Suche wird geladen …';
+      } else if (sichtbar === 0) {
+        // Kurz, weil das Feld unten den ganzen Satz samt Zurücksetzen
+        // zeigt. Zweimal dasselbe wäre doppelt — aber ganz zu schweigen
+        // auch falsch: wer die Seite vorlesen lässt, hört nur diese
+        // Zeile, das Feld unten ist keine Live-Region.
+        statusEl.textContent = 'Keine Beiträge gefunden.';
+      } else {
+        statusEl.textContent =
+          sichtbar === 1
+            ? '1 Beitrag gefunden.'
+            : `${sichtbar} Beiträge gefunden.`;
+      }
+    }
+
+    if (leerenBtn) leerenBtn.hidden = !anfrage;
+
+    if (emptyEl && emptyTextEl) {
+      if (sichtbar === 0) {
+        emptyTextEl.textContent =
+          anfrage && aktiverTag !== 'Alle'
+            ? `Keine Beiträge zu „${anfrage}“ unter „${aktiverTag}“.`
+            : anfrage
+              ? `Keine Beiträge zu „${anfrage}“.`
+              : `Keine Beiträge unter „${aktiverTag}“.`;
         emptyEl.hidden = false;
       } else {
         emptyEl.hidden = true;
@@ -237,18 +337,103 @@ const TAG_FILTERS = ['Alle', ...TAG_REIHENFOLGE];
     }
   };
 
+  /**
+   * Holt den Index einmal. Mehrfache Tastendruecke warten auf dasselbe
+   * Versprechen, statt den Index mehrfach zu laden.
+   */
+  let laden: Promise<void> | null = null;
+  const indexHolen = () => {
+    if (index || laden) return laden ?? Promise.resolve();
+    laden = fetch('/journal/suchindex.json')
+      .then((r) => {
+        if (!r.ok) throw new Error(String(r.status));
+        return r.json();
+      })
+      .then((daten: Record<string, Indexeintrag>) => {
+        index = daten;
+      })
+      .catch(() => {
+        ladefehler = true;
+      })
+      .then(() => {
+        anwenden();
+      });
+    return laden;
+  };
+
+  /** Die Anfrage in die Adresse schreiben, damit man sie teilen kann. */
+  const adresseSchreiben = () => {
+    const url = new URL(window.location.href);
+    if (anfrage) url.searchParams.set('q', anfrage);
+    else url.searchParams.delete('q');
+    // replaceState, nicht pushState: sonst liegen nach „Bearbeitungssystem"
+    // achtzehn Einträge im Verlauf und der Zurück-Knopf fuehrt nicht
+    // zurueck zur vorigen Seite, sondern Buchstabe fuer Buchstabe durch
+    // die Eingabe.
+    window.history.replaceState(null, '', url);
+  };
+
   chips.forEach((chip) => {
     chip.addEventListener('click', () => {
-      const tag = chip.dataset.filter || 'Alle';
-      setActive(tag);
-      applyFilter(tag);
+      aktiverTag = chip.dataset.filter || 'Alle';
+      setActive(aktiverTag);
+      anwenden();
     });
   });
 
   resetBtn?.addEventListener('click', () => {
+    aktiverTag = 'Alle';
+    anfrage = '';
+    if (sucheEl) sucheEl.value = '';
     setActive('Alle');
-    applyFilter('Alle');
+    adresseSchreiben();
+    anwenden();
   });
+
+  leerenBtn?.addEventListener('click', () => {
+    anfrage = '';
+    if (sucheEl) {
+      sucheEl.value = '';
+      sucheEl.focus();
+    }
+    adresseSchreiben();
+    anwenden();
+  });
+
+  if (sucheEl) {
+    // Kurz warten, statt bei jedem Buchstaben durch 145 kB zu laufen.
+    // 160 ms ist unter der Schwelle, ab der Tippen sich zaeh anfuehlt,
+    // und spart bei einem Wort wie „bearbeitungssystem“ 17 Durchgaenge.
+    let timer = 0;
+    sucheEl.addEventListener('input', () => {
+      anfrage = sucheEl.value.trim();
+      if (anfrage) void indexHolen();
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        adresseSchreiben();
+        anwenden();
+      }, 160);
+    });
+    // Enter soll nichts abschicken, sondern nur sofort filtern.
+    sucheEl.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter') return;
+      e.preventDefault();
+      window.clearTimeout(timer);
+      adresseSchreiben();
+      anwenden();
+    });
+
+    // Mit ?q=… im Link ankommen: Eingabe fuellen und sofort suchen.
+    const start = new URL(window.location.href).searchParams.get('q');
+    if (start) {
+      anfrage = start.trim();
+      sucheEl.value = start;
+      void indexHolen();
+    }
+  }
+
+  setActive('Alle');
+  anwenden();
 </script>
 
 <style>
@@ -298,6 +483,124 @@ const TAG_FILTERS = ['Alle', ...TAG_REIHENFOLGE];
     padding-top: 32px;
   }
 
+  /* === Suchfeld ===
+     Bewusst ruhiger als die Chips: die Chips sind das auffaellige
+     Element oben, das Suchfeld ist das genauere darunter. Waeren beide
+     in Bernstein, konkurrierten sie um denselben Blick. */
+  .journal-suche {
+    position: relative;
+    z-index: 2;
+    max-width: 520px;
+    margin: 0 auto 28px;
+  }
+  /* Die Beschriftung ist fuer Vorleseprogramme da, nicht fuer das Auge —
+     sichtbar sagt sie dasselbe wie der Platzhalter. Nicht display:none:
+     damit faellt sie auch aus der Vorlese-Reihenfolge. */
+  .journal-suche-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .journal-suche-feld {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(245, 245, 244, 0.16);
+    background: rgba(245, 245, 244, 0.04);
+    transition: border-color 180ms ease, background 180ms ease;
+  }
+  .journal-suche-feld:focus-within {
+    border-color: rgba(245, 158, 11, 0.6);
+    background: rgba(245, 158, 11, 0.06);
+  }
+  .journal-suche-lupe {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    color: rgba(245, 245, 244, 0.45);
+  }
+  .journal-suche-feld:focus-within .journal-suche-lupe {
+    color: rgba(245, 158, 11, 0.9);
+  }
+  .journal-suche-eingabe {
+    flex: 1;
+    min-width: 0;
+    /* 16px, nicht kleiner: darunter zoomt iOS Safari beim Antippen in
+       das Feld hinein und der Besucher sitzt in einer vergroesserten
+       Seite fest. */
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    color: rgba(245, 245, 244, 0.95);
+    background: transparent;
+    border: 0;
+    padding: 13px 0;
+    outline: none;
+  }
+  .journal-suche-eingabe::placeholder {
+    color: rgba(245, 245, 244, 0.38);
+  }
+  /* Das eigene Kreuz steht schon rechts im Feld — das von WebKit waere
+     ein zweites daneben. */
+  .journal-suche-eingabe::-webkit-search-cancel-button {
+    display: none;
+  }
+  .journal-suche-leeren {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(245, 245, 244, 0.08);
+    color: rgba(245, 245, 244, 0.7);
+    cursor: pointer;
+    transition: background 160ms ease, color 160ms ease;
+  }
+  .journal-suche-leeren:hover {
+    background: rgba(245, 158, 11, 0.2);
+    color: rgba(245, 158, 11, 0.95);
+  }
+  .journal-suche-leeren svg {
+    width: 14px;
+    height: 14px;
+  }
+  .journal-suche-status {
+    margin: 10px 0 0;
+    min-height: 1.2em;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+    color: rgba(245, 245, 244, 0.5);
+  }
+
+  :global(html[data-site-theme='light']) .journal-suche-feld {
+    border-color: rgba(26, 26, 28, 0.18);
+    background: rgba(26, 26, 28, 0.03);
+  }
+  :global(html[data-site-theme='light']) .journal-suche-eingabe {
+    color: rgba(26, 26, 28, 0.95);
+  }
+  :global(html[data-site-theme='light']) .journal-suche-eingabe::placeholder {
+    color: rgba(26, 26, 28, 0.45);
+  }
+  :global(html[data-site-theme='light']) .journal-suche-lupe {
+    color: rgba(26, 26, 28, 0.45);
+  }
+  :global(html[data-site-theme='light']) .journal-suche-leeren {
+    background: rgba(26, 26, 28, 0.07);
+    color: rgba(26, 26, 28, 0.6);
+  }
+  :global(html[data-site-theme='light']) .journal-suche-status {
+    color: rgba(26, 26, 28, 0.55);
+  }
+
   /* === Filter-Chips === */
   .journal-filters {
     position: relative;
@@ -337,6 +640,9 @@ const TAG_FILTERS = ['Alle', ...TAG_REIHENFOLGE];
   }
 
   @media (max-width: 768px) {
+    .journal-suche {
+      margin-bottom: 22px;
+    }
     .journal-filters {
       margin-left: -20px;
       margin-right: -20px;
