@@ -104,11 +104,13 @@ const locale = localeOf(Astro.url.pathname);
 const isLanding = routeKey === 'home';
 const initialPage = isLanding ? 'landing' : 'subpage';
 
-// Vertical Landings sind eigene Photo-Hero-Landings mit eigener
-// Design-Sprache — kein Site-Theme-Toggle darauf.
-const VERTICAL_KEYS = ['handwerk', 'praxis', 'gastronomie'];
-const isVerticalLanding = VERTICAL_KEYS.includes(routeKey ?? '');
-const hideThemeToggle = isLanding || isVerticalLanding;
+// Die Startseite hat den Weltraum-Hintergrund und kennt kein helles
+// Thema — dort bleibt der Umschalter weg. Die Branchenseiten haben
+// ihn seit dem Werbe-Umbau: ihr Hero ist ein Foto und bleibt in
+// beiden Themen dunkel, alles darunter schaltet mit. Ein dunkler
+// Deckel ueber einer hellen Seite ist kein Notbehelf, sondern das,
+// was ein Foto-Hero ohnehin ist.
+const hideThemeToggle = isLanding;
 
 // LocalBusiness JSON-LD Schema. ProfessionalService (Subtype von
 // LocalBusiness) matched einen Solo-Freelance-Webentwickler besser
