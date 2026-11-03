@@ -32,9 +32,9 @@ const u = SKIZZE[locale].ueberMich;
 const fakten = u.fakten.map((f) => f.replace('{n}', String(REFERENCES.length)));
 ---
 
-<section class="um" data-reveal aria-labelledby="um-titel">
+<section class="um" aria-labelledby="um-titel">
   <div class="um-raster">
-    <div class="um-bild">
+    <div class="um-bild" data-reveal>
       <img
         src="/tammo-foto.webp"
         alt={u.fotoAlt}
@@ -45,10 +45,10 @@ const fakten = u.fakten.map((f) => f.replace('{n}', String(REFERENCES.length)));
       />
     </div>
     <div class="um-text">
-      <p class="um-augenbraue">{u.augenbraue}</p>
-      <h2 class="um-headline" id="um-titel">{u.headline}</h2>
-      <p class="um-absatz">{u.text[branche]}</p>
-      <ul class="um-fakten">
+      <p class="um-augenbraue" data-reveal>{u.augenbraue}</p>
+      <h2 class="um-headline" id="um-titel" data-reveal>{u.headline}</h2>
+      <p class="um-absatz" data-reveal>{u.text[branche]}</p>
+      <ul class="um-fakten" data-reveal>
         {fakten.map((f) => <li>{f}</li>)}
       </ul>
     </div>

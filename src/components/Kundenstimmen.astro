@@ -42,21 +42,21 @@ const [gross, ...klein] = testimonialsFuer(branche);
 const [vorG, phraseG, nachG] = zerlegen(gross);
 ---
 
-<section class="ks" data-reveal aria-labelledby="ks-titel">
-  <p class="ks-augenbraue" id="ks-titel">{s.stimmen.titel}</p>
+<section class="ks" aria-labelledby="ks-titel">
+  <p class="ks-augenbraue" id="ks-titel" data-reveal>{s.stimmen.titel}</p>
 
   {/* Der Bewertungs-Kopf. Die Zahl und die Sterne sagen dasselbe —
       zusammen sind sie ein Siegel, einzeln nur eine Angabe. Für
       Vorleseprogramme steht beides einmal als Satz da, die gemalten
       Teile sind ausgeblendet. */}
-  <div class="ks-kopf">
+  <div class="ks-kopf" data-reveal>
     <p class="ks-note" aria-hidden="true">{s.stimmen.note}</p>
     <p class="ks-sterne" aria-hidden="true">★★★★★</p>
     <span class="ks-nurlesen">{s.stimmen.noteLabel}</span>
     <p class="ks-unterzeile">{s.stimmen.unterZeile}</p>
   </div>
 
-  <figure class="ks-gross">
+  <figure class="ks-gross" data-reveal>
     {/* Reine Zierde, und zwar eine, die ein Vorleseprogramm sonst als
         Anführungszeichen vorlesen würde. */}
     <span class="ks-zeichen" aria-hidden="true">&ldquo;</span>
@@ -77,7 +77,7 @@ const [vorG, phraseG, nachG] = zerlegen(gross);
       klein.map((stimme) => {
         const [vor, phrase, nach] = zerlegen(stimme);
         return (
-          <li class="ks-karte">
+          <li class="ks-karte" data-reveal>
             {stimme.abzeichen && (
               <span class="ks-abzeichen" aria-hidden="true">{stimme.abzeichen}</span>
             )}

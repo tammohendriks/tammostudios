@@ -38,15 +38,15 @@ const telefonAnzeige = locale === 'en' ? PHONE_INTERNATIONAL : SITE.phone;
 const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
 ---
 
-<section class="as" data-reveal aria-labelledby="as-titel">
+<section class="as" aria-labelledby="as-titel">
   <div class="as-innen">
-    <p class="as-augenbraue">{a.augenbraue}</p>
-    <h2 class="as-headline" id="as-titel">
+    <p class="as-augenbraue" data-reveal>{a.augenbraue}</p>
+    <h2 class="as-headline" id="as-titel" data-reveal>
       {a.headlineVor} <span class="as-stark">{a.headlineStark}</span>
     </h2>
-    <p class="as-sub">{sub}</p>
+    <p class="as-sub" data-reveal>{sub}</p>
 
-    <button type="button" class="cta-orbital as-knopf" data-skizze-oeffnen>
+    <button type="button" class="cta-orbital as-knopf" data-skizze-oeffnen data-reveal>
       <span>{a.cta}</span>
       <svg
         width="20"
@@ -65,19 +65,47 @@ const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
 
     {/* Dieselbe Komponente wie im Hero, nur kleiner: wer bis hierhin
         gescrollt hat, hat die Zahl oben längst vergessen. */}
-    <div class="as-slots">
+    <div class="as-slots" data-reveal>
       <Projektslots variante="klein" />
     </div>
 
-    <ul class="as-fakten">
+    <ul class="as-fakten" data-reveal>
       {a.fakten.map((f) => <li>{f}</li>)}
     </ul>
 
-    <p class="as-telefon">
+    <p class="as-telefon" data-reveal>
       {a.telVor} <a href={telefonLink}>{telefonAnzeige}</a>
     </p>
   </div>
 </section>
+
+<style is:global>
+  /* EINRASTEN AM SCHLUSS.
+   *
+   * `proximity`, nicht `mandatory`: die Seite rastet nur ein, wenn
+   * man ohnehin in der Naehe zum Stehen kommt. Bei `mandatory` wuerde
+   * jeder Scroll im ganzen Dokument gegen die Schnappstelle arbeiten,
+   * und am Handy fuehlt sich das an, als haette man die Kontrolle
+   * verloren.
+   *
+   * Es gibt genau EINEN Schnapppunkt auf der Seite — diesen Block.
+   * Alle anderen Abschnitte haben kein scroll-snap-align und werden
+   * deshalb nicht angefasst, auch der klebende Fuenf-Sekunden-Teil
+   * nicht.
+   *
+   * Steht global, weil scroll-snap-type auf den SCROLLENDEN Kasten
+   * gehoert, und das ist das Dokument. Astro liefert diesen Block nur
+   * auf Seiten aus, die diese Komponente wirklich benutzen. */
+  html {
+    scroll-snap-type: y proximity;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-snap-type: none;
+    }
+  }
+</style>
 
 <style>
   /* Der Schein liegt im Hintergrund der Sektion, nicht hinter dem
@@ -86,7 +114,15 @@ const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
   .as {
     position: relative;
     isolation: isolate;
-    padding: clamp(80px, 12vw, 140px) 40px clamp(70px, 10vw, 120px);
+    /* Der einzige Schnapppunkt der Seite. 'end' statt 'center': der
+       Block ist auf dem Handy hoeher als das Fenster, und ein
+       zentrierter Schnapppunkt waere dort nicht erreichbar. So kommt
+       die Seite mit dem Knopf und der Fusszeile zur Ruhe. */
+    scroll-snap-align: end;
+    /* Unten deutlich knapper als oben: der Block endet auf der
+       Telefonnummer, danach kommt direkt die Fusszeile. Viel Luft
+       dazwischen liest sich als Seitenende vor dem Seitenende. */
+    padding: clamp(80px, 12vw, 140px) 40px clamp(36px, 5vw, 56px);
     text-align: center;
     overflow: hidden;
   }

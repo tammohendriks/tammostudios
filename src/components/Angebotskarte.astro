@@ -46,11 +46,11 @@ const anwendungenZeile =
     : a.anwendungen.replace('{n}', String(angebot.anwendungen));
 ---
 
-<section class="ak" data-reveal aria-labelledby="ak-titel">
-  <p class="ak-augenbraue">{d.branche.wasEsKostet}</p>
-  <h2 class="ak-headline" id="ak-titel">{d.branche.preisHeadline}</h2>
+<section class="ak" aria-labelledby="ak-titel">
+  <p class="ak-augenbraue" data-reveal>{d.branche.wasEsKostet}</p>
+  <h2 class="ak-headline" id="ak-titel" data-reveal>{d.branche.preisHeadline}</h2>
 
-  <article class="ak-karte">
+  <article class="ak-karte" data-reveal>
     {angebot.abzeichen && <p class="ak-abzeichen">{a.abzeichen[branche]}</p>}
 
     <p class="ak-bezeichnung">{a.bezeichnung[branche]}</p>

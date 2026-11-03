@@ -34,6 +34,8 @@ import QuizModal from './QuizModal.astro';
 import Kundenstimmen from './Kundenstimmen.astro';
 import { SKIZZE } from '../lib/i18n/seiten/skizze';
 import { SITE, PHONE_INTERNATIONAL } from '../lib/constants';
+import { REFERENCES } from '../lib/references';
+import { subtitleFor } from '../lib/references.en';
 import Projektslots from './Projektslots.astro';
 import UeberMich from './UeberMich.astro';
 import Angebotskarte from './Angebotskarte.astro';
@@ -105,6 +107,45 @@ const hostVon = (url: string): string => {
   }
 };
 
+/**
+ * Was ueber eine Referenz sonst noch bekannt ist.
+ *
+ * verticals.ts kennt pro Referenz nur Name, Bild und Adresse.
+ * references.ts kennt dazu die Unterzeile („Arbeitsmedizinische
+ * Praxis“) und die eingesetzte Technik. Beides steht laengst da und
+ * macht aus einem nackten Screenshot eine Angabe. Verknuepft ueber den
+ * Hostnamen, nicht ueber die Zeichenkette: in verticals.ts steht mal
+ * mit und mal ohne www.
+ */
+/**
+ * Die Fallstudie hatte als einziger Abschnitt keine Ueberschrift:
+ * Augenbraue (12px) und direkt Fliesstext (16px), waehrend ueberall
+ * sonst eine 34px-Zeile dazwischen steht. Der Abschnitt fiel dadurch
+ * aus der Ordnung — genau so gemeldet.
+ *
+ * Beide Teile stecken schon in der bestehenden Zeile
+ * („AUS DER PRAXIS — SAMEDOS + IBI", englisch mit Doppelpunkt). Der
+ * vordere Teil wird die Augenbraue; die Ueberschrift kommt aus den
+ * Namen der Referenzen selbst, damit sie richtig geschrieben ist und
+ * nicht in Grossbuchstaben schreit.
+ */
+const fallstudieBraue = (() => {
+  const roh = vertical.caseStudy.eyebrow;
+  const m = roh.match(/^(.*?)(?:\s—\s|:\s)/);
+  return m ? m[1] : roh;
+})();
+const fallstudieTitel = vertical.caseStudy.references.map((r) => r.name).join(' + ');
+
+const refInfo = (url: string) => {
+  const host = hostVon(url);
+  const treffer = REFERENCES.find((r) => hostVon(r.url) === host);
+  if (!treffer) return null;
+  return {
+    unterzeile: subtitleFor(treffer, locale as 'de' | 'en'),
+    technik: treffer.tags,
+  };
+};
+
 // --- Umbau fuer bezahlte Werbung ---------------------------------------
 //
 // Die neuen Teile erscheinen nur auf den Seiten, die in UMBAU_AKTIV
@@ -135,7 +176,7 @@ const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
   description={vertical.meta.description}
   additionalSchema={faqSchema}
 >
-  <main class="vertical-page">
+  <main class:list={['vertical-page', umgebaut && 'ist-umgebaut']}>
     <!-- HERO: Full-Bleed BG-Image (CSS background-image, 100dvh) + Dark
          Gradient-Scrim + fette Typo mit Text-Shadow fuer Punch. Bild
          wird ueber CSS-Custom-Property injiziert damit Astro-Scoped
@@ -148,7 +189,11 @@ const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
     >
       <div class="v-hero-content">
         {umgebaut && <Projektslots />}
-        <p class="v-eyebrow v-hero-eyebrow">{vertical.hero.eyebrow}</p>
+        {/* Auf den umgebauten Seiten faellt sie weg: darueber steht
+            schon der Projektstart-Block, und zwei kleine Zeilen
+            uebereinander vor der Ueberschrift verzoegern nur den
+            Blick auf das, worum es geht. */}
+        {!umgebaut && <p class="v-eyebrow v-hero-eyebrow">{vertical.hero.eyebrow}</p>}
         <h1 class="v-hero-title">
           {vertical.hero.headlineLines.map((line, i) => (
             <>
@@ -162,8 +207,15 @@ const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
                     preserveAspectRatio="none"
                     aria-hidden="true"
                   >
+                    {/* pathLength="1" normiert die Laenge des Pfades
+                        auf 1. Vorher stand im CSS eine geschaetzte
+                        Zahl fuer stroke-dasharray — war sie kleiner
+                        als der Pfad, blieb das letzte Stueck
+                        ungezeichnet. Mit der Normierung stimmt es
+                        unabhaengig von der Geometrie. */}
                     <path
                       d="M 3 7 C 50 3, 150 9, 197 4"
+                      pathLength="1"
                       vector-effect="non-scaling-stroke"
                     />
                   </svg>
@@ -236,11 +288,11 @@ const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
     )}
 
     <!-- CHECKLIST -->
-    <section class="v-checklist" data-reveal aria-label={vertical.checklistTitle}>
-      <h2 class="v-section-headline">{vertical.checklistTitle}</h2>
+    <section class="v-checklist" aria-label={vertical.checklistTitle}>
+      <h2 class="v-section-headline" data-reveal>{vertical.checklistTitle}</h2>
       <ul class="v-check-list">
         {vertical.checklist.map((item) => (
-          <li>
+          <li data-reveal>
             <span class="v-check-icon" set:html={checkIcon} />
             <span class="v-check-text">{item}</span>
           </li>
@@ -273,22 +325,20 @@ const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
     )}
 
     <!-- CASE STUDY -->
-    <section class="v-case" data-reveal aria-label={vertical.caseStudy.eyebrow}>
-      <p class="v-eyebrow">{vertical.caseStudy.eyebrow}</p>
+    <section class="v-case" aria-label={vertical.caseStudy.eyebrow}>
+      <p class="v-eyebrow" data-reveal>{fallstudieBraue}</p>
+      <h2 class="v-section-headline" data-reveal>{fallstudieTitel}</h2>
       <div class={`v-case-grid ${vertical.caseStudy.references.length > 1 ? 'is-multi' : 'is-single'}`}>
-        <div class="v-case-body">
-          {vertical.caseStudy.paragraphs.map((p) => <p class="text-lines">{p}</p>)}
-          <div class="v-case-links">
-            {vertical.caseStudy.references.map((ref) => (
-              <a class="cta-link" href={ref.url} target="_blank" rel="noopener noreferrer">
-                {ref.linkLabel}
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-              </a>
-            ))}
-          </div>
+        <div class="v-case-body" data-reveal>
+          {vertical.caseStudy.paragraphs.map((p, i) => (
+            <p class:list={['text-lines', i === 0 && 'v-case-lead']}>{p}</p>
+          ))}
         </div>
         <div class="v-case-images">
-          {vertical.caseStudy.references.map((ref) => (
+          {vertical.caseStudy.references.map((ref) => {
+            const info = refInfo(ref.url);
+            return (
+            <article class="v-case-karte" data-reveal>
             <a class="v-case-image-link" href={ref.url} target="_blank" rel="noopener noreferrer" aria-label={`${ref.name} — ${d.branche.liveSeiteOeffnen}`}>
               {/* Scheinleiste eines Browsers. Sie sagt in einem Blick,
                   dass das kein Entwurf ist, sondern eine Seite, die
@@ -308,17 +358,32 @@ const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
                 <img src={ref.image} alt={ref.alt} loading="lazy" />
               </span>
             </a>
-          ))}
+            <div class="v-case-fuss">
+              <p class="v-case-name">{ref.name}</p>
+              {info?.unterzeile && <p class="v-case-unter">{info.unterzeile}</p>}
+              {info?.technik && (
+                <ul class="v-case-technik">
+                  {info.technik.map((tech) => <li>{tech}</li>)}
+                </ul>
+              )}
+              <a class="cta-link v-case-link" href={ref.url} target="_blank" rel="noopener noreferrer">
+                {ref.linkLabel}
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+              </a>
+            </div>
+            </article>
+            );
+          })}
         </div>
       </div>
     </section>
 
     <!-- FAQ -->
-    <section class="v-faq" data-reveal aria-label={d.branche.faqTitel}>
-      <h2 class="v-section-headline">{d.branche.faqTitel}</h2>
+    <section class="v-faq" aria-label={d.branche.faqTitel}>
+      <h2 class="v-section-headline" data-reveal>{d.branche.faqTitel}</h2>
       <div class="v-faq-list">
         {vertical.faq.map((entry) => (
-          <details class="v-faq-item">
+          <details class="v-faq-item" data-reveal>
             <summary>
               <span class="v-faq-q">{entry.q}</span>
               <span class="v-faq-icon" aria-hidden="true">
@@ -384,6 +449,13 @@ const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
        Bildes ab. `clip` schneidet genauso ab, ohne Scroll-Container.
        Nur auf der Waagerechten, damit die Senkrechte frei bleibt. */
     overflow-x: clip;
+  }
+
+  /* Der Abschluss-Block bringt seinen eigenen Abstand nach unten mit.
+     Der Seitenabstand kaeme obendrauf und riss ein Loch zwischen
+     Telefonnummer und Fusszeile. */
+  .vertical-page.ist-umgebaut {
+    padding-bottom: 0;
   }
 
   .vertical-page > *:not(:first-child) {
@@ -546,8 +618,8 @@ const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
      fertige Strich. */
   @media (prefers-reduced-motion: no-preference) {
     .hero-highlight-underline path {
-      stroke-dasharray: 210;
-      stroke-dashoffset: 210;
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
       animation: hero-strich 820ms cubic-bezier(0.22, 1, 0.36, 1) 380ms forwards;
     }
 
@@ -604,6 +676,7 @@ const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
   .v-check-list li {
     display: flex;
     align-items: flex-start;
+    justify-content: center;
     gap: 14px;
     padding: 14px 18px;
     background: rgba(15, 15, 18, 0.5);
@@ -631,7 +704,10 @@ const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
   }
 
   .v-check-text {
-    flex: 1;
+    /* Kein flex: 1 — sonst fuellt der Text die ganze Zeile und
+       justify-content hat nichts mehr zu zentrieren. */
+    flex: 0 1 auto;
+    text-align: center;
   }
 
   /* === PRICING === */
@@ -707,17 +783,77 @@ const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
     margin: 0;
   }
 
-  .v-case-links {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    align-items: flex-start;
-    margin-top: 8px;
+  /* Der erste Absatz traegt den Abschnitt und bekommt Lesegroesse. */
+  .v-case-lead {
+    font-size: var(--lp-lead) !important;
+    line-height: 1.55;
+    color: rgba(245, 245, 244, 0.92) !important;
   }
 
   .v-case-images {
     display: grid;
     gap: 20px;
+    margin-top: 40px;
+  }
+
+  /* Eine Karte je Referenz: Rahmen, Name, was es ist, womit gebaut,
+     Verweis. Vorher stand unter dem Text nur eine Reihe nackter
+     Screenshots und zwei lose Links daneben — viel Flaeche, wenig
+     Aussage. Name, Unterzeile und Technik stehen laengst in
+     references.ts. */
+  .v-case-karte {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .v-case-fuss {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .v-case-name {
+    margin: 0;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: var(--lp-text);
+    line-height: 1.25;
+    color: #f5f5f4;
+  }
+
+  .v-case-unter {
+    margin: 0;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-klein);
+    line-height: 1.35;
+    color: rgba(245, 245, 244, 0.55);
+  }
+
+  .v-case-technik {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    margin: 5px 0 2px;
+    padding: 0;
+  }
+
+  .v-case-technik li {
+    padding: 3px 9px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.03);
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.02em;
+    color: rgba(245, 245, 244, 0.5);
+  }
+
+  .v-case-link {
+    font-size: var(--lp-klein);
   }
 
   .v-case-grid.is-multi .v-case-images {
@@ -834,11 +970,14 @@ const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
   }
 
   .v-faq-item summary {
+    position: relative;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     gap: 16px;
-    padding: 18px 22px;
+    /* Rechts und links derselbe Platz, damit die Frage wirklich
+       mittig steht und nicht nur neben dem Pfeil. */
+    padding: 18px 52px;
     cursor: pointer;
     list-style: none;
     font-family: 'Neue Montreal', 'Inter', sans-serif;
@@ -863,22 +1002,29 @@ const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
   }
 
   .v-faq-q {
-    flex: 1;
+    flex: 0 1 auto;
+    text-align: center;
   }
 
   .v-faq-icon {
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    display: inline-flex;
     flex-shrink: 0;
     color: rgba(245, 158, 11, 0.85);
     transition: transform 240ms ease;
   }
 
   .v-faq-item[open] .v-faq-icon {
-    transform: rotate(180deg);
+    transform: translateY(-50%) rotate(180deg);
   }
 
   .v-faq-a {
-    padding: 0 22px 20px;
+    padding: 0 28px 20px;
     margin: 0;
+    text-align: center;
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-weight: 400;
     font-size: var(--lp-text);
@@ -937,12 +1083,12 @@ const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
     }
 
     .v-faq-item summary {
-      padding: 16px 18px;
+      padding: 16px 44px;
       font-size: 0.95rem;
     }
 
     .v-faq-a {
-      padding: 0 18px 18px;
+      padding: 0 20px 18px;
       font-size: 0.92rem;
     }
 
@@ -978,18 +1124,6 @@ const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
   .v-pricing-body p,
   .v-case-body {
     text-align: center;
-  }
-
-  /* Die Verweise auf die Kundenseiten nebeneinander statt untereinander
-     — zwei zentrierte Zeilen unter einem zentrierten Text saehen aus
-     wie eine Liste, die vergessen wurde. */
-  .v-case-links {
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 10px 24px;
-    margin-top: 14px;
   }
 
   .v-check-list {
