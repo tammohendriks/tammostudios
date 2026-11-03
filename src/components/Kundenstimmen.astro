@@ -182,15 +182,20 @@ const [vorG, phraseG, nachG] = zerlegen(gross);
     z-index: 0;
   }
 
+  /* AUFRECHT, NICHT KURSIV. Die Kursive von Neue Montreal ist ein
+     echter eigener Schnitt mit anderen Buchstabenformen — einstöckiges
+     a, anderes g. Bei einem Wort fällt das als Betonung auf, bei
+     vierzig Wörtern in 38px liest es sich wie eine zweite Schrift auf
+     der Seite. Dass es ein Zitat ist, sagen schon das
+     Anführungszeichen dahinter und die Namenszeile darunter. */
   .ks-gross-zitat {
     position: relative;
     z-index: 1;
     margin: 0 0 26px;
     font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-style: italic;
     font-weight: 400;
     font-size: var(--lp-mittel);
-    line-height: 1.42;
+    line-height: 1.38;
     letter-spacing: -0.012em;
     color: rgba(245, 245, 244, 0.95);
     text-wrap: balance;
@@ -200,6 +205,12 @@ const [vorG, phraseG, nachG] = zerlegen(gross);
   .ks-zitat strong {
     color: #f59e0b;
     font-weight: 500;
+  }
+
+  /* Ohne die Kursive trug die Hervorhebung nur noch die Farbe. Im
+     grossen Zitat reicht das nicht — dort steht sie in Bold. */
+  .ks-gross-zitat strong {
+    font-weight: 700;
   }
 
   /* === Die beiden kleinen === */
@@ -255,7 +266,6 @@ const [vorG, phraseG, nachG] = zerlegen(gross);
   .ks-zitat {
     margin: 0;
     font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-style: italic;
     font-size: var(--lp-text);
     line-height: 1.55;
     color: rgba(245, 245, 244, 0.8);
