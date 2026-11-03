@@ -138,4 +138,4 @@ export const SCHRITTE = 6;
  * branchenspezifischen Teile (Funktions-Auswahl, Reihenfolge der
  * Kundenstimmen) liegen längst bereit.
  */
-export const UMBAU_AKTIV: readonly SkizzeBranche[] = ['praxis'];
+export const UMBAU_AKTIV: readonly SkizzeBranche[] = ['praxis', 'handwerk', 'gastronomie'];
