@@ -778,6 +778,63 @@ const umgebaut = UMBAU_AKTIV.includes(slug as SkizzeBranche);
     }
 
   }
+  /* === Alles auf die Mittelachse ==================================
+     Hero und Intro standen zentriert, ab der Checkliste lief alles
+     linksbuendig weiter — die Seite kippte auf halber Hoehe nach
+     links, und beim Scrollen sah man die Kante.
+
+     Zentriert wird der TEXT, nicht der Inhalt von Listenzeilen. Eine
+     zentrierte Aufzaehlung liest sich schlechter als eine
+     linksbuendige: dem Auge fehlt die gemeinsame Kante, an der die
+     naechste Zeile anfaengt. Checkliste und FAQ bleiben deshalb innen
+     linksbuendig und werden nur als Block mittig gesetzt.
+
+     Diese Regeln stehen am Ende des Stilblocks, damit sie die
+     Ausrichtung der Abschnitte weiter oben ueberschreiben, ohne dass
+     dort etwas geloescht werden muss. */
+  .v-eyebrow,
+  .v-section-headline {
+    text-align: center;
+  }
+
+  /* Lesespalte: 680px traegt rund 75 Zeichen pro Zeile. Darueber
+     verliert das Auge beim Ruecksprung die naechste Zeile. */
+  .v-pricing-body,
+  .v-case-body {
+    max-width: 680px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .v-pricing-body p,
+  .v-case-body {
+    text-align: center;
+  }
+
+  /* Die Verweise auf die Kundenseiten nebeneinander statt untereinander
+     — zwei zentrierte Zeilen unter einem zentrierten Text saehen aus
+     wie eine Liste, die vergessen wurde. */
+  .v-case-links {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 10px 24px;
+    margin-top: 14px;
+  }
+
+  .v-check-list {
+    max-width: 820px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .v-faq-list {
+    max-width: 760px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
   /* === Umbau fuer bezahlte Werbung ============================== */
 
   /* Der Knopf traegt dieselbe globale Klasse wie der Link daneben.
