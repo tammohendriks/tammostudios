@@ -99,7 +99,6 @@ export const de = {
     // ihn finden, aber nicht als gleichwertige Alternative angeboten
     // bekommen — sonst zerfällt die Aufmerksamkeit auf zwei Knöpfe.
     ctaZweit: 'Lieber kurz telefonieren?',
-    ctaZweitRuf: 'Direkt anrufen',
     vertrauen: [
       'DSGVO-konform',
       'Festpreis garantiert',
@@ -392,7 +391,6 @@ export const en: Shape<typeof de> = {
     slotPunkte: '{frei} of {gesamt} project slots left',
     cta: 'Free website sketch in 48h',
     ctaZweit: 'Rather talk for a minute?',
-    ctaZweitRuf: 'Call directly',
     vertrauen: [
       'GDPR compliant',
       'Fixed price, guaranteed',

@@ -130,7 +130,10 @@ const inhalt = alle[branche];
     font-family: var(--lp-mono);
     font-size: var(--lp-mono-groesse);
     letter-spacing: 0.04em;
-    color: rgba(245, 245, 244, 0.4);
+    /* 0.4 ergab auf #050507 einen Kontrast von 3,49 — unter den 4,5,
+       die kleiner Text braucht (von Lighthouse gemeldet, nicht
+       geschaetzt). 0.55 liegt bei rund 5,2. */
+    color: rgba(245, 245, 244, 0.55);
     /* Feste Breite: die Zahl wechselt beim Scrollen, und eine
        springende Augenbraue daneben wäre das Gegenteil von ruhig. */
     min-width: 3.4em;
