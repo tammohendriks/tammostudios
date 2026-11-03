@@ -63,6 +63,15 @@ export const ANGEBOTE: Record<SkizzeBranche, Angebot> = {
     anwendungen: 1,
     abzeichen: true,
   },
+  kanzlei: {
+    // Wie Praxis: zwei individuelle Anwendungen und derselbe Aufwand
+    // bei Pflichtangaben und Datenschutz. Der Markt ruft fuer eine
+    // Kanzlei-Website 3.000 bis 8.000 Euro auf — 2.500 ist deutlich
+    // darunter, ohne billig zu wirken.
+    preis: '2.500',
+    anwendungen: 2,
+    abzeichen: false,
+  },
   medien: {
     preis: '2.000',
     anwendungen: 1,

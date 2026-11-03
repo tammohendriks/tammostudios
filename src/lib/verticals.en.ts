@@ -356,4 +356,61 @@ export const VERTICAL_TEXT_EN: VerticalTexte = {
       },
     ],
   },
+  kanzlei: {
+    meta: {
+      title: 'Website for law and tax firms',
+      description:
+        'A website for tax advisors and lawyers, built by hand in Bremen. Secure document upload, a careers page, and clean professional-law compliance. €2,500 all in, a sketch within 48 hours.',
+    },
+    hero: {
+      eyebrow: 'WEBSITE FOR LAW FIRMS',
+      headlineLines: ['Your', 'firm website.', 'Serious, not stiff.'],
+      subheadline:
+        '€2,500 all in. Live in 14 days.\nFor tax advisors, lawyers and notaries.',
+    },
+    intro:
+      'Clients compare before they call.\n' +
+      'They open three firms in three tabs and decide within a minute which one to try.\n' +
+      'What decides it is rarely expertise. It is who feels reachable.',
+    checklistTitle: 'What belongs on a law firm website',
+    checklist: [
+      'Practice areas clearly separated, not a wall of text',
+      'A team with faces: clients are looking for people',
+      'First contact without a hurdle: a callback, a form, or an appointment',
+      'Documents handed over securely and encrypted',
+      'A careers page that actually speaks to applicants',
+      'Mandatory details done right: imprint, professional law, privacy',
+      'Maintained by you: new colleagues, new services, no agency',
+    ],
+    pricingParagraphs: [
+      'A firm website: €2,500, including two custom applications, for example an encrypted document upload and an appointment request.\nNo hourly rates, no asterisks. Done in 14 days.',
+      'For €30 a month I handle maintenance, security updates, and priority support.\nOptional, month to month.',
+    ],
+    faq: [
+      {
+        q: 'Are lawyers and tax advisors allowed to advertise like this?',
+        a: 'German professional law allows factual information about your work and forbids advertising that misleads or promises outcomes. The sites I build inform; they promise nothing. I deliver the technical side. What your professional body allows in a given case, you tell me. I am a developer, not a lawyer.',
+      },
+      {
+        q: 'Can clients upload documents securely?',
+        a: 'Yes, that is one of the two custom applications: an encrypted upload that lands with you instead of in an email attachment. If you already run a client portal, you get a clear route to it instead.',
+      },
+      {
+        q: 'Can it connect to DATEV or our portal?',
+        a: 'Linking to it, always. Connecting more deeply depends on which interface your provider opens up. We settle that in the intro call, before anything is promised.',
+      },
+      {
+        q: 'Does the site help with hiring?',
+        a: 'For many firms that is now the real reason for a new site. A careers page with real faces, honest tasks and a two-minute application does more than a job ad, and it keeps working once the ad has expired.',
+      },
+      {
+        q: 'How fast will we show up on Google?',
+        a: 'The site is online immediately. For your own firm name you rank within 2 to 4 weeks. For general searches it takes 3 to 6 months.',
+      },
+      {
+        q: 'Can we edit the texts ourselves?',
+        a: 'Yes. You get your own CMS: add a colleague, add a service, fix a sentence. No code, no call to me.',
+      },
+    ],
+  },
 };

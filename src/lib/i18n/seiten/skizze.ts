@@ -61,6 +61,15 @@ const funktionenDe = {
     'Blog / Journal',
     'Shop für Prints oder Presets',
   ],
+  kanzlei: [
+    'Kontaktformular (mit DSGVO-Haken)',
+    'Rechtsgebiete / Leistungen',
+    'Team-Vorstellung',
+    'Sicherer Unterlagen-Upload',
+    'Terminanfrage',
+    'Karriere-Seite',
+    'Zweisprachig (DE/EN)',
+  ],
 } as const satisfies Funktionsnamen;
 
 const funktionenEn = {
@@ -99,6 +108,15 @@ const funktionenEn = {
     'Client logos as proof',
     'Blog / journal',
     'Shop for prints or presets',
+  ],
+  kanzlei: [
+    'Contact form (with privacy checkbox)',
+    'Practice areas / services',
+    'Team section',
+    'Secure document upload',
+    'Appointment request',
+    'Careers page',
+    'Bilingual (German/English)',
   ],
 } as const satisfies Funktionsnamen;
 
@@ -185,6 +203,16 @@ export const de = {
       uhr: '{s}s',
       uhrLabel: 'Die ersten fünf Sekunden auf deiner Seite',
     },
+    kanzlei: {
+      augenbraue: 'DIE ERSTEN 5 SEKUNDEN',
+      aufmacher: 'Mandanten öffnen drei Kanzleien in drei Tabs.',
+      fragen: ['Macht ihr meinen Fall?', 'Wer sitzt da eigentlich?', 'Wie komme ich an einen Termin?'],
+      pointeVor: 'Deine Website muss diese Fragen ',
+      pointeStark: 'in Sekunden',
+      pointeNach: ' beantworten — sonst rufen sie bei Nummer zwei an.',
+      uhr: '{s}s',
+      uhrLabel: 'Die ersten fünf Sekunden auf deiner Seite',
+    },
   },
 
   /**
@@ -218,12 +246,14 @@ export const de = {
       handwerk: 'Handwerker-Website',
       gastronomie: 'Gastro-Website',
       medien: 'Portfolio-Website',
+      kanzlei: 'Kanzlei-Website',
     },
     fuerWen: {
       praxis: 'für Praxen',
       handwerk: 'für Handwerker',
       gastronomie: 'für Gastronomie',
       medien: 'für Kreative',
+      kanzlei: 'für Kanzleien',
     },
     // Für das Service-Schema: audienceType will eine Zielgruppe
     // benennen, keine Präposition.
@@ -232,6 +262,7 @@ export const de = {
       handwerk: 'Handwerksbetriebe',
       gastronomie: 'Restaurants, Cafés und Bars',
       medien: 'Fotografen, Videografen, Werbe- und Produktionsfirmen',
+      kanzlei: 'Steuerberater, Rechtsanwälte und Notare',
     },
     preisTitel: 'Was eine {wort} kostet.',
     faqTitel: 'Häufige Fragen zur {wort}',
@@ -274,6 +305,8 @@ export const de = {
         'Ich baue Websites für Gastronomie, Handwerk und kleine Unternehmen, von Bremen aus für ganz Deutschland. Kein Team, keine Agentur dazwischen: Du sprichst von der ersten Skizze bis zum Launch mit mir. Und wenn danach was ist, auch.',
       medien:
         'Ich baue Websites für Medienbetriebe, Praxen und Handwerk, von Bremen aus für ganz Deutschland. Kein Team, keine Agentur dazwischen: Du sprichst von der ersten Skizze bis zum Launch mit mir. Und wenn danach was ist, auch.',
+      kanzlei:
+        'Ich baue Websites für Kanzleien, Praxen und kleine Unternehmen, von Bremen aus für ganz Deutschland. Kein Team, keine Agentur dazwischen: Du sprichst von der ersten Skizze bis zum Launch mit mir. Und wenn danach was ist, auch.',
     },
     // {n} ist die Zahl der Referenzen aus references.ts — abgeleitet
     // statt hingeschrieben. Eine Zahl, die man pflegen muss, ist eine
@@ -297,12 +330,14 @@ export const de = {
       // Wird nicht gezeigt (abzeichen: false in angebote.ts), steht
       // aber bereit, falls es einmal genug Belege dafür gibt.
       medien: 'Für Portfolios gebaut',
+      kanzlei: 'Für Kanzleien gebaut',
     },
     bezeichnung: {
       praxis: 'Eine Praxis-Website',
       handwerk: 'Eine Handwerker-Website',
       gastronomie: 'Eine Gastro-Website',
       medien: 'Eine Portfolio-Website',
+      kanzlei: 'Eine Kanzlei-Website',
     },
     // {n} ist die Zahl der Anwendungen aus angebote.ts.
     anwendungen: '{n} individuelle Anwendungen deiner Wahl',
@@ -316,6 +351,8 @@ export const de = {
         'z. B. Speisekarte zum Selbstpflegen, Tischreservierung, Tageskarte als PDF, Veranstaltungs-Kalender',
       medien:
         'z. B. Kundengalerie mit Passwort, Video-Player ohne Fremdanbieter, Shop für Prints, Anfrage mit Budget-Abfrage',
+      kanzlei:
+        'z. B. verschlüsselter Unterlagen-Upload, Terminanfrage, Karriere-Seite mit Bewerbungsformular, Mandanten-Login',
     },
     // Die Merkmale ohne die Anwendungen — die stehen als eigene Zeile
     // dazwischen, weil ihr Hinweis darunter gehört.
@@ -324,6 +361,7 @@ export const de = {
       handwerk: ['Eigenes Design, auf deinen Betrieb zugeschnitten', 'Eigenes CMS, das du selbst pflegst'],
       gastronomie: ['Eigenes Design, auf dein Lokal zugeschnitten', 'Eigenes CMS, das du selbst pflegst'],
       medien: ['Eigenes Design, auf deine Arbeit zugeschnitten', 'Eigenes CMS, das du selbst pflegst'],
+      kanzlei: ['Eigenes Design, auf deine Kanzlei zugeschnitten', 'Eigenes CMS, das du selbst pflegst'],
     },
     merkmaleNach: {
       praxis: [
@@ -339,6 +377,10 @@ export const de = {
         'Mobil und am Rechner schnell, SEO-sauber',
       ],
       medien: [
+        'DSGVO-konform, verschlüsselte Formulare',
+        'Mobil und am Rechner schnell, SEO-sauber',
+      ],
+      kanzlei: [
         'DSGVO-konform, verschlüsselte Formulare',
         'Mobil und am Rechner schnell, SEO-sauber',
       ],
@@ -399,6 +441,7 @@ export const de = {
       handwerk: 'deinen Betrieb',
       gastronomie: 'dein Lokal',
       medien: 'dein Studio',
+      kanzlei: 'deine Kanzlei',
     },
     cta: 'Kostenlose Website-Skizze anfordern',
     fakten: ['Antwort < 24 h', 'Kostenlos', 'DE & EN'],
@@ -577,6 +620,16 @@ export const en: Shape<typeof de> = {
       uhr: '{s}s',
       uhrLabel: 'The first five seconds on your site',
     },
+    kanzlei: {
+      augenbraue: 'THE FIRST 5 SECONDS',
+      aufmacher: 'Clients open three firms in three tabs.',
+      fragen: ['Do you handle my case?', 'Who actually works here?', 'How do I get an appointment?'],
+      pointeVor: 'Your website has to answer all three ',
+      pointeStark: 'in seconds',
+      pointeNach: ' — or they call number two.',
+      uhr: '{s}s',
+      uhrLabel: 'The first five seconds on your site',
+    },
   },
 
   seo: {
@@ -585,18 +638,21 @@ export const en: Shape<typeof de> = {
       handwerk: 'website for your trade business',
       gastronomie: 'restaurant website',
       medien: 'portfolio website',
+      kanzlei: 'law firm website',
     },
     fuerWen: {
       praxis: 'for medical practices',
       handwerk: 'for contractors',
       gastronomie: 'for restaurants',
       medien: 'for creatives',
+      kanzlei: 'for law and tax firms',
     },
     zielgruppe: {
       praxis: 'Medical and dental practices',
       handwerk: 'Trade businesses',
       gastronomie: 'Restaurants, cafes and bars',
       medien: 'Photographers, videographers, advertising and production companies',
+      kanzlei: 'Tax advisors, lawyers and notaries',
     },
     preisTitel: 'What a {wort} costs.',
     faqTitel: 'Common questions about a {wort}',
@@ -638,6 +694,8 @@ export const en: Shape<typeof de> = {
         'I build websites for restaurants, trades and small businesses, from Bremen for all of Germany. No team, no agency in between: you talk to me from the first sketch to launch. And afterwards too, if something comes up.',
       medien:
         'I build websites for media studios, medical practices and trades, from Bremen for all of Germany. No team, no agency in between: you talk to me from the first sketch to launch. And afterwards too, if something comes up.',
+      kanzlei:
+        'I build websites for law and tax firms, medical practices and small businesses, from Bremen for all of Germany. No team, no agency in between: you talk to me from the first sketch to launch. And afterwards too, if something comes up.',
     },
     fakten: ['{n} websites live', 'Reply < 24 h', 'Bremen'],
     fotoAlt: 'Tammo Hendriks, founder of Tammo Studios',
@@ -650,12 +708,14 @@ export const en: Shape<typeof de> = {
       handwerk: 'Most booked by trades',
       gastronomie: 'Most booked by restaurants',
       medien: 'Built for portfolios',
+      kanzlei: 'Built for law firms',
     },
     bezeichnung: {
       praxis: 'One practice website',
       handwerk: 'One website for your trade business',
       gastronomie: 'One restaurant website',
       medien: 'One portfolio website',
+      kanzlei: 'One firm website',
     },
     anwendungen: '{n} custom applications of your choice',
     anwendungenEine: 'One custom application of your choice',
@@ -668,18 +728,22 @@ export const en: Shape<typeof de> = {
         'e.g. a menu you edit yourself, table reservations, a daily special as PDF, an events calendar',
       medien:
         'e.g. a password-protected client gallery, a video player with no third party, a shop for prints, an inquiry form that asks for the budget',
+      kanzlei:
+        'e.g. an encrypted document upload, an appointment request, a careers page with an application form, a client login',
     },
     merkmaleVor: {
       praxis: ['Your own design, cut to your practice', 'Your own CMS, maintained by you'],
       handwerk: ['Your own design, cut to your business', 'Your own CMS, maintained by you'],
       gastronomie: ['Your own design, cut to your place', 'Your own CMS, maintained by you'],
       medien: ['Your own design, cut to your work', 'Your own CMS, maintained by you'],
+      kanzlei: ['Your own design, cut to your firm', 'Your own CMS, maintained by you'],
     },
     merkmaleNach: {
       praxis: ['GDPR compliant, encrypted forms', 'Fast on phone and desktop, clean SEO'],
       handwerk: ['GDPR compliant, encrypted forms', 'Fast on phone and desktop, clean SEO'],
       gastronomie: ['GDPR compliant, encrypted forms', 'Fast on phone and desktop, clean SEO'],
       medien: ['GDPR compliant, encrypted forms', 'Fast on phone and desktop, clean SEO'],
+      kanzlei: ['GDPR compliant, encrypted forms', 'Fast on phone and desktop, clean SEO'],
     },
     zahlung: 'Payment: 50 % on order, 50 % at launch.',
     bugfix: 'Bug fixes after launch: free.',
@@ -712,6 +776,7 @@ export const en: Shape<typeof de> = {
       handwerk: 'your business',
       gastronomie: 'your place',
       medien: 'your studio',
+      kanzlei: 'your firm',
     },
     cta: 'Request your free website sketch',
     fakten: ['Reply < 24 h', 'Free', 'DE & EN'],

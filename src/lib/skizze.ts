@@ -70,6 +70,15 @@ export const FUNKTIONEN = {
     'blog',
     'shop',
   ],
+  kanzlei: [
+    'kontaktformular',
+    'rechtsgebiete',
+    'team',
+    'unterlagen',
+    'termine',
+    'karriere',
+    'mehrsprachig',
+  ],
 } as const;
 
 /** Die Branchen, für die es einen Fragebogen gibt. */
@@ -152,4 +161,5 @@ export const UMBAU_AKTIV: readonly SkizzeBranche[] = [
   'handwerk',
   'gastronomie',
   'medien',
+  'kanzlei',
 ];

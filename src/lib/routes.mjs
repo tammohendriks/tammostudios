@@ -55,6 +55,7 @@ export const ROUTES = {
   praxis:       { de: '/webdesign-praxis',      en: '/en/web-design-medical-practices' },
   gastronomie:  { de: '/webdesign-gastronomie', en: '/en/web-design-restaurants' },
   medien:       { de: '/webdesign-medien',      en: '/en/web-design-media-agencies' },
+  kanzlei:      { de: '/webdesign-kanzlei',     en: '/en/web-design-law-firms' },
 
   // Dauerhaft nur deutsch. Das Journal ist rein deutsch geschrieben,
   // die Rechtstexte sind in der deutschen Fassung verbindlich.

@@ -484,4 +484,72 @@ export const VERTICALS = [
       },
     ],
   },
+  {
+    slug: 'kanzlei',
+    pageSlug: 'webdesign-kanzlei',
+    meta: {
+      title: 'Kanzlei-Website erstellen lassen',
+      description:
+        'Kanzlei-Website für Steuerberater und Rechtsanwälte, von Hand gebaut in Bremen. Sicherer Unterlagen-Upload, Karriere-Seite, berufsrechtlich sauber. 2.500 € komplett, Skizze in 48 Stunden.',
+    },
+    hero: {
+      eyebrow: 'WEBSITE FÜR KANZLEIEN',
+      headlineLines: [
+        { text: 'Deine' },
+        { text: 'Kanzlei-Website.', highlight: true },
+        { text: 'Seriös, ohne steif.' },
+      ],
+      subheadline:
+        '2.500 € komplett. In 14 Tagen live.\nFür Steuerberater, Anwälte und Notare.',
+      // Kein Foto. Siehe medien: lieber ein gebauter Hintergrund als
+      // ein gekaufter Händedruck vor grauem Himmel — das Bild, das
+      // auf jeder zweiten Kanzlei-Seite steht.
+    },
+    intro:
+      'Mandanten vergleichen, bevor sie anrufen.\n' +
+      'Sie öffnen drei Kanzleien in drei Tabs und entscheiden in einer Minute, bei welcher sie es versuchen.\n' +
+      'Entschieden wird dabei selten über Fachliches — sondern darüber, wer greifbar wirkt.',
+    checklistTitle: 'Was auf eine Kanzlei-Website gehört',
+    checklist: [
+      'Rechtsgebiete klar getrennt, nicht als Bleiwüste',
+      'Team mit Gesichtern — Mandanten suchen Menschen',
+      'Erstkontakt ohne Hürde: Rückruf, Formular oder Termin',
+      'Unterlagen sicher und verschlüsselt übergeben',
+      'Eine Karriere-Seite, die Bewerber wirklich anspricht',
+      'Pflichtangaben sauber: Impressum, Berufsrecht, Datenschutz',
+      'Selbst pflegbar — neue Leute, neue Leistungen, ohne Agentur',
+    ],
+    pricing: {
+      paragraphs: [
+        'Eine Kanzlei-Website 2.500 €, inklusive zwei individueller Anwendungen — etwa einem verschlüsselten Unterlagen-Upload und einer Terminanfrage.\nKeine Stundensätze, keine Sternchen. Fertig in 14 Tagen.',
+        'Für 30 € im Monat übernehme ich Wartung, Sicherheits-Updates und priorisierten Support.\nOptional, monatlich kündbar.',
+      ],
+    },
+    faq: [
+      {
+        q: 'Darf ich als Anwalt oder Steuerberater so werben?',
+        a: 'Das Berufsrecht erlaubt sachliche Information über die Tätigkeit und verbietet Reklame, die irreführt oder Erfolge verspricht. Die Seiten, die ich baue, informieren — sie versprechen nichts. Die technische Seite liefere ich; was deine Kammer im Einzelfall erlaubt, sagst du mir. Ich bin Entwickler, kein Anwalt.',
+      },
+      {
+        q: 'Können Mandanten Unterlagen sicher hochladen?',
+        a: 'Ja, das ist eine der beiden individuellen Anwendungen: ein verschlüsselter Upload, der direkt bei dir landet statt im E-Mail-Anhang. Wer schon ein Mandantenportal hat, bekommt stattdessen einen klaren Weg dorthin.',
+      },
+      {
+        q: 'Lässt sich das mit DATEV oder unserem Portal verbinden?',
+        a: 'Verlinken immer. Tiefer verbinden hängt davon ab, welche Schnittstelle dein Anbieter öffnet — das klären wir im Erstgespräch, bevor irgendetwas versprochen wird.',
+      },
+      {
+        q: 'Hilft die Seite bei der Suche nach Mitarbeitern?',
+        a: 'Bei vielen Kanzleien ist das inzwischen der eigentliche Grund für eine neue Seite. Eine Karriere-Seite mit echten Gesichtern, ehrlichen Aufgaben und einer Bewerbung in zwei Minuten bringt mehr als jede Anzeige — und sie läuft weiter, wenn die Anzeige ausgelaufen ist.',
+      },
+      {
+        q: 'Wie schnell sind wir bei Google zu finden?',
+        a: 'Die Seite ist sofort online. Beim eigenen Kanzleinamen stehst du nach 2–4 Wochen oben, bei allgemeinen Suchen wie „steuerberater bremen" dauert es 3–6 Monate.',
+      },
+      {
+        q: 'Können wir Texte selbst ändern?',
+        a: 'Ja. Du bekommst ein eigenes CMS: neue Kollegin eintragen, Leistung ergänzen, Text korrigieren. Kein Code, kein Anruf bei mir.',
+      },
+    ],
+  },
 ] as const satisfies readonly Vertical[];
