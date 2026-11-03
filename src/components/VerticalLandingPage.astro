@@ -88,6 +88,21 @@ const checkIcon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" a
 // Hero-Focal-Point fuer object-position (default center center).
 const heroFocalPoint = vertical.hero.background.focalPoint ?? 'center center';
 
+/**
+ * Der Name der Seite fuer die Scheinleiste des Browser-Rahmens.
+ *
+ * Aus der URL abgeleitet statt im Datensatz gepflegt: so kann die
+ * Leiste gar nicht erst etwas anderes anzeigen als der Verweis
+ * darunter aufruft.
+ */
+const hostVon = (url: string): string => {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return url;
+  }
+};
+
 // --- Umbau fuer bezahlte Werbung ---------------------------------------
 //
 // Die neuen Teile erscheinen nur auf den Seiten, die in UMBAU_AKTIV
@@ -266,7 +281,23 @@ const hatFuenfSekunden = umgebaut && Boolean(ersteSekundenAlle[slug as SkizzeBra
         <div class="v-case-images">
           {vertical.caseStudy.references.map((ref) => (
             <a class="v-case-image-link" href={ref.url} target="_blank" rel="noopener noreferrer" aria-label={`${ref.name} — ${d.branche.liveSeiteOeffnen}`}>
-              <img src={ref.image} alt={ref.alt} loading="lazy" />
+              {/* Scheinleiste eines Browsers. Sie sagt in einem Blick,
+                  dass das kein Entwurf ist, sondern eine Seite, die
+                  im Netz steht — und sie nennt die Adresse, die der
+                  Verweis wirklich oeffnet. Reine Zierde fuer
+                  Vorleseprogramme: die Adresse steht als Linktext
+                  schon daneben. */}
+              <span class="v-case-leiste" aria-hidden="true">
+                <span class="v-case-punkte">
+                  <span class="v-case-punkt"></span>
+                  <span class="v-case-punkt"></span>
+                  <span class="v-case-punkt"></span>
+                </span>
+                <span class="v-case-adresse">{hostVon(ref.url)}</span>
+              </span>
+              <span class="v-case-bild">
+                <img src={ref.image} alt={ref.alt} loading="lazy" />
+              </span>
             </a>
           ))}
         </div>
@@ -658,16 +689,71 @@ const hatFuenfSekunden = umgebaut && Boolean(ersteSekundenAlle[slug as SkizzeBra
     border-radius: 12px;
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    aspect-ratio: 2 / 1;
     background: #0a0a0c;
+    box-shadow: 0 18px 46px rgba(0, 0, 0, 0.42);
     transition: transform 300ms ease, border-color 300ms ease, box-shadow 300ms ease;
+  }
+
+  /* Browser-Rahmen: Leiste oben, Bild darunter. Das Seitenverhaeltnis
+     sitzt am Bild, nicht am Rahmen — sonst fraesse die Leiste oben
+     vom Bild ab. */
+  .v-case-leiste {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    background: rgba(255, 255, 255, 0.045);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .v-case-punkte {
+    display: flex;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+
+  .v-case-punkt {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.16);
+  }
+
+  .v-case-adresse {
+    flex: 1;
+    min-width: 0;
+    padding: 3px 10px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.32);
+    font-family: 'SF Mono', Monaco, monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.01em;
+    color: rgba(245, 245, 244, 0.45);
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Die Punkte links wiegen optisch; ohne Gegengewicht rechts saesse
+     die Adresse nicht in der Mitte des Rahmens. */
+  .v-case-leiste::after {
+    content: '';
+    flex-shrink: 0;
+    width: 39px;
+  }
+
+  .v-case-bild {
+    display: block;
+    aspect-ratio: 2 / 1;
+    overflow: hidden;
   }
 
   .v-case-image-link:hover,
   .v-case-image-link:focus-visible {
-    transform: translateY(-3px);
+    transform: translateY(-4px);
     border-color: rgba(245, 158, 11, 0.4);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 40px rgba(245, 158, 11, 0.12);
+    box-shadow: 0 22px 56px rgba(0, 0, 0, 0.5), 0 0 48px rgba(245, 158, 11, 0.14);
     outline: none;
   }
 
