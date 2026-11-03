@@ -115,6 +115,10 @@ const REIHENFOLGE = {
   handwerk: ['kirsch', 'waermepower', 'ibi'],
   praxis: ['ibi', 'kirsch', 'waermepower'],
   gastronomie: ['ibi', 'kirsch', 'waermepower'],
+  // Für Medien gibt es noch keine eigene Bewertung. Vorn steht die,
+  // die ausdrücklich die Gestaltung lobt — das ist das, was diese
+  // Zielgruppe prüft.
+  medien: ['ibi', 'kirsch', 'waermepower'],
 } as const satisfies Record<string, readonly Testimonial['id'][]>;
 
 /** Die Branchen, für die eine Reihenfolge hinterlegt ist. */

@@ -63,4 +63,12 @@ export const ANGEBOTE: Record<SkizzeBranche, Angebot> = {
     anwendungen: 1,
     abzeichen: true,
   },
+  medien: {
+    preis: '2.000',
+    anwendungen: 1,
+    // KEIN Abzeichen: „Von Agenturen am häufigsten gebucht" wäre für
+    // eine Branche mit genau einer Referenz eine Behauptung ohne
+    // Grundlage. Lieber kein Abzeichen als ein unglaubwürdiges.
+    abzeichen: false,
+  },
 };

@@ -26,6 +26,10 @@ export const VERTICAL_KEY_BY_CATEGORY = {
   Handwerk: 'handwerk',
   Medizin: 'praxis',
   Gastronomie: 'gastronomie',
+  // Gräfe Media lag in references.ts schon unter dieser Kategorie,
+  // hatte aber keine Branchenseite, auf die der Querverweis zeigen
+  // konnte. Jetzt gibt es sie.
+  Medien: 'medien',
 } as const satisfies Record<string, RouteKey>;
 
 export type VerticalReference = {
@@ -387,6 +391,96 @@ export const VERTICALS = [
       {
         q: 'Was ist mit Google Maps und Bewertungen?',
         a: 'Wir verknüpfen dein Google Business Profile prominent. Falls du noch keins hast: setzen wir zusammen auf.',
+      },
+    ],
+  },
+  {
+    slug: 'medien',
+    pageSlug: 'webdesign-medien',
+    meta: {
+      // „Portfolio-Website" ist das Wort, das Fotografen, Videografen
+      // und Agenturen fuer ihre eigene Seite benutzen — „Medien-
+      // Website" tippt niemand.
+      title: 'Portfolio-Website erstellen lassen',
+      description:
+        'Portfolio-Website für Fotografen, Videografen und Agenturen, von Hand gebaut in Bremen. Video ohne YouTube, schnell trotz schwerer Bilder. 2.000 € komplett, Skizze in 48 Stunden.',
+    },
+    hero: {
+      eyebrow: 'WEBSITE FÜR MEDIEN',
+      headlineLines: [
+        { text: 'Deine' },
+        { text: 'Portfolio-Website.', highlight: true },
+        { text: 'So gut wie deine Arbeit.' },
+      ],
+      subheadline:
+        '2.000 € komplett. In 14 Tagen live.\nFür Fotografen, Videografen und Agenturen.',
+      // KEIN FOTO, und das mit Absicht: fuer diese Branche gibt es
+      // keins im Projekt, und ein gekauftes Stockbild vor einer Seite,
+      // die mit eigener Bildsprache wirbt, waere der schlechteste
+      // denkbare erste Eindruck. Die Komponente baut stattdessen einen
+      // eigenen Hintergrund. Kommt spaeter ein Foto, reicht hier die
+      // background-Zeile.
+    },
+    intro:
+      'Wer dich bucht, hat vorher deine Seite gesehen.\n' +
+      'Sie ist die erste Arbeitsprobe, die du abgibst — noch vor dem Reel und noch vor dem Portfolio-PDF.\n' +
+      'Wenn sie langsam lädt oder aussieht wie tausend andere, hast du einen Teil der Antwort schon gegeben.',
+    checklistTitle: 'Was auf eine Portfolio-Website gehört',
+    checklist: [
+      'Arbeiten groß, scharf und trotzdem schnell geladen',
+      'Video ohne YouTube-Logo und ohne Cookie-Banner davor',
+      'Projekte nach Art sortiert: Image, Produkt, Hochzeit, Doku',
+      'Kundenlogos oder Kundenliste als Beleg',
+      'Ein Anfrageweg, der nicht nach Behördenformular aussieht',
+      'Neue Arbeiten selbst einstellen, ohne jemanden zu fragen',
+      'Eine Seite, die nicht aussieht wie eine Vorlage',
+    ],
+    pricing: {
+      paragraphs: [
+        'Eine Portfolio-Website 2.000 €, inklusive einer individuellen Anwendung — zum Beispiel einer Kundengalerie mit Passwort oder einem Video-Player ohne Fremdanbieter.\nKeine Stundensätze, keine Sternchen. Fertig in 14 Tagen.',
+        'Für 30 € im Monat übernehme ich Wartung, Sicherheits-Updates und priorisierten Support.\nOptional, monatlich kündbar.',
+      ],
+    },
+    caseStudy: {
+      eyebrow: 'AUS DER PRAXIS — GRÄFE MEDIA',
+      paragraphs: [
+        'Gräfe Media ist eine Mediengestaltung aus Bremen: Film, Foto und Grafik aus einer Hand.\nDie Seite stellt die Arbeiten nach vorn und erklärt erst danach, wer dahintersteckt — in dieser Reihenfolge, weil Kunden so suchen.',
+        'Gebaut wie alles hier: Astro, eigenes CMS, kein Baukasten. Neue Projekte stellt das Team selbst ein.',
+      ],
+      references: [
+        {
+          name: 'Gräfe Media',
+          image: '/referenzen/graefe-media.webp',
+          alt: 'Vorschau der Website von Gräfe Media',
+          url: 'https://graefemedia.de',
+          linkLabel: 'graefemedia.de ansehen',
+        },
+      ],
+    },
+    faq: [
+      {
+        q: 'Kann ich Videos ohne YouTube einbinden?',
+        a: 'Ja. Die Dateien liegen bei dir oder bei einem Anbieter ohne Werbung und ohne Tracking. Kein fremdes Logo im Player, keine Vorschläge für andere Videos am Ende, und kein Cookie-Banner, das sich vor dein Reel schiebt.',
+      },
+      {
+        q: 'Wird die Seite langsam, wenn ich viele Bilder zeige?',
+        a: 'Nicht, wenn man es richtig macht. Bilder werden beim Hochladen in mehreren Größen und modernen Formaten erzeugt, und geladen wird nur, was gerade zu sehen ist. Große Galerien sind der Normalfall in dieser Branche, nicht die Ausnahme.',
+      },
+      {
+        q: 'Ich kann selbst gestalten. Warum nicht Webflow oder Squarespace?',
+        a: 'Kannst du machen, und für manche reicht das. Der Unterschied: hier gibt es kein Raster, in das deine Arbeit hineinpassen muss, keine Monatsgebühr, die mit der Seite wächst, und keinen Anbieter, der dir das Layout unter den Füßen ändert. Du bekommst den Code.',
+      },
+      {
+        q: 'Kann ich neue Projekte selbst einstellen?',
+        a: 'Ja. Du bekommst ein eigenes CMS: Projekt anlegen, Bilder hochladen, Reihenfolge ziehen, fertig. Kein Code, kein Anruf bei mir.',
+      },
+      {
+        q: 'Geht auch ein geschützter Bereich für Kunden?',
+        a: 'Ja, das ist eine der individuellen Anwendungen: eine Galerie mit Passwort, aus der dein Kunde auswählt oder Dateien zieht.',
+      },
+      {
+        q: 'Was passiert, wenn wir uns trennen?',
+        a: 'Du bekommst den kompletten Code und alle Inhalte. Die Seite läuft auf deinem eigenen Hosting weiter, auch ohne mich. Es gibt nichts, was dich hier festhält.',
       },
     ],
   },

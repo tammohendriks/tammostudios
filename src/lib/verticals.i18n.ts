@@ -47,7 +47,11 @@ export function getVertical(
         text: en.hero.headlineLines[i],
       })),
       subheadline: en.hero.subheadline,
-      background: deutsch.hero.background,
+      // Nur mitnehmen, wenn die Branche ein Foto hat. Fuer eine
+      // Branche ohne eines gibt es den Schluessel gar nicht, und ein
+      // `background: undefined` waere ein Feld, das die Komponente
+      // pruefen muesste, obwohl es nie etwas enthaelt.
+      ...('background' in deutsch.hero ? { background: deutsch.hero.background } : {}),
     },
     intro: en.intro,
     checklistTitle: en.checklistTitle,

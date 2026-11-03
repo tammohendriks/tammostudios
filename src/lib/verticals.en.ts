@@ -289,4 +289,71 @@ export const VERTICAL_TEXT_EN: VerticalTexte = {
       },
     ],
   },
+  medien: {
+    meta: {
+      title: 'Portfolio website, built by hand',
+      description:
+        'A portfolio website for photographers, videographers and agencies, built by hand in Bremen. Video without YouTube, fast even with heavy images. €2,000 all in, a sketch within 48 hours.',
+    },
+    hero: {
+      eyebrow: 'WEBSITE FOR CREATIVES',
+      headlineLines: ['Your', 'portfolio website.', 'As good as your work.'],
+      subheadline:
+        '€2,000 all in. Live in 14 days.\nFor photographers, videographers and agencies.',
+    },
+    intro:
+      'Whoever books you has seen your site first.\n' +
+      'It is the first sample of your work you hand over, before the reel and before the portfolio PDF.\n' +
+      'If it loads slowly or looks like a thousand others, you have already answered part of the question.',
+    checklistTitle: 'What belongs on a portfolio website',
+    checklist: [
+      'Work shown large and sharp, and still fast to load',
+      'Video without a YouTube logo and without a cookie banner in front of it',
+      'Projects sorted by type: brand, product, wedding, documentary',
+      'Client logos or a client list as proof',
+      'A way to get in touch that does not feel like paperwork',
+      'New work published by you, without asking anyone',
+      'A site that does not look like a template',
+    ],
+    pricingParagraphs: [
+      'A portfolio website: €2,000, including one custom application, for example a password-protected client gallery or a video player with no third party involved.\nNo hourly rates, no asterisks. Done in 14 days.',
+      'For €30 a month I handle maintenance, security updates, and priority support.\nOptional, month to month.',
+    ],
+    caseStudy: {
+      eyebrow: 'REAL PROJECTS: GRÄFE MEDIA',
+      paragraphs: [
+        'Gräfe Media is a media studio in Bremen: film, photography and graphic design under one roof.\nThe site puts the work first and explains who is behind it afterwards, in that order, because that is how clients look.',
+        'Built like everything here: Astro, its own CMS, no page builder. The team publishes new projects themselves.',
+      ],
+      references: [
+        { alt: 'Preview of the Gräfe Media website', linkLabel: 'Visit graefemedia.de' },
+      ],
+    },
+    faq: [
+      {
+        q: 'Can I embed video without YouTube?',
+        a: 'Yes. The files sit with you or with a provider that has no ads and no tracking. No foreign logo in the player, no suggested videos at the end, and no cookie banner sliding in front of your reel.',
+      },
+      {
+        q: 'Will the site get slow if I show a lot of images?',
+        a: 'Not if it is done right. Images are generated in several sizes and modern formats on upload, and only what is on screen gets loaded. Large galleries are the normal case in this field, not the exception.',
+      },
+      {
+        q: 'I can design myself. Why not Webflow or Squarespace?',
+        a: 'You can, and for some people that is enough. The difference: there is no grid your work has to fit into, no monthly fee that grows with the site, and no vendor changing the layout under your feet. You get the code.',
+      },
+      {
+        q: 'Can I publish new projects myself?',
+        a: 'Yes. You get your own CMS: add a project, upload images, drag them into order, done. No code, no call to me.',
+      },
+      {
+        q: 'Can I have a protected area for clients?',
+        a: 'Yes, that is one of the custom applications: a password-protected gallery your client picks from or pulls files out of.',
+      },
+      {
+        q: 'What happens if we part ways?',
+        a: 'You get the full code and all the content. The site keeps running on your own hosting without me. Nothing here locks you in.',
+      },
+    ],
+  },
 };

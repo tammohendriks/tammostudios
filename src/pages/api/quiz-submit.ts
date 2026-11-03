@@ -70,7 +70,19 @@ const BRANCHEN: Record<SkizzeBranche, string> = {
   handwerk: 'Handwerk',
   praxis: 'Praxis',
   gastronomie: 'Gastronomie',
+  medien: 'Medien',
 };
+
+/**
+ * Die erlaubten Branchen, abgeleitet statt aufgezaehlt.
+ *
+ * Stand hier vorher als eigene Liste im zod-Schema. Eine neue Branche
+ * haette dann ueberall funktioniert — nur der Fragebogen haette sie
+ * mit "Bitte prüf deine Eingaben" abgelehnt, und zwar erst in
+ * Produktion, weil der Typchecker eine vollstaendige, aber falsche
+ * Liste nicht bemaengelt. Jetzt ist FUNKTIONEN die einzige Quelle.
+ */
+const BRANCHEN_SCHLUESSEL = Object.keys(BRANCHEN) as [SkizzeBranche, ...SkizzeBranche[]];
 
 const ZIEL_LABEL: Record<string, string> = Object.fromEntries(
   ZIELE.map((wert, i) => [wert, skizzeDe.quiz.ziel.optionen[i].titel])
@@ -148,7 +160,7 @@ const skizzeSchema = (m: typeof meldungenDe) =>
     // ungefiltert an den Besucher. Gemessen stand da sonst
     // 'Invalid option: expected one of "handwerk"|"praxis"|…': eine
     // englische Zeile, die obendrein die internen Werte verraet.
-    branche: z.enum(['handwerk', 'praxis', 'gastronomie'], { error: m.validierung }),
+    branche: z.enum(BRANCHEN_SCHLUESSEL, { error: m.validierung }),
     // Mehrfachauswahl seit Runde 2. Die Meldung steht dreimal, weil
     // zod sonst an drei Stellen englisch wird: beim fehlenden Feld,
     // beim unbekannten Wert und bei der leeren Liste.

@@ -61,6 +61,15 @@ export const FUNKTIONEN = {
     'galerie',
     'lieferdienst',
   ],
+  medien: [
+    'kontaktformular',
+    'portfolio',
+    'video',
+    'kundengalerie',
+    'referenzlogos',
+    'blog',
+    'shop',
+  ],
 } as const;
 
 /** Die Branchen, für die es einen Fragebogen gibt. */
@@ -138,4 +147,9 @@ export const SCHRITTE = 6;
  * branchenspezifischen Teile (Funktions-Auswahl, Reihenfolge der
  * Kundenstimmen) liegen längst bereit.
  */
-export const UMBAU_AKTIV: readonly SkizzeBranche[] = ['praxis', 'handwerk', 'gastronomie'];
+export const UMBAU_AKTIV: readonly SkizzeBranche[] = [
+  'praxis',
+  'handwerk',
+  'gastronomie',
+  'medien',
+];
