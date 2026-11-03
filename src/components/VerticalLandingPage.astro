@@ -34,6 +34,9 @@ import QuizModal from './QuizModal.astro';
 import Kundenstimmen from './Kundenstimmen.astro';
 import { SKIZZE } from '../lib/i18n/seiten/skizze';
 import Projektslots from './Projektslots.astro';
+import UeberMich from './UeberMich.astro';
+import Angebotskarte from './Angebotskarte.astro';
+import AbschlussSkizze from './AbschlussSkizze.astro';
 import { UMBAU_AKTIV, type SkizzeBranche } from '../lib/skizze';
 
 export interface Props {
@@ -207,19 +210,29 @@ const umgebaut = UMBAU_AKTIV.includes(slug as SkizzeBranche);
       </ul>
     </section>
 
-    <!-- PRICING -->
-    <section class="v-pricing" data-reveal aria-label={d.branche.wasEsKostet}>
-      <article class="v-pricing-card">
-        <p class="v-eyebrow v-eyebrow-inline">{d.branche.wasEsKostet}</p>
-        <h2 class="v-section-headline v-pricing-headline">{d.branche.preisHeadline}</h2>
-        <div class="v-pricing-body">
-          {vertical.pricing.paragraphs.map((p) => <p class="text-lines">{p}</p>)}
-        </div>
-        {preisePfad && (
-          <a class="cta-link" href={preisePfad}>{d.branche.preislisteAnsehen} <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg></a>
-        )}
-      </article>
-    </section>
+    {umgebaut && <UeberMich branche={slug as SkizzeBranche} />}
+
+    {/* PREIS — auf den umgebauten Seiten eine Karte mit einem Betrag,
+        sonst der bisherige Fliesstext. Der Verweis auf die volle
+        Preisliste faellt dort weg: die Seite ist das Ziel bezahlter
+        Anzeigen, und jeder Verweis, der wegfuehrt, verliert einen
+        bezahlten Klick. */}
+    {umgebaut ? (
+      <Angebotskarte branche={slug as SkizzeBranche} />
+    ) : (
+      <section class="v-pricing" data-reveal aria-label={d.branche.wasEsKostet}>
+        <article class="v-pricing-card">
+          <p class="v-eyebrow v-eyebrow-inline">{d.branche.wasEsKostet}</p>
+          <h2 class="v-section-headline v-pricing-headline">{d.branche.preisHeadline}</h2>
+          <div class="v-pricing-body">
+            {vertical.pricing.paragraphs.map((p) => <p class="text-lines">{p}</p>)}
+          </div>
+          {preisePfad && (
+            <a class="cta-link" href={preisePfad}>{d.branche.preislisteAnsehen} <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg></a>
+          )}
+        </article>
+      </section>
+    )}
 
     <!-- CASE STUDY -->
     <section class="v-case" data-reveal aria-label={vertical.caseStudy.eyebrow}>
@@ -268,18 +281,26 @@ const umgebaut = UMBAU_AKTIV.includes(slug as SkizzeBranche);
 
     {umgebaut && <Kundenstimmen branche={slug as SkizzeBranche} />}
 
-    <!-- FINAL CTA -->
-    <ClosingCta
-      recommendation={
-        softwarePfad
-          ? {
-              text: d.branche.empfehlung.text,
-              label: d.branche.empfehlung.label,
-              href: softwarePfad,
-            }
-          : undefined
-      }
-    />
+    {/* ABSCHLUSS — auf den umgebauten Seiten ein Block, der genau eine
+        Sache anbietet. Der geteilte ClosingCta schickt zum
+        Erstgespraech UND empfiehlt eine andere Seite; das sind zwei
+        Wege nach draussen, und einer davon fuehrt nicht einmal zu
+        einer Anfrage. */}
+    {umgebaut ? (
+      <AbschlussSkizze branche={slug as SkizzeBranche} />
+    ) : (
+      <ClosingCta
+        recommendation={
+          softwarePfad
+            ? {
+                text: d.branche.empfehlung.text,
+                label: d.branche.empfehlung.label,
+                href: softwarePfad,
+              }
+            : undefined
+        }
+      />
+    )}
   </main>
 
   <SiteFooter />

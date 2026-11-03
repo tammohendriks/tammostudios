@@ -212,6 +212,29 @@ export const de = {
     noteLabel: 'Durchschnitt: 5,0 von 5 Sternen',
   },
 
+  /**
+   * Der Abschluss-Block. Ersetzt auf den umgebauten Seiten den
+   * geteilten ClosingCta: der schickt zum Erstgespräch und zu einer
+   * anderen Seite, hier soll genau eine Sache passieren.
+   */
+  abschluss: {
+    augenbraue: 'DER NÄCHSTE SCHRITT',
+    headlineVor: 'Deine Skizze.',
+    headlineStark: 'In 48 Stunden.',
+    // {fuer} wird aus der Branche gefüllt.
+    sub: 'Sechs kurze Fragen, zwei Minuten. Danach bekommst du einen echten Entwurf für {fuer} — kein Angebot, kein Verkaufsgespräch.',
+    fuer: {
+      praxis: 'deine Praxis',
+      handwerk: 'deinen Betrieb',
+      gastronomie: 'dein Lokal',
+    },
+    cta: 'Kostenlose Website-Skizze anfordern',
+    fakten: ['Antwort < 24 h', 'Kostenlos', 'DE & EN'],
+    // Der einzige Weg, der von dieser Seite wegführt, und zwar ans
+    // Telefon. Wer lieber redet als tippt, bricht sonst ganz ab.
+    telVor: 'Lieber kurz telefonieren?',
+  },
+
   quiz: {
     titel: 'Kostenlose Website-Skizze',
     untertitel: 'Sechs kurze Fragen. Danach bekommst du einen Entwurf, kein Angebot.',
@@ -403,6 +426,21 @@ export const en: Shape<typeof de> = {
     unterZeile: 'FROM REAL PROJECTS · ORIGINAL GERMAN REVIEWS',
     sterne: 'Five out of five stars',
     noteLabel: 'Average: 5.0 out of 5 stars',
+  },
+
+  abschluss: {
+    augenbraue: 'THE NEXT STEP',
+    headlineVor: 'Your sketch.',
+    headlineStark: 'In 48 hours.',
+    sub: 'Six short questions, two minutes. Then you get a real draft for {fuer} — not a quote, not a sales call.',
+    fuer: {
+      praxis: 'your practice',
+      handwerk: 'your business',
+      gastronomie: 'your place',
+    },
+    cta: 'Request your free website sketch',
+    fakten: ['Reply < 24 h', 'Free', 'DE & EN'],
+    telVor: 'Rather talk for a minute?',
   },
 
   quiz: {
