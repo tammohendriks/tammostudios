@@ -241,6 +241,18 @@ export const de = {
    * geteilten ClosingCta: der schickt zum Erstgespräch und zu einer
    * anderen Seite, hier soll genau eine Sache passieren.
    */
+  /**
+   * Der mitlaufende Knopf, der ab dem Hero unten mitfährt.
+   *
+   * Zwei Beschriftungen, weil zwei Größen: auf dem Handy eine Leiste
+   * über die ganze Breite, am Rechner eine kleine Pille unten rechts.
+   * Die Leiste hat weniger Platz, also den kürzeren Satz.
+   */
+  schwebend: {
+    handy: 'Skizze in 48h',
+    rechner: 'Kostenlose Skizze',
+  },
+
   abschluss: {
     augenbraue: 'DER NÄCHSTE SCHRITT',
     headlineVor: 'Deine Skizze.',
@@ -463,6 +475,11 @@ export const en: Shape<typeof de> = {
     unterZeile: 'FROM REAL PROJECTS · ORIGINAL GERMAN REVIEWS',
     sterne: 'Five out of five stars',
     noteLabel: 'Average: 5.0 out of 5 stars',
+  },
+
+  schwebend: {
+    handy: 'Sketch in 48h',
+    rechner: 'Free sketch',
   },
 
   abschluss: {
