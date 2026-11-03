@@ -146,13 +146,13 @@ export const VERTICAL_TEXT_EN: VerticalTexte = {
       description:
         'Handcrafted websites for medical practices in Bremen: GDPR ' +
         'compliant, with appointment requests and team profiles. ' +
-        'From €2,000. Recent work: Samedos and IBI.',
+        '€2,500 all in. Recent work: Samedos and IBI.',
     },
     hero: {
       eyebrow: 'WEBSITE FOR MEDICAL PRACTICES',
       headlineLines: ['Your', 'medical practice website.', 'Discreet, clear, professional.'],
       subheadline:
-        'GDPR compliant. From €2,000.\nBuilt in Bremen for practices all over Germany.',
+        'GDPR compliant. €2,500 all in.\nBuilt in Bremen for practices all over Germany.',
     },
     intro:
       'Patients look up your practice online first.\nThey want to know: is this the right approach?\nWho works there?\nHow do they get an appointment?\nYour website has to answer those questions in seconds, without jargon and without red tape.',
@@ -167,7 +167,7 @@ export const VERTICAL_TEXT_EN: VerticalTexte = {
       'Built for accessibility',
     ],
     pricingParagraphs: [
-      'A practice website: €2,000, including one custom application, for example an inquiry form that asks for the type of checkup right away.\nWith extended features like online booking or a patient portal: €3,000 (base setup).\nEvery standard included: data protection, encryption, and GDPR compliance are mandatory, not an add-on.',
+      'A practice website: €2,500, including two custom applications — for example an inquiry form that asks for the type of checkup right away, and online appointment booking.\nEvery standard included: data protection, encryption, and GDPR compliance are mandatory, not an add-on.',
       'For €30 a month I handle maintenance, security updates, and priority support.\nOptional, month to month.',
     ],
     caseStudy: {

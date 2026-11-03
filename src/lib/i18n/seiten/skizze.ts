@@ -108,6 +108,87 @@ export const de = {
     ],
   },
 
+  /**
+   * Der Über-mich-Teaser nach der Checkliste.
+   *
+   * Der Satz nennt die Branche der eigenen Seite zuerst: wer auf der
+   * Praxis-Seite liest, soll „für Praxen" lesen und nicht raten, ob er
+   * gemeint ist. Der Rest des Satzes ist überall gleich — das ist der
+   * Punkt, nicht die Aufzählung.
+   */
+  ueberMich: {
+    augenbraue: 'WER DAHINTER STECKT',
+    headline: 'Hi, ich bin Tammo.',
+    text: {
+      praxis:
+        'Ich baue Websites für Praxen, Handwerk und kleine Unternehmen, von Bremen aus für ganz Deutschland. Kein Team, keine Agentur dazwischen: Du sprichst von der ersten Skizze bis zum Launch mit mir. Und wenn danach was ist, auch.',
+      handwerk:
+        'Ich baue Websites für Handwerksbetriebe, Praxen und kleine Unternehmen, von Bremen aus für ganz Deutschland. Kein Team, keine Agentur dazwischen: Du sprichst von der ersten Skizze bis zum Launch mit mir. Und wenn danach was ist, auch.',
+      gastronomie:
+        'Ich baue Websites für Gastronomie, Handwerk und kleine Unternehmen, von Bremen aus für ganz Deutschland. Kein Team, keine Agentur dazwischen: Du sprichst von der ersten Skizze bis zum Launch mit mir. Und wenn danach was ist, auch.',
+    },
+    // {n} ist die Zahl der Referenzen aus references.ts — abgeleitet
+    // statt hingeschrieben. Eine Zahl, die man pflegen muss, ist eine
+    // Zahl, die irgendwann falsch ist, und auf einer Seite, die mit
+    // Vertrauen wirbt, ist das teuer.
+    fakten: ['{n} Websites live', 'Antwort < 24 h', 'Bremen'],
+    fotoAlt: 'Tammo Hendriks, Gründer von Tammo Studios',
+  },
+
+  /**
+   * Die Angebotskarte. Preis und Anzahl kommen aus lib/angebote.ts,
+   * hier stehen nur die Worte drumherum.
+   */
+  angebot: {
+    // Wortgleich mit /preise — zwei Seiten, eine Formulierung.
+    einmalig: 'Einmalig. Fix.',
+    abzeichen: {
+      praxis: 'Von Praxen am häufigsten gebucht',
+      handwerk: 'Von Betrieben am häufigsten gebucht',
+      gastronomie: 'Von Lokalen am häufigsten gebucht',
+    },
+    bezeichnung: {
+      praxis: 'Eine Praxis-Website',
+      handwerk: 'Eine Handwerker-Website',
+      gastronomie: 'Eine Gastro-Website',
+    },
+    // {n} ist die Zahl der Anwendungen aus angebote.ts.
+    anwendungen: '{n} individuelle Anwendungen deiner Wahl',
+    anwendungenEine: 'Eine individuelle Anwendung deiner Wahl',
+    anwendungenHinweis: {
+      praxis:
+        'z. B. Anfrage-Formular mit PDF, Online-Terminbuchung, Preisliste als PDF, mehrsprachige Seiten',
+      handwerk:
+        'z. B. Angebotsrechner, Notdienst-Formular, Projekt-Galerie, Anfahrts-Rechner',
+      gastronomie:
+        'z. B. Speisekarte zum Selbstpflegen, Tischreservierung, Tageskarte als PDF, Veranstaltungs-Kalender',
+    },
+    // Die Merkmale ohne die Anwendungen — die stehen als eigene Zeile
+    // dazwischen, weil ihr Hinweis darunter gehört.
+    merkmaleVor: {
+      praxis: ['Eigenes Design, auf deine Praxis zugeschnitten', 'Eigenes CMS, das du selbst pflegst'],
+      handwerk: ['Eigenes Design, auf deinen Betrieb zugeschnitten', 'Eigenes CMS, das du selbst pflegst'],
+      gastronomie: ['Eigenes Design, auf dein Lokal zugeschnitten', 'Eigenes CMS, das du selbst pflegst'],
+    },
+    merkmaleNach: {
+      praxis: [
+        'DSGVO-konform, verschlüsselte Formulare',
+        'Mobil und am Rechner schnell, SEO-sauber',
+      ],
+      handwerk: [
+        'DSGVO-konform, verschlüsselte Formulare',
+        'Mobil und am Rechner schnell, SEO-sauber',
+      ],
+      gastronomie: [
+        'DSGVO-konform, verschlüsselte Formulare',
+        'Mobil und am Rechner schnell, SEO-sauber',
+      ],
+    },
+    zahlung: 'Zahlung: 50 % bei Auftrag, 50 % bei Launch.',
+    bugfix: 'Bug-Fixes nach Launch: kostenlos.',
+    pflege: 'Optional: Wartung und Support für 30 € im Monat, monatlich kündbar.',
+  },
+
   stimmen: {
     titel: 'Was Kunden sagen',
     unter: 'Drei Stimmen aus laufenden Projekten',
@@ -244,6 +325,58 @@ export const en: Shape<typeof de> = {
       'No subscription trap',
       'You own everything',
     ],
+  },
+
+  ueberMich: {
+    augenbraue: 'WHO IS BEHIND THIS',
+    headline: "Hi, I'm Tammo.",
+    text: {
+      praxis:
+        'I build websites for medical practices, trades and small businesses, from Bremen for all of Germany. No team, no agency in between: you talk to me from the first sketch to launch. And afterwards too, if something comes up.',
+      handwerk:
+        'I build websites for trades, medical practices and small businesses, from Bremen for all of Germany. No team, no agency in between: you talk to me from the first sketch to launch. And afterwards too, if something comes up.',
+      gastronomie:
+        'I build websites for restaurants, trades and small businesses, from Bremen for all of Germany. No team, no agency in between: you talk to me from the first sketch to launch. And afterwards too, if something comes up.',
+    },
+    fakten: ['{n} websites live', 'Reply < 24 h', 'Bremen'],
+    fotoAlt: 'Tammo Hendriks, founder of Tammo Studios',
+  },
+
+  angebot: {
+    einmalig: 'One time. Fixed.',
+    abzeichen: {
+      praxis: 'Most booked by practices',
+      handwerk: 'Most booked by trades',
+      gastronomie: 'Most booked by restaurants',
+    },
+    bezeichnung: {
+      praxis: 'One practice website',
+      handwerk: 'One website for your trade business',
+      gastronomie: 'One restaurant website',
+    },
+    anwendungen: '{n} custom applications of your choice',
+    anwendungenEine: 'One custom application of your choice',
+    anwendungenHinweis: {
+      praxis:
+        'e.g. an inquiry form with PDF, online appointment booking, a price list as PDF, bilingual pages',
+      handwerk:
+        'e.g. a quote calculator, an emergency callout form, a project gallery, a service-area checker',
+      gastronomie:
+        'e.g. a menu you edit yourself, table reservations, a daily special as PDF, an events calendar',
+    },
+    merkmaleVor: {
+      praxis: ['Your own design, cut to your practice', 'Your own CMS, maintained by you'],
+      handwerk: ['Your own design, cut to your business', 'Your own CMS, maintained by you'],
+      gastronomie: ['Your own design, cut to your place', 'Your own CMS, maintained by you'],
+    },
+    merkmaleNach: {
+      praxis: ['GDPR compliant, encrypted forms', 'Fast on phone and desktop, clean SEO'],
+      handwerk: ['GDPR compliant, encrypted forms', 'Fast on phone and desktop, clean SEO'],
+      gastronomie: ['GDPR compliant, encrypted forms', 'Fast on phone and desktop, clean SEO'],
+    },
+    zahlung: 'Payment: 50 % on order, 50 % at launch.',
+    bugfix: 'Bug fixes after launch: free.',
+    pflege: 'Optional: maintenance and support for €30 a month, month to month.',
   },
 
   stimmen: {

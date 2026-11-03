@@ -179,7 +179,7 @@ export const VERTICALS = [
       description:
         'Handgemachte Websites für Arztpraxen in Bremen: DSGVO-konform, ' +
         'mit Terminanfrage, Team-Vorstellung und Öffnungszeiten. Ab ' +
-        '2.000 €, Referenzen: Samedos und IBI.',
+        '2.500 € komplett, Referenzen: Samedos und IBI.',
     },
     hero: {
       eyebrow: 'WEBSITE FÜR PRAXEN',
@@ -188,7 +188,10 @@ export const VERTICALS = [
         { text: 'Praxis-Website.', highlight: true },
         { text: 'Diskret, klar, professionell.' },
       ],
-      subheadline: 'DSGVO-konform. Ab 2.000 €.\nAus Bremen für Praxen in ganz Deutschland.',
+      // Der Betrag steht auch in lib/angebote.ts und in der
+      // Angebotskarte. Wer ihn hier aendert, aendert ihn dort mit.
+      subheadline:
+        'DSGVO-konform. Komplett für 2.500 €.\nAus Bremen für Praxen in ganz Deutschland.',
       background: {
         image: '/webdesign-landings/hero-praxis.webp',
         focalPoint: 'center 35%',
@@ -213,7 +216,11 @@ export const VERTICALS = [
     ],
     pricing: {
       paragraphs: [
-        'Eine Praxis-Website 2.000 €, inklusive einer individuellen Anwendung — etwa einem Anfrageformular, das die Vorsorge-Art direkt mit abfragt.\nMit erweiterten Features wie Online-Terminbuchung oder Patientenportal 3.000 € (Grundausstattung).\nAlle Standards inklusive — Datenschutz, Verschlüsselung, DSGVO-Konformität sind Pflicht, nicht Extra.',
+        // Wird auf der umgebauten Seite NICHT angezeigt — dort steht
+        // die Angebotskarte. Der Text bleibt trotzdem richtig, damit
+        // die Seite nicht zwei Preise kennt, falls der Umbau je
+        // abgeschaltet wird.
+        'Eine Praxis-Website 2.500 €, inklusive zwei individueller Anwendungen — etwa einem Anfrageformular, das die Vorsorge-Art direkt mit abfragt, und einer Online-Terminbuchung.\nAlle Standards inklusive — Datenschutz, Verschlüsselung, DSGVO-Konformität sind Pflicht, nicht Extra.',
         'Für 30 € im Monat übernehme ich Wartung, Sicherheits-Updates und priorisierten Support.\nOptional, monatlich kündbar.',
       ],
     },
