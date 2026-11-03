@@ -1,6 +1,39 @@
-/* Lokal gehostete Schriften für Wordmark + spätere Brand-Anwendungen.
-   Bewusst minimal: Body-Text nutzt aktuell weiterhin Inter als Fallback,
-   bis weitere Neue-Montreal-Gewichte gebraucht werden. */
+/* Lokal gehostete Schriften.
+ *
+ * ES WAREN LANGE NUR BOLD UND KURSIV DEKLARIERT, obwohl unter
+ * public/fonts/montreal auch Light, Regular und Medium liegen. Das
+ * hatte eine Folge, die man auf jeder Seite sah, ohne sie benennen zu
+ * können: ein Element mit `font-family: 'Neue Montreal'` und Gewicht
+ * 400 oder 500 trifft die Familie, findet dort aber nur den
+ * Bold-Schnitt — und wird damit gesetzt. Fließtext, Checklisten,
+ * FAQ-Antworten, Hero-Unterzeilen: alles lief in Bold, und damit gab
+ * es zwischen Überschrift und Text keinen Gewichtsunterschied mehr.
+ *
+ * Jetzt sind Regular und Medium deklariert. Kein neues Asset, keine
+ * Fremdschrift — die Dateien lagen die ganze Zeit da. */
+
+@font-face {
+  font-family: 'Neue Montreal';
+  src:
+    url('/fonts/montreal/NeueMontreal-Regular.woff2') format('woff2'),
+    url('/fonts/montreal/NeueMontreal-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: optional;
+}
+
+@font-face {
+  font-family: 'Neue Montreal';
+  src:
+    url('/fonts/montreal/NeueMontreal-Medium.woff2') format('woff2'),
+    url('/fonts/montreal/NeueMontreal-Medium.woff') format('woff');
+  /* 500 UND 600: der Browser nimmt bei 600 sonst den naechsthoeheren
+     vorhandenen Schnitt, also Bold — und ein halbfetter Text saehe
+     wieder aus wie eine Ueberschrift. */
+  font-weight: 500 600;
+  font-style: normal;
+  font-display: optional;
+}
 
 @font-face {
   font-family: 'Neue Montreal';
