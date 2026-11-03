@@ -1284,7 +1284,7 @@ html[data-site-theme='light'] .ks-autor-text span {
 }
 
 /* --- Abschluss --------------------------------------------------------- */
-html[data-site-theme='light'] .as::before {
+html[data-site-theme='light'] .as-buehne::before {
   background: radial-gradient(
     ellipse 70% 60% at 50% 45%,
     rgba(245, 158, 11, 0.16) 0%,
@@ -1293,7 +1293,7 @@ html[data-site-theme='light'] .as::before {
   ) !important;
 }
 
-html[data-site-theme='light'] .as::after {
+html[data-site-theme='light'] .as-buehne::after {
   background: linear-gradient(
     to right,
     transparent,

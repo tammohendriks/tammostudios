@@ -39,7 +39,9 @@ const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
 ---
 
 <section class="as" aria-labelledby="as-titel">
-  <div class="as-innen">
+  <div class="as-bahn">
+    <div class="as-buehne">
+      <div class="as-innen">
     <p class="as-augenbraue" data-reveal>{a.augenbraue}</p>
     <h2 class="as-headline" id="as-titel" data-reveal>
       {a.headlineVor} <span class="as-stark">{a.headlineStark}</span>
@@ -73,52 +75,40 @@ const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
       {a.fakten.map((f) => <li>{f}</li>)}
     </ul>
 
-    <p class="as-telefon" data-reveal>
-      {a.telVor} <a href={telefonLink}>{telefonAnzeige}</a>
-    </p>
+        <p class="as-telefon" data-reveal>
+          {a.telVor} <a href={telefonLink}>{telefonAnzeige}</a>
+        </p>
+      </div>
+    </div>
   </div>
 </section>
-
-<style is:global>
-  /* EINRASTEN AM SCHLUSS.
-   *
-   * `proximity`, nicht `mandatory`: die Seite rastet nur ein, wenn
-   * man ohnehin in der Naehe zum Stehen kommt. Bei `mandatory` wuerde
-   * jeder Scroll im ganzen Dokument gegen die Schnappstelle arbeiten,
-   * und am Handy fuehlt sich das an, als haette man die Kontrolle
-   * verloren.
-   *
-   * Es gibt genau EINEN Schnapppunkt auf der Seite — diesen Block.
-   * Alle anderen Abschnitte haben kein scroll-snap-align und werden
-   * deshalb nicht angefasst, auch der klebende Fuenf-Sekunden-Teil
-   * nicht.
-   *
-   * Steht global, weil scroll-snap-type auf den SCROLLENDEN Kasten
-   * gehoert, und das ist das Dokument. Astro liefert diesen Block nur
-   * auf Seiten aus, die diese Komponente wirklich benutzen. */
-  html {
-    scroll-snap-type: y proximity;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    html {
-      scroll-snap-type: none;
-    }
-  }
-</style>
 
 <style>
   /* Der Schein liegt im Hintergrund der Sektion, nicht hinter dem
      Knopf: ein Leuchten um den Knopf wäre ein Knopf mit Leuchten, ein
      Leuchten in der Fläche ist eine Bühne. */
+  /* KURZ ANHALTEN, OHNE ZU BREMSEN.
+   *
+   * Erster Versuch war scroll-snap. Das war falsch: Schnappen greift
+   * in die Scroll-Bewegung selbst ein — die Seite zieht gegen den
+   * Finger und springt. Gewollt ist kein Eingriff, sondern ein
+   * Verweilen. Also wird der Abschnitt kuenstlich in die Laenge
+   * gezogen und sein Inhalt darin festgehalten: man scrollt ganz
+   * normal weiter, der Block bleibt nur eine Weile stehen, bevor die
+   * Fusszeile kommt. Dieselbe Mechanik wie beim
+   * Fuenf-Sekunden-Abschnitt, nur kuerzer.
+   *
+   * Im Grundzustand ist nichts davon aktiv: normale Hoehe, kein
+   * Kleben. Das Verweilen kommt nur dazu, wenn das Fenster hoch genug
+   * ist — sonst klebte etwas, das groesser ist als der Bildschirm —
+   * und wenn keine reduzierte Bewegung eingestellt ist. */
   .as {
     position: relative;
+  }
+
+  .as-buehne {
+    position: relative;
     isolation: isolate;
-    /* Der einzige Schnapppunkt der Seite. 'end' statt 'center': der
-       Block ist auf dem Handy hoeher als das Fenster, und ein
-       zentrierter Schnapppunkt waere dort nicht erreichbar. So kommt
-       die Seite mit dem Knopf und der Fusszeile zur Ruhe. */
-    scroll-snap-align: end;
     /* Unten deutlich knapper als oben: der Block endet auf der
        Telefonnummer, danach kommt direkt die Fusszeile. Viel Luft
        dazwischen liest sich als Seitenende vor dem Seitenende. */
@@ -127,7 +117,24 @@ const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
     overflow: hidden;
   }
 
-  .as::before {
+  @media (prefers-reduced-motion: no-preference) and (min-height: 760px) {
+    /* Eine Bildschirmhoehe fuer die Buehne plus 45vh Verweilen. Mehr
+       fuehlte sich wie ein Hindernis an, weniger merkt man nicht. */
+    .as-bahn {
+      min-height: calc(100dvh + 45vh);
+    }
+
+    .as-buehne {
+      position: sticky;
+      top: 0;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  .as-buehne::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -143,7 +150,7 @@ const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
 
   /* Eine Haarlinie als Kante nach oben — sonst schwebt der Block
      zusammenhanglos unter den Kundenstimmen. */
-  .as::after {
+  .as-buehne::after {
     content: '';
     position: absolute;
     top: 0;
@@ -272,7 +279,7 @@ const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
   }
 
   @media (max-width: 768px) {
-    .as {
+    .as-buehne {
       padding-left: 20px;
       padding-right: 20px;
     }
