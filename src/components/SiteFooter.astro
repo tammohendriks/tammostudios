@@ -19,6 +19,8 @@ const { variant = 'default' } = Astro.props;
 import { SITE } from '../lib/constants';
 import { t } from '../lib/i18n';
 import { localeOf, path, pathOr } from '../lib/routes.mjs';
+import { SKIZZE } from '../lib/i18n/seiten/skizze';
+import { UMBAU_AKTIV } from '../lib/skizze';
 
 const d = t(Astro.url.pathname);
 const locale = localeOf(Astro.url.pathname);
@@ -34,6 +36,23 @@ const FOOTER_KEYS = [
   'home', 'ueber', 'website', 'software', 'preise', 'werkstatt',
   'referenzen', 'journal',
 ] as const;
+/**
+ * Die Branchenseiten als eigene Zeile.
+ *
+ * Sie stehen nicht in der Hauptnavigation — sie sind Ziele bezahlter
+ * Anzeigen und organischer Suche, keine Stationen eines Rundgangs.
+ * Ohne einen einzigen eingehenden Verweis findet eine Suchmaschine
+ * sie aber kaum, und ein Besucher gar nicht. Die Fußzeile loest
+ * beides, ohne jemandem etwas wegzunehmen.
+ *
+ * Die Reihenfolge kommt aus UMBAU_AKTIV, damit hier keine zweite
+ * Liste gepflegt werden muss.
+ */
+const branchenLinks = UMBAU_AKTIV
+  .map((key) => ({ key, href: path(key, locale) }))
+  .filter((e): e is { key: (typeof UMBAU_AKTIV)[number]; href: string } => e.href !== null)
+  .map((e) => ({ href: e.href, label: SKIZZE[locale as 'de' | 'en'].seo.kurz[e.key] }));
+
 const navLinks = FOOTER_KEYS
   .map((key) => ({ key, href: path(key, locale) }))
   .filter((e): e is { key: (typeof FOOTER_KEYS)[number]; href: string } => e.href !== null)
@@ -67,6 +86,15 @@ const legalLinks = [
           stillschweigend wieder deutsch benannt. */}
       <nav class="footer-nav" aria-label={d.nav.hauptnavigation}>
         {navLinks.map((link, i) => (
+          <>
+            {i > 0 && <span aria-hidden="true">·</span>}
+            <a href={link.href}>{link.label}</a>
+          </>
+        ))}
+      </nav>
+      <nav class="footer-branchen" aria-label={SKIZZE[locale as 'de' | 'en'].seo.branchenTitel}>
+        <span class="footer-branchen-titel">{SKIZZE[locale as 'de' | 'en'].seo.branchenTitel}</span>
+        {branchenLinks.map((link, i) => (
           <>
             {i > 0 && <span aria-hidden="true">·</span>}
             <a href={link.href}>{link.label}</a>
@@ -308,11 +336,48 @@ const legalLinks = [
   }
 
   .footer-nav,
+  .footer-branchen,
   .footer-legal {
     display: flex;
     gap: 12px;
     align-items: center;
     flex-wrap: wrap;
+  }
+
+  /* Die Branchen-Zeile steht eine Stufe leiser als die Hauptnavigation:
+     sie ist ein Verzeichnis, kein Rundgang. */
+  .footer-branchen {
+    gap: 10px;
+    font-size: 0.82rem;
+    /* Eigene Zeile: sonst rutschen die Social-Symbole hinter die
+       Branchen statt hinter die Hauptnavigation, und die Zeile wirkt
+       zusammengeschoben. */
+    flex-basis: 100%;
+  }
+
+  .footer-branchen-titel {
+    color: rgba(245, 245, 244, 0.4);
+    white-space: nowrap;
+  }
+
+  .footer-branchen a {
+    color: rgba(245, 245, 244, 0.55);
+    text-decoration: none;
+    transition: color 200ms ease;
+  }
+
+  .footer-branchen a:hover,
+  .footer-branchen a:focus-visible {
+    color: rgba(245, 158, 11, 0.95);
+    outline: none;
+  }
+
+  html[data-site-theme='light'] .footer-branchen-titel {
+    color: rgba(26, 26, 28, 0.45);
+  }
+
+  html[data-site-theme='light'] .footer-branchen a {
+    color: rgba(26, 26, 28, 0.62);
   }
 
   .footer-nav a,

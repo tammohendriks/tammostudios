@@ -552,4 +552,69 @@ export const VERTICALS = [
       },
     ],
   },
+  {
+    slug: 'immobilien',
+    pageSlug: 'webdesign-immobilien',
+    meta: {
+      title: 'Website für Immobilienmakler erstellen',
+      description:
+        'Makler-Website von Hand gebaut in Bremen: Objekte mit Suche, Exposé als PDF, Wertermittlung als Anfrage. 2.000 € komplett, Festpreis. Kostenlose Skizze in 48 Stunden.',
+    },
+    hero: {
+      eyebrow: 'WEBSITE FÜR MAKLER',
+      headlineLines: [
+        { text: 'Deine' },
+        { text: 'Makler-Website.', highlight: true },
+        { text: 'Objekte, die verkaufen.' },
+      ],
+      subheadline:
+        '2.000 € komplett. In 14 Tagen live.\nFür Makler und Hausverwaltungen in Norddeutschland.',
+    },
+    intro:
+      'Dein Kunde ist nicht der Käufer. Dein Kunde ist der Eigentümer.\n' +
+      'Der sucht sich aus, wem er sein Haus anvertraut — und schaut sich dafür an, wie du fremde Häuser zeigst.\n' +
+      'Deine Objektseiten sind die Arbeitsprobe, nach der er entscheidet.',
+    checklistTitle: 'Was auf eine Makler-Website gehört',
+    checklist: [
+      'Objekte groß gezeigt, mit Bildern in voller Qualität',
+      'Suche nach Lage, Preis und Zimmerzahl',
+      'Exposé als PDF, ohne Umweg über ein Formular',
+      'Wertermittlung als eigener Weg für Eigentümer',
+      'Team mit Gesichtern: verkauft wird an Menschen',
+      'Anbindung an dein Maklerprogramm statt doppelter Pflege',
+      'Neues Objekt in Minuten online, ohne Agentur',
+    ],
+    pricing: {
+      paragraphs: [
+        'Eine Makler-Website 2.000 €, inklusive einer individuellen Anwendung — zum Beispiel der Objektsuche oder einer Wertermittlungs-Anfrage, die gleich die richtigen Fragen stellt.\nKeine Stundensätze, keine Sternchen. Fertig in 14 Tagen.',
+        'Für 30 € im Monat übernehme ich Wartung, Sicherheits-Updates und priorisierten Support.\nOptional, monatlich kündbar.',
+      ],
+    },
+    faq: [
+      {
+        q: 'Kann ich Objekte aus meinem Maklerprogramm übernehmen?',
+        a: 'In der Regel ja. Die meisten Programme geben Objekte über eine Schnittstelle oder als OpenImmo-Datei heraus; die lese ich ein, und du pflegst weiter dort, wo du es gewohnt bist. Welches Programm du nutzt, klären wir vorher — versprochen wird erst, was geprüft ist.',
+      },
+      {
+        q: 'Was ist mit Objekten, die schon verkauft sind?',
+        a: 'Die bleiben als Referenz stehen, deutlich als verkauft markiert. Eine leere Objektliste überzeugt keinen Eigentümer; eine Liste mit zwanzig verkauften Häusern schon.',
+      },
+      {
+        q: 'Brauche ich eine Wertermittlung auf der Seite?',
+        a: 'Wenn du Eigentümer gewinnen willst: ja. Das ist der Weg, auf dem sich jemand meldet, der noch gar nicht verkaufen wollte. Als individuelle Anwendung ist genau das im Preis drin.',
+      },
+      {
+        q: 'Laden die vielen Objektbilder nicht ewig?',
+        a: 'Nicht, wenn man es richtig macht. Bilder werden beim Hochladen in mehreren Größen erzeugt, in modernen Formaten ausgeliefert und erst geladen, wenn sie ins Bild kommen.',
+      },
+      {
+        q: 'Wie schnell bin ich bei Google zu finden?',
+        a: 'Die Seite ist sofort online. Beim eigenen Namen stehst du nach 2–4 Wochen oben, bei Suchen wie „makler bremen" dauert es 3–6 Monate.',
+      },
+      {
+        q: 'Was ist mit den Pflichtangaben aus der Energieausweis-Regelung?',
+        a: 'Die Felder dafür sind in der Objektverwaltung vorgesehen und werden im Exposé mit ausgegeben. Was du angeben musst, weißt du besser als ich — die Seite macht es dir nur leicht, es nicht zu vergessen.',
+      },
+    ],
+  },
 ] as const satisfies readonly Vertical[];

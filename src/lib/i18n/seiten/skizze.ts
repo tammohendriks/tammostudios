@@ -70,6 +70,15 @@ const funktionenDe = {
     'Karriere-Seite',
     'Zweisprachig (DE/EN)',
   ],
+  immobilien: [
+    'Kontaktformular',
+    'Objekt-Übersicht',
+    'Suche nach Lage und Preis',
+    'Wertermittlung anfragen',
+    'Team-Vorstellung',
+    'Google Maps + Unternehmensprofil',
+    'Anbindung ans Maklerprogramm',
+  ],
 } as const satisfies Funktionsnamen;
 
 const funktionenEn = {
@@ -117,6 +126,15 @@ const funktionenEn = {
     'Appointment request',
     'Careers page',
     'Bilingual (German/English)',
+  ],
+  immobilien: [
+    'Contact form',
+    'Listing overview',
+    'Search by area and price',
+    'Request a valuation',
+    'Team section',
+    'Google Maps + Business Profile',
+    'Link to your agency software',
   ],
 } as const satisfies Funktionsnamen;
 
@@ -213,6 +231,16 @@ export const de = {
       uhr: '{s}s',
       uhrLabel: 'Die ersten fünf Sekunden auf deiner Seite',
     },
+    immobilien: {
+      augenbraue: 'DIE ERSTEN 5 SEKUNDEN',
+      aufmacher: 'Wer verkaufen will, prüft zuerst, wem er das zutraut.',
+      fragen: ['Was habt ihr schon verkauft?', 'Kennt ihr meine Lage?', 'Was kostet mich das?'],
+      pointeVor: 'Deine Website muss diese Fragen ',
+      pointeStark: 'in Sekunden',
+      pointeNach: ' beantworten — sonst steht nächste Woche ein anderes Schild im Vorgarten.',
+      uhr: '{s}s',
+      uhrLabel: 'Die ersten fünf Sekunden auf deiner Seite',
+    },
   },
 
   /**
@@ -247,6 +275,7 @@ export const de = {
       gastronomie: 'Gastro-Website',
       medien: 'Portfolio-Website',
       kanzlei: 'Kanzlei-Website',
+      immobilien: 'Makler-Website',
     },
     fuerWen: {
       praxis: 'für Praxen',
@@ -254,6 +283,7 @@ export const de = {
       gastronomie: 'für Gastronomie',
       medien: 'für Kreative',
       kanzlei: 'für Kanzleien',
+      immobilien: 'für Makler',
     },
     // Für das Service-Schema: audienceType will eine Zielgruppe
     // benennen, keine Präposition.
@@ -263,6 +293,24 @@ export const de = {
       gastronomie: 'Restaurants, Cafés und Bars',
       medien: 'Fotografen, Videografen, Werbe- und Produktionsfirmen',
       kanzlei: 'Steuerberater, Rechtsanwälte und Notare',
+      immobilien: 'Immobilienmakler und Hausverwaltungen',
+    },
+    /**
+     * Kurze Beschriftungen für die Branchen-Zeile in der Fußzeile.
+     *
+     * Sechs Seiten, auf die nichts verweist, findet eine Suchmaschine
+     * schlecht und ein Besucher gar nicht. Die Fußzeile ist der
+     * richtige Ort dafür: sie steht auf jeder Seite und nimmt
+     * niemandem etwas weg.
+     */
+    branchenTitel: 'Websites für Branchen',
+    kurz: {
+      praxis: 'Praxen',
+      handwerk: 'Handwerk',
+      gastronomie: 'Gastronomie',
+      medien: 'Medien',
+      kanzlei: 'Kanzleien',
+      immobilien: 'Makler',
     },
     preisTitel: 'Was eine {wort} kostet.',
     faqTitel: 'Häufige Fragen zur {wort}',
@@ -307,6 +355,8 @@ export const de = {
         'Ich baue Websites für Medienbetriebe, Praxen und Handwerk, von Bremen aus für ganz Deutschland. Kein Team, keine Agentur dazwischen: Du sprichst von der ersten Skizze bis zum Launch mit mir. Und wenn danach was ist, auch.',
       kanzlei:
         'Ich baue Websites für Kanzleien, Praxen und kleine Unternehmen, von Bremen aus für ganz Deutschland. Kein Team, keine Agentur dazwischen: Du sprichst von der ersten Skizze bis zum Launch mit mir. Und wenn danach was ist, auch.',
+      immobilien:
+        'Ich baue Websites für Makler, Handwerk und kleine Unternehmen, von Bremen aus für ganz Deutschland. Kein Team, keine Agentur dazwischen: Du sprichst von der ersten Skizze bis zum Launch mit mir. Und wenn danach was ist, auch.',
     },
     // {n} ist die Zahl der Referenzen aus references.ts — abgeleitet
     // statt hingeschrieben. Eine Zahl, die man pflegen muss, ist eine
@@ -331,6 +381,7 @@ export const de = {
       // aber bereit, falls es einmal genug Belege dafür gibt.
       medien: 'Für Portfolios gebaut',
       kanzlei: 'Für Kanzleien gebaut',
+      immobilien: 'Für Makler gebaut',
     },
     bezeichnung: {
       praxis: 'Eine Praxis-Website',
@@ -338,6 +389,7 @@ export const de = {
       gastronomie: 'Eine Gastro-Website',
       medien: 'Eine Portfolio-Website',
       kanzlei: 'Eine Kanzlei-Website',
+      immobilien: 'Eine Makler-Website',
     },
     // {n} ist die Zahl der Anwendungen aus angebote.ts.
     anwendungen: '{n} individuelle Anwendungen deiner Wahl',
@@ -353,6 +405,8 @@ export const de = {
         'z. B. Kundengalerie mit Passwort, Video-Player ohne Fremdanbieter, Shop für Prints, Anfrage mit Budget-Abfrage',
       kanzlei:
         'z. B. verschlüsselter Unterlagen-Upload, Terminanfrage, Karriere-Seite mit Bewerbungsformular, Mandanten-Login',
+      immobilien:
+        'z. B. Objektsuche nach Lage und Preis, Wertermittlungs-Anfrage, Exposé als PDF, Anbindung ans Maklerprogramm',
     },
     // Die Merkmale ohne die Anwendungen — die stehen als eigene Zeile
     // dazwischen, weil ihr Hinweis darunter gehört.
@@ -362,6 +416,7 @@ export const de = {
       gastronomie: ['Eigenes Design, auf dein Lokal zugeschnitten', 'Eigenes CMS, das du selbst pflegst'],
       medien: ['Eigenes Design, auf deine Arbeit zugeschnitten', 'Eigenes CMS, das du selbst pflegst'],
       kanzlei: ['Eigenes Design, auf deine Kanzlei zugeschnitten', 'Eigenes CMS, das du selbst pflegst'],
+      immobilien: ['Eigenes Design, auf dein Büro zugeschnitten', 'Eigenes CMS, das du selbst pflegst'],
     },
     merkmaleNach: {
       praxis: [
@@ -381,6 +436,10 @@ export const de = {
         'Mobil und am Rechner schnell, SEO-sauber',
       ],
       kanzlei: [
+        'DSGVO-konform, verschlüsselte Formulare',
+        'Mobil und am Rechner schnell, SEO-sauber',
+      ],
+      immobilien: [
         'DSGVO-konform, verschlüsselte Formulare',
         'Mobil und am Rechner schnell, SEO-sauber',
       ],
@@ -442,6 +501,7 @@ export const de = {
       gastronomie: 'dein Lokal',
       medien: 'dein Studio',
       kanzlei: 'deine Kanzlei',
+      immobilien: 'dein Büro',
     },
     cta: 'Kostenlose Website-Skizze anfordern',
     fakten: ['Antwort < 24 h', 'Kostenlos', 'DE & EN'],
@@ -630,6 +690,16 @@ export const en: Shape<typeof de> = {
       uhr: '{s}s',
       uhrLabel: 'The first five seconds on your site',
     },
+    immobilien: {
+      augenbraue: 'THE FIRST 5 SECONDS',
+      aufmacher: 'Anyone selling first checks who they would trust with it.',
+      fragen: ['What have you sold already?', 'Do you know my area?', 'What will this cost me?'],
+      pointeVor: 'Your website has to answer all three ',
+      pointeStark: 'in seconds',
+      pointeNach: ' — or a different sign goes up in that front garden next week.',
+      uhr: '{s}s',
+      uhrLabel: 'The first five seconds on your site',
+    },
   },
 
   seo: {
@@ -639,6 +709,7 @@ export const en: Shape<typeof de> = {
       gastronomie: 'restaurant website',
       medien: 'portfolio website',
       kanzlei: 'law firm website',
+      immobilien: 'estate agent website',
     },
     fuerWen: {
       praxis: 'for medical practices',
@@ -646,6 +717,7 @@ export const en: Shape<typeof de> = {
       gastronomie: 'for restaurants',
       medien: 'for creatives',
       kanzlei: 'for law and tax firms',
+      immobilien: 'for estate agents',
     },
     zielgruppe: {
       praxis: 'Medical and dental practices',
@@ -653,6 +725,16 @@ export const en: Shape<typeof de> = {
       gastronomie: 'Restaurants, cafes and bars',
       medien: 'Photographers, videographers, advertising and production companies',
       kanzlei: 'Tax advisors, lawyers and notaries',
+      immobilien: 'Estate agents and property managers',
+    },
+    branchenTitel: 'Websites by industry',
+    kurz: {
+      praxis: 'Practices',
+      handwerk: 'Trades',
+      gastronomie: 'Restaurants',
+      medien: 'Media',
+      kanzlei: 'Law firms',
+      immobilien: 'Estate agents',
     },
     preisTitel: 'What a {wort} costs.',
     faqTitel: 'Common questions about a {wort}',
@@ -696,6 +778,8 @@ export const en: Shape<typeof de> = {
         'I build websites for media studios, medical practices and trades, from Bremen for all of Germany. No team, no agency in between: you talk to me from the first sketch to launch. And afterwards too, if something comes up.',
       kanzlei:
         'I build websites for law and tax firms, medical practices and small businesses, from Bremen for all of Germany. No team, no agency in between: you talk to me from the first sketch to launch. And afterwards too, if something comes up.',
+      immobilien:
+        'I build websites for estate agents, trades and small businesses, from Bremen for all of Germany. No team, no agency in between: you talk to me from the first sketch to launch. And afterwards too, if something comes up.',
     },
     fakten: ['{n} websites live', 'Reply < 24 h', 'Bremen'],
     fotoAlt: 'Tammo Hendriks, founder of Tammo Studios',
@@ -709,6 +793,7 @@ export const en: Shape<typeof de> = {
       gastronomie: 'Most booked by restaurants',
       medien: 'Built for portfolios',
       kanzlei: 'Built for law firms',
+      immobilien: 'Built for estate agents',
     },
     bezeichnung: {
       praxis: 'One practice website',
@@ -716,6 +801,7 @@ export const en: Shape<typeof de> = {
       gastronomie: 'One restaurant website',
       medien: 'One portfolio website',
       kanzlei: 'One firm website',
+      immobilien: 'One estate agent website',
     },
     anwendungen: '{n} custom applications of your choice',
     anwendungenEine: 'One custom application of your choice',
@@ -730,6 +816,8 @@ export const en: Shape<typeof de> = {
         'e.g. a password-protected client gallery, a video player with no third party, a shop for prints, an inquiry form that asks for the budget',
       kanzlei:
         'e.g. an encrypted document upload, an appointment request, a careers page with an application form, a client login',
+      immobilien:
+        'e.g. a listing search by area and price, a valuation request, the brochure as a PDF, a link to your agency software',
     },
     merkmaleVor: {
       praxis: ['Your own design, cut to your practice', 'Your own CMS, maintained by you'],
@@ -737,6 +825,7 @@ export const en: Shape<typeof de> = {
       gastronomie: ['Your own design, cut to your place', 'Your own CMS, maintained by you'],
       medien: ['Your own design, cut to your work', 'Your own CMS, maintained by you'],
       kanzlei: ['Your own design, cut to your firm', 'Your own CMS, maintained by you'],
+      immobilien: ['Your own design, cut to your office', 'Your own CMS, maintained by you'],
     },
     merkmaleNach: {
       praxis: ['GDPR compliant, encrypted forms', 'Fast on phone and desktop, clean SEO'],
@@ -744,6 +833,7 @@ export const en: Shape<typeof de> = {
       gastronomie: ['GDPR compliant, encrypted forms', 'Fast on phone and desktop, clean SEO'],
       medien: ['GDPR compliant, encrypted forms', 'Fast on phone and desktop, clean SEO'],
       kanzlei: ['GDPR compliant, encrypted forms', 'Fast on phone and desktop, clean SEO'],
+      immobilien: ['GDPR compliant, encrypted forms', 'Fast on phone and desktop, clean SEO'],
     },
     zahlung: 'Payment: 50 % on order, 50 % at launch.',
     bugfix: 'Bug fixes after launch: free.',
@@ -777,6 +867,7 @@ export const en: Shape<typeof de> = {
       gastronomie: 'your place',
       medien: 'your studio',
       kanzlei: 'your firm',
+      immobilien: 'your office',
     },
     cta: 'Request your free website sketch',
     fakten: ['Reply < 24 h', 'Free', 'DE & EN'],

@@ -122,6 +122,7 @@ const REIHENFOLGE = {
   // Auch hier noch keine eigene Stimme. Vorn die aus einem
   // freien Beruf — das ist die naechstliegende Lage.
   kanzlei: ['ibi', 'kirsch', 'waermepower'],
+  immobilien: ['kirsch', 'ibi', 'waermepower'],
 } as const satisfies Record<string, readonly Testimonial['id'][]>;
 
 /** Die Branchen, für die eine Reihenfolge hinterlegt ist. */

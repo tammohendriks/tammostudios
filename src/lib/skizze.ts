@@ -79,6 +79,15 @@ export const FUNKTIONEN = {
     'karriere',
     'mehrsprachig',
   ],
+  immobilien: [
+    'kontaktformular',
+    'objekte',
+    'objektsuche',
+    'bewertung',
+    'team',
+    'maps',
+    'maklerprogramm',
+  ],
 } as const;
 
 /** Die Branchen, für die es einen Fragebogen gibt. */
@@ -162,4 +171,5 @@ export const UMBAU_AKTIV: readonly SkizzeBranche[] = [
   'gastronomie',
   'medien',
   'kanzlei',
+  'immobilien',
 ];

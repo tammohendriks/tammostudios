@@ -413,4 +413,61 @@ export const VERTICAL_TEXT_EN: VerticalTexte = {
       },
     ],
   },
+  immobilien: {
+    meta: {
+      title: 'Website for estate agents',
+      description:
+        'An estate agent website built by hand in Bremen: listings with search, the brochure as a PDF, a valuation request. €2,000 all in, a sketch within 48 hours.',
+    },
+    hero: {
+      eyebrow: 'WEBSITE FOR ESTATE AGENTS',
+      headlineLines: ['Your', 'agency website.', 'Listings that sell.'],
+      subheadline:
+        '€2,000 all in. Live in 14 days.\nFor estate agents and property managers in northern Germany.',
+    },
+    intro:
+      'Your client is not the buyer. Your client is the owner.\n' +
+      'They choose who to trust with their house, and to decide that they look at how you present other people\u2019s houses.\n' +
+      'Your listing pages are the work sample they judge you on.',
+    checklistTitle: 'What belongs on an estate agent website',
+    checklist: [
+      'Listings shown large, with images at full quality',
+      'Search by area, price and number of rooms',
+      'The brochure as a PDF, without a form in the way',
+      'A valuation request as its own route for owners',
+      'A team with faces: people buy from people',
+      'A link to your agency software instead of double work',
+      'A new listing online in minutes, with no agency involved',
+    ],
+    pricingParagraphs: [
+      'An estate agent website: €2,000, including one custom application, for example the listing search or a valuation request that asks the right questions up front.\nNo hourly rates, no asterisks. Done in 14 days.',
+      'For €30 a month I handle maintenance, security updates, and priority support.\nOptional, month to month.',
+    ],
+    faq: [
+      {
+        q: 'Can I pull listings from my agency software?',
+        a: 'Usually yes. Most systems export listings through an interface or an OpenImmo file. I read that in and you keep working where you are used to. Which system you use we check beforehand: nothing gets promised before it is verified.',
+      },
+      {
+        q: 'What about properties that are already sold?',
+        a: 'They stay on as references, clearly marked as sold. An empty listing page convinces no owner. A page with twenty sold houses does.',
+      },
+      {
+        q: 'Do I need a valuation form on the site?',
+        a: 'If you want to win owners: yes. It is the route someone takes who was not even planning to sell yet. As a custom application, exactly that is included in the price.',
+      },
+      {
+        q: 'Will all those property photos be slow?',
+        a: 'Not if it is done right. Images are generated in several sizes on upload, served in modern formats, and only loaded once they come into view.',
+      },
+      {
+        q: 'How fast will I show up on Google?',
+        a: 'The site is online immediately. For your own name you rank within 2 to 4 weeks. For general searches it takes 3 to 6 months.',
+      },
+      {
+        q: 'What about the mandatory energy certificate details?',
+        a: 'The fields are part of the listing editor and are printed in the brochure. What you have to disclose you know better than I do. The site just makes it hard to forget.',
+      },
+    ],
+  },
 };

@@ -72,6 +72,7 @@ const BRANCHEN: Record<SkizzeBranche, string> = {
   gastronomie: 'Gastronomie',
   medien: 'Medien',
   kanzlei: 'Kanzlei',
+  immobilien: 'Immobilien',
 };
 
 /**

@@ -72,6 +72,11 @@ export const ANGEBOTE: Record<SkizzeBranche, Angebot> = {
     anwendungen: 2,
     abzeichen: false,
   },
+  immobilien: {
+    preis: '2.000',
+    anwendungen: 1,
+    abzeichen: false,
+  },
   medien: {
     preis: '2.000',
     anwendungen: 1,
