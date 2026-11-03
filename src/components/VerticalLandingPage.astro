@@ -38,6 +38,7 @@ import UeberMich from './UeberMich.astro';
 import Angebotskarte from './Angebotskarte.astro';
 import AbschlussSkizze from './AbschlussSkizze.astro';
 import FuenfSekunden from './FuenfSekunden.astro';
+import SchwebenderCta from './SchwebenderCta.astro';
 import { UMBAU_AKTIV, type SkizzeBranche } from '../lib/skizze';
 
 export interface Props {
@@ -355,6 +356,7 @@ const hatFuenfSekunden = umgebaut && Boolean(ersteSekundenAlle[slug as SkizzeBra
       Markup ist fuer die Darstellung belanglos — aber in der
       Vorlese-Reihenfolge steht er so nicht mitten im Inhalt. */}
   {umgebaut && <QuizModal branche={slug as SkizzeBranche} />}
+  {umgebaut && <SchwebenderCta />}
 </BaseLayout>
 
 <style>
@@ -390,8 +392,8 @@ const hatFuenfSekunden = umgebaut && Boolean(ersteSekundenAlle[slug as SkizzeBra
   .v-eyebrow {
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-weight: 500;
-    font-size: 0.75rem;
-    letter-spacing: 0.3em;
+    font-size: var(--lp-braue);
+    letter-spacing: var(--lp-braue-sperrung);
     color: rgba(245, 158, 11, 0.85);
     text-transform: uppercase;
     margin: 0 0 18px;
@@ -416,7 +418,12 @@ const hatFuenfSekunden = umgebaut && Boolean(ersteSekundenAlle[slug as SkizzeBra
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 140px 40px 100px;
+    /* Die Abstaende haengen an der HOEHE des Fensters, nicht an einer
+       festen Zahl. Gemessen: mit 140/100 stand auf einem 1366x768er
+       Laptop der Haupt-CTA unter der Falz und die Zusagen fehlten um
+       154px — auf einer Seite, die bezahlte Klicks einkauft, ist das
+       der teuerste Fehler ueberhaupt. */
+    padding: clamp(96px, 13dvh, 140px) 40px clamp(48px, 8dvh, 100px);
     overflow: hidden;
     isolation: isolate;
 
@@ -451,7 +458,7 @@ const hatFuenfSekunden = umgebaut && Boolean(ersteSekundenAlle[slug as SkizzeBra
   .v-hero-eyebrow {
     color: rgba(245, 158, 11, 0.95);
     text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
-    margin-bottom: 22px;
+    margin-bottom: clamp(11px, 2.2dvh, 22px);
   }
 
   /* Fette Typo mit Text-Shadow fuer Punch auf dem Foto.
@@ -460,11 +467,14 @@ const hatFuenfSekunden = umgebaut && Boolean(ersteSekundenAlle[slug as SkizzeBra
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-weight: 700;
     font-style: normal;
-    font-size: clamp(3rem, 8vw, 6rem);
+    /* min() statt nur clamp(): die Breite allein weiss nicht, ob
+       noch Hoehe da ist. 9.5dvh haelt vier Zeilen Ueberschrift auch
+       auf einem flachen Laptop im Bild. */
+    font-size: min(var(--lp-riese), 9.5dvh);
     line-height: 0.98;
     letter-spacing: -0.035em;
     color: #ffffff;
-    margin: 0 0 28px;
+    margin: 0 0 clamp(16px, 2.8dvh, 28px);
     text-wrap: balance;
     text-shadow:
       0 2px 24px rgba(0, 0, 0, 0.45),
@@ -474,11 +484,11 @@ const hatFuenfSekunden = umgebaut && Boolean(ersteSekundenAlle[slug as SkizzeBra
   .v-hero-subtitle {
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-weight: 500;
-    font-size: clamp(1.1rem, 1.5vw, 1.3rem);
+    font-size: var(--lp-lead);
     line-height: 1.55;
     color: rgba(245, 245, 244, 0.95);
     max-width: 640px;
-    margin: 0 auto 40px;
+    margin: 0 auto clamp(20px, 3.6dvh, 40px);
     text-shadow: 0 1px 12px rgba(0, 0, 0, 0.4);
   }
 
@@ -541,7 +551,7 @@ const hatFuenfSekunden = umgebaut && Boolean(ersteSekundenAlle[slug as SkizzeBra
   .v-section-headline {
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-weight: 700;
-    font-size: clamp(1.6rem, 2.6vw, 2.1rem);
+    font-size: var(--lp-titel);
     line-height: 1.15;
     letter-spacing: -0.015em;
     color: #f5f5f4;
@@ -571,7 +581,7 @@ const hatFuenfSekunden = umgebaut && Boolean(ersteSekundenAlle[slug as SkizzeBra
     border-radius: 10px;
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-weight: 400;
-    font-size: 1rem;
+    font-size: var(--lp-text);
     line-height: 1.5;
     color: rgba(245, 245, 244, 0.85);
     transition: border-color 240ms ease, background-color 240ms ease;
@@ -661,7 +671,7 @@ const hatFuenfSekunden = umgebaut && Boolean(ersteSekundenAlle[slug as SkizzeBra
   .v-case-body p {
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-weight: 400;
-    font-size: 1.02rem;
+    font-size: var(--lp-text);
     line-height: 1.6;
     color: rgba(245, 245, 244, 0.82);
     margin: 0;
@@ -725,9 +735,9 @@ const hatFuenfSekunden = umgebaut && Boolean(ersteSekundenAlle[slug as SkizzeBra
     padding: 3px 10px;
     border-radius: 6px;
     background: rgba(0, 0, 0, 0.32);
-    font-family: 'SF Mono', Monaco, monospace;
-    font-size: 0.68rem;
-    letter-spacing: 0.01em;
+    font-family: var(--lp-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.02em;
     color: rgba(245, 245, 244, 0.45);
     text-align: center;
     white-space: nowrap;
@@ -803,7 +813,7 @@ const hatFuenfSekunden = umgebaut && Boolean(ersteSekundenAlle[slug as SkizzeBra
     list-style: none;
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-weight: 500;
-    font-size: 1rem;
+    font-size: var(--lp-text);
     line-height: 1.4;
     color: #f5f5f4;
     transition: color 200ms ease;
@@ -841,7 +851,7 @@ const hatFuenfSekunden = umgebaut && Boolean(ersteSekundenAlle[slug as SkizzeBra
     margin: 0;
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-weight: 400;
-    font-size: 0.98rem;
+    font-size: var(--lp-text);
     line-height: 1.6;
     color: rgba(245, 245, 244, 0.78);
   }
@@ -860,7 +870,7 @@ const hatFuenfSekunden = umgebaut && Boolean(ersteSekundenAlle[slug as SkizzeBra
     }
 
     .v-hero {
-      padding: 120px 20px 80px;
+      padding: clamp(84px, 12dvh, 120px) 20px clamp(40px, 7dvh, 80px);
       min-height: 100dvh;
     }
 
@@ -992,14 +1002,14 @@ const hatFuenfSekunden = umgebaut && Boolean(ersteSekundenAlle[slug as SkizzeBra
   /* Zusagen-Zeile unter dem CTA. */
   .v-zusagen {
     list-style: none;
-    margin: 26px 0 0;
+    margin: clamp(13px, 2.4dvh, 26px) 0 0;
     padding: 0;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 10px 22px;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.8rem;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-klein);
     color: rgba(245, 245, 244, 0.6);
   }
   .v-zusagen li {

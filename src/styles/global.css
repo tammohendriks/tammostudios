@@ -21,6 +21,44 @@
     -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
+/* === Schriftskala der Branchen-Landingpages ======================
+ *
+ * Vorher hatte jeder Abschnitt seine eigene clamp()-Zeile. Gemessen
+ * waren das sieben verschiedene Display-Größen auf einer Seite —
+ * 34, 42, 58, 70, 96, 99 und 104 Pixel — und keine davon stand in
+ * einem erkennbaren Verhältnis zur nächsten. Das sieht man nicht als
+ * Fehler, man sieht es als Unruhe.
+ *
+ * Jetzt sechs Stufen, und jede Überschrift nimmt die, die ihrer Rolle
+ * entspricht. Zwei Elemente derselben Rolle haben damit zwangsläufig
+ * dieselbe Größe: die Bewertungsnote und der Preis sind beide „die
+ * große Zahl", der Abschluss und die Scroll-Fragen sind beide „die
+ * große Aussage".
+ *
+ * Steht hier und nicht in einer Komponente, weil Custom Properties
+ * vererbt werden — auch über Astro-Komponentengrenzen hinweg, die
+ * Klassenselektoren nicht überschreiten. So liest der Fragebogen im
+ * <dialog> dieselben Werte wie die Seite dahinter. */
+:root {
+  --lp-riese: clamp(3rem, 8vw, 6rem);
+  --lp-zahl: clamp(3.2rem, 7.6vw, 5.5rem);
+  --lp-gross: clamp(2.2rem, 5.4vw, 4rem);
+  --lp-mittel: clamp(1.75rem, 3vw, 2.4rem);
+  --lp-titel: clamp(1.6rem, 2.6vw, 2.1rem);
+  --lp-lead: clamp(1.05rem, 1.45vw, 1.25rem);
+  --lp-text: 1rem;
+  --lp-klein: 0.875rem;
+  --lp-braue: 0.75rem;
+  --lp-braue-sperrung: 0.3em;
+
+  /* ui-monospace zuerst: unter macOS ist das SF Mono. Ohne diesen
+     Eintrag greift der Browser auf Monaco zurück — eine Schrift von
+     1991, die neben Neue Montreal wie ein Fremdkörper aussieht.
+     Nachgemessen: an sechs Stellen der Seite stand Monaco. */
+  --lp-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, monospace;
+  --lp-mono-groesse: 0.75rem;
+}
+
 html {
   /* Reserviert dauerhaft Platz für die Scrollbar — der visuelle
      Mittelpunkt des Viewports bleibt konstant, egal ob die Seite
