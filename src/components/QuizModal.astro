@@ -89,11 +89,19 @@ const telefonAnzeige = locale === 'en' ? PHONE_INTERNATIONAL : SITE.phone;
       <!-- 1 — Ziel -->
       <section class="sk-schritt" data-sk-schritt="1">
         <h3 class="sk-frage">{q.ziel.frage}</h3>
+        <p class="sk-hinweis">{q.ziel.hinweis}</p>
+        {/* Mehrfachauswahl: die wenigsten Betriebe wollen genau eine
+            Sache. Wer vorher zwischen „Mehr Anfragen" und „Vertrauen
+            aufbauen" waehlen musste, hat geraten — und die Antwort war
+            fuer die Skizze weniger wert als beide zusammen. */}
         <div class="sk-karten">
           {ZIELE.map((wert, i) => (
-            <label class="sk-karte">
-              <input type="radio" name="ziel" value={wert} required />
+            <label class="sk-karte sk-karte-mehrfach">
+              <input type="checkbox" name="ziele" value={wert} />
               <span class="sk-karte-innen">
+                <span class="sk-karte-marke" aria-hidden="true">
+                  <svg viewBox="0 0 16 16"><path d="M3.5 8.5L6.5 11.5L12.5 4.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                </span>
                 <span class="sk-karte-titel">{q.ziel.optionen[i].titel}</span>
                 <span class="sk-karte-text">{q.ziel.optionen[i].text}</span>
               </span>
@@ -287,6 +295,7 @@ const telefonAnzeige = locale === 'en' ? PHONE_INTERNATIONAL : SITE.phone;
       senden: q.kontakt.senden,
       sendenLaeuft: q.kontakt.sendenLaeuft,
       bitteWaehlen: q.bitteWaehlen,
+      bitteEineAntwort: q.bitteEineAntwort,
       urlUngueltig: q.website.urlUngueltig,
       zuGross: q.upload.zuGross,
       gesamtZuGross: q.upload.gesamtZuGross,
@@ -346,6 +355,10 @@ const telefonAnzeige = locale === 'en' ? PHONE_INTERNATIONAL : SITE.phone;
 
     const GESAMT: number = texte.gesamt;
     const SPEICHER = 'skizze-entwurf';
+    /* Felder, die mehrfach vorkommen duerfen. Ohne diese Liste behielte
+       der Entwurf nur den zuletzt angeklickten Wert — FormData liefert
+       jede Auswahl als eigenen Eintrag unter demselben Namen. */
+    const MEHRFACH = new Set(['ziele', 'funktionen']);
     const sanfter = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     let aktuell = 1;
@@ -409,7 +422,8 @@ const telefonAnzeige = locale === 'en' ? PHONE_INTERNATIONAL : SITE.phone;
     };
 
     const pruefen = (): string | null => {
-      if (aktuell === 1 && !wertVon('ziel')) return texte.bitteWaehlen;
+      if (aktuell === 1 && !form.querySelector('input[name="ziele"]:checked'))
+        return texte.bitteEineAntwort;
       if (aktuell === 2) {
         if (!wertVon('hatWebsite')) return texte.bitteWaehlen;
         const url = form.querySelector<HTMLInputElement>('[name="url"]')!;
@@ -441,10 +455,10 @@ const telefonAnzeige = locale === 'en' ? PHONE_INTERNATIONAL : SITE.phone;
         const objekt: Record<string, unknown> = {};
         for (const [k, v] of daten.entries()) {
           if (typeof v !== 'string') continue;
-          if (k === 'funktionen') {
-            const liste = (objekt.funktionen as string[] | undefined) ?? [];
+          if (MEHRFACH.has(k)) {
+            const liste = (objekt[k] as string[] | undefined) ?? [];
             liste.push(v);
-            objekt.funktionen = liste;
+            objekt[k] = liste;
           } else {
             objekt[k] = v;
           }
@@ -665,6 +679,12 @@ const telefonAnzeige = locale === 'en' ? PHONE_INTERNATIONAL : SITE.phone;
     // Eine getroffene Auswahl ist die Antwort — nicht noch einmal auf
     // „Weiter" klicken lassen. Nur dort, wo genau eine Antwort möglich
     // ist; bei Mehrfachauswahl wäre es eine Falle.
+    // Bei Mehrfachauswahl bleibt die Meldung sonst stehen, bis jemand
+    // auf „Weiter" drueckt — obwohl das Problem schon behoben ist.
+    form.querySelectorAll<HTMLInputElement>('input[type="checkbox"]').forEach((feld) => {
+      feld.addEventListener('change', () => fehlerZeigen(null));
+    });
+
     form.querySelectorAll<HTMLInputElement>('input[type="radio"]').forEach((feld) => {
       feld.addEventListener('change', () => {
         fehlerZeigen(null);
@@ -675,7 +695,7 @@ const telefonAnzeige = locale === 'en' ? PHONE_INTERNATIONAL : SITE.phone;
             return;
           }
         }
-        if (feld.name === 'ziel' || feld.name === 'stil') {
+        if (feld.name === 'stil') {
           window.setTimeout(() => void weiter(), sanfter ? 220 : 0);
         }
       });
@@ -905,6 +925,38 @@ const telefonAnzeige = locale === 'en' ? PHONE_INTERNATIONAL : SITE.phone;
     outline: 2px solid rgba(245, 158, 11, 0.8);
     outline-offset: 2px;
   }
+  /* Mehrfachauswahl auf Karten: ein kleines Kaestchen oben rechts.
+     Ohne es sieht eine angekreuzte Karte wie eine angeklickte aus —
+     der Unterschied zwischen „eins davon" und „so viele du willst"
+     muss man sehen, nicht erraten. */
+  .sk-karte-mehrfach .sk-karte-innen {
+    position: relative;
+    padding-right: 44px;
+  }
+  .sk-karte-marke {
+    position: absolute;
+    top: 13px;
+    right: 13px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 19px;
+    height: 19px;
+    border: 1px solid rgba(245, 245, 244, 0.22);
+    border-radius: 6px;
+    color: transparent;
+    transition: background 180ms ease, border-color 180ms ease, color 180ms ease;
+  }
+  .sk-karte-marke svg {
+    width: 11px;
+    height: 11px;
+  }
+  .sk-karte input:checked + .sk-karte-innen .sk-karte-marke {
+    background: #f59e0b;
+    border-color: #f59e0b;
+    color: #0a0a0c;
+  }
+
   .sk-karte-titel {
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-size: 0.96rem;

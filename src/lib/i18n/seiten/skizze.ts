@@ -129,9 +129,11 @@ export const de = {
     abbrechenJa: 'Ja, schließen',
     abbrechenNein: 'Weiter ausfüllen',
     bitteWaehlen: 'Bitte triff eine Auswahl.',
+    bitteEineAntwort: 'Wähl mindestens eine Antwort.',
 
     ziel: {
       frage: 'Was soll die Website für dich tun?',
+      hinweis: 'Mehrere Antworten möglich',
       optionen: [
         { titel: 'Mehr Anfragen', text: 'Kunden sollen dich schnell erreichen' },
         { titel: 'Online-Terminbuchung', text: 'Kalender direkt auf der Seite' },
@@ -266,9 +268,11 @@ export const en: Shape<typeof de> = {
     abbrechenJa: 'Yes, close',
     abbrechenNein: 'Keep going',
     bitteWaehlen: 'Please pick one.',
+    bitteEineAntwort: 'Pick at least one answer.',
 
     ziel: {
       frage: 'What should the website do for you?',
+      hinweis: 'Pick as many as you like',
       optionen: [
         { titel: 'More inquiries', text: 'Customers should reach you fast' },
         { titel: 'Online booking', text: 'A calendar right on the site' },

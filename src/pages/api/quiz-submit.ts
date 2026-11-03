@@ -149,7 +149,12 @@ const skizzeSchema = (m: typeof meldungenDe) =>
     // 'Invalid option: expected one of "handwerk"|"praxis"|…': eine
     // englische Zeile, die obendrein die internen Werte verraet.
     branche: z.enum(['handwerk', 'praxis', 'gastronomie'], { error: m.validierung }),
-    ziel: z.enum(ZIELE, { error: m.validierung }),
+    // Mehrfachauswahl seit Runde 2. Die Meldung steht dreimal, weil
+    // zod sonst an drei Stellen englisch wird: beim fehlenden Feld,
+    // beim unbekannten Wert und bei der leeren Liste.
+    ziele: z
+      .array(z.enum(ZIELE, { error: m.validierung }), { error: m.validierung })
+      .min(1, m.validierung),
     hatWebsite: z.enum(['ja', 'nein'], { error: m.validierung }),
     url: z.string({ error: m.validierung }).trim().max(300).optional(),
     funktionen: z.array(z.string()).default([]),
@@ -211,7 +216,7 @@ const anfrageText = (
     ...(locale === 'en' ? ['Sprache:  Englisch — bitte auf Englisch antworten.'] : []),
     '',
     '--- Fragebogen ---',
-    `Ziel:        ${ZIEL_LABEL[d.ziel] ?? d.ziel}`,
+    `Ziele:       ${d.ziele.map((z) => ZIEL_LABEL[z] ?? z).join(', ')}`,
     `Website:     ${d.hatWebsite === 'ja' ? d.url || 'ja, ohne Adresse' : 'noch keine'}`,
     `Stil:        ${STIL_LABEL[d.stil] ?? d.stil}`,
     `Funktionen:  ${
@@ -246,7 +251,7 @@ const anfrageHtml = (
     ${d.telefon ? zeile('Telefon', d.telefon) : ''}
   </table>
   <table style="border-collapse:collapse;margin-bottom:18px">
-    ${zeile('Ziel', ZIEL_LABEL[d.ziel] ?? d.ziel)}
+    ${zeile('Ziele', d.ziele.map((z) => ZIEL_LABEL[z] ?? z).join(', '))}
     ${zeile('Website', d.hatWebsite === 'ja' ? d.url || 'ja, ohne Adresse' : 'noch keine')}
     ${zeile('Stil', STIL_LABEL[d.stil] ?? d.stil)}
     ${zeile(
@@ -350,10 +355,10 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     const roh: Record<string, unknown> = {};
     for (const [schluessel, wert] of fd.entries()) {
       if (wert instanceof File) continue;
-      if (schluessel === 'funktionen') {
-        const bisher = (roh.funktionen as string[] | undefined) ?? [];
+      if (schluessel === 'funktionen' || schluessel === 'ziele') {
+        const bisher = (roh[schluessel] as string[] | undefined) ?? [];
         bisher.push(wert);
-        roh.funktionen = bisher;
+        roh[schluessel] = bisher;
       } else {
         roh[schluessel] = wert;
       }
