@@ -1,4 +1,6 @@
-// Texte des Skizzen-Fragebogens und der Danke-Seite, beide Sprachen.
+// Texte des Werbe-Umbaus der Branchenseiten, beide Sprachen:
+// Projektstart-Block, Scroll-Moment, Über-mich, Angebotskarte,
+// Kundenstimmen, Abschluss-Block, Fragebogen und Danke-Seite.
 //
 // Die Werte hinter den Auswahlpunkten stehen NICHT hier, sondern in
 // src/lib/skizze.ts — sie gehen so an den Server und werden dort gegen
@@ -9,7 +11,7 @@
 // eine Zeile mehr oder weniger bricht `npm run check`, statt im Browser
 // einen Auswahlpunkt ohne Beschriftung zu erzeugen.
 //
-// {n} und {zeitraum} sind Platzhalter, die die Komponente ersetzt. Eine
+// Platzhalter in geschweiften Klammern ersetzt die Komponente. Eine
 // Funktion wäre bequemer, verträgt sich aber nicht mit Shape<> — das
 // bildet Funktionstypen auf ihre Eigenschaften ab und verliert dabei
 // die Prüfung.
@@ -84,9 +86,14 @@ const funktionenEn = {
 
 export const de = {
   hero: {
-    // {n} Plätze, {zeitraum} aus SLOT_KNAPPHEIT in constants.ts.
-    knappheit: 'Nur noch {n} Slots für {zeitraum}',
-    knappheitEiner: 'Nur noch 1 Slot für {zeitraum}',
+    // {frei}, {gesamt}, {monat}, {start} und {hinweis} kommen aus
+    // SLOT_KNAPPHEIT in constants.ts.
+    slotZeile: 'Noch {frei} von {gesamt} Projektstarts frei im {monat}',
+    slotZeileEiner: 'Noch 1 von {gesamt} Projektstarts frei im {monat}',
+    slotUnten: 'Nächster Start: {start} · {hinweis}',
+    // Für Vorleseprogramme: die fünf Punkte sind gemalt und sagen einem
+    // Vorleseprogramm nichts.
+    slotPunkte: '{frei} von {gesamt} Projektstarts frei',
     cta: 'Kostenlose Website-Skizze in 48h',
     // Der zweite Weg, bewusst leiser: wer lieber redet als tippt, soll
     // ihn finden, aber nicht als gleichwertige Alternative angeboten
@@ -222,8 +229,10 @@ export const de = {
 
 export const en: Shape<typeof de> = {
   hero: {
-    knappheit: 'Only {n} slots left for {zeitraum}',
-    knappheitEiner: 'Only 1 slot left for {zeitraum}',
+    slotZeile: '{frei} of {gesamt} project slots left in {monat}',
+    slotZeileEiner: '1 of {gesamt} project slots left in {monat}',
+    slotUnten: 'Next start: {start} · {hinweis}',
+    slotPunkte: '{frei} of {gesamt} project slots left',
     cta: 'Free website sketch in 48h',
     ctaZweit: 'Rather talk for a minute?',
     ctaZweitRuf: 'Call directly',

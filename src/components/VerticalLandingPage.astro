@@ -33,7 +33,7 @@ import { getVertical, type VerticalSlug } from '../lib/verticals.i18n';
 import QuizModal from './QuizModal.astro';
 import Kundenstimmen from './Kundenstimmen.astro';
 import { SKIZZE } from '../lib/i18n/seiten/skizze';
-import { SLOT_KNAPPHEIT } from '../lib/constants';
+import Projektslots from './Projektslots.astro';
 import { UMBAU_AKTIV, type SkizzeBranche } from '../lib/skizze';
 
 export interface Props {
@@ -92,14 +92,6 @@ const heroFocalPoint = vertical.hero.background.focalPoint ?? 'center center';
 const sk = SKIZZE[locale as 'de' | 'en'];
 const umgebaut = UMBAU_AKTIV.includes(slug as SkizzeBranche);
 
-const knappheitText = (() => {
-  if (!SLOT_KNAPPHEIT.aktiv) return null;
-  const vorlage =
-    SLOT_KNAPPHEIT.plaetze === 1 ? sk.hero.knappheitEiner : sk.hero.knappheit;
-  return vorlage
-    .replace('{n}', String(SLOT_KNAPPHEIT.plaetze))
-    .replace('{zeitraum}', SLOT_KNAPPHEIT.zeitraum[locale as 'de' | 'en']);
-})();
 ---
 
 <BaseLayout
@@ -119,12 +111,7 @@ const knappheitText = (() => {
       style={`--hero-image: url('${vertical.hero.background.image}'); --hero-focal: ${heroFocalPoint};`}
     >
       <div class="v-hero-content">
-        {umgebaut && knappheitText && (
-          <p class="v-knappheit">
-            <span class="v-knappheit-punkt" aria-hidden="true"></span>
-            {knappheitText}
-          </p>
-        )}
+        {umgebaut && <Projektslots />}
         <p class="v-eyebrow v-hero-eyebrow">{vertical.hero.eyebrow}</p>
         <h1 class="v-hero-title">
           {vertical.hero.headlineLines.map((line, i) => (
@@ -793,37 +780,6 @@ const knappheitText = (() => {
   }
   /* === Umbau fuer bezahlte Werbung ============================== */
 
-  /* Knappheits-Pille, ganz oben im Hero. Leise: sie soll als Erstes
-     gelesen werden, aber nicht lauter sein als die Ueberschrift. */
-  .v-knappheit {
-    display: inline-flex;
-    align-items: center;
-    gap: 9px;
-    margin: 0 0 22px;
-    padding: 8px 18px;
-    border: 1px solid rgba(245, 158, 11, 0.35);
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.04);
-    backdrop-filter: blur(4px);
-    font-family: 'Inter', sans-serif;
-    font-size: 0.81rem;
-    letter-spacing: 0.01em;
-    color: rgba(245, 245, 244, 0.88);
-  }
-  .v-knappheit-punkt {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: rgba(245, 158, 11, 1);
-    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
-    animation: v-knappheit-puls 2s ease-out infinite;
-  }
-  @keyframes v-knappheit-puls {
-    0%   { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
-    70%  { box-shadow: 0 0 0 7px rgba(245, 158, 11, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
-  }
-
   /* Der Knopf traegt dieselbe globale Klasse wie der Link daneben.
      .cta-orbital gehoert aber auch der Navigationsleiste — deshalb
      hier ein Zusatz statt einer Aenderung in global.css. Ein <button>
@@ -872,11 +828,6 @@ const knappheitText = (() => {
   }
 
   @media (max-width: 768px) {
-    .v-knappheit {
-      font-size: 0.76rem;
-      padding: 7px 15px;
-      margin-bottom: 18px;
-    }
     /* Vier Zusagen nebeneinander ergaeben auf dem Handy vier
        Einzeiler. Zwei Spalten halten die Zeile kompakt. */
     .v-zusagen {
@@ -889,8 +840,5 @@ const knappheitText = (() => {
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .v-knappheit-punkt { animation: none; }
-  }
 
 </style>

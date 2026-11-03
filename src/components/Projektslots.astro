@@ -1,0 +1,232 @@
+---
+/**
+ * Die Projektstart-Anzeige: fünf Punkte und zwei Zeilen.
+ *
+ * Vorher stand hier eine schmale Pille mit einem Satz. Die war, mit den
+ * Worten des Betreibers, „zu unauffällig und nichts aussagend" — sie
+ * nannte eine Zahl, aber nicht, was sie bedeutet. Jetzt zeigen fünf
+ * Punkte das Verhältnis, und die zweite Zeile sagt, was der freie Platz
+ * für den Besucher heißt: wann es losgeht und wann er live ist.
+ *
+ * Belegte Punkte sind gefüllt, freie sind offen und atmen. Das ist die
+ * Blickrichtung, die man will: das Auge zählt zuerst die drei vollen
+ * und landet dann auf den beiden, um die es geht.
+ *
+ * ZWEI GRÖSSEN, EINE QUELLE: der Block steht im Hero und ein zweites
+ * Mal, kleiner, im Abschluss. Beides dieselbe Komponente — zwei
+ * Fassungen wären zwei Wahrheiten, sobald jemand eine Zahl ändert.
+ *
+ * Er rendert NICHTS, wenn der Schalter aus ist oder kein Platz frei ist.
+ * „Noch 0 von 5 frei" wäre Werbung mit dem Gegenteil von Verfügbarkeit.
+ */
+import { SLOT_KNAPPHEIT } from '../lib/constants';
+import { SKIZZE } from '../lib/i18n/seiten/skizze';
+import { localeOf } from '../lib/routes.mjs';
+
+export interface Props {
+  /** 'hero' ist die große Fassung, 'klein' die im Abschluss-Block. */
+  variante?: 'hero' | 'klein';
+}
+
+const { variante = 'hero' } = Astro.props;
+
+const locale = localeOf(Astro.url.pathname) as 'de' | 'en';
+const h = SKIZZE[locale].hero;
+
+const { aktiv, gesamt, frei } = SLOT_KNAPPHEIT;
+const zeigen = aktiv && frei > 0 && gesamt > 0;
+
+// Mehr freie als überhaupt vorhandene Plätze ist ein Pflegefehler, der
+// als „Noch 7 von 5 frei" live gehen würde. Die Anzeige begrenzt sich
+// selbst, statt sich lächerlich zu machen.
+const freiGezeigt = Math.min(frei, gesamt);
+const belegt = gesamt - freiGezeigt;
+
+const fuellen = (vorlage: string) =>
+  vorlage
+    .replace('{frei}', String(freiGezeigt))
+    .replace('{gesamt}', String(gesamt))
+    .replace('{monat}', SLOT_KNAPPHEIT.monat[locale])
+    .replace('{start}', SLOT_KNAPPHEIT.naechsterStart[locale])
+    .replace('{hinweis}', SLOT_KNAPPHEIT.hinweis[locale]);
+
+const zeileOben = fuellen(freiGezeigt === 1 ? h.slotZeileEiner : h.slotZeile);
+const zeileUnten = fuellen(h.slotUnten);
+const punkteText = fuellen(h.slotPunkte);
+---
+
+{
+  zeigen && (
+    <p class:list={['ps', variante === 'klein' && 'ps-klein']}>
+      {/* Die Punkte sind Dekoration: was sie zeigen, steht daneben im
+          Text. Deshalb aria-hidden und ein eigener Satz für
+          Vorleseprogramme — fünf Kreise sind sonst fünf Nichts. */}
+      <span class="ps-punkte" aria-hidden="true">
+        {Array.from({ length: gesamt }, (_, i) => (
+          <span
+            class:list={['ps-punkt', i >= belegt && 'ps-punkt-frei']}
+            style={i >= belegt ? `--versatz: ${i - belegt}` : undefined}
+          />
+        ))}
+      </span>
+      <span class="ps-nurlesen">{punkteText}</span>
+      <span class="ps-text">
+        <span class="ps-oben">{zeileOben}</span>
+        <span class="ps-unten">{zeileUnten}</span>
+      </span>
+    </p>
+  )
+}
+
+<style>
+  /* Glas wie in der Navigationsleiste: dunkel, durchscheinend, dünner
+     Amber-Rand. Der Schein außen ist niedrig dosiert — er soll den
+     Block aus dem Foto heben, nicht leuchten. */
+  .ps {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 18px;
+    margin: 0 0 26px;
+    padding: 14px 22px;
+    border: 1px solid rgba(245, 158, 11, 0.42);
+    border-radius: 16px;
+    background: rgba(10, 10, 13, 0.55);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 0 40px rgba(245, 158, 11, 0.25);
+    text-align: left;
+  }
+
+  .ps-punkte {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    flex-shrink: 0;
+  }
+
+  .ps-punkt {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #f59e0b;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+  }
+
+  /* Die freien Plätze: offen, und sie atmen. Zwei Punkte, die sich
+     langsam heben, ziehen den Blick genau dorthin, wo die Aussage
+     liegt. Der Versatz macht aus zwei gleichzeitigen Pulsen eine
+     Bewegung. */
+  .ps-punkt-frei {
+    background: transparent;
+    border: 1.5px solid rgba(245, 158, 11, 0.75);
+    box-shadow: none;
+    animation: ps-atmen 2.4s ease-in-out infinite;
+    /* --versatz zählt die FREIEN Punkte, nicht alle. Mit nth-of-type
+       hinge der Takt daran, wie viele Plätze belegt sind — bei vier
+       belegten atmete plötzlich keiner mehr versetzt. */
+    animation-delay: calc(var(--versatz, 0) * 0.45s);
+  }
+
+  @keyframes ps-atmen {
+    0%,
+    100% {
+      opacity: 0.55;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.18);
+    }
+  }
+
+  .ps-text {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .ps-oben {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 1.02rem;
+    line-height: 1.3;
+    letter-spacing: -0.005em;
+    color: #f5f5f4;
+  }
+
+  .ps-unten {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.82rem;
+    line-height: 1.3;
+    color: rgba(245, 158, 11, 0.95);
+  }
+
+  /* Die kleine Fassung im Abschluss-Block: dieselbe Aussage, aber sie
+     tritt hinter den Knopf zurück, den sie stützt. */
+  .ps-klein {
+    gap: 14px;
+    padding: 10px 18px;
+    border-radius: 13px;
+    margin: 0;
+    box-shadow: 0 0 28px rgba(245, 158, 11, 0.16);
+  }
+
+  .ps-klein .ps-punkt {
+    width: 8px;
+    height: 8px;
+  }
+
+  .ps-klein .ps-punkte {
+    gap: 5px;
+  }
+
+  .ps-klein .ps-oben {
+    font-size: 0.88rem;
+  }
+
+  .ps-klein .ps-unten {
+    font-size: 0.74rem;
+  }
+
+  .ps-nurlesen {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* Auf dem Handy stehen die Punkte über dem Text, beides zentriert:
+     nebeneinander bliebe für die erste Zeile zu wenig Breite, und sie
+     bräche mitten im Satz. */
+  @media (max-width: 560px) {
+    .ps {
+      flex-direction: column;
+      gap: 11px;
+      padding: 13px 18px;
+      text-align: center;
+    }
+
+    .ps-text {
+      align-items: center;
+    }
+
+    .ps-oben {
+      font-size: 0.94rem;
+    }
+
+    .ps-unten {
+      font-size: 0.78rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ps-punkt-frei {
+      animation: none;
+      opacity: 1;
+    }
+  }
+</style>
