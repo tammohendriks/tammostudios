@@ -37,6 +37,7 @@ import Projektslots from './Projektslots.astro';
 import UeberMich from './UeberMich.astro';
 import Angebotskarte from './Angebotskarte.astro';
 import AbschlussSkizze from './AbschlussSkizze.astro';
+import FuenfSekunden from './FuenfSekunden.astro';
 import { UMBAU_AKTIV, type SkizzeBranche } from '../lib/skizze';
 
 export interface Props {
@@ -94,6 +95,14 @@ const heroFocalPoint = vertical.hero.background.focalPoint ?? 'center center';
 // indem ihr Name dort eingetragen wird.
 const sk = SKIZZE[locale as 'de' | 'en'];
 const umgebaut = UMBAU_AKTIV.includes(slug as SkizzeBranche);
+
+// Den Scroll-Moment gibt es nur fuer Branchen, fuer die eigene Fragen
+// hinterlegt sind. Wo nicht, bleibt der Intro-Absatz stehen — er sagt
+// dasselbe, nur ohne Inszenierung, und erfundene Fragen fuer eine
+// andere Branche waeren schlechter als keine.
+const ersteSekundenAlle: Partial<Record<SkizzeBranche, unknown>> =
+  SKIZZE[locale as 'de' | 'en'].ersteSekunden;
+const hatFuenfSekunden = umgebaut && Boolean(ersteSekundenAlle[slug as SkizzeBranche]);
 
 ---
 
@@ -192,10 +201,15 @@ const umgebaut = UMBAU_AKTIV.includes(slug as SkizzeBranche);
       </div>
     </header>
 
-    <!-- INTRO — text-lines respektiert \n aus verticals.ts als Zeilenumbrueche -->
-    <section class="v-intro" data-reveal>
-      <p class="text-lines">{vertical.intro}</p>
-    </section>
+    {/* INTRO — entweder als Scroll-Moment oder als Absatz.
+        text-lines respektiert \n aus verticals.ts als Zeilenumbrueche. */}
+    {hatFuenfSekunden ? (
+      <FuenfSekunden branche={slug as SkizzeBranche} />
+    ) : (
+      <section class="v-intro" data-reveal>
+        <p class="text-lines">{vertical.intro}</p>
+      </section>
+    )}
 
     <!-- CHECKLIST -->
     <section class="v-checklist" data-reveal aria-label={vertical.checklistTitle}>
@@ -320,7 +334,15 @@ const umgebaut = UMBAU_AKTIV.includes(slug as SkizzeBranche);
     background: #050507;
     padding: 0 0 100px;
     position: relative;
-    overflow: hidden;
+    /* CLIP, NICHT HIDDEN. Beides schneidet ab, aber `hidden` macht das
+       Element zum Scroll-Container — und damit ist jedes
+       `position: sticky` darin wirkungslos: es klebt dann an einem
+       Kasten, der selbst nicht scrollt, und wandert mit nach oben
+       raus. Nachgemessen: die Buehne des Fuenf-Sekunden-Abschnitts
+       stand bei -1881px, die ganze Inszenierung lief ausserhalb des
+       Bildes ab. `clip` schneidet genauso ab, ohne Scroll-Container.
+       Nur auf der Waagerechten, damit die Senkrechte frei bleibt. */
+    overflow-x: clip;
   }
 
   .vertical-page > *:not(:first-child) {

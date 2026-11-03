@@ -116,6 +116,30 @@ export const de = {
    * gemeint ist. Der Rest des Satzes ist überall gleich — das ist der
    * Punkt, nicht die Aufzählung.
    */
+  /**
+   * Der Scroll-Moment nach dem Hero. Ersetzt dort, wo es ihn gibt, den
+   * Intro-Absatz — der Inhalt ist derselbe, nur nimmt er sich Zeit.
+   *
+   * NUR FUER BRANCHEN MIT EIGENEN WORTEN. Die drei Fragen sind die,
+   * die ein Patient wirklich stellt; für einen Dachdecker wären es
+   * andere, und erfundene wären schlechter als keine. Wer eine Branche
+   * dazunimmt, trägt sie in BEIDEN Sprachen ein — Shape<> erzwingt,
+   * dass hier und drüben dieselben Schlüssel stehen.
+   */
+  ersteSekunden: {
+    praxis: {
+      augenbraue: 'DIE ERSTEN 5 SEKUNDEN',
+      aufmacher: 'Patienten checken deine Praxis zuerst online.',
+      fragen: ['Passt der Ansatz?', 'Wer arbeitet dort?', 'Wie kommen sie zum Termin?'],
+      pointeVor: 'Deine Website muss diese Fragen ',
+      pointeStark: 'in Sekunden',
+      pointeNach: ' beantworten — ohne Fachchinesisch, ohne Bürokratie.',
+      // Die Sekundenanzeige läuft beim Scrollen mit. {s} ist die Zahl.
+      uhr: '{s}s',
+      uhrLabel: 'Die ersten fünf Sekunden auf deiner Seite',
+    },
+  },
+
   ueberMich: {
     augenbraue: 'WER DAHINTER STECKT',
     headline: 'Hi, ich bin Tammo.',
@@ -363,6 +387,19 @@ export const en: Shape<typeof de> = {
       'No subscription trap',
       'You own everything',
     ],
+  },
+
+  ersteSekunden: {
+    praxis: {
+      augenbraue: 'THE FIRST 5 SECONDS',
+      aufmacher: 'Patients check your practice online first.',
+      fragen: ['Is this the right approach?', 'Who works there?', 'How do I get an appointment?'],
+      pointeVor: 'Your website has to answer all three ',
+      pointeStark: 'in seconds',
+      pointeNach: ' — no jargon, no paperwork.',
+      uhr: '{s}s',
+      uhrLabel: 'The first five seconds on your site',
+    },
   },
 
   ueberMich: {
