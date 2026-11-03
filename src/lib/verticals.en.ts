@@ -53,15 +53,32 @@ type Uebersetzbar<V extends DeutscheEintraege> = {
   // Flacher als im Deutschen (dort pricing.paragraphs): das Objekt
   // drumherum traegt nichts, wenn es nur ein Feld hat.
   pricingParagraphs: Texte<V['pricing']['paragraphs']>;
-  caseStudy: {
-    eyebrow: string;
-    paragraphs: Texte<V['caseStudy']['paragraphs']>;
-    // Nur Alternativtext und Linktext. Name, Bild und URL sind in
-    // beiden Sprachen dieselben.
-    references: Gleichlang<V['caseStudy']['references'], { alt: string; linkLabel: string }>;
-  };
   faq: Gleichlang<V['faq'], { q: string; a: string }>;
-};
+} & Fallstudie<V>;
+
+/**
+ * Der Fallstudien-Teil, und zwar nur dann, wenn es ihn im Deutschen
+ * gibt.
+ *
+ * Ein einfaches `caseStudy?:` würde zu wenig prüfen: man könnte ihn
+ * deutsch pflegen und englisch vergessen, oder umgekehrt einen
+ * englischen Block für eine Branche schreiben, die gar keinen hat.
+ * Der bedingte Typ bindet beides aneinander — entweder beide oder
+ * keiner.
+ */
+type Fallstudie<V> = V extends {
+  caseStudy: { paragraphs: infer P; references: infer R };
+}
+  ? {
+      caseStudy: {
+        eyebrow: string;
+        paragraphs: Texte<P>;
+        // Nur Alternativtext und Linktext. Name, Bild und URL sind in
+        // beiden Sprachen dieselben.
+        references: Gleichlang<R, { alt: string; linkLabel: string }>;
+      };
+    }
+  : { caseStudy?: undefined };
 
 export type VerticalTexte = { [S in Slug]: Uebersetzbar<Deutsch<S>> };
 
@@ -182,6 +199,14 @@ export const VERTICAL_TEXT_EN: VerticalTexte = {
       ],
     },
     faq: [
+      {
+        q: 'What belongs on a medical practice website?',
+        a: 'Services, the team with photos, opening hours, directions, contact details and a way to ask for an appointment, roughly in that order of importance. Plus an imprint and a privacy policy. Everything else is optional: explainer videos, patient downloads, job openings. The list further up this page is exactly that.',
+      },
+      {
+        q: 'Which rules does a doctor\'s website have to follow in Germany?',
+        a: 'Four areas: the legal imprint, data protection under the GDPR, the German law on advertising in healthcare, and the professional code of your medical association. I build the technical side: a cookie banner with real opt-in, encrypted forms, EU hosting, a fitting privacy policy. On the content side you tell me what your association allows. I am a developer, not a lawyer.',
+      },
       {
         q: 'Is the site GDPR compliant?',
         a: 'Yes, fully. A cookie banner with real opt-in, encrypted forms, EU hosting, and a privacy policy written for your practice. Legally clean from day one.',

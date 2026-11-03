@@ -35,12 +35,14 @@ import Kundenstimmen from './Kundenstimmen.astro';
 import { SKIZZE } from '../lib/i18n/seiten/skizze';
 import { SITE, PHONE_INTERNATIONAL } from '../lib/constants';
 import { REFERENCES } from '../lib/references';
+import { ANGEBOTE } from '../lib/angebote';
 import { subtitleFor } from '../lib/references.en';
 import Projektslots from './Projektslots.astro';
 import UeberMich from './UeberMich.astro';
 import Angebotskarte from './Angebotskarte.astro';
 import AbschlussSkizze from './AbschlussSkizze.astro';
 import FuenfSekunden from './FuenfSekunden.astro';
+import Ablauf from './Ablauf.astro';
 import SchwebenderCta from './SchwebenderCta.astro';
 import { UMBAU_AKTIV, type SkizzeBranche } from '../lib/skizze';
 
@@ -86,11 +88,55 @@ const faqSchema = {
   })),
 };
 
+/**
+ * Das Angebot DIESER Seite als eigene Entitaet.
+ *
+ * Die Startseite beschreibt ueber BaseLayout den Betrieb samt
+ * Leistungskatalog. Das beantwortet aber nicht, was auf DIESER Seite
+ * zu welchem Preis angeboten wird — und genau danach fragt eine
+ * Suchmaschine bei einer Branchenseite. provider zeigt per @id auf
+ * denselben Betrieb, Google fuehrt beides zusammen.
+ *
+ * Der Preis kommt aus lib/angebote.ts, also aus derselben Quelle wie
+ * die Karte auf der Seite. Zwei Zahlen, die auseinanderlaufen
+ * koennen, waeren hier besonders teuer: eine falsche Angabe in
+ * strukturierten Daten ist eine Zusage an die Suchmaschine.
+ */
+const seitenUrl = `${SITE.url}${Astro.url.pathname.replace(/\/$/, '')}`;
+const dienstSchema = {
+  '@type': 'Service',
+  '@id': `${seitenUrl}#dienst`,
+  name: vertical.meta.title,
+  description: vertical.meta.description,
+  serviceType: locale === 'en' ? 'Web design' : 'Webdesign',
+  provider: { '@id': `${SITE.url}/#business` },
+  areaServed: {
+    '@type': 'Country',
+    name: locale === 'en' ? 'Germany' : 'Deutschland',
+  },
+  audience: {
+    '@type': 'BusinessAudience',
+    audienceType: SKIZZE[locale as 'de' | 'en'].seo.zielgruppe[slug as SkizzeBranche],
+  },
+  offers: {
+    '@type': 'Offer',
+    // '2.500' ist deutsche Schreibweise; schema.org will eine Zahl.
+    price: (ANGEBOTE[slug as SkizzeBranche]?.preis ?? '').replace(/\./g, ''),
+    priceCurrency: 'EUR',
+    availability: 'https://schema.org/InStock',
+    url: seitenUrl,
+  },
+};
+
 // Amber Check-Icon fuer Checklist-Items (matched /preise-Style).
 const checkIcon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="rgba(245, 158, 11, 0.6)" stroke-width="1.5"/><path d="M8 12.5L11 15.5L16 9" stroke="rgba(245, 158, 11, 1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
 // Hero-Focal-Point fuer object-position (default center center).
-const heroFocalPoint = vertical.hero.background.focalPoint ?? 'center center';
+// Ohne Foto baut die Komponente den Hintergrund selbst. Ein fremdes
+// Stockfoto waere schlechter als keines: es verspricht eine Naehe zur
+// Branche, die nicht da ist.
+const heroBild = vertical.hero.background?.image;
+const heroFocalPoint = vertical.hero.background?.focalPoint ?? 'center center';
 
 /**
  * Der Name der Seite fuer die Scheinleiste des Browser-Rahmens.
@@ -129,12 +175,28 @@ const hostVon = (url: string): string => {
  * Namen der Referenzen selbst, damit sie richtig geschrieben ist und
  * nicht in Grossbuchstaben schreit.
  */
+// --- Suchbegriffe in den Ueberschriften -------------------------------
+//
+// Google gewichtet Ueberschriften. „Haeufige Fragen" und
+// „Samedos + IBI" sind gute Zeilen, in denen kein Begriff steht, nach
+// dem jemand sucht. Die Zeilen bleiben, bekommen aber den
+// Branchenbegriff dazu.
+const seo = SKIZZE[locale as 'de' | 'en'].seo;
+const seoWort = seo.wort[slug as SkizzeBranche];
+const seoFuerWen = seo.fuerWen[slug as SkizzeBranche];
+const faqTitel = seo.faqTitel.replace('{wort}', seoWort);
+
 const fallstudieBraue = (() => {
-  const roh = vertical.caseStudy.eyebrow;
+  const roh = vertical.caseStudy?.eyebrow ?? '';
   const m = roh.match(/^(.*?)(?:\s—\s|:\s)/);
   return m ? m[1] : roh;
 })();
-const fallstudieTitel = vertical.caseStudy.references.map((r) => r.name).join(' + ');
+const fallstudieTitel = seo.fallstudieTitel
+  .replace('{fuerWen}', seoFuerWen)
+  .replace(
+    '{namen}',
+    (vertical.caseStudy?.references ?? []).map((r) => r.name).join(' + ')
+  );
 
 const refInfo = (url: string) => {
   const host = hostVon(url);
@@ -174,7 +236,7 @@ const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
 <BaseLayout
   pageTitle={vertical.meta.title}
   description={vertical.meta.description}
-  additionalSchema={faqSchema}
+  additionalSchema={umgebaut ? [faqSchema, dienstSchema] : faqSchema}
 >
   <main class:list={['vertical-page', umgebaut && 'ist-umgebaut']}>
     <!-- HERO: Full-Bleed BG-Image (CSS background-image, 100dvh) + Dark
@@ -185,7 +247,8 @@ const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
          bleibt Nice-to-have. -->
     <header
       class="v-hero"
-      style={`--hero-image: url('${vertical.hero.background.image}'); --hero-focal: ${heroFocalPoint};`}
+      data-ohne-bild={heroBild ? undefined : ''}
+      style={heroBild ? `--hero-image: url('${heroBild}'); --hero-focal: ${heroFocalPoint};` : undefined}
     >
       <div class="v-hero-content">
         {umgebaut && <Projektslots />}
@@ -324,63 +387,74 @@ const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
       </section>
     )}
 
-    <!-- CASE STUDY -->
-    <section class="v-case" aria-label={vertical.caseStudy.eyebrow}>
-      <p class="v-eyebrow" data-reveal>{fallstudieBraue}</p>
-      <h2 class="v-section-headline" data-reveal>{fallstudieTitel}</h2>
-      <div class={`v-case-grid ${vertical.caseStudy.references.length > 1 ? 'is-multi' : 'is-single'}`}>
-        <div class="v-case-body" data-reveal>
-          {vertical.caseStudy.paragraphs.map((p, i) => (
-            <p class:list={['text-lines', i === 0 && 'v-case-lead']}>{p}</p>
-          ))}
-        </div>
-        <div class="v-case-images">
-          {vertical.caseStudy.references.map((ref) => {
-            const info = refInfo(ref.url);
-            return (
-            <article class="v-case-karte" data-reveal>
-            <a class="v-case-image-link" href={ref.url} target="_blank" rel="noopener noreferrer" aria-label={`${ref.name} — ${d.branche.liveSeiteOeffnen}`}>
-              {/* Scheinleiste eines Browsers. Sie sagt in einem Blick,
-                  dass das kein Entwurf ist, sondern eine Seite, die
-                  im Netz steht — und sie nennt die Adresse, die der
-                  Verweis wirklich oeffnet. Reine Zierde fuer
-                  Vorleseprogramme: die Adresse steht als Linktext
-                  schon daneben. */}
-              <span class="v-case-leiste" aria-hidden="true">
-                <span class="v-case-punkte">
-                  <span class="v-case-punkt"></span>
-                  <span class="v-case-punkt"></span>
-                  <span class="v-case-punkt"></span>
+    {/* FALLSTUDIE ODER ABLAUF — je nachdem, ob es fuer die Branche
+        schon Referenzen gibt. Erfundene oder branchenfremde Beispiele
+        waeren an dieser Stelle das Gegenteil von Vertrauen; der
+        Ablauf braucht kein fremdes Material. Kommen spaeter
+        Referenzen dazu, verschwindet er von selbst. */}
+    {vertical.caseStudy ? (
+      <>
+      <!-- CASE STUDY -->
+      <section class="v-case" aria-label={vertical.caseStudy!.eyebrow}>
+        <p class="v-eyebrow" data-reveal>{fallstudieBraue}</p>
+        <h2 class="v-section-headline" data-reveal>{fallstudieTitel}</h2>
+        <div class={`v-case-grid ${vertical.caseStudy!.references.length > 1 ? 'is-multi' : 'is-single'}`}>
+          <div class="v-case-body" data-reveal>
+            {vertical.caseStudy!.paragraphs.map((p, i) => (
+              <p class:list={['text-lines', i === 0 && 'v-case-lead']}>{p}</p>
+            ))}
+          </div>
+          <div class="v-case-images">
+            {vertical.caseStudy!.references.map((ref) => {
+              const info = refInfo(ref.url);
+              return (
+              <article class="v-case-karte" data-reveal>
+              <a class="v-case-image-link" href={ref.url} target="_blank" rel="noopener noreferrer" aria-label={`${ref.name} — ${d.branche.liveSeiteOeffnen}`}>
+                {/* Scheinleiste eines Browsers. Sie sagt in einem Blick,
+                    dass das kein Entwurf ist, sondern eine Seite, die
+                    im Netz steht — und sie nennt die Adresse, die der
+                    Verweis wirklich oeffnet. Reine Zierde fuer
+                    Vorleseprogramme: die Adresse steht als Linktext
+                    schon daneben. */}
+                <span class="v-case-leiste" aria-hidden="true">
+                  <span class="v-case-punkte">
+                    <span class="v-case-punkt"></span>
+                    <span class="v-case-punkt"></span>
+                    <span class="v-case-punkt"></span>
+                  </span>
+                  <span class="v-case-adresse">{hostVon(ref.url)}</span>
                 </span>
-                <span class="v-case-adresse">{hostVon(ref.url)}</span>
-              </span>
-              <span class="v-case-bild">
-                <img src={ref.image} alt={ref.alt} loading="lazy" />
-              </span>
-            </a>
-            <div class="v-case-fuss">
-              <p class="v-case-name">{ref.name}</p>
-              {info?.unterzeile && <p class="v-case-unter">{info.unterzeile}</p>}
-              {info?.technik && (
-                <ul class="v-case-technik">
-                  {info.technik.map((tech) => <li>{tech}</li>)}
-                </ul>
-              )}
-              <a class="cta-link v-case-link" href={ref.url} target="_blank" rel="noopener noreferrer">
-                {ref.linkLabel}
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                <span class="v-case-bild">
+                  <img src={ref.image} alt={ref.alt} loading="lazy" />
+                </span>
               </a>
-            </div>
-            </article>
-            );
-          })}
+              <div class="v-case-fuss">
+                <p class="v-case-name">{ref.name}</p>
+                {info?.unterzeile && <p class="v-case-unter">{info.unterzeile}</p>}
+                {info?.technik && (
+                  <ul class="v-case-technik">
+                    {info.technik.map((tech) => <li>{tech}</li>)}
+                  </ul>
+                )}
+                <a class="cta-link v-case-link" href={ref.url} target="_blank" rel="noopener noreferrer">
+                  {ref.linkLabel}
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                </a>
+              </div>
+              </article>
+              );
+            })}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+      </>
+    ) : (
+      <Ablauf branche={slug as SkizzeBranche} />
+    )}
 
     <!-- FAQ -->
-    <section class="v-faq" aria-label={d.branche.faqTitel}>
-      <h2 class="v-section-headline" data-reveal>{d.branche.faqTitel}</h2>
+    <section class="v-faq" aria-label={faqTitel}>
+      <h2 class="v-section-headline" data-reveal>{faqTitel}</h2>
       <div class="v-faq-list">
         {vertical.faq.map((entry) => (
           <details class="v-faq-item" data-reveal>
@@ -525,6 +599,25 @@ const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
     background-size: cover, cover, cover;
     background-position: center, center, var(--hero-focal, center);
     background-repeat: no-repeat;
+  }
+
+  /* Ohne Foto: derselbe Aufbau wie die Startseite — fast schwarz, ein
+     warmer Schein aus der Mitte und ein feines Raster darueber. Das
+     ist eine eigene Gestaltung, kein Platzhalter. */
+  .v-hero[data-ohne-bild] {
+    background-color: #050507;
+    background-image:
+      radial-gradient(
+        ellipse 95% 70% at 50% 38%,
+        rgba(245, 158, 11, 0.2) 0%,
+        rgba(245, 158, 11, 0.05) 45%,
+        transparent 72%
+      ),
+      linear-gradient(to bottom, rgba(5, 5, 7, 0) 55%, rgba(5, 5, 7, 0.9) 100%),
+      linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+    background-size: cover, cover, 64px 64px, 64px 64px;
+    background-position: center, center, center, center;
   }
 
   .v-hero-content {

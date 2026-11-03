@@ -53,15 +53,22 @@ export function getVertical(
     checklistTitle: en.checklistTitle,
     checklist: en.checklist,
     pricing: { paragraphs: en.pricingParagraphs },
-    caseStudy: {
-      eyebrow: en.caseStudy.eyebrow,
-      paragraphs: en.caseStudy.paragraphs,
-      references: deutsch.caseStudy.references.map((ref, i) => ({
-        ...ref,
-        alt: en.caseStudy.references[i].alt,
-        linkLabel: en.caseStudy.references[i].linkLabel,
-      })),
-    },
+    // Nur mitnehmen, wenn es die Branche hat. Ein leeres Objekt waere
+    // schlimmer als gar keins: die Komponente pruefte dann auf
+    // Vorhandensein und bekaeme einen Block ohne Inhalt.
+    ...(deutsch.caseStudy && en.caseStudy
+      ? {
+          caseStudy: {
+            eyebrow: en.caseStudy.eyebrow,
+            paragraphs: en.caseStudy.paragraphs,
+            references: deutsch.caseStudy.references.map((ref, i) => ({
+              ...ref,
+              alt: en.caseStudy!.references[i].alt,
+              linkLabel: en.caseStudy!.references[i].linkLabel,
+            })),
+          },
+        }
+      : {}),
     faq: en.faq,
   };
 }

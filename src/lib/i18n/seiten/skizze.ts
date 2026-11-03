@@ -139,6 +139,78 @@ export const de = {
     },
   },
 
+  /**
+   * Der Ablauf. Steht dort, wo es noch keine Referenzen aus der
+   * Branche gibt.
+   *
+   * Erfundene oder branchenfremde Referenzen waeren an dieser Stelle
+   * das Gegenteil von Vertrauen. Der Ablauf braucht kein fremdes
+   * Material und beantwortet die Frage, die ohne Referenz offen
+   * bleibt: was passiert eigentlich, wenn ich hier klicke?
+   *
+   * {preis} kommt aus lib/angebote.ts.
+   */
+  /**
+   * Die Wörter, aus denen die Überschriften ihre Suchbegriffe
+   * beziehen.
+   *
+   * Google gewichtet Überschriften. Vorher hiessen sie „Klar, fix,
+   * ohne Sternchen.", „Häufige Fragen" und „Samedos + IBI" — gute
+   * Sätze, in denen kein einziger Begriff steht, nach dem jemand
+   * sucht. Die Sätze bleiben im Kern, bekommen aber den Branchen-
+   * begriff dazu.
+   *
+   * ZWEI FORMEN, weil beide gesucht werden: das Kompositum
+   * („Praxis-Website", häufiger in Verbindung mit „kosten") und die
+   * Umschreibung („Websites für Praxen", häufiger allein).
+   */
+  seo: {
+    wort: {
+      praxis: 'Praxis-Website',
+      handwerk: 'Handwerker-Website',
+      gastronomie: 'Gastro-Website',
+    },
+    fuerWen: {
+      praxis: 'für Praxen',
+      handwerk: 'für Handwerker',
+      gastronomie: 'für Gastronomie',
+    },
+    // Für das Service-Schema: audienceType will eine Zielgruppe
+    // benennen, keine Präposition.
+    zielgruppe: {
+      praxis: 'Arztpraxen und Zahnarztpraxen',
+      handwerk: 'Handwerksbetriebe',
+      gastronomie: 'Restaurants, Cafés und Bars',
+    },
+    preisTitel: 'Was eine {wort} kostet.',
+    faqTitel: 'Häufige Fragen zur {wort}',
+    // {namen} sind die Namen der Referenzen.
+    fallstudieTitel: 'Websites {fuerWen}: {namen}',
+  },
+
+  ablauf: {
+    augenbraue: 'SO LÄUFT ES AB',
+    headline: 'Von der Skizze bis live.',
+    schritte: [
+      {
+        titel: 'Skizze, kostenlos',
+        text: 'Du beantwortest sechs kurze Fragen. Innerhalb von 48 Stunden bekommst du einen echten Entwurf deiner Startseite — kein Angebot, kein Verkaufsgespräch.',
+      },
+      {
+        titel: 'Du entscheidest',
+        text: 'Passt die Richtung, machen wir weiter. Passt sie nicht, hast du einen Entwurf und ich eine Absage. Beides ist in Ordnung, und beides kostet dich nichts.',
+      },
+      {
+        titel: 'Gebaut, nicht zusammengeklickt',
+        text: 'Ich baue die Seite von Hand und du siehst sie wachsen. Unterwegs sagst du, was anders soll. {preis} € fest — keine Stundensätze, keine Nachträge.',
+      },
+      {
+        titel: 'Live, und danach',
+        text: 'Launch, Übergabe, und du pflegst alles selbst in deinem eigenen CMS. Fehler nach dem Start behebe ich kostenlos. Du sprichst immer mit mir, nicht mit einem Ticket.',
+      },
+    ],
+  },
+
   ueberMich: {
     augenbraue: 'WER DAHINTER STECKT',
     headline: 'Hi, ich bin Tammo.',
@@ -410,6 +482,50 @@ export const en: Shape<typeof de> = {
       uhr: '{s}s',
       uhrLabel: 'The first five seconds on your site',
     },
+  },
+
+  seo: {
+    wort: {
+      praxis: 'practice website',
+      handwerk: 'website for your trade business',
+      gastronomie: 'restaurant website',
+    },
+    fuerWen: {
+      praxis: 'for medical practices',
+      handwerk: 'for contractors',
+      gastronomie: 'for restaurants',
+    },
+    zielgruppe: {
+      praxis: 'Medical and dental practices',
+      handwerk: 'Trade businesses',
+      gastronomie: 'Restaurants, cafes and bars',
+    },
+    preisTitel: 'What a {wort} costs.',
+    faqTitel: 'Common questions about a {wort}',
+    fallstudieTitel: 'Websites {fuerWen}: {namen}',
+  },
+
+  ablauf: {
+    augenbraue: 'HOW IT WORKS',
+    headline: 'From sketch to live.',
+    schritte: [
+      {
+        titel: 'A free sketch',
+        text: 'You answer six short questions. Within 48 hours you get a real draft of your home page: not a quote, not a sales call.',
+      },
+      {
+        titel: 'You decide',
+        text: 'If the direction fits, we keep going. If it does not, you have a draft and I have a no. Both are fine, and both cost you nothing.',
+      },
+      {
+        titel: 'Built, not clicked together',
+        text: 'I build the site by hand and you watch it grow, saying what should change along the way. €{preis} fixed: no hourly rates, no add-ons.',
+      },
+      {
+        titel: 'Live, and after',
+        text: 'Launch, handover, and you maintain everything yourself in your own CMS. Bugs after launch are on me. You always talk to me, never to a ticket.',
+      },
+    ],
   },
 
   ueberMich: {

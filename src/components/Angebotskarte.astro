@@ -40,6 +40,13 @@ const angebot = ANGEBOTE[branche];
 // Geschütztes Leerzeichen, damit Betrag und Zeichen zusammenbleiben.
 const betrag = `${angebot.preis} €`;
 
+// „Klar, fix, ohne Sternchen." ist ein guter Satz, in dem kein
+// einziger Begriff steht, nach dem jemand sucht. „Was eine
+// Praxis-Website kostet." sagt dasselbe und trifft die Suche nach
+// Preisen — mit Abstand der haeufigste Zusatz zu einer Branchensuche.
+const seo = SKIZZE[locale].seo;
+const headline = seo.preisTitel.replace('{wort}', seo.wort[branche]);
+
 const anwendungenZeile =
   angebot.anwendungen === 1
     ? a.anwendungenEine
@@ -48,7 +55,7 @@ const anwendungenZeile =
 
 <section class="ak" aria-labelledby="ak-titel">
   <p class="ak-augenbraue" data-reveal>{d.branche.wasEsKostet}</p>
-  <h2 class="ak-headline" id="ak-titel" data-reveal>{d.branche.preisHeadline}</h2>
+  <h2 class="ak-headline" id="ak-titel" data-reveal>{headline}</h2>
 
   <article class="ak-karte" data-reveal>
     {angebot.abzeichen && <p class="ak-abzeichen">{a.abzeichen[branche]}</p>}

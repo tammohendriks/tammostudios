@@ -57,7 +57,17 @@ export type Vertical = {
     eyebrow: string;
     headlineLines: readonly VerticalHeadlineLine[];
     subheadline: string;
-    background: VerticalHeroBackground;
+    /**
+     * Das Foto hinter dem Hero. OPTIONAL.
+     *
+     * Für eine neue Branche gibt es nicht immer eines, und ein
+     * fremdes Stockfoto wäre schlechter als keines: es verspricht
+     * eine Nähe zur Branche, die nicht da ist. Ohne Bild baut die
+     * Komponente einen eigenen Hintergrund aus Verlauf und Raster —
+     * dieselbe Sprache wie die Startseite. Kommt später ein Foto
+     * dazu, reicht diese eine Zeile.
+     */
+    background?: VerticalHeroBackground;
   };
   // intro kann '\n' Zeilenumbrueche enthalten — Component nutzt .text-lines
   // (white-space: pre-line) fuer explizite Sentence-per-Line Kadenz.
@@ -65,7 +75,15 @@ export type Vertical = {
   checklistTitle: string;
   checklist: readonly string[];
   pricing: { paragraphs: readonly string[] };
-  caseStudy: {
+  /**
+   * Zwei Kundenseiten als Beleg. OPTIONAL.
+   *
+   * Für eine neue Branche gibt es noch keine. Erfundene oder
+   * branchenfremde Referenzen wären an dieser Stelle das Gegenteil
+   * von Vertrauen. Fehlt der Block, zeigt die Komponente stattdessen
+   * den Ablauf — der überzeugt ohne fremdes Material.
+   */
+  caseStudy?: {
     eyebrow: string;
     paragraphs: readonly string[];
     references: readonly VerticalReference[];
@@ -83,9 +101,13 @@ export const VERTICALS = [
     slug: 'handwerk',
     pageSlug: 'webdesign-handwerk',
     meta: {
-      title: 'Websites für Handwerksbetriebe',
+      // „erstellen lassen" steht in fast jedem Titel, der zu dieser
+      // Suche rankt, und fehlte hier komplett. Der Markenzusatz
+      // „ — Tammo Studios" kommt vom Layout dazu; deshalb bleibt der
+      // Titel unter 45 Zeichen, sonst schneidet Google ab.
+      title: 'Website für Handwerker erstellen lassen',
       description:
-        'Handgemachte Websites für Handwerker in Bremen. Ab 2.000 €, in 14 Tagen live. Mit Notdienst-Funktion und mobile-first Design.',
+        'Handwerker-Website vom Entwickler aus Bremen: Notdienst-Knopf, Referenzen, auf dem Handy schnell. 2.000 € komplett, Festpreis. Kostenlose Skizze in 48 Stunden.',
     },
     hero: {
       eyebrow: 'WEBSITE FÜR HANDWERK',
@@ -94,8 +116,10 @@ export const VERTICALS = [
         { text: 'Handwerker-Website.', highlight: true },
         { text: 'Handfest gebaut.' },
       ],
+      // „Ab" widerspricht dem Festpreis, mit dem die Angebotskarte
+      // darunter wirbt. Der Betrag steht auch in lib/angebote.ts.
       subheadline:
-        'Ab 2.000 €. In 14 Tagen live.\nAus Bremen für Handwerker in Norddeutschland.',
+        '2.000 € komplett. In 14 Tagen live.\nAus Bremen für Handwerker in Norddeutschland.',
       background: {
         image: '/webdesign-landings/hero-handwerk.webp',
         focalPoint: 'center 40%',
@@ -175,11 +199,13 @@ export const VERTICALS = [
       // (43 Impressionen auf "praxis website inhalte", "arzt homepage
       // richtlinien", "praxis website vertrauen", "praxis website
       // dsgvo"). Titel und Description nehmen die Woerter deshalb auf.
-      title: 'Website für Arztpraxen: DSGVO-konform',
+      title: 'Website für Arztpraxis erstellen lassen',
+      // Stand vorher „Ab 2.500 € komplett" — ein Widerspruch in sich,
+      // entstanden beim Umstellen des Preises.
       description:
-        'Handgemachte Websites für Arztpraxen in Bremen: DSGVO-konform, ' +
-        'mit Terminanfrage, Team-Vorstellung und Öffnungszeiten. Ab ' +
-        '2.500 € komplett, Referenzen: Samedos und IBI.',
+        'Praxis-Website vom Entwickler aus Bremen: DSGVO-konform, mit ' +
+        'Terminanfrage und Team-Seite. 2.500 € komplett, Festpreis. ' +
+        'Kostenlose Skizze in 48 Stunden.',
     },
     hero: {
       eyebrow: 'WEBSITE FÜR PRAXEN',
@@ -248,6 +274,18 @@ export const VERTICALS = [
       ],
     },
     faq: [
+      // Die beiden folgenden Fragen bedienen Suchanfragen, fuer die
+      // die Seite laut Search Console schon Impressionen bekommt
+      // („praxis website inhalte", „arzt homepage richtlinien"), ohne
+      // bisher eine Antwort darauf zu haben.
+      {
+        q: 'Welche Inhalte gehören auf eine Praxis-Website?',
+        a: 'Leistungen, Team mit Fotos, Öffnungszeiten, Anfahrt, Kontakt und eine Terminanfrage — ungefähr in dieser Reihenfolge der Wichtigkeit. Dazu Impressum und Datenschutzerklärung. Alles Weitere ist Kür: Aufklärungsvideos, Downloads für Patienten, Stellenanzeigen. Die Liste weiter oben auf dieser Seite ist genau das.',
+      },
+      {
+        q: 'Welche Richtlinien muss eine Arzt-Homepage einhalten?',
+        a: 'Vier Bereiche: Impressumspflicht, Datenschutz nach DSGVO, das Heilmittelwerbegesetz und die Berufsordnung deiner Kammer. Die technische Seite baue ich mit — Cookie-Banner mit echtem Opt-in, verschlüsselte Formulare, EU-Hosting, passende Datenschutzerklärung. Bei den Inhalten sagst du mir, was deine Kammer erlaubt: ich bin Entwickler, kein Anwalt.',
+      },
       {
         q: 'Ist die Seite DSGVO-konform?',
         a: 'Ja, komplett. Cookie-Banner mit echtem Opt-in, verschlüsselte Formulare, EU-Hosting, Datenschutzerklärung passend zur Praxis. Rechtlich sauber ab Tag 1.',
@@ -275,7 +313,7 @@ export const VERTICALS = [
     slug: 'gastronomie',
     pageSlug: 'webdesign-gastronomie',
     meta: {
-      title: 'Websites für Gastronomie',
+      title: 'Website für Restaurants erstellen lassen',
       description:
         'Handgemachte Websites für Restaurants, Cafés und Kneipen in ' +
         'Bremen: Speisekarte selbst pflegen, Reservierungsanfrage, ' +
@@ -289,7 +327,8 @@ export const VERTICALS = [
         { text: 'Einzigartig wie' },
         { text: 'dein Laden.' },
       ],
-      subheadline: 'Ab 2.000 €.\nAus Bremen für Gastro in ganz Deutschland.',
+      subheadline:
+        '2.000 € komplett.\nAus Bremen für Gastro in ganz Deutschland.',
       background: {
         image: '/webdesign-landings/hero-gastro.webp',
         focalPoint: 'center 45%',
