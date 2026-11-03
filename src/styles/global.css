@@ -1356,3 +1356,33 @@ html[data-site-theme='light'] .sc {
   background: rgba(248, 244, 234, 0.88) !important;
   border-top-color: rgba(217, 119, 6, 0.28) !important;
 }
+
+/* --- Ablauf (Branchen ohne Referenzen) ------------------------------
+   Nachgetragen: der Abschnitt entstand nach dem Theme-Block oben und
+   waere sonst weisse Schrift auf Creme. */
+html[data-site-theme='light'] .ab-augenbraue,
+html[data-site-theme='light'] .ab-nr {
+  color: var(--lp-amber-text) !important;
+}
+
+html[data-site-theme='light'] .ab-headline,
+html[data-site-theme='light'] .ab-titel {
+  color: var(--theme-text-strong) !important;
+}
+
+html[data-site-theme='light'] .ab-absatz {
+  color: var(--theme-text) !important;
+}
+
+html[data-site-theme='light'] .ab-nr {
+  background: var(--theme-bg) !important;
+  border-color: rgba(217, 119, 6, 0.45) !important;
+}
+
+html[data-site-theme='light'] .ab-schritt::before {
+  background: linear-gradient(
+    to bottom,
+    rgba(217, 119, 6, 0.5),
+    rgba(0, 0, 0, 0.1)
+  ) !important;
+}
