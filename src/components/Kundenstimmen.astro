@@ -1,11 +1,21 @@
 ---
 /**
- * Drei echte Kundenstimmen, Reihenfolge nach Branche.
+ * Drei echte Kundenstimmen: eine groß, zwei klein.
  *
  * Steht auf den Branchen-Landingpages zwischen FAQ und Abschluss: nach
  * allen Argumenten, vor der Aufforderung. Wer bis hierhin gelesen hat,
  * weiß was es kostet und wie es abläuft — was fehlt, ist jemand
  * anderes, der es schon gemacht hat.
+ *
+ * WARUM NICHT DREI GLEICHE KARTEN: drei gleich große Karten sind drei
+ * gleich wichtige Stimmen, und das Auge liest dann keine. Die erste
+ * Stimme ist die, die zur Branche der Seite passt (die Reihenfolge
+ * steht in testimonials.ts) — die bekommt Platz, die anderen beiden
+ * stützen sie.
+ *
+ * In jeder Stimme ist eine Stelle hervorgehoben. Sie steht wörtlich im
+ * Zitat; zerlegen() wirft beim Bauen, wenn nicht. Eine Hervorhebung,
+ * die im Original nicht vorkommt, wäre ein erfundenes Zitat im Zitat.
  *
  * Die Breite steht hier und nicht in der Elternseite: deren Regel
  * `.vertical-page > *:not(:first-child)` ist auf die Komponenten-
@@ -18,7 +28,7 @@
  */
 import { localeOf } from '../lib/routes.mjs';
 import { SKIZZE } from '../lib/i18n/seiten/skizze';
-import { testimonialsFuer, type TestimonialBranche } from '../lib/testimonials';
+import { testimonialsFuer, zerlegen, type TestimonialBranche } from '../lib/testimonials';
 
 interface Props {
   branche: TestimonialBranche;
@@ -27,31 +37,66 @@ interface Props {
 const { branche } = Astro.props;
 const locale = localeOf(Astro.url.pathname);
 const s = SKIZZE[locale as 'de' | 'en'];
-const stimmen = testimonialsFuer(branche);
+
+const [gross, ...klein] = testimonialsFuer(branche);
+const [vorG, phraseG, nachG] = zerlegen(gross);
 ---
 
 <section class="ks" data-reveal aria-labelledby="ks-titel">
-  <p class="ks-eyebrow">{s.stimmen.titel}</p>
-  <h2 class="ks-headline" id="ks-titel">{s.stimmen.unter}</h2>
+  <p class="ks-augenbraue" id="ks-titel">{s.stimmen.titel}</p>
+
+  {/* Der Bewertungs-Kopf. Die Zahl und die Sterne sagen dasselbe —
+      zusammen sind sie ein Siegel, einzeln nur eine Angabe. Für
+      Vorleseprogramme steht beides einmal als Satz da, die gemalten
+      Teile sind ausgeblendet. */}
+  <div class="ks-kopf">
+    <p class="ks-note" aria-hidden="true">{s.stimmen.note}</p>
+    <p class="ks-sterne" aria-hidden="true">★★★★★</p>
+    <span class="ks-nurlesen">{s.stimmen.noteLabel}</span>
+    <p class="ks-unterzeile">{s.stimmen.unterZeile}</p>
+  </div>
+
+  <figure class="ks-gross">
+    {/* Reine Zierde, und zwar eine, die ein Vorleseprogramm sonst als
+        Anführungszeichen vorlesen würde. */}
+    <span class="ks-zeichen" aria-hidden="true">&ldquo;</span>
+    <blockquote class="ks-gross-zitat">
+      {vorG}<strong>{phraseG}</strong>{nachG}
+    </blockquote>
+    <figcaption class="ks-autor">
+      <span class="ks-initialen" aria-hidden="true">{gross.initialen}</span>
+      <span class="ks-autor-text">
+        <strong>{gross.autor}</strong>
+        <span>{gross.betrieb}</span>
+      </span>
+    </figcaption>
+  </figure>
 
   <ul class="ks-raster">
-    {stimmen.map((stimme) => (
-      <li class="ks-karte">
-        {/* Fuenf gemalte Sterne sind fuer ein Vorleseprogramm fuenf
-            bedeutungslose Zeichen — deshalb der Text daneben, und die
-            Sterne selbst aria-hidden. */}
-        <p class="ks-sterne" aria-hidden="true">★★★★★</p>
-        <span class="ks-sterne-text">{s.stimmen.sterne}</span>
-        <blockquote class="ks-zitat">{stimme.zitat}</blockquote>
-        <figcaption class="ks-autor">
-          <span class="ks-initialen" aria-hidden="true">{stimme.initialen}</span>
-          <span class="ks-autor-text">
-            <strong>{stimme.autor}</strong>
-            <span>{stimme.betrieb}</span>
-          </span>
-        </figcaption>
-      </li>
-    ))}
+    {
+      klein.map((stimme) => {
+        const [vor, phrase, nach] = zerlegen(stimme);
+        return (
+          <li class="ks-karte">
+            {stimme.abzeichen && (
+              <span class="ks-abzeichen" aria-hidden="true">{stimme.abzeichen}</span>
+            )}
+            <p class="ks-sterne-klein" aria-hidden="true">★★★★★</p>
+            <span class="ks-nurlesen">{s.stimmen.sterne}</span>
+            <blockquote class="ks-zitat">
+              {vor}<strong>{phrase}</strong>{nach}
+            </blockquote>
+            <figure class="ks-autor">
+              <span class="ks-initialen" aria-hidden="true">{stimme.initialen}</span>
+              <figcaption class="ks-autor-text">
+                <strong>{stimme.autor}</strong>
+                <span>{stimme.betrieb}</span>
+              </figcaption>
+            </figure>
+          </li>
+        );
+      })
+    }
   </ul>
 </section>
 
@@ -60,69 +105,215 @@ const stimmen = testimonialsFuer(branche);
     position: relative;
     z-index: 1;
     max-width: 880px;
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 96px;
-    padding-left: 40px;
-    padding-right: 40px;
+    margin: 0 auto 96px;
+    padding: 0 40px;
+    text-align: center;
   }
 
-  .ks-eyebrow {
+  .ks-augenbraue {
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-weight: 500;
     font-size: 0.75rem;
     letter-spacing: 0.3em;
     text-transform: uppercase;
     color: rgba(245, 158, 11, 0.85);
-    margin: 0 0 18px;
-  }
-  .ks-headline {
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-weight: 700;
-    font-size: clamp(1.6rem, 2.6vw, 2.1rem);
-    line-height: 1.15;
-    letter-spacing: -0.015em;
-    color: #f5f5f4;
-    margin: 0 0 32px;
+    margin: 0 0 26px;
   }
 
-  .ks-raster {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
-    /* stretch, damit die drei Karten gleich hoch sind. Die
-       Autorenzeile haengt per margin-top:auto unten fest, sonst
-       klebte sie bei kurzen Zitaten mitten in der Karte. */
-    align-items: stretch;
-  }
-
-  .ks-karte {
+  /* === Bewertungs-Kopf === */
+  .ks-kopf {
     display: flex;
     flex-direction: column;
-    padding: 22px 20px 20px;
-    border: 1px solid rgba(245, 245, 244, 0.1);
-    border-radius: 14px;
-    background: rgba(245, 245, 244, 0.03);
-    transition: border-color 220ms ease, background 220ms ease, transform 220ms ease;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 48px;
   }
-  .ks-karte:hover {
-    border-color: rgba(245, 158, 11, 0.45);
-    background: rgba(245, 158, 11, 0.04);
-    transform: translateY(-2px);
+
+  .ks-note {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(3.6rem, 9vw, 6.5rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    color: #f5f5f4;
+    margin: 0;
   }
 
   .ks-sterne {
-    margin: 0 0 14px;
-    font-size: 0.92rem;
+    font-size: clamp(1.4rem, 3.4vw, 2rem);
+    letter-spacing: 0.18em;
+    line-height: 1;
+    color: #f59e0b;
+    margin: 4px 0 0;
+    /* Der Buchstabenabstand hängt rechts als Leerraum nach und
+       verschiebt die Reihe nach links. */
+    text-indent: 0.18em;
+  }
+
+  .ks-unterzeile {
+    font-family: 'SF Mono', Monaco, monospace;
+    font-size: 0.72rem;
     letter-spacing: 0.14em;
+    color: rgba(245, 245, 244, 0.45);
+    margin: 10px 0 0;
+  }
+
+  /* === Die große Stimme === */
+  .ks-gross {
+    position: relative;
+    max-width: 720px;
+    margin: 0 auto 32px;
+    padding: 0 8px;
+  }
+
+  /* Hinter dem Zitat, nicht daneben: ein Anführungszeichen in dieser
+     Größe ist Textur, kein Zeichen. */
+  .ks-zeichen {
+    position: absolute;
+    top: -0.34em;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: clamp(9rem, 22vw, 15rem);
+    line-height: 1;
+    color: rgba(245, 158, 11, 0.09);
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+  }
+
+  .ks-gross-zitat {
+    position: relative;
+    z-index: 1;
+    margin: 0 0 26px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(1.35rem, 2.9vw, 2rem);
+    line-height: 1.42;
+    letter-spacing: -0.012em;
+    color: rgba(245, 245, 244, 0.95);
+    text-wrap: balance;
+  }
+
+  .ks-gross-zitat strong,
+  .ks-zitat strong {
+    color: #f59e0b;
+    font-weight: 500;
+  }
+
+  /* === Die beiden kleinen === */
+  .ks-raster {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin: 0;
+    padding: 0;
+  }
+
+  .ks-karte {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 26px 24px 22px;
+    background: rgba(15, 15, 18, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 16px;
+    text-align: left;
+    transition:
+      transform 280ms ease,
+      border-color 280ms ease;
+  }
+
+  .ks-karte:hover {
+    transform: translateY(-3px);
+    border-color: rgba(245, 158, 11, 0.32);
+  }
+
+  .ks-abzeichen {
+    position: absolute;
+    top: 18px;
+    right: 20px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.35rem;
+    letter-spacing: -0.02em;
+    line-height: 1;
     color: rgba(245, 158, 11, 0.95);
   }
-  /* Nur fuer Vorleseprogramme. clip-path statt display:none, sonst
-     faellt der Satz auch dort heraus. */
-  .ks-sterne-text {
+
+  .ks-sterne-klein {
+    margin: 0;
+    font-size: 0.92rem;
+    letter-spacing: 0.1em;
+    line-height: 1;
+    color: #f59e0b;
+  }
+
+  .ks-zitat {
+    margin: 0;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-style: italic;
+    font-size: 0.98rem;
+    line-height: 1.55;
+    color: rgba(245, 245, 244, 0.8);
+  }
+
+  /* === Namenszeile, in beiden Größen gleich === */
+  .ks-autor {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 13px;
+    margin: 0;
+  }
+
+  .ks-karte .ks-autor {
+    justify-content: flex-start;
+    margin-top: auto;
+    padding-top: 4px;
+  }
+
+  .ks-initialen {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    background: rgba(245, 158, 11, 0.09);
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: rgba(245, 158, 11, 0.95);
+  }
+
+  .ks-autor-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    text-align: left;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.88rem;
+    line-height: 1.35;
+  }
+
+  .ks-autor-text strong {
+    font-weight: 600;
+    color: #f5f5f4;
+  }
+
+  .ks-autor-text span {
+    color: rgba(245, 245, 244, 0.5);
+    font-size: 0.82rem;
+  }
+
+  .ks-nurlesen {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -131,76 +322,33 @@ const stimmen = testimonialsFuer(branche);
     white-space: nowrap;
   }
 
-  .ks-zitat {
-    margin: 0 0 20px;
-    /* Echter Kursiv-Schnitt, deklariert in styles/fonts.css. Die Datei
-       lag laengst unter public/fonts und war nur nie angemeldet —
-       ohne sie schraegt der Browser den Fettschnitt, und das sieht
-       man. */
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-style: italic;
-    font-size: 0.98rem;
-    line-height: 1.55;
-    color: rgba(245, 245, 244, 0.88);
-  }
-
-  .ks-autor {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: auto;
-    padding-top: 16px;
-    /* Feste Mindesthoehe, damit die Trennlinien der drei Karten auf
-       einer Linie sitzen. Ohne sie richtet sich jede nach ihrem
-       eigenen Namensblock, und „Institut fuer Betriebsmedizin
-       Isernhagen" laeuft ueber drei Zeilen — die Linie saesse dort
-       28 px hoeher als nebenan. 90 px sind gemessen, nicht geraten:
-       der laengste Block braucht 89. */
-    min-height: 90px;
-    border-top: 1px solid rgba(245, 245, 244, 0.08);
-  }
-  .ks-initialen {
-    flex-shrink: 0;
-    display: grid;
-    place-items: center;
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.9), rgba(217, 119, 6, 0.75));
-    color: #141414;
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-size: 0.8rem;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-  }
-  .ks-autor-text {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-    min-width: 0;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.82rem;
-    line-height: 1.35;
-  }
-  .ks-autor-text strong {
-    font-weight: 600;
-    color: rgba(245, 245, 244, 0.92);
-  }
-  .ks-autor-text span { color: rgba(245, 245, 244, 0.5); }
-
-  @media (max-width: 860px) {
-    /* Drei Spalten waeren hier drei Streifen von je 100 px. */
-    .ks-raster { grid-template-columns: 1fr; gap: 14px; }
-  }
   @media (max-width: 768px) {
     .ks {
-      padding-left: 20px;
-      padding-right: 20px;
-      margin-bottom: 72px;
+      margin-bottom: 64px;
+      padding: 0 20px;
+    }
+
+    .ks-kopf {
+      margin-bottom: 36px;
+    }
+
+    .ks-raster {
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .ks-abzeichen {
+      font-size: 1.2rem;
     }
   }
+
   @media (prefers-reduced-motion: reduce) {
-    .ks-karte { transition: none; }
-    .ks-karte:hover { transform: none; }
+    .ks-karte {
+      transition: none;
+    }
+
+    .ks-karte:hover {
+      transform: none;
+    }
   }
 </style>

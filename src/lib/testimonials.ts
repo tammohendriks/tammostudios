@@ -40,6 +40,22 @@ export type Testimonial = {
   betrieb: string;
   /** Zwei Buchstaben für den Kreis links. */
   initialen: string;
+  /**
+   * Die Stelle, die auf der Karte hervorgehoben wird.
+   *
+   * MUSS wörtlich im Zitat stehen — zerlegen() wirft sonst beim Bauen.
+   * Das ist Absicht: eine „hervorgehobene" Phrase, die im Zitat gar
+   * nicht vorkommt, wäre ein erfundenes Zitat im Zitat, und genau das
+   * darf auf einer Seite mit echten Bewertungen nicht passieren.
+   */
+  kernphrase: string;
+  /**
+   * Ein kurzes Abzeichen in der Ecke der Karte, etwa eine Note.
+   *
+   * Nur dort, wo die Bewertung selbst eine hergibt. Erfinden wäre
+   * dasselbe Problem wie oben.
+   */
+  abzeichen?: string;
   /** Nur zur Orientierung beim Pflegen, nicht sichtbar. */
   branche: string;
 };
@@ -49,6 +65,8 @@ export const TESTIMONIALS: readonly Testimonial[] = [
     id: 'kirsch',
     zitat:
       'Sehr zu empfehlen. Die Zusammenarbeit funktioniert klasse, wir sind mit der Arbeit und dem Miteinander sehr zufrieden und freuen uns auch in Zukunft weiterhin mit Tammo zusammen zu arbeiten. 10/10.',
+    kernphrase: 'Die Zusammenarbeit funktioniert klasse',
+    abzeichen: '10/10',
     autor: 'Kirsch Dach & Fassade GmbH',
     betrieb: 'Bremen',
     initialen: 'KD',
@@ -67,6 +85,7 @@ export const TESTIMONIALS: readonly Testimonial[] = [
       'Tammo Studios können wir als betriebsärztliche Praxis wirklich empfehlen — kurze Kommunikationswege, präzise Umsetzung, eine gelungene Websitegestaltung. Tammo können wir von Herzen empfehlen. Ein wunderbarer Mensch ist er außerdem.',
     zitatVoll:
       'Ganz herzlichen Dank für die Neugestaltung unserer Website. Für alle Mitlesenden: Tammo Studios können wir als betriebsärztliche Praxis wirklich empfehlen — kurze Kommunikationswege, präzise Umsetzung, einfach eine gelungene Websitegestaltung mit gut funktionierendem Responsive-System. Tammo können wir von Herzen empfehlen. Ein wunderbarer Mensch ist er außerdem.',
+    kernphrase: 'kurze Kommunikationswege, präzise Umsetzung',
     autor: 'Dr. Kirsten Witzak-Agah',
     betrieb: 'Institut für Betriebsmedizin Isernhagen',
     initialen: 'KW',
@@ -76,6 +95,7 @@ export const TESTIMONIALS: readonly Testimonial[] = [
     id: 'waermepower',
     zitat:
       'Sympathischer junger Kerl, der nahezu jede Idee umsetzen kann. Preis / Leistung der Hammer und schnelle Antwort!',
+    kernphrase: 'Preis / Leistung der Hammer',
     autor: 'WärmePower',
     betrieb: 'Bremen',
     initialen: 'WP',
@@ -107,6 +127,24 @@ export type TestimonialBranche = keyof typeof REIHENFOLGE;
  * gibt. Still eine Karte weniger anzuzeigen wäre schlimmer: die Lücke
  * fiele im Raster kaum auf und stünde dann monatelang live.
  */
+/**
+ * Zerlegt ein Zitat an seiner Kernphrase in drei Teile.
+ *
+ * Wirft, wenn die Phrase nicht wörtlich im Zitat steht. Still auf die
+ * Hervorhebung zu verzichten wäre bequemer und falsch: man sähe es
+ * niemandem an, und die Karte stünde monatelang ohne den Satz da, auf
+ * den es ankommt. Ein Fehler beim Bauen fällt sofort auf.
+ */
+export const zerlegen = (t: Testimonial): [string, string, string] => {
+  const i = t.zitat.indexOf(t.kernphrase);
+  if (i === -1) {
+    throw new Error(
+      `Kernphrase „${t.kernphrase}" steht nicht im Zitat von ${t.autor}.`
+    );
+  }
+  return [t.zitat.slice(0, i), t.kernphrase, t.zitat.slice(i + t.kernphrase.length)];
+};
+
 export const testimonialsFuer = (branche: TestimonialBranche): Testimonial[] =>
   REIHENFOLGE[branche].map((id) => {
     const gefunden = TESTIMONIALS.find((t) => t.id === id);

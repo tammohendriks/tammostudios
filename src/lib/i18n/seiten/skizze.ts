@@ -191,10 +191,25 @@ export const de = {
 
   stimmen: {
     titel: 'Was Kunden sagen',
-    unter: 'Drei Stimmen aus laufenden Projekten',
+    /**
+     * Der Schnitt. Muss zum Google-Profil passen — die Zahl ist
+     * nachprüfbar, und eine Seite, die mit echten Bewertungen wirbt,
+     * verliert bei genau dieser Zahl am meisten, wenn sie nicht
+     * stimmt.
+     */
+    note: '5,0',
+    /**
+     * ACHTUNG, eine Behauptung: „100 % Weiterempfehlung" liest sich
+     * wie eine Zahl über alle Kunden, belegt ist sie nur über die
+     * drei gezeigten Stimmen. Wer das enger fassen will, schreibt
+     * hier „ALLE DREI EMPFEHLEN WEITER" — das steht wörtlich in den
+     * Zitaten und ist von jedem nachlesbar.
+     */
+    unterZeile: 'AUS ECHTEN PROJEKTEN · 100 % WEITEREMPFEHLUNG',
     // Für Vorleseprogramme: fünf gemalte Sterne sind sonst fünf
     // bedeutungslose Zeichen.
     sterne: 'Fünf von fünf Sternen',
+    noteLabel: 'Durchschnitt: 5,0 von 5 Sternen',
   },
 
   quiz: {
@@ -381,11 +396,13 @@ export const en: Shape<typeof de> = {
 
   stimmen: {
     titel: 'What clients say',
+    note: '5.0',
     // Die Zitate bleiben im Original — eine uebersetzte Bewertung ist
-    // keine Bewertung mehr. Der Hinweis sagt das, statt es zu
+    // keine Bewertung mehr. Die Zeile sagt das, statt es zu
     // verschweigen.
-    unter: 'Three voices from ongoing projects (in German)',
+    unterZeile: 'FROM REAL PROJECTS · ORIGINAL GERMAN REVIEWS',
     sterne: 'Five out of five stars',
+    noteLabel: 'Average: 5.0 out of 5 stars',
   },
 
   quiz: {
