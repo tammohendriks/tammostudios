@@ -625,7 +625,23 @@ const jsonLdGraph = {
           },
           {
             threshold: 0.15,
-            rootMargin: '0px 0px -5% 0px',
+            // OBEN WEIT AUFGEZOGEN, und das ist der Kern.
+            //
+            // Wer springt statt zu scrollen — Ankerlink,
+            // Zurueck-Taste, scrollIntoView, Einrasten am Seitenende —
+            // schiebt Elemente in EINEM Bild von unterhalb des
+            // Fensters nach oberhalb. Der Beobachter meldet dabei gar
+            // nichts: der Zustand war „nicht sichtbar" und ist es
+            // geblieben. Die Elemente blieben dauerhaft auf
+            // opacity 0. Nachgestellt auf /webdesign-praxis — nach
+            // einem Sprung zur Angebotskarte war deren Augenbraue fuer
+            // immer weg.
+            //
+            // Mit dem grossen oberen Rand zaehlt alles OBERHALB des
+            // Fensters als sichtbar und wird sofort eingeblendet. Nach
+            // unten bleibt der Rand negativ, damit weiter unten
+            // wartende Elemente warten.
+            rootMargin: '10000px 0px -5% 0px',
           }
         );
 
