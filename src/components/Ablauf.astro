@@ -17,7 +17,7 @@
  * dieser Abschnitt verschwindet von selbst.
  */
 import { SKIZZE } from '../lib/i18n/seiten/skizze';
-import { ANGEBOTE } from '../lib/angebote';
+import { preisText } from '../lib/angebote';
 import { localeOf } from '../lib/routes.mjs';
 import type { SkizzeBranche } from '../lib/skizze';
 
@@ -29,7 +29,7 @@ const { branche } = Astro.props;
 
 const locale = localeOf(Astro.url.pathname) as 'de' | 'en';
 const ab = SKIZZE[locale].ablauf;
-const preis = ANGEBOTE[branche].preis;
+const preis = preisText(branche, locale);
 
 const schritte = ab.schritte.map((s) => ({
   titel: s.titel,

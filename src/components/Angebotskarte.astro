@@ -20,7 +20,7 @@
  * Klick. Er öffnet den Fragebogen wie alle anderen Knöpfe hier.
  */
 import { SKIZZE } from '../lib/i18n/seiten/skizze';
-import { ANGEBOTE } from '../lib/angebote';
+import { ANGEBOTE, preisText } from '../lib/angebote';
 import { t } from '../lib/i18n';
 import { localeOf } from '../lib/routes.mjs';
 import type { SkizzeBranche } from '../lib/skizze';
@@ -38,7 +38,13 @@ const sk = SKIZZE[locale].hero;
 const angebot = ANGEBOTE[branche];
 
 // Geschütztes Leerzeichen, damit Betrag und Zeichen zusammenbleiben.
-const betrag = `${angebot.preis} €`;
+// Deutsch steht das Zeichen hinter der Zahl, englisch davor. Das
+// geschuetzte Leerzeichen gibt es nur im Deutschen — es haelt Zahl
+// und Zeichen zusammen, damit das € nie allein umbricht.
+const betrag =
+  locale === 'en'
+    ? `€${preisText(branche, locale)}`
+    : `${preisText(branche, locale)}\u00a0€`;
 
 // „Klar, fix, ohne Sternchen." ist ein guter Satz, in dem kein
 // einziger Begriff steht, nach dem jemand sucht. „Was eine
@@ -61,7 +67,7 @@ const anwendungenZeile =
     {angebot.abzeichen && <p class="ak-abzeichen">{a.abzeichen[branche]}</p>}
 
     <p class="ak-bezeichnung">{a.bezeichnung[branche]}</p>
-    <p class="ak-betrag">{betrag}</p>
+    <p class="ak-betrag" data-zaehlen>{betrag}</p>
     <p class="ak-einmalig">{a.einmalig}</p>
 
     <div class="ak-trenner"></div>

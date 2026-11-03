@@ -43,6 +43,7 @@ import Angebotskarte from './Angebotskarte.astro';
 import AbschlussSkizze from './AbschlussSkizze.astro';
 import FuenfSekunden from './FuenfSekunden.astro';
 import Ablauf from './Ablauf.astro';
+import Hochzaehlen from './Hochzaehlen.astro';
 import SchwebenderCta from './SchwebenderCta.astro';
 import { UMBAU_AKTIV, type SkizzeBranche } from '../lib/skizze';
 
@@ -120,8 +121,7 @@ const dienstSchema = {
   },
   offers: {
     '@type': 'Offer',
-    // '2.500' ist deutsche Schreibweise; schema.org will eine Zahl.
-    price: (ANGEBOTE[slug as SkizzeBranche]?.preis ?? '').replace(/\./g, ''),
+    price: String(ANGEBOTE[slug as SkizzeBranche]?.preis ?? ''),
     priceCurrency: 'EUR',
     availability: 'https://schema.org/InStock',
     url: seitenUrl,
@@ -504,6 +504,7 @@ const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
       Vorlese-Reihenfolge steht er so nicht mitten im Inhalt. */}
   {umgebaut && <QuizModal branche={slug as SkizzeBranche} />}
   {umgebaut && <SchwebenderCta />}
+  {umgebaut && <Hochzaehlen />}
 </BaseLayout>
 
 <style>

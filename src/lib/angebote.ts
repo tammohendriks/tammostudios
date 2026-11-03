@@ -25,8 +25,15 @@
 import type { SkizzeBranche } from './skizze';
 
 export type Angebot = {
-  /** Der Betrag ohne Währungszeichen, deutsch gesetzt. */
-  preis: string;
+  /**
+   * Der Betrag als ZAHL, nicht als Zeichenkette.
+   *
+   * Stand hier vorher als '2.500' — deutsche Schreibweise, fest
+   * verdrahtet. Auf der englischen Fassung stand dadurch „2.500 €" in
+   * der Karte, waehrend der Fliesstext daneben „€2,500" sagte. Eine
+   * Zahl laesst sich pro Sprache formatieren, eine Zeichenkette nicht.
+   */
+  preis: number;
   /**
    * Wie viele individuelle Anwendungen im Paket sind.
    *
@@ -49,17 +56,17 @@ export type Angebot = {
 
 export const ANGEBOTE: Record<SkizzeBranche, Angebot> = {
   praxis: {
-    preis: '2.500',
+    preis: 2500,
     anwendungen: 2,
     abzeichen: true,
   },
   handwerk: {
-    preis: '2.000',
+    preis: 2000,
     anwendungen: 1,
     abzeichen: true,
   },
   gastronomie: {
-    preis: '2.000',
+    preis: 2000,
     anwendungen: 1,
     abzeichen: true,
   },
@@ -68,17 +75,17 @@ export const ANGEBOTE: Record<SkizzeBranche, Angebot> = {
     // bei Pflichtangaben und Datenschutz. Der Markt ruft fuer eine
     // Kanzlei-Website 3.000 bis 8.000 Euro auf — 2.500 ist deutlich
     // darunter, ohne billig zu wirken.
-    preis: '2.500',
+    preis: 2500,
     anwendungen: 2,
     abzeichen: false,
   },
   immobilien: {
-    preis: '2.000',
+    preis: 2000,
     anwendungen: 1,
     abzeichen: false,
   },
   medien: {
-    preis: '2.000',
+    preis: 2000,
     anwendungen: 1,
     // KEIN Abzeichen: „Von Agenturen am häufigsten gebucht" wäre für
     // eine Branche mit genau einer Referenz eine Behauptung ohne
@@ -86,3 +93,11 @@ export const ANGEBOTE: Record<SkizzeBranche, Angebot> = {
     abzeichen: false,
   },
 };
+
+/**
+ * Der Betrag in der Schreibweise der jeweiligen Sprache, ohne
+ * Währungszeichen — das steht im Wörterbuch, weil es im Deutschen
+ * hinter und im Englischen vor der Zahl steht.
+ */
+export const preisText = (branche: SkizzeBranche, locale: 'de' | 'en'): string =>
+  ANGEBOTE[branche].preis.toLocaleString(locale === 'en' ? 'en-US' : 'de-DE');
