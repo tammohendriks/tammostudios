@@ -471,7 +471,17 @@ const telefonAnzeige = locale === 'en' ? PHONE_INTERNATIONAL : SITE.phone;
       }
     };
 
+    /* Wahr, solange der gespeicherte Entwurf zurueckgespielt wird.
+       entwurfLaden() stellt die Auswahl mit .click() wieder her — anders
+       bliebe das URL-Feld bei „ja" verborgen. Der Klick loest aber
+       change aus, und daran haengt der Sprung zum naechsten Schritt.
+       Bei einem Entwurf auf dem letzten Schritt war der naechste Schritt
+       das ABSENDEN: der Fragebogen verschickte sich selbst, sobald
+       jemand ihn wieder oeffnete. Nachgestellt und bestaetigt. */
+    let ladend = false;
+
     const entwurfLaden = () => {
+      ladend = true;
       try {
         const roh = localStorage.getItem(SPEICHER);
         if (!roh) return;
@@ -504,6 +514,8 @@ const telefonAnzeige = locale === 'en' ? PHONE_INTERNATIONAL : SITE.phone;
       } catch {
         // Kaputter Entwurf: lieber von vorn als mit halbem Zustand.
         try { localStorage.removeItem(SPEICHER); } catch { /* egal */ }
+      } finally {
+        ladend = false;
       }
     };
 
@@ -695,7 +707,7 @@ const telefonAnzeige = locale === 'en' ? PHONE_INTERNATIONAL : SITE.phone;
             return;
           }
         }
-        if (feld.name === 'stil') {
+        if (feld.name === 'stil' && !ladend) {
           window.setTimeout(() => void weiter(), sanfter ? 220 : 0);
         }
       });
