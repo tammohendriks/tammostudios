@@ -6,6 +6,7 @@ import SiteLangToggle from '../components/SiteLangToggle.astro';
 import { SITE } from '../lib/constants';
 import { absUrl, hreflangs, keyOf, localeOf, pathOr } from '../lib/routes.mjs';
 import { t } from '../lib/i18n';
+import { UMBAU_AKTIV } from '../lib/skizze';
 
 interface Props {
   pageTitle: string;
@@ -111,6 +112,12 @@ const initialPage = isLanding ? 'landing' : 'subpage';
 // Deckel ueber einer hellen Seite ist kein Notbehelf, sondern das,
 // was ein Foto-Hero ohnehin ist.
 const hideThemeToggle = isLanding;
+
+// Auf den Branchenseiten erscheint der Umschalter erst unterhalb des
+// Heros. Der Hero ist ein Foto und sieht in beiden Themen gleich aus —
+// ein Schalter, der sichtbar ueber etwas schwebt, das sich nicht
+// aendert, sieht aus wie ein kaputter Schalter.
+const themaErstNachHero = (UMBAU_AKTIV as readonly string[]).includes(routeKey ?? '');
 
 // LocalBusiness JSON-LD Schema. ProfessionalService (Subtype von
 // LocalBusiness) matched einen Solo-Freelance-Webentwickler besser
@@ -588,7 +595,7 @@ const jsonLdGraph = {
         Ausblenden per Bedingung hier — die Entscheidung gehoert in die
         Routen-Tabelle, nicht ins Layout. */}
     <SiteLangToggle />
-    {!hideThemeToggle && <SiteThemeToggle />}
+    {!hideThemeToggle && <SiteThemeToggle nachHero={themaErstNachHero} />}
     <slot />
     <script>
       // Site-weiter Scroll-Reveal: alle [data-reveal] Elemente werden
