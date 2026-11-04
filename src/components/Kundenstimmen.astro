@@ -40,6 +40,21 @@ const s = SKIZZE[locale as 'de' | 'en'];
 
 const [gross, ...klein] = testimonialsFuer(branche);
 const [vorG, phraseG, nachG] = zerlegen(gross);
+
+/**
+ * Die Schriftgroesse des grossen Zitats haengt an seiner LAENGE.
+ *
+ * Die drei Stimmen sind 112, 197 und 232 Zeichen lang. In einer
+ * festen Groesse heisst das drei bis zwoelf Zeilen — und zwoelf
+ * zentrierte Zeilen in 38px sind kein Zitat mehr, sondern ein Absatz
+ * in Grossschrift. Genau so stand die Stimme von Dr. Witzak-Agah auf
+ * der Praxis- und der Medienseite.
+ *
+ * Die drei Stufen sind so gewaehlt, dass JEDE Stimme auf drei bis
+ * fuenf Zeilen kommt. Nebenwirkung: text-wrap: balance greift erst
+ * bis etwa sechs Zeilen — in der alten Groesse lief es ins Leere.
+ */
+const stufe = gross.zitat.length > 200 ? 'lang' : gross.zitat.length > 140 ? 'mittel' : 'kurz';
 ---
 
 <section class="ks" aria-labelledby="ks-titel">
@@ -56,7 +71,7 @@ const [vorG, phraseG, nachG] = zerlegen(gross);
     <p class="ks-unterzeile">{s.stimmen.unterZeile}</p>
   </div>
 
-  <figure class="ks-gross" data-reveal>
+  <figure class="ks-gross" data-laenge={stufe} data-reveal>
     {/* Reine Zierde, und zwar eine, die ein Vorleseprogramm sonst als
         Anführungszeichen vorlesen würde. */}
     <span class="ks-zeichen" aria-hidden="true">&ldquo;</span>
@@ -160,10 +175,31 @@ const [vorG, phraseG, nachG] = zerlegen(gross);
 
   /* === Die große Stimme === */
   .ks-gross {
+    /* Grundstufe: kurzes Zitat. Die beiden anderen Stufen stehen
+       darunter und ueberschreiben nur diese drei Werte. */
+    --zitat-groesse: clamp(1.75rem, 3vw, 2.4rem);
+    --zitat-breite: 720px;
+    --zitat-zeile: 1.38;
+    --zitat-zeichen: clamp(9rem, 22vw, 15rem);
+
     position: relative;
-    max-width: 720px;
+    max-width: var(--zitat-breite);
     margin: 0 auto 32px;
     padding: 0 8px;
+  }
+
+  .ks-gross[data-laenge='mittel'] {
+    --zitat-groesse: clamp(1.45rem, 2.4vw, 1.95rem);
+    --zitat-breite: 780px;
+    --zitat-zeile: 1.42;
+    --zitat-zeichen: clamp(7rem, 17vw, 11.5rem);
+  }
+
+  .ks-gross[data-laenge='lang'] {
+    --zitat-groesse: clamp(1.3rem, 2.1vw, 1.7rem);
+    --zitat-breite: 800px;
+    --zitat-zeile: 1.46;
+    --zitat-zeichen: clamp(6rem, 15vw, 10rem);
   }
 
   /* Hinter dem Zitat, nicht daneben: ein Anführungszeichen in dieser
@@ -174,7 +210,7 @@ const [vorG, phraseG, nachG] = zerlegen(gross);
     left: 50%;
     transform: translateX(-50%);
     font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-size: clamp(9rem, 22vw, 15rem);
+    font-size: var(--zitat-zeichen);
     line-height: 1;
     color: rgba(245, 158, 11, 0.09);
     pointer-events: none;
@@ -194,8 +230,8 @@ const [vorG, phraseG, nachG] = zerlegen(gross);
     margin: 0 0 26px;
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-weight: 400;
-    font-size: var(--lp-mittel);
-    line-height: 1.38;
+    font-size: var(--zitat-groesse);
+    line-height: var(--zitat-zeile);
     letter-spacing: -0.012em;
     color: rgba(245, 245, 244, 0.95);
     text-wrap: balance;
