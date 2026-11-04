@@ -1,0 +1,204 @@
+---
+/**
+ * Der mitlaufende Knopf: unten eine Leiste auf dem Handy, unten rechts
+ * eine Pille am Rechner.
+ *
+ * WARUM ÜBERHAUPT: die Seite ist lang. Wer beim FAQ überzeugt ist,
+ * müsste ohne ihn zurück zum Hero oder weiter bis zum Abschluss
+ * scrollen. Bei bezahltem Verkehr ist jeder solche Umweg bezahlter
+ * Verkehr, der nicht anfragt.
+ *
+ * WANN ER NICHT DA IST — drei Fälle, alle drei notwendig:
+ *   - im Hero, denn dort steht der große Knopf schon
+ *   - sobald der Abschluss-Block in Sicht kommt, denn dort steht er
+ *     wieder; zwei Knöpfe übereinander sehen nach Panik aus
+ *   - solange der Fragebogen offen ist, denn dann läge er über dem
+ *     Dialog und führte in den Dialog, in dem man schon ist
+ *
+ * Ohne JavaScript erscheint er gar nicht. Das ist richtig so: sein
+ * ganzer Zweck ist, auf den Scroll-Stand zu reagieren.
+ */
+import { SKIZZE } from '../lib/i18n/seiten/skizze';
+import { localeOf } from '../lib/routes.mjs';
+
+const locale = localeOf(Astro.url.pathname) as 'de' | 'en';
+const sch = SKIZZE[locale].schwebend;
+---
+
+<div class="sc" data-sc hidden>
+  <button type="button" class="sc-knopf" data-skizze-oeffnen>
+    <span class="sc-handy">{sch.handy}</span>
+    <span class="sc-rechner">{sch.rechner}</span>
+    <svg
+      width="17"
+      height="17"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M5 12h14M13 6l6 6-6 6" />
+    </svg>
+  </button>
+</div>
+
+<style>
+  .sc {
+    position: fixed;
+    z-index: 60;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* Auf Geräten mit Hausbalken sitzt die Leiste sonst darunter. */
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px));
+    background: rgba(5, 5, 7, 0.82);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(245, 158, 11, 0.22);
+    transform: translateY(110%);
+    transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .sc[data-sichtbar] {
+    transform: translateY(0);
+  }
+
+  .sc-knopf {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    width: 100%;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+    color: #0a0a0c;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: -0.005em;
+    box-shadow: 0 6px 24px rgba(245, 158, 11, 0.32);
+  }
+
+  .sc-knopf:focus-visible {
+    outline: 2px solid #fcd34d;
+    outline-offset: 3px;
+  }
+
+  .sc-rechner {
+    display: none;
+  }
+
+  /* Am Rechner keine Leiste über die ganze Breite — da ist genug
+     Platz, und eine Vollbreit-Leiste nähme ihn ohne Grund. */
+  @media (min-width: 769px) {
+    .sc {
+      left: auto;
+      right: 28px;
+      bottom: 28px;
+      padding: 0;
+      background: none;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      border: none;
+      transform: translateY(26px);
+      opacity: 0;
+      transition:
+        transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 320ms ease;
+      pointer-events: none;
+    }
+
+    .sc[data-sichtbar] {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .sc-knopf {
+      width: auto;
+      padding: 13px 24px;
+      font-size: 0.94rem;
+    }
+
+    .sc-handy {
+      display: none;
+    }
+
+    .sc-rechner {
+      display: inline;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sc,
+    .sc[data-sichtbar] {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  (() => {
+    const leiste = document.querySelector<HTMLElement>('[data-sc]');
+    if (!leiste) return;
+
+    const abschluss = document.querySelector('.as');
+    const dialog = document.querySelector<HTMLDialogElement>('#skizze-dialog');
+
+    // Erst ab hier. Darüber steht der Hero-Knopf noch im Bild.
+    const SCHWELLE = 400;
+
+    let abschlussNah = false;
+    let dialogOffen = false;
+    let laeuft = false;
+
+    const pruefen = () => {
+      laeuft = false;
+      const sichtbar = window.scrollY > SCHWELLE && !abschlussNah && !dialogOffen;
+      if (sichtbar) leiste.dataset.sichtbar = '';
+      else delete leiste.dataset.sichtbar;
+    };
+
+    const anstossen = () => {
+      if (laeuft) return;
+      laeuft = true;
+      requestAnimationFrame(pruefen);
+    };
+
+    // Das hidden faellt erst hier weg: ohne Skript soll gar nichts
+    // erscheinen, denn ohne Skript reagiert nichts auf den Scrollstand.
+    leiste.hidden = false;
+
+    if (abschluss) {
+      // Der Beobachter spart den Rect-Lesevorgang pro Bild. Der Rand
+      // von 120px laesst die Leiste verschwinden, kurz BEVOR der
+      // grosse Knopf ins Bild kommt — nicht gleichzeitig.
+      new IntersectionObserver(
+        ([eintrag]) => {
+          abschlussNah = eintrag.isIntersecting;
+          anstossen();
+        },
+        { rootMargin: '120px 0px 0px 0px' }
+      ).observe(abschluss);
+    }
+
+    if (dialog) {
+      // <dialog> meldet das Oeffnen nicht von sich aus; close gibt es,
+      // open nicht. Also am Attribut horchen.
+      dialogOffen = dialog.open;
+      new MutationObserver(() => {
+        dialogOffen = dialog.open;
+        anstossen();
+      }).observe(dialog, { attributes: true, attributeFilter: ['open'] });
+    }
+
+    window.addEventListener('scroll', anstossen, { passive: true });
+    anstossen();
+  })();
+</script>

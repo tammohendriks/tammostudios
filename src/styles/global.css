@@ -21,6 +21,44 @@
     -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
+/* === Schriftskala der Branchen-Landingpages ======================
+ *
+ * Vorher hatte jeder Abschnitt seine eigene clamp()-Zeile. Gemessen
+ * waren das sieben verschiedene Display-Größen auf einer Seite —
+ * 34, 42, 58, 70, 96, 99 und 104 Pixel — und keine davon stand in
+ * einem erkennbaren Verhältnis zur nächsten. Das sieht man nicht als
+ * Fehler, man sieht es als Unruhe.
+ *
+ * Jetzt sechs Stufen, und jede Überschrift nimmt die, die ihrer Rolle
+ * entspricht. Zwei Elemente derselben Rolle haben damit zwangsläufig
+ * dieselbe Größe: die Bewertungsnote und der Preis sind beide „die
+ * große Zahl", der Abschluss und die Scroll-Fragen sind beide „die
+ * große Aussage".
+ *
+ * Steht hier und nicht in einer Komponente, weil Custom Properties
+ * vererbt werden — auch über Astro-Komponentengrenzen hinweg, die
+ * Klassenselektoren nicht überschreiten. So liest der Fragebogen im
+ * <dialog> dieselben Werte wie die Seite dahinter. */
+:root {
+  --lp-riese: clamp(3rem, 8vw, 6rem);
+  --lp-zahl: clamp(3.2rem, 7.6vw, 5.5rem);
+  --lp-gross: clamp(2.2rem, 5.4vw, 4rem);
+  --lp-mittel: clamp(1.75rem, 3vw, 2.4rem);
+  --lp-titel: clamp(1.6rem, 2.6vw, 2.1rem);
+  --lp-lead: clamp(1.05rem, 1.45vw, 1.25rem);
+  --lp-text: 1rem;
+  --lp-klein: 0.875rem;
+  --lp-braue: 0.75rem;
+  --lp-braue-sperrung: 0.3em;
+
+  /* ui-monospace zuerst: unter macOS ist das SF Mono. Ohne diesen
+     Eintrag greift der Browser auf Monaco zurück — eine Schrift von
+     1991, die neben Neue Montreal wie ein Fremdkörper aussieht.
+     Nachgemessen: an sechs Stellen der Seite stand Monaco. */
+  --lp-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, monospace;
+  --lp-mono-groesse: 0.75rem;
+}
+
 html {
   /* Reserviert dauerhaft Platz für die Scrollbar — der visuelle
      Mittelpunkt des Viewports bleibt konstant, egal ob die Seite
@@ -943,4 +981,428 @@ body[data-current-bg="cream"] .cta-orbital::before {
   .cta-orbital:hover svg {
     transform: none !important;
   }
+}
+
+/* === HELLES THEMA — BRANCHEN-LANDINGPAGES ===========================
+ *
+ * Die Branchenseiten hatten bis zum Werbe-Umbau keinen Umschalter
+ * (data-no-theme). Jetzt haben sie einen, und das stellt eine Frage,
+ * die die anderen Seiten nicht haben: der Hero ist ein ganzflaechiges
+ * Foto. Dunkler Text darauf ist unleserlich, und ein helles Foto gibt
+ * es nicht.
+ *
+ * ANTWORT: der Hero bleibt in beiden Themen dunkel. Das ist kein
+ * Notbehelf — ein Foto-Hero IST ein dunkler Deckel, und darunter eine
+ * helle, ruhige Seite zu haben, ist ein eigener, guter Aufbau. Die
+ * Regeln weiter oben in dieser Datei faerben Hero-Ueberschrift und
+ * -Unterzeile hell ein; hier werden sie fuer den Hero zurueckgeholt.
+ *
+ * AMBER AUF CREME: #f59e0b auf #f8f4ea hat ein Kontrastverhaeltnis um
+ * 2,1. Das ist wenig, und es ist trotzdem der Wert, der hier steht —
+ * siehe die Begruendung am Token-Block weiter unten.
+ *
+ * WARUM UEBERALL !important: Astro haengt beim Scoping an JEDEN Teil
+ * eines Selektors ein Attribut. Aus `.ks-autor-text strong` wird
+ * `.ks-autor-text[cid] strong[cid]` — Spezifitaet (0,3,1). Eine
+ * globale Regel `html[data-site-theme] .ks-autor-text strong` kommt
+ * nur auf (0,2,2) und verliert. Gemessen: die Namenszeile unter dem
+ * grossen Zitat blieb im hellen Thema weiss auf Creme. Ein
+ * Theme-Block ist genau die Stelle, an der !important richtig ist;
+ * die Regeln weiter oben in dieser Datei machen es ebenso.
+ *
+ * Der Fragebogen im Dialog bleibt bewusst dunkel: ein Overlay darf
+ * sich vom Untergrund abheben, und ein zweiter kompletter Satz
+ * Regeln fuer 40 Elemente waere Pflegeaufwand ohne Gewinn. */
+
+/* DAS GOLD DER MARKE, AUCH IM HELLEN THEMA: #f59e0b, derselbe Wert
+   wie im dunklen.
+
+   Hier standen bis zum 04.11.2026 zwei abgedunkelte Toene (#9a5208
+   fuer Text, #d97706 fuer Zierde), gewaehlt wegen des Kontrasts auf
+   Creme. #9a5208 ist aber kein Gold mehr, sondern ein Braun, und es
+   kam in der Farbwelt der Marke nirgends sonst vor — auf Ansage des
+   Betreibers zurueck auf das klassische Gold.
+
+   WAS DAS KOSTET: #f59e0b auf #f8f4ea ergibt 2,1:1. Fuer Zierde
+   (Linien, Punkte, Raender) ist das egal, fuer die kleinen
+   Grossbuchstaben-Zeilen daruber nicht — die sind im hellen Thema
+   schwerer zu lesen als im dunklen. Bewusste Entscheidung, keine
+   Unachtsamkeit. */
+html[data-site-theme='light'] .vertical-page {
+  --lp-amber-text: #f59e0b !important;
+  --lp-amber-deko: #f59e0b !important;
+}
+
+/* --- Hero bleibt dunkel ------------------------------------------- */
+html[data-site-theme='light'] .v-hero-title {
+  color: #ffffff !important;
+}
+
+html[data-site-theme='light'] .v-hero-subtitle {
+  color: rgba(245, 245, 244, 0.95) !important;
+}
+
+html[data-site-theme='light'] .v-hero-eyebrow {
+  color: rgba(245, 158, 11, 0.95) !important;
+}
+
+html[data-site-theme='light'] .v-zusagen {
+  color: rgba(245, 245, 244, 0.6) !important;
+}
+
+/* Der zweite Weg steht ebenfalls auf dem Foto. Ohne diese Regel
+   faerbt ihn die allgemeine .cta-link-Regel des hellen Themas dunkel
+   ein — gemessen: auf dem Foto praktisch unsichtbar. */
+html[data-site-theme='light'] .v-hero-cta-zweit,
+html[data-site-theme='light'] .v-hero-cta-zweit .v-hero-nummer {
+  color: rgba(245, 245, 244, 0.78) !important;
+}
+
+html[data-site-theme='light'] .v-hero-cta-zweit:hover,
+html[data-site-theme='light'] .v-hero-cta-zweit:focus-visible {
+  color: rgba(252, 211, 77, 1) !important;
+}
+
+/* --- Die ersten 5 Sekunden ---------------------------------------- */
+html[data-site-theme='light'] .fs-braue,
+html[data-site-theme='light'] .fs-nr,
+html[data-site-theme='light'] .fs-stark {
+  color: var(--lp-amber-text) !important;
+}
+
+html[data-site-theme='light'] .fs-uhr {
+  color: var(--theme-text-muted) !important;
+}
+
+html[data-site-theme='light'] .fs-linie {
+  background: rgba(0, 0, 0, 0.1) !important;
+}
+
+html[data-site-theme='light'] .fs-aufmacher,
+html[data-site-theme='light'] .fs-frage {
+  color: var(--theme-text-strong) !important;
+}
+
+html[data-site-theme='light'] .fs-pointe {
+  color: var(--theme-text) !important;
+}
+
+/* --- Checkliste ---------------------------------------------------- */
+html[data-site-theme='light'] .v-check-list li {
+  background: var(--theme-card-bg) !important;
+  border-color: var(--theme-border) !important;
+}
+
+html[data-site-theme='light'] .v-check-list li:hover {
+  background: var(--theme-card-bg-solid) !important;
+  border-color: rgba(245, 158, 11, 0.42) !important;
+}
+
+/* --- Preis-Fliesstext der noch nicht umgebauten Branchenseiten -----
+   Handwerk und Gastronomie zeigen statt der Angebotskarte weiter den
+   alten Block. Der hatte nie eine helle Regel, weil es auf diesen
+   Seiten nie einen Umschalter gab — ohne sie stuende eine dunkelgraue
+   Karte auf Creme. */
+html[data-site-theme='light'] .v-pricing-card {
+  background: var(--theme-card-bg) !important;
+  border-color: var(--theme-border) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* --- Ueber mich ---------------------------------------------------- */
+html[data-site-theme='light'] .um-augenbraue {
+  color: var(--lp-amber-text) !important;
+}
+
+html[data-site-theme='light'] .um-headline {
+  color: var(--theme-text-strong) !important;
+}
+
+html[data-site-theme='light'] .um-absatz {
+  color: var(--theme-text) !important;
+}
+
+html[data-site-theme='light'] .um-fakten {
+  color: var(--theme-text-muted) !important;
+}
+
+html[data-site-theme='light'] .um-fakten li + li::before {
+  color: var(--lp-amber-text) !important;
+}
+
+html[data-site-theme='light'] .um-bild img {
+  border-color: rgba(245, 158, 11, 0.42) !important;
+}
+
+/* --- Angebotskarte -------------------------------------------------- */
+html[data-site-theme='light'] .ak-augenbraue,
+html[data-site-theme='light'] .ak-bezeichnung {
+  color: var(--lp-amber-text) !important;
+}
+
+html[data-site-theme='light'] .ak-headline,
+html[data-site-theme='light'] .ak-betrag {
+  color: var(--theme-text-strong) !important;
+}
+
+html[data-site-theme='light'] .ak-karte {
+  background: var(--theme-card-bg) !important;
+  border-color: var(--theme-border) !important;
+}
+
+html[data-site-theme='light'] .ak-karte:hover,
+html[data-site-theme='light'] .ak-karte:focus-within {
+  border-color: rgba(245, 158, 11, 0.54) !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.1) !important;
+}
+
+html[data-site-theme='light'] .ak-abzeichen {
+  background: var(--theme-bg) !important;
+  border-color: rgba(245, 158, 11, 0.54) !important;
+  color: var(--lp-amber-text) !important;
+}
+
+html[data-site-theme='light'] .ak-einmalig,
+html[data-site-theme='light'] .ak-hinweis,
+html[data-site-theme='light'] .ak-fuss {
+  color: var(--theme-text-muted) !important;
+}
+
+html[data-site-theme='light'] .ak-liste li {
+  color: var(--theme-text) !important;
+}
+
+/* Die Reichweiten-Zeile steht eine Stufe staerker als das
+   Kleingedruckte darunter — in beiden Themen. */
+html[data-site-theme='light'] .ak-breite {
+  color: var(--theme-text) !important;
+  border-bottom-color: var(--theme-border) !important;
+}
+
+html[data-site-theme='light'] .ak-liste li::before {
+  color: var(--lp-amber-text) !important;
+}
+
+html[data-site-theme='light'] .ak-trenner {
+  background: var(--theme-border) !important;
+}
+
+/* --- Fallstudie ----------------------------------------------------- */
+html[data-site-theme='light'] .v-case-lead {
+  color: var(--theme-text) !important;
+}
+
+/* Der Browser-Rahmen wird hell: eine dunkle Leiste ueber einem hellen
+   Screenshot auf heller Seite waere der einzige dunkle Fleck. */
+html[data-site-theme='light'] .v-case-image-link {
+  background: var(--theme-card-bg-solid) !important;
+  border-color: var(--theme-border) !important;
+  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.12) !important;
+}
+
+html[data-site-theme='light'] .v-case-leiste {
+  background: rgba(0, 0, 0, 0.04) !important;
+  border-bottom-color: var(--theme-border) !important;
+}
+
+html[data-site-theme='light'] .v-case-punkt {
+  background: rgba(0, 0, 0, 0.16) !important;
+}
+
+html[data-site-theme='light'] .v-case-adresse {
+  background: rgba(255, 255, 255, 0.85) !important;
+  color: var(--theme-text-muted) !important;
+}
+
+html[data-site-theme='light'] .v-case-name {
+  color: var(--theme-text-strong) !important;
+}
+
+html[data-site-theme='light'] .v-case-unter {
+  color: var(--theme-text-muted) !important;
+}
+
+html[data-site-theme='light'] .v-case-technik li {
+  background: rgba(0, 0, 0, 0.03) !important;
+  border-color: var(--theme-border) !important;
+  color: var(--theme-text-muted) !important;
+}
+
+/* --- FAQ ------------------------------------------------------------- */
+html[data-site-theme='light'] .v-faq-item summary {
+  color: var(--theme-text-strong) !important;
+}
+
+html[data-site-theme='light'] .v-faq-item summary:hover {
+  color: var(--lp-amber-text) !important;
+}
+
+html[data-site-theme='light'] .v-faq-icon {
+  color: var(--lp-amber-text) !important;
+}
+
+/* --- Kundenstimmen ---------------------------------------------------- */
+html[data-site-theme='light'] .ks-augenbraue {
+  color: var(--lp-amber-text) !important;
+}
+
+html[data-site-theme='light'] .ks-note {
+  color: var(--theme-text-strong) !important;
+}
+
+html[data-site-theme='light'] .ks-sterne,
+html[data-site-theme='light'] .ks-sterne-klein {
+  color: var(--lp-amber-deko) !important;
+}
+
+html[data-site-theme='light'] .ks-unterzeile {
+  color: var(--theme-text-muted) !important;
+}
+
+html[data-site-theme='light'] .ks-zeichen {
+  color: rgba(245, 158, 11, 0.17) !important;
+}
+
+html[data-site-theme='light'] .ks-gross-zitat {
+  color: var(--theme-text-strong) !important;
+}
+
+html[data-site-theme='light'] .ks-gross-zitat strong,
+html[data-site-theme='light'] .ks-zitat strong {
+  color: var(--lp-amber-text) !important;
+}
+
+html[data-site-theme='light'] .ks-karte {
+  background: var(--theme-card-bg) !important;
+  border-color: var(--theme-border) !important;
+}
+
+html[data-site-theme='light'] .ks-karte:hover {
+  border-color: rgba(245, 158, 11, 0.42) !important;
+}
+
+html[data-site-theme='light'] .ks-zitat {
+  color: var(--theme-text) !important;
+}
+
+html[data-site-theme='light'] .ks-abzeichen {
+  color: var(--lp-amber-text) !important;
+}
+
+html[data-site-theme='light'] .ks-initialen {
+  border-color: rgba(245, 158, 11, 0.48) !important;
+  background: rgba(245, 158, 11, 0.12) !important;
+  color: var(--lp-amber-text) !important;
+}
+
+html[data-site-theme='light'] .ks-autor-text strong {
+  color: var(--theme-text-strong) !important;
+}
+
+html[data-site-theme='light'] .ks-autor-text span {
+  color: var(--theme-text-muted) !important;
+}
+
+/* --- Abschluss --------------------------------------------------------- */
+html[data-site-theme='light'] .as-buehne::before {
+  background: radial-gradient(
+    ellipse 70% 60% at 50% 45%,
+    rgba(245, 158, 11, 0.16) 0%,
+    rgba(245, 158, 11, 0.05) 42%,
+    transparent 72%
+  ) !important;
+}
+
+html[data-site-theme='light'] .as-buehne::after {
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(245, 158, 11, 0.48),
+    transparent
+  ) !important;
+}
+
+html[data-site-theme='light'] .as-augenbraue {
+  color: var(--lp-amber-text) !important;
+}
+
+html[data-site-theme='light'] .as-headline {
+  color: var(--theme-text-strong) !important;
+}
+
+html[data-site-theme='light'] .as-stark {
+  color: var(--lp-amber-deko) !important;
+}
+
+html[data-site-theme='light'] .as-sub {
+  color: var(--theme-text) !important;
+}
+
+html[data-site-theme='light'] .as-fakten {
+  color: var(--theme-text-muted) !important;
+}
+
+html[data-site-theme='light'] .as-fakten li + li::before {
+  color: var(--lp-amber-text) !important;
+}
+
+html[data-site-theme='light'] .as-telefon {
+  color: var(--theme-text-muted) !important;
+}
+
+html[data-site-theme='light'] .as-telefon a {
+  color: var(--theme-text-strong) !important;
+  border-bottom-color: rgba(245, 158, 11, 0.6) !important;
+}
+
+/* Der kleine Projektstart-Block im Abschluss steht auf Creme, der
+   grosse oben im Hero auf dem Foto — nur der kleine schaltet um. */
+html[data-site-theme='light'] .as .ps {
+  background: var(--theme-card-bg-solid) !important;
+  border-color: rgba(245, 158, 11, 0.5) !important;
+  box-shadow: 0 0 28px rgba(245, 158, 11, 0.14) !important;
+}
+
+html[data-site-theme='light'] .as .ps-oben {
+  color: var(--theme-text-strong) !important;
+}
+
+html[data-site-theme='light'] .as .ps-unten {
+  color: var(--lp-amber-text) !important;
+}
+
+/* --- Mitlaufender Knopf -------------------------------------------------- */
+html[data-site-theme='light'] .sc {
+  background: rgba(248, 244, 234, 0.88) !important;
+  border-top-color: rgba(245, 158, 11, 0.34) !important;
+}
+
+/* --- Ablauf (Branchen ohne Referenzen) ------------------------------
+   Nachgetragen: der Abschnitt entstand nach dem Theme-Block oben und
+   waere sonst weisse Schrift auf Creme. */
+html[data-site-theme='light'] .ab-augenbraue,
+html[data-site-theme='light'] .ab-nr {
+  color: var(--lp-amber-text) !important;
+}
+
+html[data-site-theme='light'] .ab-headline,
+html[data-site-theme='light'] .ab-titel {
+  color: var(--theme-text-strong) !important;
+}
+
+html[data-site-theme='light'] .ab-absatz {
+  color: var(--theme-text) !important;
+}
+
+html[data-site-theme='light'] .ab-nr {
+  background: var(--theme-bg) !important;
+  border-color: rgba(245, 158, 11, 0.54) !important;
+}
+
+html[data-site-theme='light'] .ab-schritt::before {
+  background: linear-gradient(
+    to bottom,
+    rgba(245, 158, 11, 0.6),
+    rgba(0, 0, 0, 0.1)
+  ) !important;
 }

@@ -20,7 +20,8 @@
  * Anti-Spam
  * - Honeypot-Feld `website` — wenn nicht leer: 200 zurueck OHNE Mail
  *   (Bot merkt keinen Fehler)
- * - Rate-Limit: 5 Anfragen / Stunde pro IP (in-memory Map — reicht fuer
+ * - Rate-Limit: 5 Anfragen / Stunde pro IP, GETEILT mit
+ *   /api/quiz-submit (src/lib/rateLimit.ts — in-memory, reicht fuer
  *   Solo-Setup, ueberlebt Cold-Starts nicht aber macht Serverless
  *   trotzdem hart genug gegen naive Spam-Bursts)
  *
@@ -35,12 +36,10 @@ import type { APIRoute } from 'astro';
 import { z } from 'zod';
 import { Resend } from 'resend';
 import { PHONE_INTERNATIONAL, SITE } from '../../lib/constants';
+import { limitPruefen } from '../../lib/rateLimit';
 import type { Gleichlang } from '../../lib/i18n/shape';
 
 // --- Config ------------------------------------------------------------
-
-const RATE_LIMIT_MAX = 5;
-const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 Stunde
 
 // Fuer die Benachrichtigung an Tammo, also immer deutsch. Der Wert
 // selbst ist sprachunabhaengig und kommt so aus dem Formular — auf der
@@ -117,23 +116,12 @@ const contactSchema = (m: typeof meldungenDe) =>
 
 type ContactData = z.infer<ReturnType<typeof contactSchema>>;
 
-// --- Rate-Limiting (in-memory) -----------------------------------------
-
-const rateLimits = new Map<string, { count: number; resetAt: number }>();
-
-const checkRateLimit = (ip: string): { allowed: boolean; retryAfter?: number } => {
-  const now = Date.now();
-  const entry = rateLimits.get(ip);
-  if (!entry || entry.resetAt <= now) {
-    rateLimits.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-    return { allowed: true };
-  }
-  if (entry.count >= RATE_LIMIT_MAX) {
-    return { allowed: false, retryAfter: Math.ceil((entry.resetAt - now) / 1000) };
-  }
-  entry.count += 1;
-  return { allowed: true };
-};
+// --- Rate-Limiting -----------------------------------------------------
+//
+// Der Zaehler steht seit /api/quiz-submit in src/lib/rateLimit.ts und
+// wird von beiden Routen GETEILT. Vorher lag er hier als modul-lokale
+// Map; jede weitere Route haette ihr eigenes Kontingent bekommen und
+// die Grenze damit bei jeder neuen Route verdoppelt.
 
 // --- Helpers -----------------------------------------------------------
 
@@ -330,9 +318,9 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
     // --- Rate-Limit ---
     const ip = clientAddress || 'unknown';
-    const rate = checkRateLimit(ip);
-    if (!rate.allowed) {
-      return jsonResponse({ success: false, error: m.rateLimit(rate.retryAfter ?? 0) }, 429);
+    const rate = limitPruefen(ip);
+    if (!rate.erlaubt) {
+      return jsonResponse({ success: false, error: m.rateLimit(rate.erneutIn ?? 0) }, 429);
     }
 
     // --- Send mails ---

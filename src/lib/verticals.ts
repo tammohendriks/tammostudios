@@ -26,6 +26,10 @@ export const VERTICAL_KEY_BY_CATEGORY = {
   Handwerk: 'handwerk',
   Medizin: 'praxis',
   Gastronomie: 'gastronomie',
+  // Gräfe Media lag in references.ts schon unter dieser Kategorie,
+  // hatte aber keine Branchenseite, auf die der Querverweis zeigen
+  // konnte. Jetzt gibt es sie.
+  Medien: 'medien',
 } as const satisfies Record<string, RouteKey>;
 
 export type VerticalReference = {
@@ -57,7 +61,17 @@ export type Vertical = {
     eyebrow: string;
     headlineLines: readonly VerticalHeadlineLine[];
     subheadline: string;
-    background: VerticalHeroBackground;
+    /**
+     * Das Foto hinter dem Hero. OPTIONAL.
+     *
+     * Für eine neue Branche gibt es nicht immer eines, und ein
+     * fremdes Stockfoto wäre schlechter als keines: es verspricht
+     * eine Nähe zur Branche, die nicht da ist. Ohne Bild baut die
+     * Komponente einen eigenen Hintergrund aus Verlauf und Raster —
+     * dieselbe Sprache wie die Startseite. Kommt später ein Foto
+     * dazu, reicht diese eine Zeile.
+     */
+    background?: VerticalHeroBackground;
   };
   // intro kann '\n' Zeilenumbrueche enthalten — Component nutzt .text-lines
   // (white-space: pre-line) fuer explizite Sentence-per-Line Kadenz.
@@ -65,7 +79,15 @@ export type Vertical = {
   checklistTitle: string;
   checklist: readonly string[];
   pricing: { paragraphs: readonly string[] };
-  caseStudy: {
+  /**
+   * Zwei Kundenseiten als Beleg. OPTIONAL.
+   *
+   * Für eine neue Branche gibt es noch keine. Erfundene oder
+   * branchenfremde Referenzen wären an dieser Stelle das Gegenteil
+   * von Vertrauen. Fehlt der Block, zeigt die Komponente stattdessen
+   * den Ablauf — der überzeugt ohne fremdes Material.
+   */
+  caseStudy?: {
     eyebrow: string;
     paragraphs: readonly string[];
     references: readonly VerticalReference[];
@@ -83,9 +105,13 @@ export const VERTICALS = [
     slug: 'handwerk',
     pageSlug: 'webdesign-handwerk',
     meta: {
-      title: 'Websites für Handwerksbetriebe',
+      // „erstellen lassen" steht in fast jedem Titel, der zu dieser
+      // Suche rankt, und fehlte hier komplett. Der Markenzusatz
+      // „ — Tammo Studios" kommt vom Layout dazu; deshalb bleibt der
+      // Titel unter 45 Zeichen, sonst schneidet Google ab.
+      title: 'Website für Handwerker erstellen lassen',
       description:
-        'Handgemachte Websites für Handwerker in Bremen. Ab 2.000 €, in 14 Tagen live. Mit Notdienst-Funktion und mobile-first Design.',
+        'Handwerker-Website vom Entwickler aus Bremen: Notdienst-Knopf, Referenzen, auf dem Handy schnell. 2.000 € komplett, Festpreis. Kostenlose Skizze in 48 Stunden.',
     },
     hero: {
       eyebrow: 'WEBSITE FÜR HANDWERK',
@@ -94,8 +120,10 @@ export const VERTICALS = [
         { text: 'Handwerker-Website.', highlight: true },
         { text: 'Handfest gebaut.' },
       ],
+      // „Ab" widerspricht dem Festpreis, mit dem die Angebotskarte
+      // darunter wirbt. Der Betrag steht auch in lib/angebote.ts.
       subheadline:
-        'Ab 2.000 €. In 14 Tagen live.\nAus Bremen für Handwerker in Norddeutschland.',
+        '2.000 € komplett. In 14 Tagen live.\nAus Bremen für Handwerker in Norddeutschland.',
       background: {
         image: '/webdesign-landings/hero-handwerk.webp',
         focalPoint: 'center 40%',
@@ -175,11 +203,13 @@ export const VERTICALS = [
       // (43 Impressionen auf "praxis website inhalte", "arzt homepage
       // richtlinien", "praxis website vertrauen", "praxis website
       // dsgvo"). Titel und Description nehmen die Woerter deshalb auf.
-      title: 'Website für Arztpraxen: DSGVO-konform',
+      title: 'Website für Arztpraxis erstellen lassen',
+      // Stand vorher „Ab 2.500 € komplett" — ein Widerspruch in sich,
+      // entstanden beim Umstellen des Preises.
       description:
-        'Handgemachte Websites für Arztpraxen in Bremen: DSGVO-konform, ' +
-        'mit Terminanfrage, Team-Vorstellung und Öffnungszeiten. Ab ' +
-        '2.000 €, Referenzen: Samedos und IBI.',
+        'Praxis-Website vom Entwickler aus Bremen: DSGVO-konform, mit ' +
+        'Terminanfrage und Team-Seite. 2.500 € komplett, Festpreis. ' +
+        'Kostenlose Skizze in 48 Stunden.',
     },
     hero: {
       eyebrow: 'WEBSITE FÜR PRAXEN',
@@ -188,7 +218,10 @@ export const VERTICALS = [
         { text: 'Praxis-Website.', highlight: true },
         { text: 'Diskret, klar, professionell.' },
       ],
-      subheadline: 'DSGVO-konform. Ab 2.000 €.\nAus Bremen für Praxen in ganz Deutschland.',
+      // Der Betrag steht auch in lib/angebote.ts und in der
+      // Angebotskarte. Wer ihn hier aendert, aendert ihn dort mit.
+      subheadline:
+        'DSGVO-konform. Komplett für 2.500 €.\nAus Bremen für Praxen in ganz Deutschland.',
       background: {
         image: '/webdesign-landings/hero-praxis.webp',
         focalPoint: 'center 35%',
@@ -213,7 +246,11 @@ export const VERTICALS = [
     ],
     pricing: {
       paragraphs: [
-        'Eine Praxis-Website 2.000 €, inklusive einer individuellen Anwendung — etwa einem Anfrageformular, das die Vorsorge-Art direkt mit abfragt.\nMit erweiterten Features wie Online-Terminbuchung oder Patientenportal 3.000 € (Grundausstattung).\nAlle Standards inklusive — Datenschutz, Verschlüsselung, DSGVO-Konformität sind Pflicht, nicht Extra.',
+        // Wird auf der umgebauten Seite NICHT angezeigt — dort steht
+        // die Angebotskarte. Der Text bleibt trotzdem richtig, damit
+        // die Seite nicht zwei Preise kennt, falls der Umbau je
+        // abgeschaltet wird.
+        'Eine Praxis-Website 2.500 €, inklusive zwei individueller Anwendungen — etwa einem Anfrageformular, das die Vorsorge-Art direkt mit abfragt, und einer Online-Terminbuchung.\nAlle Standards inklusive — Datenschutz, Verschlüsselung, DSGVO-Konformität sind Pflicht, nicht Extra.',
         'Für 30 € im Monat übernehme ich Wartung, Sicherheits-Updates und priorisierten Support.\nOptional, monatlich kündbar.',
       ],
     },
@@ -241,6 +278,18 @@ export const VERTICALS = [
       ],
     },
     faq: [
+      // Die beiden folgenden Fragen bedienen Suchanfragen, fuer die
+      // die Seite laut Search Console schon Impressionen bekommt
+      // („praxis website inhalte", „arzt homepage richtlinien"), ohne
+      // bisher eine Antwort darauf zu haben.
+      {
+        q: 'Welche Inhalte gehören auf eine Praxis-Website?',
+        a: 'Leistungen, Team mit Fotos, Öffnungszeiten, Anfahrt, Kontakt und eine Terminanfrage — ungefähr in dieser Reihenfolge der Wichtigkeit. Dazu Impressum und Datenschutzerklärung. Alles Weitere ist Kür: Aufklärungsvideos, Downloads für Patienten, Stellenanzeigen. Die Liste weiter oben auf dieser Seite ist genau das.',
+      },
+      {
+        q: 'Welche Richtlinien muss eine Arzt-Homepage einhalten?',
+        a: 'Vier Bereiche: Impressumspflicht, Datenschutz nach DSGVO, das Heilmittelwerbegesetz und die Berufsordnung deiner Kammer. Die technische Seite baue ich mit — Cookie-Banner mit echtem Opt-in, verschlüsselte Formulare, EU-Hosting, passende Datenschutzerklärung. Bei den Inhalten sagst du mir, was deine Kammer erlaubt: ich bin Entwickler, kein Anwalt.',
+      },
       {
         q: 'Ist die Seite DSGVO-konform?',
         a: 'Ja, komplett. Cookie-Banner mit echtem Opt-in, verschlüsselte Formulare, EU-Hosting, Datenschutzerklärung passend zur Praxis. Rechtlich sauber ab Tag 1.',
@@ -268,7 +317,7 @@ export const VERTICALS = [
     slug: 'gastronomie',
     pageSlug: 'webdesign-gastronomie',
     meta: {
-      title: 'Websites für Gastronomie',
+      title: 'Website für Restaurants erstellen lassen',
       description:
         'Handgemachte Websites für Restaurants, Cafés und Kneipen in ' +
         'Bremen: Speisekarte selbst pflegen, Reservierungsanfrage, ' +
@@ -282,7 +331,8 @@ export const VERTICALS = [
         { text: 'Einzigartig wie' },
         { text: 'dein Laden.' },
       ],
-      subheadline: 'Ab 2.000 €.\nAus Bremen für Gastro in ganz Deutschland.',
+      subheadline:
+        '2.000 € komplett.\nAus Bremen für Gastro in ganz Deutschland.',
       background: {
         image: '/webdesign-landings/hero-gastro.webp',
         focalPoint: 'center 45%',
@@ -341,6 +391,241 @@ export const VERTICALS = [
       {
         q: 'Was ist mit Google Maps und Bewertungen?',
         a: 'Wir verknüpfen dein Google Business Profile prominent. Falls du noch keins hast: setzen wir zusammen auf.',
+      },
+    ],
+  },
+  {
+    slug: 'medien',
+    pageSlug: 'webdesign-medien',
+    meta: {
+      // „Portfolio-Website" ist das Wort, das Fotografen, Videografen
+      // und Agenturen fuer ihre eigene Seite benutzen — „Medien-
+      // Website" tippt niemand.
+      title: 'Portfolio-Website erstellen lassen',
+      description:
+        'Portfolio-Website für Fotografen, Videografen und Agenturen, von Hand gebaut in Bremen. Video ohne YouTube, schnell trotz schwerer Bilder. 2.000 € komplett, Skizze in 48 Stunden.',
+    },
+    hero: {
+      eyebrow: 'WEBSITE FÜR MEDIEN',
+      headlineLines: [
+        { text: 'Deine' },
+        { text: 'Portfolio-Website.', highlight: true },
+        { text: 'So gut wie deine Arbeit.' },
+      ],
+      subheadline:
+        '2.000 € komplett. In 14 Tagen live.\nFür Fotografen, Videografen und Agenturen.',
+      // Set statt Studio: das Bild zeigt die Arbeit, nicht das
+      // Ergebnis — und seine orange Wand trifft zufaellig genau das
+      // Amber der Seite. Der Bildausschnitt liegt mittig; auf dem
+      // Handy bleibt davon der Streifen mit Klappe und Kamera uebrig.
+      background: {
+        image: '/webdesign-landings/hero-medien.webp',
+        focalPoint: 'center 50%',
+      },
+    },
+    intro:
+      'Wer dich bucht, hat vorher deine Seite gesehen.\n' +
+      'Sie ist die erste Arbeitsprobe, die du abgibst — noch vor dem Reel und noch vor dem Portfolio-PDF.\n' +
+      'Wenn sie langsam lädt oder aussieht wie tausend andere, hast du einen Teil der Antwort schon gegeben.',
+    checklistTitle: 'Was auf eine Portfolio-Website gehört',
+    checklist: [
+      'Arbeiten groß, scharf und trotzdem schnell geladen',
+      'Video ohne YouTube-Logo und ohne Cookie-Banner davor',
+      'Projekte nach Art sortiert: Image, Produkt, Hochzeit, Doku',
+      'Kundenlogos oder Kundenliste als Beleg',
+      'Ein Anfrageweg, der nicht nach Behördenformular aussieht',
+      'Neue Arbeiten selbst einstellen, ohne jemanden zu fragen',
+      'Eine Seite, die nicht aussieht wie eine Vorlage',
+    ],
+    pricing: {
+      paragraphs: [
+        'Eine Portfolio-Website 2.000 €, inklusive einer individuellen Anwendung — zum Beispiel einer Kundengalerie mit Passwort oder einem Video-Player ohne Fremdanbieter.\nKeine Stundensätze, keine Sternchen. Fertig in 14 Tagen.',
+        'Für 30 € im Monat übernehme ich Wartung, Sicherheits-Updates und priorisierten Support.\nOptional, monatlich kündbar.',
+      ],
+    },
+    caseStudy: {
+      eyebrow: 'AUS DER PRAXIS — GRÄFE MEDIA',
+      paragraphs: [
+        'Gräfe Media ist eine Mediengestaltung aus Bremen: Film, Foto und Grafik aus einer Hand.\nDie Seite stellt die Arbeiten nach vorn und erklärt erst danach, wer dahintersteckt — in dieser Reihenfolge, weil Kunden so suchen.',
+        'Gebaut wie alles hier: Astro, eigenes CMS, kein Baukasten. Neue Projekte stellt das Team selbst ein.',
+      ],
+      references: [
+        {
+          name: 'Gräfe Media',
+          image: '/referenzen/graefe-media.webp',
+          alt: 'Vorschau der Website von Gräfe Media',
+          url: 'https://graefemedia.de',
+          linkLabel: 'graefemedia.de ansehen',
+        },
+      ],
+    },
+    faq: [
+      {
+        q: 'Kann ich Videos ohne YouTube einbinden?',
+        a: 'Ja. Die Dateien liegen bei dir oder bei einem Anbieter ohne Werbung und ohne Tracking. Kein fremdes Logo im Player, keine Vorschläge für andere Videos am Ende, und kein Cookie-Banner, das sich vor dein Reel schiebt.',
+      },
+      {
+        q: 'Wird die Seite langsam, wenn ich viele Bilder zeige?',
+        a: 'Nicht, wenn man es richtig macht. Bilder werden beim Hochladen in mehreren Größen und modernen Formaten erzeugt, und geladen wird nur, was gerade zu sehen ist. Große Galerien sind der Normalfall in dieser Branche, nicht die Ausnahme.',
+      },
+      {
+        q: 'Ich kann selbst gestalten. Warum nicht Webflow oder Squarespace?',
+        a: 'Kannst du machen, und für manche reicht das. Der Unterschied: hier gibt es kein Raster, in das deine Arbeit hineinpassen muss, keine Monatsgebühr, die mit der Seite wächst, und keinen Anbieter, der dir das Layout unter den Füßen ändert. Du bekommst den Code.',
+      },
+      {
+        q: 'Kann ich neue Projekte selbst einstellen?',
+        a: 'Ja. Du bekommst ein eigenes CMS: Projekt anlegen, Bilder hochladen, Reihenfolge ziehen, fertig. Kein Code, kein Anruf bei mir.',
+      },
+      {
+        q: 'Geht auch ein geschützter Bereich für Kunden?',
+        a: 'Ja, das ist eine der individuellen Anwendungen: eine Galerie mit Passwort, aus der dein Kunde auswählt oder Dateien zieht.',
+      },
+      {
+        q: 'Was passiert, wenn wir uns trennen?',
+        a: 'Du bekommst den kompletten Code und alle Inhalte. Die Seite läuft auf deinem eigenen Hosting weiter, auch ohne mich. Es gibt nichts, was dich hier festhält.',
+      },
+    ],
+  },
+  {
+    slug: 'kanzlei',
+    pageSlug: 'webdesign-kanzlei',
+    meta: {
+      title: 'Kanzlei-Website erstellen lassen',
+      description:
+        'Kanzlei-Website für Steuerberater und Rechtsanwälte, von Hand gebaut in Bremen. Sicherer Unterlagen-Upload, Karriere-Seite, berufsrechtlich sauber. 2.500 € komplett, Skizze in 48 Stunden.',
+    },
+    hero: {
+      eyebrow: 'WEBSITE FÜR KANZLEIEN',
+      headlineLines: [
+        { text: 'Deine' },
+        { text: 'Kanzlei-Website.', highlight: true },
+        { text: 'Seriös, nicht steif.' },
+      ],
+      subheadline:
+        '2.500 € komplett. In 14 Tagen live.\nFür Steuerberater, Anwälte und Notare.',
+      background: {
+        image: '/webdesign-landings/hero-kanzlei.webp',
+        focalPoint: 'center 42%',
+      },
+    },
+    intro:
+      'Mandanten vergleichen, bevor sie anrufen.\n' +
+      'Sie öffnen drei Kanzleien in drei Tabs und entscheiden in einer Minute, bei welcher sie es versuchen.\n' +
+      'Entschieden wird dabei selten über Fachliches — sondern darüber, wer greifbar wirkt.',
+    checklistTitle: 'Was auf eine Kanzlei-Website gehört',
+    checklist: [
+      'Rechtsgebiete klar getrennt, nicht als Bleiwüste',
+      'Team mit Gesichtern — Mandanten suchen Menschen',
+      'Erstkontakt ohne Hürde: Rückruf, Formular oder Termin',
+      'Unterlagen sicher und verschlüsselt übergeben',
+      'Eine Karriere-Seite, die Bewerber wirklich anspricht',
+      'Pflichtangaben sauber: Impressum, Berufsrecht, Datenschutz',
+      'Selbst pflegbar — neue Leute, neue Leistungen, ohne Agentur',
+    ],
+    pricing: {
+      paragraphs: [
+        'Eine Kanzlei-Website 2.500 €, inklusive zwei individueller Anwendungen — etwa einem verschlüsselten Unterlagen-Upload und einer Terminanfrage.\nKeine Stundensätze, keine Sternchen. Fertig in 14 Tagen.',
+        'Für 30 € im Monat übernehme ich Wartung, Sicherheits-Updates und priorisierten Support.\nOptional, monatlich kündbar.',
+      ],
+    },
+    faq: [
+      {
+        q: 'Darf ich als Anwalt oder Steuerberater so werben?',
+        a: 'Das Berufsrecht erlaubt sachliche Information über die Tätigkeit und verbietet Reklame, die irreführt oder Erfolge verspricht. Die Seiten, die ich baue, informieren — sie versprechen nichts. Die technische Seite liefere ich; was deine Kammer im Einzelfall erlaubt, sagst du mir. Ich bin Entwickler, kein Anwalt.',
+      },
+      {
+        q: 'Können Mandanten Unterlagen sicher hochladen?',
+        a: 'Ja, das ist eine der beiden individuellen Anwendungen: ein verschlüsselter Upload, der direkt bei dir landet statt im E-Mail-Anhang. Wer schon ein Mandantenportal hat, bekommt stattdessen einen klaren Weg dorthin.',
+      },
+      {
+        q: 'Lässt sich das mit DATEV oder unserem Portal verbinden?',
+        a: 'Verlinken immer. Tiefer verbinden hängt davon ab, welche Schnittstelle dein Anbieter öffnet — das klären wir im Erstgespräch, bevor irgendetwas versprochen wird.',
+      },
+      {
+        q: 'Hilft die Seite bei der Suche nach Mitarbeitern?',
+        a: 'Bei vielen Kanzleien ist das inzwischen der eigentliche Grund für eine neue Seite. Eine Karriere-Seite mit echten Gesichtern, ehrlichen Aufgaben und einer Bewerbung in zwei Minuten bringt mehr als jede Anzeige — und sie läuft weiter, wenn die Anzeige ausgelaufen ist.',
+      },
+      {
+        q: 'Wie schnell sind wir bei Google zu finden?',
+        a: 'Die Seite ist sofort online. Beim eigenen Kanzleinamen stehst du nach 2–4 Wochen oben, bei allgemeinen Suchen wie „steuerberater bremen" dauert es 3–6 Monate.',
+      },
+      {
+        q: 'Können wir Texte selbst ändern?',
+        a: 'Ja. Du bekommst ein eigenes CMS: neue Kollegin eintragen, Leistung ergänzen, Text korrigieren. Kein Code, kein Anruf bei mir.',
+      },
+    ],
+  },
+  {
+    slug: 'immobilien',
+    pageSlug: 'webdesign-immobilien',
+    meta: {
+      title: 'Website für Immobilienmakler erstellen',
+      description:
+        'Makler-Website von Hand gebaut in Bremen: Objekte mit Suche, Exposé als PDF, Wertermittlung als Anfrage. 2.000 € komplett, Festpreis. Kostenlose Skizze in 48 Stunden.',
+    },
+    hero: {
+      eyebrow: 'WEBSITE FÜR MAKLER',
+      headlineLines: [
+        { text: 'Deine' },
+        { text: 'Makler-Website.', highlight: true },
+        { text: 'Objekte, die verkaufen.' },
+      ],
+      subheadline:
+        '2.000 € komplett. In 14 Tagen live.\nFür Makler und Hausverwaltungen in Norddeutschland.',
+      // Schluessel und Haus als Scherenschnitt vor Sonnenuntergang:
+      // das Warm des Bildes ist dasselbe Amber wie das der Marke, und
+      // es zeigt den Moment der Uebergabe statt eines Maklers im
+      // Anzug. Der Ausschnitt liegt mittig; auf dem Handy bleibt von
+      // links nach rechts genau Hand, Haus und Sonne stehen.
+      background: {
+        image: '/webdesign-landings/hero-immobilien.webp',
+        focalPoint: 'center 45%',
+      },
+    },
+    intro:
+      'Dein Kunde ist nicht der Käufer. Dein Kunde ist der Eigentümer.\n' +
+      'Der sucht sich aus, wem er sein Haus anvertraut — und schaut sich dafür an, wie du fremde Häuser zeigst.\n' +
+      'Deine Objektseiten sind die Arbeitsprobe, nach der er entscheidet.',
+    checklistTitle: 'Was auf eine Makler-Website gehört',
+    checklist: [
+      'Objekte groß gezeigt, mit Bildern in voller Qualität',
+      'Suche nach Lage, Preis und Zimmerzahl',
+      'Exposé als PDF, ohne Umweg über ein Formular',
+      'Wertermittlung als eigener Weg für Eigentümer',
+      'Team mit Gesichtern: verkauft wird an Menschen',
+      'Anbindung an dein Maklerprogramm statt doppelter Pflege',
+      'Neues Objekt in Minuten online, ohne Agentur',
+    ],
+    pricing: {
+      paragraphs: [
+        'Eine Makler-Website 2.000 €, inklusive einer individuellen Anwendung — zum Beispiel der Objektsuche oder einer Wertermittlungs-Anfrage, die gleich die richtigen Fragen stellt.\nKeine Stundensätze, keine Sternchen. Fertig in 14 Tagen.',
+        'Für 30 € im Monat übernehme ich Wartung, Sicherheits-Updates und priorisierten Support.\nOptional, monatlich kündbar.',
+      ],
+    },
+    faq: [
+      {
+        q: 'Kann ich Objekte aus meinem Maklerprogramm übernehmen?',
+        a: 'In der Regel ja. Die meisten Programme geben Objekte über eine Schnittstelle oder als OpenImmo-Datei heraus; die lese ich ein, und du pflegst weiter dort, wo du es gewohnt bist. Welches Programm du nutzt, klären wir vorher — versprochen wird erst, was geprüft ist.',
+      },
+      {
+        q: 'Was ist mit Objekten, die schon verkauft sind?',
+        a: 'Die bleiben als Referenz stehen, deutlich als verkauft markiert. Eine leere Objektliste überzeugt keinen Eigentümer; eine Liste mit zwanzig verkauften Häusern schon.',
+      },
+      {
+        q: 'Brauche ich eine Wertermittlung auf der Seite?',
+        a: 'Wenn du Eigentümer gewinnen willst: ja. Das ist der Weg, auf dem sich jemand meldet, der noch gar nicht verkaufen wollte. Als individuelle Anwendung ist genau das im Preis drin.',
+      },
+      {
+        q: 'Laden die vielen Objektbilder nicht ewig?',
+        a: 'Nicht, wenn man es richtig macht. Bilder werden beim Hochladen in mehreren Größen erzeugt, in modernen Formaten ausgeliefert und erst geladen, wenn sie ins Bild kommen.',
+      },
+      {
+        q: 'Wie schnell bin ich bei Google zu finden?',
+        a: 'Die Seite ist sofort online. Beim eigenen Namen stehst du nach 2–4 Wochen oben, bei Suchen wie „makler bremen" dauert es 3–6 Monate.',
+      },
+      {
+        q: 'Was ist mit den Pflichtangaben aus der Energieausweis-Regelung?',
+        a: 'Die Felder dafür sind in der Objektverwaltung vorgesehen und werden im Exposé mit ausgegeben. Was du angeben musst, weißt du besser als ich — die Seite macht es dir nur leicht, es nicht zu vergessen.',
       },
     ],
   },

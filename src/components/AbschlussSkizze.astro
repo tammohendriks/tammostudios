@@ -1,0 +1,302 @@
+---
+/**
+ * Der Abschluss der umgebauten Branchenseiten.
+ *
+ * Er ersetzt den geteilten ClosingCta. Der schickt zum Erstgespräch
+ * und empfiehlt nebenbei eine andere Seite — auf einer Seite, die
+ * bezahlte Klicks einkauft, sind das zwei Wege nach draußen und einer
+ * davon führt nicht einmal zu einer Anfrage. Hier kann genau eine
+ * Sache passieren, und die steht groß in der Mitte.
+ *
+ * Der einzige Verweis, der wegführt, ist die Telefonnummer. Die bleibt:
+ * wer lieber redet als tippt, bricht sonst ganz ab, und ein Anruf ist
+ * eine bessere Anfrage als keine.
+ *
+ * VOLLE BREITE OHNE KUNSTGRIFF: die Regel der Elternseite
+ * (`.vertical-page > *:not(:first-child)`, max-width 880px) ist an
+ * deren Astro-Kennung gebunden und greift bei einer eigenen Komponente
+ * nicht. Der Block ist also von sich aus so breit wie die Seite —
+ * dasselbe, was Kundenstimmen.astro ausnutzt, nur andersherum.
+ */
+import { SKIZZE } from '../lib/i18n/seiten/skizze';
+import { SITE, PHONE_INTERNATIONAL } from '../lib/constants';
+import { localeOf } from '../lib/routes.mjs';
+import type { SkizzeBranche } from '../lib/skizze';
+import Projektslots from './Projektslots.astro';
+
+export interface Props {
+  branche: SkizzeBranche;
+}
+
+const { branche } = Astro.props;
+
+const locale = localeOf(Astro.url.pathname) as 'de' | 'en';
+const a = SKIZZE[locale].abschluss;
+
+const sub = a.sub.replace('{fuer}', a.fuer[branche]);
+const telefonAnzeige = locale === 'en' ? PHONE_INTERNATIONAL : SITE.phone;
+const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
+---
+
+<section class="as" aria-labelledby="as-titel">
+  <div class="as-bahn">
+    <div class="as-buehne">
+      <div class="as-innen">
+    <p class="as-augenbraue" data-reveal>{a.augenbraue}</p>
+    <h2 class="as-headline" id="as-titel" data-reveal>
+      {a.headlineVor} <span class="as-stark">{a.headlineStark}</span>
+    </h2>
+    <p class="as-sub" data-reveal>{sub}</p>
+
+    <button type="button" class="cta-orbital as-knopf" data-skizze-oeffnen data-reveal>
+      <span>{a.cta}</span>
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M5 12h14M13 6l6 6-6 6" />
+      </svg>
+    </button>
+
+    {/* Dieselbe Komponente wie im Hero, nur kleiner: wer bis hierhin
+        gescrollt hat, hat die Zahl oben längst vergessen. */}
+    <div class="as-slots" data-reveal>
+      <Projektslots variante="klein" />
+    </div>
+
+    <ul class="as-fakten" data-reveal>
+      {a.fakten.map((f) => <li>{f}</li>)}
+    </ul>
+
+        <p class="as-telefon" data-reveal>
+          {a.telVor} <a href={telefonLink}>{telefonAnzeige}</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Der Schein liegt im Hintergrund der Sektion, nicht hinter dem
+     Knopf: ein Leuchten um den Knopf wäre ein Knopf mit Leuchten, ein
+     Leuchten in der Fläche ist eine Bühne. */
+  /* KURZ ANHALTEN, OHNE ZU BREMSEN.
+   *
+   * Erster Versuch war scroll-snap. Das war falsch: Schnappen greift
+   * in die Scroll-Bewegung selbst ein — die Seite zieht gegen den
+   * Finger und springt. Gewollt ist kein Eingriff, sondern ein
+   * Verweilen. Also wird der Abschnitt kuenstlich in die Laenge
+   * gezogen und sein Inhalt darin festgehalten: man scrollt ganz
+   * normal weiter, der Block bleibt nur eine Weile stehen, bevor die
+   * Fusszeile kommt. Dieselbe Mechanik wie beim
+   * Fuenf-Sekunden-Abschnitt, nur kuerzer.
+   *
+   * Im Grundzustand ist nichts davon aktiv: normale Hoehe, kein
+   * Kleben. Das Verweilen kommt nur dazu, wenn das Fenster hoch genug
+   * ist — sonst klebte etwas, das groesser ist als der Bildschirm —
+   * und wenn keine reduzierte Bewegung eingestellt ist. */
+  .as {
+    position: relative;
+  }
+
+  .as-buehne {
+    position: relative;
+    isolation: isolate;
+    /* Unten deutlich knapper als oben: der Block endet auf der
+       Telefonnummer, danach kommt direkt die Fusszeile. Viel Luft
+       dazwischen liest sich als Seitenende vor dem Seitenende. */
+    padding: clamp(80px, 12vw, 140px) 40px clamp(36px, 5vw, 56px);
+    text-align: center;
+    overflow: hidden;
+  }
+
+  @media (prefers-reduced-motion: no-preference) and (min-height: 760px) {
+    /* Eine Bildschirmhoehe fuer die Buehne plus 45vh Verweilen. Mehr
+       fuehlte sich wie ein Hindernis an, weniger merkt man nicht. */
+    .as-bahn {
+      min-height: calc(100dvh + 45vh);
+    }
+
+    .as-buehne {
+      position: sticky;
+      top: 0;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  .as-buehne::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(
+      ellipse 70% 60% at 50% 45%,
+      rgba(245, 158, 11, 0.17) 0%,
+      rgba(245, 158, 11, 0.05) 42%,
+      transparent 72%
+    );
+    pointer-events: none;
+  }
+
+  /* Eine Haarlinie als Kante nach oben — sonst schwebt der Block
+     zusammenhanglos unter den Kundenstimmen. */
+  .as-buehne::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(560px, 70%);
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      transparent,
+      rgba(245, 158, 11, 0.4),
+      transparent
+    );
+  }
+
+  .as-innen {
+    position: relative;
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .as-augenbraue {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: var(--lp-braue);
+    letter-spacing: var(--lp-braue-sperrung);
+    text-transform: uppercase;
+    color: rgba(245, 158, 11, 0.85);
+    margin: 0 0 20px;
+  }
+
+  .as-headline {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: var(--lp-gross);
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+    color: #f5f5f4;
+    margin: 0 0 22px;
+    text-wrap: balance;
+  }
+
+  .as-stark {
+    color: #f59e0b;
+  }
+
+  .as-sub {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-lead);
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.72);
+    max-width: 50ch;
+    margin: 0 0 38px;
+  }
+
+  /* Größer als der Knopf im Hero: das ist der letzte, und wer hier
+     ankommt, hat alles gelesen. Ein <button> erbt die Schrift des
+     Browsers, nicht die der Seite. */
+  .as-knopf {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 1.08rem;
+    padding: 17px 34px;
+    animation: as-puls 3s ease-in-out infinite;
+  }
+
+  @keyframes as-puls {
+    0%,
+    100% {
+      box-shadow:
+        0 0 32px rgba(245, 158, 11, 0.45),
+        0 0 80px rgba(245, 158, 11, 0.2);
+    }
+    50% {
+      box-shadow:
+        0 0 44px rgba(245, 158, 11, 0.62),
+        0 0 110px rgba(245, 158, 11, 0.3);
+    }
+  }
+
+  .as-slots {
+    margin-top: 30px;
+  }
+
+  .as-fakten {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px 10px;
+    margin: 26px 0 0;
+    padding: 0;
+    font-family: var(--lp-mono);
+    font-size: var(--lp-mono-groesse);
+    letter-spacing: 0.04em;
+    color: rgba(245, 245, 244, 0.5);
+  }
+
+  .as-fakten li + li::before {
+    content: '·';
+    margin-right: 10px;
+    color: rgba(245, 158, 11, 0.8);
+  }
+
+  .as-telefon {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-klein);
+    color: rgba(245, 245, 244, 0.42);
+    margin: 22px 0 0;
+  }
+
+  .as-telefon a {
+    color: rgba(245, 245, 244, 0.7);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.4);
+    padding-bottom: 1px;
+    transition: color 200ms ease, border-color 200ms ease;
+  }
+
+  .as-telefon a:hover,
+  .as-telefon a:focus-visible {
+    color: rgba(252, 211, 77, 1);
+    border-bottom-color: rgba(252, 211, 77, 0.9);
+  }
+
+  @media (max-width: 768px) {
+    .as-buehne {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+
+    .as-knopf {
+      font-size: 1rem;
+      padding: 15px 26px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .as-knopf {
+      animation: none;
+    }
+
+    .as-telefon a {
+      transition: none;
+    }
+  }
+</style>

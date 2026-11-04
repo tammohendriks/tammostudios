@@ -1,0 +1,419 @@
+---
+/**
+ * „Die ersten 5 Sekunden" — der Scroll-Moment nach dem Hero.
+ *
+ * Der Inhalt ist derselbe wie vorher im Intro-Absatz. Was sich ändert,
+ * ist das Tempo: statt fünf Zeilen auf einmal hält der Abschnitt
+ * stehen und gibt die drei Fragen einzeln frei, während darüber eine
+ * Uhr von 0,0 auf 5,0 läuft. Das ist keine Verzierung, sondern das
+ * Argument selbst — wer beim Lesen merkt, wie kurz fünf Sekunden sind,
+ * braucht den Rest der Seite weniger erklärt.
+ *
+ * ZWEI FASSUNGEN:
+ *
+ *   STATISCH — was das HTML von sich aus zeigt. Alles sichtbar,
+ *              untereinander, normale Höhe, kein sticky, nichts auf
+ *              opacity 0. Das ist der Grundzustand, nicht der Notfall.
+ *   KINO     — schaltet das Skript über data-kino="an" zu, und nur
+ *              dann, wenn es sich lohnt: JavaScript läuft, der
+ *              Besucher hat keine reduzierte Bewegung eingestellt und
+ *              das Fenster ist hoch genug (sonst klebt eine Bühne,
+ *              die größer ist als der Bildschirm, und man scrollt
+ *              blind).
+ *
+ * WARUM EINE STUFE ALS ATTRIBUT und kein Fortschritt pro Bild: die
+ * Takte sind ganze Schritte — Frage eins, zwei, drei, Pointe. Das
+ * Skript schreibt beim Scrollen eine Zahl ins data-Attribut, der Rest
+ * ist eine CSS-Blende. Pro Bild bleibt damit eine einzige Zuweisung
+ * einer Custom Property (die Fortschrittslinie, reine Compositor-
+ * Arbeit) statt Dutzender Stilrechnungen.
+ */
+import { SKIZZE } from '../lib/i18n/seiten/skizze';
+import { localeOf } from '../lib/routes.mjs';
+import type { SkizzeBranche } from '../lib/skizze';
+
+export interface Props {
+  branche: SkizzeBranche;
+}
+
+const { branche } = Astro.props;
+const locale = localeOf(Astro.url.pathname) as 'de' | 'en';
+
+// Nur manche Branchen haben eigene Worte. Partial<> statt eines
+// vollen Record: so sagt der Typ, was die Datei wirklich hergibt,
+// statt drei Einträge zu verlangen, die es nicht gibt.
+type Inhalt = (typeof SKIZZE)['de']['ersteSekunden']['praxis'];
+const alle: Partial<Record<SkizzeBranche, Inhalt>> = SKIZZE[locale].ersteSekunden;
+const inhalt = alle[branche];
+---
+
+{
+  inhalt && (
+    <section class="fs" data-fs aria-labelledby="fs-titel">
+      <div class="fs-bahn">
+        <div class="fs-buehne">
+          <div class="fs-inhalt">
+            <p class="fs-kopf">
+              <span class="fs-braue">{inhalt.augenbraue}</span>
+              {/* Die Uhr ist Beiwerk zum Text daneben; für ein
+                  Vorleseprogramm wäre eine zählende Zahl nur Lärm. */}
+              <span class="fs-uhr" aria-hidden="true" data-fs-uhr>
+                {inhalt.uhr.replace('{s}', '0,0')}
+              </span>
+            </p>
+
+            <div class="fs-linie" aria-hidden="true">
+              <span class="fs-linie-fuellung"></span>
+            </div>
+
+            <h2 class="fs-aufmacher" id="fs-titel">{inhalt.aufmacher}</h2>
+
+            {/* <ol>, weil die Reihenfolge der Inhalt ist. */}
+            <ol class="fs-fragen">
+              {inhalt.fragen.map((frage, i) => (
+                <li class="fs-frage" style={`--nr: ${i}`}>
+                  <span class="fs-nr" aria-hidden="true">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span class="fs-text">{frage}</span>
+                </li>
+              ))}
+            </ol>
+
+            <p class="fs-pointe">
+              {inhalt.pointeVor}
+              <em class="fs-stark">{inhalt.pointeStark}</em>
+              {inhalt.pointeNach}
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  /* === STATISCH ===
+     Der Grundzustand. Alles sichtbar, nichts klebt, keine Bewegung.
+     So sieht die Sektion ohne JavaScript aus, bei reduzierter Bewegung
+     und auf flachen Fenstern. */
+  .fs {
+    max-width: 880px;
+    margin: 96px auto;
+    padding: 0 40px;
+  }
+
+  .fs-inhalt {
+    max-width: 760px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .fs-kopf {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 14px;
+    margin: 0 0 12px;
+  }
+
+  .fs-braue {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: var(--lp-braue);
+    letter-spacing: var(--lp-braue-sperrung);
+    text-transform: uppercase;
+    color: rgba(245, 158, 11, 0.85);
+  }
+
+  .fs-uhr {
+    font-family: var(--lp-mono);
+    font-size: var(--lp-mono-groesse);
+    letter-spacing: 0.04em;
+    /* 0.4 ergab auf #050507 einen Kontrast von 3,49 — unter den 4,5,
+       die kleiner Text braucht (von Lighthouse gemeldet, nicht
+       geschaetzt). 0.55 liegt bei rund 5,2. */
+    color: rgba(245, 245, 244, 0.55);
+    /* Feste Breite: die Zahl wechselt beim Scrollen, und eine
+       springende Augenbraue daneben wäre das Gegenteil von ruhig. */
+    min-width: 3.4em;
+    text-align: left;
+  }
+
+  .fs-linie {
+    position: relative;
+    height: 1px;
+    width: min(320px, 60%);
+    margin: 0 auto 30px;
+    background: rgba(245, 245, 244, 0.1);
+    overflow: hidden;
+  }
+
+  .fs-linie-fuellung {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, rgba(245, 158, 11, 0.2), #f59e0b);
+    transform: scaleX(var(--takt, 1));
+    transform-origin: left center;
+  }
+
+  .fs-aufmacher {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: var(--lp-mittel);
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    color: #f5f5f4;
+    margin: 0 0 36px;
+    text-wrap: balance;
+  }
+
+  .fs-fragen {
+    list-style: none;
+    margin: 0 0 36px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .fs-frage {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 16px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: var(--lp-gross);
+    line-height: 1.08;
+    letter-spacing: -0.035em;
+    color: #f5f5f4;
+  }
+
+  .fs-nr {
+    font-family: var(--lp-mono);
+    font-weight: 400;
+    font-size: var(--lp-mono-groesse);
+    letter-spacing: 0.06em;
+    color: rgba(245, 158, 11, 0.9);
+    /* Hängt an der Grundlinie der großen Zeile und bleibt in der
+       Spur, auch wenn die Frage zweizeilig wird. */
+    align-self: flex-start;
+    margin-top: 0.55em;
+    flex-shrink: 0;
+  }
+
+  .fs-pointe {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-lead);
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.78);
+    max-width: 54ch;
+    margin: 0 auto;
+  }
+
+  .fs-stark {
+    font-style: normal;
+    color: #f59e0b;
+  }
+
+  /* === KINO ===
+     Nur wenn das Skript es zuschaltet. Die Bahn wird hoch, die Bühne
+     klebt, und die Takte blenden nacheinander auf. */
+  .fs[data-kino='an'] {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .fs[data-kino='an'] .fs-bahn {
+    /* 100dvh für die Bühne plus drei Takte Weg. Weniger, und die
+       Fragen hetzen; mehr, und man scrollt durch Leere. */
+    height: 320vh;
+    padding: 0 40px;
+  }
+
+  .fs[data-kino='an'] .fs-buehne {
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .fs[data-kino='an'] .fs-frage,
+  .fs[data-kino='an'] .fs-pointe {
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 520ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Die gerade angesprochene Zeile steht hell und oben, die schon
+     gelesenen treten zurück, ohne zu verschwinden: der Besucher soll
+     sehen, dass es drei sind. */
+  .fs[data-kino='an'][data-stufe='1'] .fs-frage:nth-child(1),
+  .fs[data-kino='an'][data-stufe='2'] .fs-frage:nth-child(2),
+  .fs[data-kino='an'][data-stufe='3'] .fs-frage:nth-child(3) {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .fs[data-kino='an'][data-stufe='2'] .fs-frage:nth-child(1),
+  .fs[data-kino='an'][data-stufe='3'] .fs-frage:nth-child(1),
+  .fs[data-kino='an'][data-stufe='3'] .fs-frage:nth-child(2),
+  .fs[data-kino='an'][data-stufe='4'] .fs-frage {
+    opacity: 0.25;
+    transform: translateY(0);
+  }
+
+  .fs[data-kino='an'][data-stufe='4'] .fs-pointe {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (max-width: 768px) {
+    .fs {
+      margin: 64px auto;
+      padding: 0 20px;
+    }
+
+    .fs[data-kino='an'] .fs-bahn {
+      height: 280vh;
+      padding: 0 20px;
+    }
+
+    .fs-fragen {
+      gap: 14px;
+    }
+
+    .fs-frage {
+      gap: 11px;
+    }
+  }
+
+  /* Der Riegel von der CSS-Seite. Das Skript prüft dasselbe noch
+     einmal und schaltet gar nicht erst zu — zwei Riegel, weil ein
+     klebender Abschnitt ohne Blende die Seite unbenutzbar machen
+     würde. */
+  @media (prefers-reduced-motion: reduce) {
+    .fs[data-kino='an'] .fs-bahn {
+      height: auto;
+      padding: 0;
+    }
+
+    .fs[data-kino='an'] .fs-buehne {
+      position: static;
+      height: auto;
+    }
+
+    .fs[data-kino='an'] .fs-frage,
+    .fs[data-kino='an'] .fs-pointe {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+
+    .fs-linie-fuellung {
+      transform: scaleX(1);
+    }
+  }
+</style>
+
+<script>
+  (() => {
+    const abschnitt = document.querySelector<HTMLElement>('[data-fs]');
+    if (!abschnitt) return;
+
+    const bahn = abschnitt.querySelector<HTMLElement>('.fs-bahn');
+    const uhr = abschnitt.querySelector<HTMLElement>('[data-fs-uhr]');
+    if (!bahn) return;
+
+    const ruhig = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    // Eine klebende Bühne auf einem flachen Fenster heißt: man scrollt
+    // und nichts bewegt sich. Unter dieser Höhe bleibt es statisch.
+    const MINDESTHOEHE = 560;
+
+    const vorlage = uhr?.textContent?.trim() ?? '';
+    const ziffernOrt = vorlage.replace(/[\d.,]+/, '{s}');
+    const komma = ziffernOrt.includes(',') || vorlage.includes(',');
+
+    let an = false;
+    let laeuft = false;
+    let letzteStufe = -1;
+    let letzteUhr = '';
+
+    const zeichnen = () => {
+      laeuft = false;
+      const kasten = bahn.getBoundingClientRect();
+      const weg = kasten.height - window.innerHeight;
+      if (weg <= 0) return;
+
+      const takt = Math.min(1, Math.max(0, -kasten.top / weg));
+
+      // Eine Zuweisung pro Bild, und zwar eine, die der Compositor
+      // allein erledigt (scaleX auf der Fortschrittslinie).
+      abschnitt.style.setProperty('--takt', takt.toFixed(4));
+
+      // Vier Takte: Aufmacher, drei Fragen, Pointe. Die erste Frage
+      // kommt erst, wenn der Aufmacher wirklich gelesen sein kann.
+      const stufe = takt < 0.14 ? 0 : takt < 0.38 ? 1 : takt < 0.6 ? 2 : takt < 0.82 ? 3 : 4;
+      if (stufe !== letzteStufe) {
+        letzteStufe = stufe;
+        abschnitt.dataset.stufe = String(stufe);
+      }
+
+      if (uhr) {
+        const zahl = (takt * 5).toFixed(1);
+        const text = ziffernOrt.replace('{s}', komma ? zahl.replace('.', ',') : zahl);
+        // Nur anfassen, wenn sich wirklich etwas ändert: sonst wäre
+        // das ein DOM-Schreibvorgang pro Bild für dieselbe Zahl.
+        if (text !== letzteUhr) {
+          letzteUhr = text;
+          uhr.textContent = text;
+        }
+      }
+    };
+
+    const beiScroll = () => {
+      if (laeuft) return;
+      laeuft = true;
+      requestAnimationFrame(zeichnen);
+    };
+
+    const einschalten = () => {
+      if (an) return;
+      an = true;
+      abschnitt.dataset.kino = 'an';
+      abschnitt.dataset.stufe = '0';
+      window.addEventListener('scroll', beiScroll, { passive: true });
+      window.addEventListener('resize', beiScroll, { passive: true });
+      zeichnen();
+    };
+
+    const ausschalten = () => {
+      if (!an) return;
+      an = false;
+      delete abschnitt.dataset.kino;
+      delete abschnitt.dataset.stufe;
+      abschnitt.style.removeProperty('--takt');
+      window.removeEventListener('scroll', beiScroll);
+      window.removeEventListener('resize', beiScroll);
+      if (uhr && vorlage) uhr.textContent = vorlage;
+    };
+
+    const entscheiden = () => {
+      if (!ruhig.matches && window.innerHeight >= MINDESTHOEHE) einschalten();
+      else ausschalten();
+    };
+
+    entscheiden();
+    ruhig.addEventListener('change', entscheiden);
+    // Beim Drehen des Geräts ändert sich die Höhe — dann kann aus
+    // „lohnt sich" ein „lohnt sich nicht" werden und umgekehrt.
+    window.addEventListener('resize', entscheiden, { passive: true });
+  })();
+</script>

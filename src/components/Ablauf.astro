@@ -1,0 +1,194 @@
+---
+/**
+ * Vier Schritte vom Klick bis zur fertigen Seite.
+ *
+ * WANN DIESER ABSCHNITT ERSCHEINT: wenn es für die Branche noch keine
+ * Referenzen gibt. Erfundene oder branchenfremde Kundenseiten wären an
+ * genau dieser Stelle das Gegenteil von Vertrauen — ein Dachdecker,
+ * der auf einer Seite für Videoproduktion als Beleg herhalten soll,
+ * belegt nichts.
+ *
+ * Der Ablauf braucht kein fremdes Material und beantwortet die Frage,
+ * die ohne Referenz offen bleibt: was passiert eigentlich, wenn ich
+ * hier klicke? Für eine Seite, die bezahlte Klicks einkauft, ist das
+ * die teuerste unbeantwortete Frage überhaupt.
+ *
+ * Kommen später Referenzen dazu, trägt man sie in verticals.ts ein und
+ * dieser Abschnitt verschwindet von selbst.
+ */
+import { SKIZZE } from '../lib/i18n/seiten/skizze';
+import { preisText } from '../lib/angebote';
+import { localeOf } from '../lib/routes.mjs';
+import type { SkizzeBranche } from '../lib/skizze';
+
+export interface Props {
+  branche: SkizzeBranche;
+}
+
+const { branche } = Astro.props;
+
+const locale = localeOf(Astro.url.pathname) as 'de' | 'en';
+const ab = SKIZZE[locale].ablauf;
+const preis = preisText(branche, locale);
+
+const schritte = ab.schritte.map((s) => ({
+  titel: s.titel,
+  text: s.text.replace('{preis}', preis),
+}));
+---
+
+<section class="ab" aria-labelledby="ab-titel">
+  <p class="ab-augenbraue" data-reveal>{ab.augenbraue}</p>
+  <h2 class="ab-headline" id="ab-titel" data-reveal>{ab.headline}</h2>
+
+  {/* <ol>, weil die Reihenfolge der Inhalt ist. Die Ziffern sind
+      gezeichnet; ein Vorleseprogramm zählt die Punkte selbst. */}
+  <ol class="ab-liste">
+    {
+      schritte.map((s, i) => (
+        <li class="ab-schritt" data-reveal>
+          <span class="ab-nr" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+          <div class="ab-text">
+            <h3 class="ab-titel">{s.titel}</h3>
+            <p class="ab-absatz">{s.text}</p>
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+</section>
+
+<style>
+  .ab {
+    max-width: 880px;
+    margin: 0 auto 96px;
+    padding: 0 40px;
+  }
+
+  .ab-augenbraue {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: var(--lp-braue);
+    letter-spacing: var(--lp-braue-sperrung);
+    text-transform: uppercase;
+    color: rgba(245, 158, 11, 0.85);
+    text-align: center;
+    margin: 0 0 18px;
+  }
+
+  .ab-headline {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: var(--lp-titel);
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    color: #f5f5f4;
+    text-align: center;
+    margin: 0 0 40px;
+  }
+
+  .ab-liste {
+    list-style: none;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  /* Eine durchgehende Linie links verbindet die vier Schritte zu einem
+     Weg. Ohne sie wären es vier Kästen, die zufällig untereinander
+     stehen. */
+  .ab-schritt {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 0 0 30px 0;
+    text-align: left;
+  }
+
+  .ab-schritt::before {
+    content: '';
+    position: absolute;
+    top: 30px;
+    bottom: 0;
+    left: 17px;
+    width: 1px;
+    background: linear-gradient(
+      to bottom,
+      rgba(245, 158, 11, 0.4),
+      rgba(255, 255, 255, 0.07)
+    );
+  }
+
+  .ab-schritt:last-child {
+    padding-bottom: 0;
+  }
+
+  .ab-schritt:last-child::before {
+    display: none;
+  }
+
+  .ab-nr {
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    background: #0a0a0c;
+    font-family: var(--lp-mono);
+    font-size: var(--lp-mono-groesse);
+    letter-spacing: 0.02em;
+    color: rgba(245, 158, 11, 0.95);
+  }
+
+  .ab-text {
+    padding-top: 4px;
+  }
+
+  .ab-titel {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: var(--lp-text);
+    line-height: 1.3;
+    color: #f5f5f4;
+    margin: 0 0 6px;
+  }
+
+  .ab-absatz {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-text);
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.78);
+    margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    .ab {
+      margin-bottom: 64px;
+      padding: 0 20px;
+    }
+
+    .ab-schritt {
+      gap: 15px;
+      padding-bottom: 26px;
+    }
+
+    .ab-nr {
+      width: 31px;
+      height: 31px;
+    }
+
+    .ab-schritt::before {
+      left: 15px;
+      top: 26px;
+    }
+  }
+</style>

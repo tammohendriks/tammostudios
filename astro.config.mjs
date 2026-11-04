@@ -191,8 +191,16 @@ export default defineConfig({
 
     sitemap({
       // 404 nicht in die Sitemap aufnehmen — Google soll keine Fehler-
-      // Seite indexieren.
-      filter: (page) => !page.endsWith('/404') && !page.includes('/admin'),
+      // Seite indexieren. Die Danke-Seite ebenso wenig: sie steht auf
+      // noindex, und eine Seite gleichzeitig in die Sitemap zu
+      // schreiben und per Meta-Tag abzulehnen sind zwei
+      // widersprueckliche Signale. Es gibt KEINE Build-Sicherung dafuer
+      // — eine neue Datei unter src/pages landet automatisch in der
+      // Sitemap, und niemand warnt.
+      filter: (page) =>
+        !page.endsWith('/404') &&
+        !page.includes('/admin') &&
+        !page.endsWith('/danke-skizze'),
 
       // hreflang von Hand statt ueber sitemap({ i18n }). Die eingebaute
       // Option paart URLs ueber den Pfad NACH dem Sprach-Praefix: aus

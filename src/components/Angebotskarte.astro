@@ -1,0 +1,331 @@
+---
+/**
+ * Die Angebotskarte — ein Preis, eine Karte, ein Knopf.
+ *
+ * Vorher stand hier ein Fließtext mit zwei Beträgen, einer Klammer und
+ * drei Sätzen über Standards. Zwei Dinge gingen dabei schief: der
+ * Besucher musste sich den Preis aus dem Satz heraussuchen, und bei
+ * schmalen Spalten rutschte das Euro-Zeichen allein in die nächste
+ * Zeile. Beides behebt eine Karte, die den Betrag groß und als
+ * EINE untrennbare Einheit setzt.
+ *
+ * Das geschützte Leerzeichen zwischen Zahl und Zeichen ist nicht
+ * Kosmetik: nach DIN 5008 gehört dort eins hin, und es ist genau das,
+ * was den Umbruch verhindert. Zusätzlich steht white-space: nowrap auf
+ * dem Betrag — Gürtel und Hosenträger, weil der Fehler schon einmal
+ * live war.
+ *
+ * Der Knopf führt NICHT auf /preise. Die Seite ist das Ziel bezahlter
+ * Anzeigen; jeder Verweis, der wegführt, verliert einen bezahlten
+ * Klick. Er öffnet den Fragebogen wie alle anderen Knöpfe hier.
+ */
+import { SKIZZE } from '../lib/i18n/seiten/skizze';
+import { ANGEBOTE, preisText, mindestpreisText } from '../lib/angebote';
+import { t } from '../lib/i18n';
+import { localeOf } from '../lib/routes.mjs';
+import type { SkizzeBranche } from '../lib/skizze';
+
+export interface Props {
+  branche: SkizzeBranche;
+}
+
+const { branche } = Astro.props;
+
+const locale = localeOf(Astro.url.pathname) as 'de' | 'en';
+const d = t(Astro.url.pathname);
+const a = SKIZZE[locale].angebot;
+const sk = SKIZZE[locale].hero;
+const angebot = ANGEBOTE[branche];
+
+// Geschütztes Leerzeichen, damit Betrag und Zeichen zusammenbleiben.
+// Deutsch steht das Zeichen hinter der Zahl, englisch davor. Das
+// geschuetzte Leerzeichen gibt es nur im Deutschen — es haelt Zahl
+// und Zeichen zusammen, damit das € nie allein umbricht.
+const betrag =
+  locale === 'en'
+    ? `€${preisText(branche, locale)}`
+    : `${preisText(branche, locale)}\u00a0€`;
+
+// „Klar, fix, ohne Sternchen." ist ein guter Satz, in dem kein
+// einziger Begriff steht, nach dem jemand sucht. „Was eine
+// Praxis-Website kostet." sagt dasselbe und trifft die Suche nach
+// Preisen — mit Abstand der haeufigste Zusatz zu einer Branchensuche.
+const seo = SKIZZE[locale].seo;
+const headline = seo.preisTitel.replace('{wort}', seo.wort[branche]);
+
+const anwendungenZeile =
+  angebot.anwendungen === 1
+    ? a.anwendungenEine
+    : a.anwendungen.replace('{n}', String(angebot.anwendungen));
+
+// Der Einstiegspreis ueber alle Branchen. Steht unter jeder Karte,
+// damit 2.500 € nicht als Untergrenze gelesen wird — und damit wer
+// aus einer siebten Branche kommt sieht, dass es ihn auch gibt.
+const breiteZeile = a.breite.replace('{ab}', mindestpreisText(locale));
+---
+
+<section class="ak" aria-labelledby="ak-titel">
+  <p class="ak-augenbraue" data-reveal>{d.branche.wasEsKostet}</p>
+  <h2 class="ak-headline" id="ak-titel" data-reveal>{headline}</h2>
+
+  <article class="ak-karte" data-reveal>
+    {angebot.abzeichen && <p class="ak-abzeichen">{a.abzeichen[branche]}</p>}
+
+    <p class="ak-bezeichnung">{a.bezeichnung[branche]}</p>
+    <p class="ak-betrag" data-zaehlen>{betrag}</p>
+    <p class="ak-einmalig">{a.einmalig}</p>
+
+    <div class="ak-trenner"></div>
+
+    <ul class="ak-liste">
+      {a.merkmaleVor[branche].map((m) => <li>{m}</li>)}
+      <li>
+        {anwendungenZeile}
+        <span class="ak-hinweis">{a.anwendungenHinweis[branche]}</span>
+      </li>
+      {a.merkmaleNach[branche].map((m) => <li>{m}</li>)}
+    </ul>
+
+    <div class="ak-trenner"></div>
+
+    <p class="ak-breite">{breiteZeile}</p>
+
+    <p class="ak-fuss">
+      {a.zahlung}<br />
+      {a.bugfix}<br />
+      {a.pflege}
+    </p>
+
+    <button type="button" class="cta-orbital ak-knopf" data-skizze-oeffnen>
+      <span>{sk.cta}</span>
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M5 12h14M13 6l6 6-6 6" />
+      </svg>
+    </button>
+  </article>
+</section>
+
+<style>
+  .ak {
+    max-width: 880px;
+    margin: 0 auto 96px;
+    padding: 0 40px;
+  }
+
+  .ak-augenbraue {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: var(--lp-braue);
+    letter-spacing: var(--lp-braue-sperrung);
+    text-transform: uppercase;
+    color: rgba(245, 158, 11, 0.85);
+    text-align: center;
+    margin: 0 0 18px;
+  }
+
+  .ak-headline {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: var(--lp-titel);
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    color: #f5f5f4;
+    text-align: center;
+    margin: 0 0 32px;
+  }
+
+  /* Die Karte selbst — dieselbe Machart wie die Karten auf /preise:
+     dunkles Glas, dünne Kante, großer Radius. Ein eigener Stil wäre
+     eine zweite Handschrift für dieselbe Sache. */
+  .ak-karte {
+    position: relative;
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 44px 44px 40px;
+    background: rgba(15, 15, 18, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    text-align: center;
+    transition:
+      border-color 300ms ease,
+      transform 300ms ease,
+      box-shadow 300ms ease;
+  }
+
+  .ak-karte:hover,
+  .ak-karte:focus-within {
+    border-color: rgba(245, 158, 11, 0.45);
+    transform: translateY(-3px);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+  }
+
+  /* Sitzt auf der oberen Kante, nicht darüber: innerhalb der Karte
+     wäre es eine Zeile mehr, darüber ein freistehendes Etikett. */
+  .ak-abzeichen {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+    padding: 6px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(245, 158, 11, 0.45);
+    background: #0f0f12;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    color: rgba(245, 158, 11, 0.95);
+  }
+
+  .ak-bezeichnung {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-braue);
+    font-weight: 600;
+    letter-spacing: var(--lp-braue-sperrung);
+    text-transform: uppercase;
+    color: rgba(245, 158, 11, 0.95);
+    margin: 0 0 18px;
+  }
+
+  /* Der Betrag bricht nie. Das geschützte Leerzeichen im Text hält
+     Zahl und Zeichen zusammen, nowrap hält die ganze Zeile. */
+  .ak-betrag {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: var(--lp-zahl);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    white-space: nowrap;
+    color: #f5f5f4;
+    margin: 0 0 8px;
+  }
+
+  .ak-einmalig {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-text);
+    color: rgba(245, 245, 244, 0.55);
+    margin: 0;
+  }
+
+  .ak-trenner {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.08);
+    margin: 28px 0;
+  }
+
+  /* Die Aufzählung bleibt linksbündig, auch wenn die Karte zentriert
+     ist: dem Auge fehlt sonst die Kante, an der die nächste Zeile
+     anfängt. Der Gedankenstrich in Amber statt eines Punktes — wie
+     auf /preise. */
+  .ak-liste {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-align: left;
+  }
+
+  .ak-liste li {
+    position: relative;
+    padding-left: 24px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-text);
+    line-height: 1.55;
+    color: rgba(245, 245, 244, 0.85);
+  }
+
+  .ak-liste li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: rgba(245, 158, 11, 0.85);
+    font-weight: 500;
+  }
+
+  .ak-hinweis {
+    display: block;
+    margin-top: 3px;
+    font-size: var(--lp-klein);
+    line-height: 1.5;
+    color: rgba(245, 245, 244, 0.5);
+  }
+
+  /* Die Reichweiten-Zeile steht zwischen Leistungen und Bedingungen
+     und ist etwas heller als beide: sie ist kein Kleingedrucktes,
+     sondern die Antwort auf „baut der auch fuer mich?". */
+  .ak-breite {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-klein);
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.82);
+    margin: 0 0 16px;
+    padding: 0 0 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .ak-fuss {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-klein);
+    line-height: 1.7;
+    color: rgba(245, 245, 244, 0.6);
+    margin: 0 0 30px;
+  }
+
+  /* Ein <button> erbt die Schrift des Browsers, nicht die der Seite —
+     .cta-orbital allein reicht hier nicht. */
+  .ak-knopf {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+  }
+
+  @media (max-width: 768px) {
+    .ak {
+      margin-bottom: 64px;
+      padding: 0 20px;
+    }
+
+    .ak-karte {
+      padding: 38px 24px 32px;
+      border-radius: 16px;
+    }
+
+    .ak-abzeichen {
+      font-size: 0.66rem;
+      padding: 5px 12px;
+      /* Auf schmalen Schirmen passt der Satz sonst nicht neben die
+         Kante der Karte. Umbrechen lassen ist besser als überstehen. */
+      white-space: normal;
+      max-width: calc(100% - 40px);
+      text-align: center;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ak-karte {
+      transition: none;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      background: rgba(15, 15, 18, 0.9);
+    }
+
+    .ak-karte:hover,
+    .ak-karte:focus-within {
+      transform: none;
+    }
+  }
+</style>

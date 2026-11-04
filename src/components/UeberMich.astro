@@ -1,0 +1,194 @@
+---
+/**
+ * Der Über-mich-Teaser, direkt nach der Checkliste.
+ *
+ * WARUM ER HIER STEHT: die Checkliste sagt, was auf eine gute Seite
+ * gehört. Die erste Frage danach ist „und wer macht das?". Ein Gesicht
+ * an dieser Stelle beantwortet, was drei weitere Absätze Text nicht
+ * schaffen — besonders bei einem Einzelunternehmer, dessen Vorteil
+ * gegenüber einer Agentur genau darin besteht, dass es ihn gibt.
+ *
+ * KEIN VERWEIS AUF /ueber: die Seite ist das Ziel bezahlter Anzeigen,
+ * jeder Klick hierher kostet Geld. Ein Link, der wegführt, verliert
+ * ihn. Wer mehr wissen will, findet /ueber in der Navigation.
+ *
+ * KEINE ZAHL LIVE-SEITEN in der Faktenzeile. Stand dort bis zum
+ * 04.11.2026, abgeleitet aus references.ts — und machte genau an der
+ * Stelle klein, an der die Seite groß wirken muss.
+ */
+import { SKIZZE } from '../lib/i18n/seiten/skizze';
+import { localeOf } from '../lib/routes.mjs';
+import type { SkizzeBranche } from '../lib/skizze';
+
+export interface Props {
+  branche: SkizzeBranche;
+}
+
+const { branche } = Astro.props;
+
+const locale = localeOf(Astro.url.pathname) as 'de' | 'en';
+const u = SKIZZE[locale].ueberMich;
+---
+
+<section class="um" aria-labelledby="um-titel">
+  <div class="um-raster">
+    <div class="um-bild" data-reveal>
+      <img
+        src="/tammo-foto.webp"
+        alt={u.fotoAlt}
+        width="480"
+        height="480"
+        loading="lazy"
+        decoding="async"
+      />
+    </div>
+    <div class="um-text">
+      <p class="um-augenbraue" data-reveal>{u.augenbraue}</p>
+      <h2 class="um-headline" id="um-titel" data-reveal>{u.headline}</h2>
+      <p class="um-absatz" data-reveal>{u.text[branche]}</p>
+      <ul class="um-fakten" data-reveal>
+        {u.fakten.map((f) => <li>{f}</li>)}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Eigene Breite und eigener Innenabstand: die Regel der Seite
+     (.vertical-page > *) trifft Kind-Komponenten nicht, weil Astro
+     jedem Bauteil eine eigene Kennung gibt. Dieselbe Breite wie die
+     übrigen Abschnitte, von Hand gesetzt. */
+  .um {
+    max-width: 880px;
+    margin: 0 auto 96px;
+    padding: 0 40px;
+  }
+
+  .um-raster {
+    display: grid;
+    gap: 34px;
+    justify-items: center;
+    text-align: center;
+  }
+
+  /* Ab Tablet nebeneinander. Das Bild bekommt eine feste Spalte, damit
+     der Text nicht bei jedem Zeichen die Breite wechselt. */
+  @media (min-width: 720px) {
+    .um-raster {
+      grid-template-columns: 280px 1fr;
+      gap: 44px;
+      align-items: center;
+      justify-items: start;
+      text-align: left;
+    }
+  }
+
+  /* Der Schein liegt HINTER dem Bild, nicht darauf: ein Rahmen um ein
+     Porträt sieht nach Bilderrahmen aus, ein Schein nach Licht. */
+  .um-bild {
+    position: relative;
+    width: 220px;
+    flex-shrink: 0;
+  }
+
+  @media (min-width: 720px) {
+    .um-bild {
+      width: 280px;
+    }
+  }
+
+  .um-bild::before {
+    content: '';
+    position: absolute;
+    inset: -14px;
+    border-radius: 32px;
+    background: radial-gradient(
+      circle at 50% 40%,
+      rgba(245, 158, 11, 0.3) 0%,
+      rgba(245, 158, 11, 0) 70%
+    );
+    pointer-events: none;
+  }
+
+  .um-bild img {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 24px;
+    border: 1px solid rgba(245, 158, 11, 0.28);
+  }
+
+  .um-augenbraue {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: var(--lp-braue);
+    letter-spacing: var(--lp-braue-sperrung);
+    text-transform: uppercase;
+    color: rgba(245, 158, 11, 0.85);
+    margin: 0 0 14px;
+  }
+
+  .um-headline {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: var(--lp-titel);
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    color: #f5f5f4;
+    margin: 0 0 16px;
+  }
+
+  .um-absatz {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: var(--lp-text);
+    line-height: 1.65;
+    color: rgba(245, 245, 244, 0.82);
+    margin: 0 0 22px;
+    max-width: 52ch;
+  }
+
+  /* Die Fakten in Schreibmaschine: drei kurze Angaben nebeneinander
+     lesen sich so als Daten, nicht als Satzanfang. */
+  .um-fakten {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px 10px;
+    margin: 0;
+    padding: 0;
+    font-family: var(--lp-mono);
+    font-size: var(--lp-mono-groesse);
+    letter-spacing: 0.04em;
+    color: rgba(245, 245, 244, 0.55);
+  }
+
+  @media (min-width: 720px) {
+    .um-fakten {
+      justify-content: flex-start;
+    }
+  }
+
+  .um-fakten li {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* Der Trenner gehört zwischen die Angaben, nicht vor die erste. */
+  .um-fakten li + li::before {
+    content: '·';
+    margin-right: 10px;
+    color: rgba(245, 158, 11, 0.8);
+  }
+
+  @media (max-width: 768px) {
+    .um {
+      margin-bottom: 64px;
+      padding: 0 20px;
+    }
+  }
+</style>

@@ -49,6 +49,7 @@ export const de = {
       Handwerk: 'Websites für Handwerk',
       Medizin: 'Websites für Praxen',
       Gastronomie: 'Websites für Gastronomie',
+      Medien: 'Portfolio-Websites',
     },
   },
 
@@ -87,6 +88,7 @@ export const en: Shape<typeof de> = {
       Handwerk: 'websites for contractors',
       Medizin: 'websites for medical practices',
       Gastronomie: 'websites for restaurants',
+      Medien: 'portfolio websites',
     },
   },
 

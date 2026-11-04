@@ -27,6 +27,20 @@
  */
 import { t } from '../lib/i18n';
 
+export interface Props {
+  /**
+   * Erst unterhalb des Heros einblenden.
+   *
+   * Fuer die Branchenseiten: deren Hero ist ein Foto und bleibt in
+   * beiden Themen gleich. Ein Schalter, der dort sichtbar ist und
+   * nichts bewirkt, liest sich als kaputt. Weiter unten schaltet die
+   * ganze Seite um — dort gehoert er hin.
+   */
+  nachHero?: boolean;
+}
+
+const { nachHero = false } = Astro.props;
+
 const d = t(Astro.url.pathname);
 ---
 
@@ -34,6 +48,7 @@ const d = t(Astro.url.pathname);
   type="button"
   class="site-theme-toggle"
   data-site-theme-toggle
+  data-nach-hero={nachHero ? '' : undefined}
   aria-label={d.thema.umschalten}
   data-label-hell={d.thema.aktuellHell}
   data-label-dunkel={d.thema.aktuellDunkel}
@@ -62,6 +77,41 @@ const d = t(Astro.url.pathname);
 </button>
 
 <script>
+  /* Einblenden, sobald der Hero weitgehend durchgescrollt ist.
+     Laeuft nur, wenn der Knopf data-nach-hero traegt — auf allen
+     anderen Seiten steht er wie bisher sofort da.
+
+     Gemessen wird die Unterkante des Heros, nicht scrollY: der Hero
+     ist 100dvh hoch, und das ist auf dem Handy je nach Adressleiste
+     eine andere Zahl. */
+  (() => {
+    const schalter = document.querySelector<HTMLElement>(
+      '.site-theme-toggle[data-nach-hero]'
+    );
+    const hero = document.querySelector<HTMLElement>('.v-hero');
+    if (!schalter || !hero) return;
+
+    let geplant = false;
+    const pruefen = () => {
+      geplant = false;
+      const unten = hero.getBoundingClientRect().bottom;
+      if (unten < window.innerHeight * 0.35) schalter.dataset.sichtbar = '';
+      else delete schalter.dataset.sichtbar;
+    };
+    const anstossen = () => {
+      if (geplant) return;
+      geplant = true;
+      requestAnimationFrame(pruefen);
+    };
+
+    window.addEventListener('scroll', anstossen, { passive: true });
+    window.addEventListener('resize', anstossen, { passive: true });
+    // Beim Laden einmal pruefen: der Browser stellt beim Zurueck-
+    // Navigieren die alte Scrollposition wieder her, und die kann
+    // schon weit unterhalb des Heros liegen.
+    pruefen();
+  })();
+
   const btn = document.querySelector<HTMLButtonElement>(
     '[data-site-theme-toggle]'
   );
@@ -163,6 +213,29 @@ const d = t(Astro.url.pathname);
     -webkit-tap-highlight-color: transparent;
   }
 
+  /* Ueber dem Hero nicht da, darunter schon. Kein display: none,
+     sondern Deckkraft: so laesst es sich weich einblenden, und der
+     Knopf behaelt seinen Platz im Fokus-Ablauf erst, wenn er
+     sichtbar ist (pointer-events + inert waere doppelt gemoppelt,
+     tabindex setzt das Skript nicht — der Knopf ist dann zwar
+     fokussierbar, aber auch erreichbar, sobald man dorthin
+     scrollt). */
+  .site-theme-toggle[data-nach-hero] {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-8px);
+    transition:
+      opacity 280ms ease,
+      transform 280ms ease,
+      border-color 200ms ease;
+  }
+
+  .site-theme-toggle[data-nach-hero][data-sichtbar] {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+  }
+
   .site-theme-toggle:hover {
     border-color: rgba(245, 158, 11, 0.5);
   }
@@ -248,6 +321,11 @@ const d = t(Astro.url.pathname);
 
   @media (prefers-reduced-motion: reduce) {
     .site-theme-thumb {
+      transition: none;
+    }
+
+    .site-theme-toggle[data-nach-hero] {
+      transform: none;
       transition: none;
     }
   }

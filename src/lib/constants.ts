@@ -49,3 +49,49 @@ export const SITE = {
  * Landesvorwahl. Aendert sich die Nummer, aendert sich beides.
  */
 export const PHONE_INTERNATIONAL = `+49 ${SITE.phone.replace(/^0/, '')}`;
+
+/**
+ * Die Projektstart-Anzeige oben auf den Branchen-Landingpages und im
+ * Abschluss-Block.
+ *
+ * Statisch im Code und mit einem Schalter, nicht im Studio gepflegt:
+ * eine Zahl, die jemand im CMS vergisst, wird zur Lüge. Hier stehen
+ * alle Angaben nebeneinander — wer die eine ändert, sieht die andere.
+ *
+ * WICHTIG: die Zahlen müssen stimmen. Eine erfundene Knappheit ist auf
+ * einer Seite, die mit Vertrauen wirbt, der teuerste Satz von allen.
+ * Werbeanzeigen bringen genug Leute vorbei, dass es auffällt, wenn seit
+ * Monaten dasselbe dasteht; und eine Verfügbarkeits-Angabe, die nicht
+ * stimmt, ist irreführende Werbung nach § 5 UWG — abmahnfähig, nicht
+ * nur unschön. Lieber abschalten als faken.
+ *
+ * aktiv: false blendet den Block auf allen Seiten aus. frei: 0 blendet
+ * ihn ebenfalls aus — „noch 0 von 5 frei" wirbt mit dem Gegenteil von
+ * Verfügbarkeit, und einen Ausgebucht-Hinweis will die Seite an dieser
+ * Stelle nicht.
+ */
+export const SLOT_KNAPPHEIT: {
+  aktiv: boolean;
+  gesamt: number;
+  frei: number;
+  monat: { de: string; en: string };
+  naechsterStart: { de: string; en: string };
+  hinweis: { de: string; en: string };
+} = {
+  aktiv: true,
+  /** Wie viele Projektstarts der Monat überhaupt hat. */
+  gesamt: 5,
+  /** Wie viele davon noch frei sind. */
+  frei: 2,
+  /** Der Monat, auf den sich die Zahlen beziehen. */
+  monat: { de: 'Dezember', en: 'December' },
+  /** Wann der nächste freie Start beginnt. */
+  naechsterStart: { de: 'KW 49', en: 'week 49' },
+  /** Was das für den Kunden bedeutet. Ein Satzteil, kein Satz. */
+  hinweis: { de: 'Live vor Weihnachten', en: 'Live before Christmas' },
+};
+// Bewusst OHNE `as const`: sonst wären gesamt und frei die Literaltypen
+// 5 und 2, und jeder Vergleich im Code — der Einzahl-Zweig des Textes,
+// die Prüfung auf frei === 0 — gälte dem Typchecker als unerreichbar.
+// Er meldet dann einen Vergleich, der nie zutreffen kann. Die Zahlen
+// sollen sich aber ändern lassen, genau dafür stehen sie hier.

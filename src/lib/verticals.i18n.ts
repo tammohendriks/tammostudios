@@ -47,21 +47,54 @@ export function getVertical(
         text: en.hero.headlineLines[i],
       })),
       subheadline: en.hero.subheadline,
-      background: deutsch.hero.background,
+      // Nur mitnehmen, wenn die Branche ein Foto hat. Fuer eine
+      // Branche ohne eines gibt es den Schluessel gar nicht, und ein
+      // `background: undefined` waere ein Feld, das die Komponente
+      // pruefen muesste, obwohl es nie etwas enthaelt.
+      ...('background' in deutsch.hero ? { background: deutsch.hero.background } : {}),
     },
     intro: en.intro,
     checklistTitle: en.checklistTitle,
     checklist: en.checklist,
     pricing: { paragraphs: en.pricingParagraphs },
+    // Nur mitnehmen, wenn es die Branche hat. Ein leeres Objekt waere
+    // schlimmer als gar keins: die Komponente pruefte dann auf
+    // Vorhandensein und bekaeme einen Block ohne Inhalt.
+    //
+    // `'caseStudy' in …` statt eines Wahrheitstests: bei einer Branche
+    // ohne Fallstudie gibt es den Schluessel gar nicht, und der
+    // Typchecker laesst den Zugriff dann zu Recht nicht zu.
+    ...(fallstudie(deutsch, en)),
+    faq: en.faq,
+  };
+}
+
+/**
+ * Der Fallstudien-Teil, zusammengesetzt aus beiden Sprachen — oder
+ * nichts, wenn die Branche keinen hat.
+ *
+ * Steht als eigene Funktion da, weil der Typchecker die beiden
+ * Schluessel sonst innerhalb eines Objekt-Literals nicht als
+ * vorhanden erkennt: die Einengung durch `in` traegt dort nicht bis
+ * in die verschachtelten Zugriffe.
+ */
+function fallstudie(
+  deutsch: (typeof VERTICALS)[number],
+  en: (typeof VERTICAL_TEXT_EN)[keyof typeof VERTICAL_TEXT_EN]
+): Pick<Vertical, 'caseStudy'> | Record<string, never> {
+  if (!('caseStudy' in deutsch) || !('caseStudy' in en)) return {};
+  const d = deutsch.caseStudy;
+  const e = en.caseStudy;
+  if (!d || !e) return {};
+  return {
     caseStudy: {
-      eyebrow: en.caseStudy.eyebrow,
-      paragraphs: en.caseStudy.paragraphs,
-      references: deutsch.caseStudy.references.map((ref, i) => ({
+      eyebrow: e.eyebrow,
+      paragraphs: e.paragraphs,
+      references: d.references.map((ref, i) => ({
         ...ref,
-        alt: en.caseStudy.references[i].alt,
-        linkLabel: en.caseStudy.references[i].linkLabel,
+        alt: e.references[i].alt,
+        linkLabel: e.references[i].linkLabel,
       })),
     },
-    faq: en.faq,
   };
 }

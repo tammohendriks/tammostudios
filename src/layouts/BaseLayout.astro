@@ -6,6 +6,7 @@ import SiteLangToggle from '../components/SiteLangToggle.astro';
 import { SITE } from '../lib/constants';
 import { absUrl, hreflangs, keyOf, localeOf, pathOr } from '../lib/routes.mjs';
 import { t } from '../lib/i18n';
+import { UMBAU_AKTIV } from '../lib/skizze';
 
 interface Props {
   pageTitle: string;
@@ -104,11 +105,19 @@ const locale = localeOf(Astro.url.pathname);
 const isLanding = routeKey === 'home';
 const initialPage = isLanding ? 'landing' : 'subpage';
 
-// Vertical Landings sind eigene Photo-Hero-Landings mit eigener
-// Design-Sprache — kein Site-Theme-Toggle darauf.
-const VERTICAL_KEYS = ['handwerk', 'praxis', 'gastronomie'];
-const isVerticalLanding = VERTICAL_KEYS.includes(routeKey ?? '');
-const hideThemeToggle = isLanding || isVerticalLanding;
+// Die Startseite hat den Weltraum-Hintergrund und kennt kein helles
+// Thema — dort bleibt der Umschalter weg. Die Branchenseiten haben
+// ihn seit dem Werbe-Umbau: ihr Hero ist ein Foto und bleibt in
+// beiden Themen dunkel, alles darunter schaltet mit. Ein dunkler
+// Deckel ueber einer hellen Seite ist kein Notbehelf, sondern das,
+// was ein Foto-Hero ohnehin ist.
+const hideThemeToggle = isLanding;
+
+// Auf den Branchenseiten erscheint der Umschalter erst unterhalb des
+// Heros. Der Hero ist ein Foto und sieht in beiden Themen gleich aus —
+// ein Schalter, der sichtbar ueber etwas schwebt, das sich nicht
+// aendert, sieht aus wie ein kaputter Schalter.
+const themaErstNachHero = (UMBAU_AKTIV as readonly string[]).includes(routeKey ?? '');
 
 // LocalBusiness JSON-LD Schema. ProfessionalService (Subtype von
 // LocalBusiness) matched einen Solo-Freelance-Webentwickler besser
@@ -586,7 +595,7 @@ const jsonLdGraph = {
         Ausblenden per Bedingung hier — die Entscheidung gehoert in die
         Routen-Tabelle, nicht ins Layout. */}
     <SiteLangToggle />
-    {!hideThemeToggle && <SiteThemeToggle />}
+    {!hideThemeToggle && <SiteThemeToggle nachHero={themaErstNachHero} />}
     <slot />
     <script>
       // Site-weiter Scroll-Reveal: alle [data-reveal] Elemente werden
@@ -625,7 +634,23 @@ const jsonLdGraph = {
           },
           {
             threshold: 0.15,
-            rootMargin: '0px 0px -5% 0px',
+            // OBEN WEIT AUFGEZOGEN, und das ist der Kern.
+            //
+            // Wer springt statt zu scrollen — Ankerlink,
+            // Zurueck-Taste, scrollIntoView, Einrasten am Seitenende —
+            // schiebt Elemente in EINEM Bild von unterhalb des
+            // Fensters nach oberhalb. Der Beobachter meldet dabei gar
+            // nichts: der Zustand war „nicht sichtbar" und ist es
+            // geblieben. Die Elemente blieben dauerhaft auf
+            // opacity 0. Nachgestellt auf /webdesign-praxis — nach
+            // einem Sprung zur Angebotskarte war deren Augenbraue fuer
+            // immer weg.
+            //
+            // Mit dem grossen oberen Rand zaehlt alles OBERHALB des
+            // Fensters als sichtbar und wird sofort eingeblendet. Nach
+            // unten bleibt der Rand negativ, damit weiter unten
+            // wartende Elemente warten.
+            rootMargin: '10000px 0px -5% 0px',
           }
         );
 

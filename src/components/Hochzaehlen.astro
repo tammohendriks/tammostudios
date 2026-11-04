@@ -1,0 +1,87 @@
+---
+/**
+ * Zählt die großen Zahlen hoch, wenn sie zum ersten Mal ins Bild
+ * kommen — die Bewertungsnote und den Preis.
+ *
+ * NUR ZWEI STELLEN, und zwar die beiden, die sowieso groß gesetzt
+ * sind. Jede weitere Zahl mitzählen zu lassen wäre der Punkt, an dem
+ * aus einem Akzent ein Jahrmarkt wird.
+ *
+ * DER ENDZUSTAND STEHT IM HTML. Das Skript schreibt nur unterwegs
+ * etwas anderes hinein und setzt am Ende exakt den ursprünglichen
+ * Text zurück — mit geschütztem Leerzeichen und allem. Ohne
+ * JavaScript, bei reduzierter Bewegung und für Vorleseprogramme steht
+ * damit von Anfang an die richtige Zahl da.
+ */
+---
+
+<script>
+  (() => {
+    const ziele = document.querySelectorAll<HTMLElement>('[data-zaehlen]');
+    if (!ziele.length) return;
+    // Bei reduzierter Bewegung gar nicht erst anfassen: im HTML steht
+    // die fertige Zahl.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const sprache = document.documentElement.lang === 'en' ? 'en-US' : 'de-DE';
+
+    const zaehlen = (el: HTMLElement) => {
+      const fertig = el.textContent ?? '';
+      const teile = fertig.trim().match(/^(\D*)([\d.,]+)(\D*)$/);
+      if (!teile) return;
+      const [, vor, zahl, nach] = teile;
+
+      // Welches Zeichen das Dezimaltrennzeichen ist, haengt an der
+      // Sprache — und an der Zahl selbst. „2.500" sind zweitausend-
+      // fuenfhundert, „5,0" sind fuenf Komma null. Entscheidend ist,
+      // wie viele Ziffern NACH dem letzten Trenner stehen: eine oder
+      // zwei heisst Dezimalstelle, drei heissen Tausender.
+      const dez = zahl.match(/[.,](\d{1,2})$/);
+      const nachkomma = dez ? dez[1].length : 0;
+      const ziffern = zahl.replace(/\D/g, '');
+      const wert = Number(ziffern) / Math.pow(10, nachkomma);
+      if (!Number.isFinite(wert) || wert <= 0) return;
+
+      const formatieren = (n: number) =>
+        n.toLocaleString(sprache, {
+          minimumFractionDigits: nachkomma,
+          maximumFractionDigits: nachkomma,
+        });
+
+      const DAUER = 900;
+      let beginn: number | null = null;
+      const schritt = (jetzt: number) => {
+        if (beginn === null) beginn = jetzt;
+        const t = Math.min(1, (jetzt - beginn) / DAUER);
+        // Schnell anfangen, weich auslaufen.
+        const weich = 1 - Math.pow(1 - t, 3);
+        if (t < 1) {
+          el.textContent = vor + formatieren(wert * weich) + nach;
+          requestAnimationFrame(schritt);
+        } else {
+          // Nicht neu formatieren, sondern den Originaltext
+          // zuruecksetzen: der enthaelt das geschuetzte Leerzeichen
+          // vor dem Euro-Zeichen, das den Umbruch verhindert.
+          el.textContent = fertig;
+        }
+      };
+      requestAnimationFrame(schritt);
+    };
+
+    const beobachter = new IntersectionObserver(
+      (eintraege, o) => {
+        for (const e of eintraege) {
+          if (!e.isIntersecting) continue;
+          o.unobserve(e.target);
+          zaehlen(e.target as HTMLElement);
+        }
+      },
+      // Erst wenn die Zahl wirklich dasteht, nicht wenn ihre Oberkante
+      // gerade erscheint — sonst ist sie durchgelaufen, bevor jemand
+      // hinsieht.
+      { threshold: 0.8 }
+    );
+
+    ziele.forEach((z) => beobachter.observe(z));
+  })();
+</script>
