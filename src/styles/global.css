@@ -998,9 +998,8 @@ body[data-current-bg="cream"] .cta-orbital::before {
  * -Unterzeile hell ein; hier werden sie fuer den Hero zurueckgeholt.
  *
  * AMBER AUF CREME: #f59e0b auf #f8f4ea hat ein Kontrastverhaeltnis um
- * 1,9 — fuer 12px-Text unlesbar. Kleiner Text bekommt deshalb ein
- * dunkleres Amber (#9a5208, rund 5,3). Grosse Flaechen und Dekor
- * duerfen das helle Amber behalten.
+ * 2,1. Das ist wenig, und es ist trotzdem der Wert, der hier steht —
+ * siehe die Begruendung am Token-Block weiter unten.
  *
  * WARUM UEBERALL !important: Astro haengt beim Scoping an JEDEN Teil
  * eines Selektors ein Attribut. Aus `.ks-autor-text strong` wird
@@ -1015,9 +1014,23 @@ body[data-current-bg="cream"] .cta-orbital::before {
  * sich vom Untergrund abheben, und ein zweiter kompletter Satz
  * Regeln fuer 40 Elemente waere Pflegeaufwand ohne Gewinn. */
 
+/* DAS GOLD DER MARKE, AUCH IM HELLEN THEMA: #f59e0b, derselbe Wert
+   wie im dunklen.
+
+   Hier standen bis zum 04.11.2026 zwei abgedunkelte Toene (#9a5208
+   fuer Text, #d97706 fuer Zierde), gewaehlt wegen des Kontrasts auf
+   Creme. #9a5208 ist aber kein Gold mehr, sondern ein Braun, und es
+   kam in der Farbwelt der Marke nirgends sonst vor — auf Ansage des
+   Betreibers zurueck auf das klassische Gold.
+
+   WAS DAS KOSTET: #f59e0b auf #f8f4ea ergibt 2,1:1. Fuer Zierde
+   (Linien, Punkte, Raender) ist das egal, fuer die kleinen
+   Grossbuchstaben-Zeilen daruber nicht — die sind im hellen Thema
+   schwerer zu lesen als im dunklen. Bewusste Entscheidung, keine
+   Unachtsamkeit. */
 html[data-site-theme='light'] .vertical-page {
-  --lp-amber-text: #9a5208 !important;
-  --lp-amber-deko: #d97706 !important;
+  --lp-amber-text: #f59e0b !important;
+  --lp-amber-deko: #f59e0b !important;
 }
 
 /* --- Hero bleibt dunkel ------------------------------------------- */
@@ -1082,7 +1095,7 @@ html[data-site-theme='light'] .v-check-list li {
 
 html[data-site-theme='light'] .v-check-list li:hover {
   background: var(--theme-card-bg-solid) !important;
-  border-color: rgba(217, 119, 6, 0.35) !important;
+  border-color: rgba(245, 158, 11, 0.42) !important;
 }
 
 /* --- Preis-Fliesstext der noch nicht umgebauten Branchenseiten -----
@@ -1118,7 +1131,7 @@ html[data-site-theme='light'] .um-fakten li + li::before {
 }
 
 html[data-site-theme='light'] .um-bild img {
-  border-color: rgba(217, 119, 6, 0.35) !important;
+  border-color: rgba(245, 158, 11, 0.42) !important;
 }
 
 /* --- Angebotskarte -------------------------------------------------- */
@@ -1139,13 +1152,13 @@ html[data-site-theme='light'] .ak-karte {
 
 html[data-site-theme='light'] .ak-karte:hover,
 html[data-site-theme='light'] .ak-karte:focus-within {
-  border-color: rgba(217, 119, 6, 0.45) !important;
+  border-color: rgba(245, 158, 11, 0.54) !important;
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.1) !important;
 }
 
 html[data-site-theme='light'] .ak-abzeichen {
   background: var(--theme-bg) !important;
-  border-color: rgba(217, 119, 6, 0.45) !important;
+  border-color: rgba(245, 158, 11, 0.54) !important;
   color: var(--lp-amber-text) !important;
 }
 
@@ -1157,6 +1170,13 @@ html[data-site-theme='light'] .ak-fuss {
 
 html[data-site-theme='light'] .ak-liste li {
   color: var(--theme-text) !important;
+}
+
+/* Die Reichweiten-Zeile steht eine Stufe staerker als das
+   Kleingedruckte darunter — in beiden Themen. */
+html[data-site-theme='light'] .ak-breite {
+  color: var(--theme-text) !important;
+  border-bottom-color: var(--theme-border) !important;
 }
 
 html[data-site-theme='light'] .ak-liste li::before {
@@ -1240,7 +1260,7 @@ html[data-site-theme='light'] .ks-unterzeile {
 }
 
 html[data-site-theme='light'] .ks-zeichen {
-  color: rgba(217, 119, 6, 0.14) !important;
+  color: rgba(245, 158, 11, 0.17) !important;
 }
 
 html[data-site-theme='light'] .ks-gross-zitat {
@@ -1258,7 +1278,7 @@ html[data-site-theme='light'] .ks-karte {
 }
 
 html[data-site-theme='light'] .ks-karte:hover {
-  border-color: rgba(217, 119, 6, 0.35) !important;
+  border-color: rgba(245, 158, 11, 0.42) !important;
 }
 
 html[data-site-theme='light'] .ks-zitat {
@@ -1270,8 +1290,8 @@ html[data-site-theme='light'] .ks-abzeichen {
 }
 
 html[data-site-theme='light'] .ks-initialen {
-  border-color: rgba(217, 119, 6, 0.4) !important;
-  background: rgba(217, 119, 6, 0.1) !important;
+  border-color: rgba(245, 158, 11, 0.48) !important;
+  background: rgba(245, 158, 11, 0.12) !important;
   color: var(--lp-amber-text) !important;
 }
 
@@ -1297,7 +1317,7 @@ html[data-site-theme='light'] .as-buehne::after {
   background: linear-gradient(
     to right,
     transparent,
-    rgba(217, 119, 6, 0.4),
+    rgba(245, 158, 11, 0.48),
     transparent
   ) !important;
 }
@@ -1332,14 +1352,14 @@ html[data-site-theme='light'] .as-telefon {
 
 html[data-site-theme='light'] .as-telefon a {
   color: var(--theme-text-strong) !important;
-  border-bottom-color: rgba(217, 119, 6, 0.5) !important;
+  border-bottom-color: rgba(245, 158, 11, 0.6) !important;
 }
 
 /* Der kleine Projektstart-Block im Abschluss steht auf Creme, der
    grosse oben im Hero auf dem Foto — nur der kleine schaltet um. */
 html[data-site-theme='light'] .as .ps {
   background: var(--theme-card-bg-solid) !important;
-  border-color: rgba(217, 119, 6, 0.42) !important;
+  border-color: rgba(245, 158, 11, 0.5) !important;
   box-shadow: 0 0 28px rgba(245, 158, 11, 0.14) !important;
 }
 
@@ -1354,7 +1374,7 @@ html[data-site-theme='light'] .as .ps-unten {
 /* --- Mitlaufender Knopf -------------------------------------------------- */
 html[data-site-theme='light'] .sc {
   background: rgba(248, 244, 234, 0.88) !important;
-  border-top-color: rgba(217, 119, 6, 0.28) !important;
+  border-top-color: rgba(245, 158, 11, 0.34) !important;
 }
 
 /* --- Ablauf (Branchen ohne Referenzen) ------------------------------
@@ -1376,13 +1396,13 @@ html[data-site-theme='light'] .ab-absatz {
 
 html[data-site-theme='light'] .ab-nr {
   background: var(--theme-bg) !important;
-  border-color: rgba(217, 119, 6, 0.45) !important;
+  border-color: rgba(245, 158, 11, 0.54) !important;
 }
 
 html[data-site-theme='light'] .ab-schritt::before {
   background: linear-gradient(
     to bottom,
-    rgba(217, 119, 6, 0.5),
+    rgba(245, 158, 11, 0.6),
     rgba(0, 0, 0, 0.1)
   ) !important;
 }
