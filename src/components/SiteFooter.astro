@@ -53,6 +53,12 @@ const branchenLinks = UMBAU_AKTIV
   .filter((e): e is { key: (typeof UMBAU_AKTIV)[number]; href: string } => e.href !== null)
   .map((e) => ({ href: e.href, label: SKIZZE[locale as 'de' | 'en'].seo.kurz[e.key] }));
 
+// „… und viele mehr" hinter der letzten Branche, und zwar als Verweis
+// auf den Kontakt. Sechs Branchen nebeneinander lesen sich sonst als
+// abschliessende Liste — gebaut wird aber fuer jede Art von
+// Unternehmen. Ein Hinweis ohne Ziel waere eine Sackgasse.
+const mehrHref = path('kontakt', locale);
+
 const navLinks = FOOTER_KEYS
   .map((key) => ({ key, href: path(key, locale) }))
   .filter((e): e is { key: (typeof FOOTER_KEYS)[number]; href: string } => e.href !== null)
@@ -100,6 +106,11 @@ const legalLinks = [
             <a href={link.href}>{link.label}</a>
           </>
         ))}
+        {mehrHref && (
+          <a class="footer-branchen-mehr" href={mehrHref}>
+            {SKIZZE[locale as 'de' | 'en'].seo.mehr}
+          </a>
+        )}
       </nav>
       <ul class="footer-socials" aria-label={d.footer.socialsLabel}>
         {SITE.socials.map((social) => (
@@ -256,23 +267,20 @@ const legalLinks = [
     border-bottom-color: #92400e;
   }
 
-  /* Hellmodus auf den Unterseiten. Die Component ist gescoped, der
-     Theme-Schalter sitzt auf <html> — daher :global. */
-  :global(html[data-site-theme='light']) .footer-privacy {
-    /* Nicht --theme-text-muted: dessen 0.55 ergaeben nur 3.79:1 auf
-       #f8f4ea. 0.7 bringt 6.15:1. */
-    color: rgba(26, 26, 28, 0.7);
-  }
+  /* KEINE REGELN FUER DAS HELLE THEMA IN DIESER DATEI.
+     Die Fussleiste bleibt schwarz, egal wie der Schalter steht.
 
-  :global(html[data-site-theme='light']) .footer-privacy a {
-    color: var(--theme-text-dim);
-    border-bottom-color: rgba(26, 26, 28, 0.25);
-  }
+     Hier standen bis zum 04.11.2026 drei Regeln, die .footer-privacy
+     im hellen Thema auf rgba(26, 26, 28, …) setzten — dunkler Text.
+     Der Grund der Fussleiste ist aber auch im hellen Thema
+     rgb(5, 5, 7): nachgemessen 1,17:1, also unlesbar. Das war live.
 
-  :global(html[data-site-theme='light']) .footer-privacy a:hover {
-    color: #92400e;
-    border-bottom-color: #92400e;
-  }
+     Wer hier etwas fuer das helle Thema ergaenzen will, muss zuerst
+     den Grund mit umstellen; solange der schwarz bleibt, gilt der
+     dunkle Satz Farben weiter oben fuer beide Themen.
+
+     NICHT BETROFFEN ist .is-embedded-cream: das ist die Cream-Section
+     am Fuss der Startseite, eine Variante des Bauteils, kein Thema. */
 
   .site-footer.is-embedded-cream .footer-nav a:hover,
   .site-footer.is-embedded-cream .footer-nav a:focus-visible,
@@ -360,6 +368,16 @@ const legalLinks = [
     white-space: nowrap;
   }
 
+  /* Ohne Trennpunkt davor und leicht heller: der Eintrag gehoert zur
+     Reihe, ist aber keine siebte Branche, sondern die Einladung. */
+  .footer-branchen-mehr {
+    white-space: nowrap;
+  }
+
+  .footer-branchen .footer-branchen-mehr {
+    color: rgba(245, 245, 244, 0.68);
+  }
+
   .footer-branchen a {
     color: rgba(245, 245, 244, 0.55);
     text-decoration: none;
@@ -370,14 +388,6 @@ const legalLinks = [
   .footer-branchen a:focus-visible {
     color: rgba(245, 158, 11, 0.95);
     outline: none;
-  }
-
-  html[data-site-theme='light'] .footer-branchen-titel {
-    color: rgba(26, 26, 28, 0.45);
-  }
-
-  html[data-site-theme='light'] .footer-branchen a {
-    color: rgba(26, 26, 28, 0.62);
   }
 
   .footer-nav a,
