@@ -378,6 +378,40 @@ const legalLinks = [
     color: rgba(245, 245, 244, 0.68);
   }
 
+  /* DIE BRANCHENZEILE AUF CREME.
+     Die Variante is-embedded-cream ist KEIN Thema, sondern der Fuss
+     der Startseite auf hellem Grund — dort traegt die ganze
+     Fussleiste dunklen Text. Die Branchenzeile kam spaeter dazu und
+     hatte diese Regeln nicht: gemessen 1,24:1 auf der Startseite,
+     also praktisch unsichtbar. Jede neue Zeile in dieser Fussleiste
+     braucht ihren Cream-Satz, sonst steht sie dort in Hellgrau. */
+  .site-footer.is-embedded-cream .footer-branchen-titel {
+    color: rgba(26, 26, 28, 0.5);
+  }
+
+  .site-footer.is-embedded-cream .footer-branchen a {
+    color: rgba(26, 26, 28, 0.65);
+  }
+
+  .site-footer.is-embedded-cream .footer-branchen .footer-branchen-mehr {
+    color: rgba(26, 26, 28, 0.78);
+  }
+
+  .site-footer.is-embedded-cream .footer-branchen a:hover,
+  .site-footer.is-embedded-cream .footer-branchen a:focus-visible {
+    color: #92400e;
+  }
+
+  /* Die Trennpunkte zwischen den Eintraegen. Sie erben die Farbe der
+     Fussleiste und standen dadurch auf Creme in Weiss — in ALLEN drei
+     Reihen, nicht nur in der neuen. Bestandsfehler, hier mitbehoben,
+     weil es dieselbe Stelle und dieselbe Ursache ist. */
+  .site-footer.is-embedded-cream .footer-nav span[aria-hidden],
+  .site-footer.is-embedded-cream .footer-branchen span[aria-hidden],
+  .site-footer.is-embedded-cream .footer-legal span[aria-hidden] {
+    color: rgba(26, 26, 28, 0.35);
+  }
+
   .footer-branchen a {
     color: rgba(245, 245, 244, 0.55);
     text-decoration: none;
