@@ -414,12 +414,14 @@ export const VERTICALS = [
       ],
       subheadline:
         '2.000 € komplett. In 14 Tagen live.\nFür Fotografen, Videografen und Agenturen.',
-      // KEIN FOTO, und das mit Absicht: fuer diese Branche gibt es
-      // keins im Projekt, und ein gekauftes Stockbild vor einer Seite,
-      // die mit eigener Bildsprache wirbt, waere der schlechteste
-      // denkbare erste Eindruck. Die Komponente baut stattdessen einen
-      // eigenen Hintergrund. Kommt spaeter ein Foto, reicht hier die
-      // background-Zeile.
+      // Set statt Studio: das Bild zeigt die Arbeit, nicht das
+      // Ergebnis — und seine orange Wand trifft zufaellig genau das
+      // Amber der Seite. Der Bildausschnitt liegt mittig; auf dem
+      // Handy bleibt davon der Streifen mit Klappe und Kamera uebrig.
+      background: {
+        image: '/webdesign-landings/hero-medien.webp',
+        focalPoint: 'center 50%',
+      },
     },
     intro:
       'Wer dich bucht, hat vorher deine Seite gesehen.\n' +
@@ -497,13 +499,14 @@ export const VERTICALS = [
       headlineLines: [
         { text: 'Deine' },
         { text: 'Kanzlei-Website.', highlight: true },
-        { text: 'Seriös, ohne steif.' },
+        { text: 'Seriös, nicht steif.' },
       ],
       subheadline:
         '2.500 € komplett. In 14 Tagen live.\nFür Steuerberater, Anwälte und Notare.',
-      // Kein Foto. Siehe medien: lieber ein gebauter Hintergrund als
-      // ein gekaufter Händedruck vor grauem Himmel — das Bild, das
-      // auf jeder zweiten Kanzlei-Seite steht.
+      background: {
+        image: '/webdesign-landings/hero-kanzlei.webp',
+        focalPoint: 'center 42%',
+      },
     },
     intro:
       'Mandanten vergleichen, bevor sie anrufen.\n' +
@@ -569,6 +572,15 @@ export const VERTICALS = [
       ],
       subheadline:
         '2.000 € komplett. In 14 Tagen live.\nFür Makler und Hausverwaltungen in Norddeutschland.',
+      // Schluessel und Haus als Scherenschnitt vor Sonnenuntergang:
+      // das Warm des Bildes ist dasselbe Amber wie das der Marke, und
+      // es zeigt den Moment der Uebergabe statt eines Maklers im
+      // Anzug. Der Ausschnitt liegt mittig; auf dem Handy bleibt von
+      // links nach rechts genau Hand, Haus und Sonne stehen.
+      background: {
+        image: '/webdesign-landings/hero-immobilien.webp',
+        focalPoint: 'center 45%',
+      },
     },
     intro:
       'Dein Kunde ist nicht der Käufer. Dein Kunde ist der Eigentümer.\n' +
