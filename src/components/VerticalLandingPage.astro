@@ -270,15 +270,17 @@ const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
                     preserveAspectRatio="none"
                     aria-hidden="true"
                   >
-                    {/* pathLength="1" normiert die Laenge des Pfades
-                        auf 1. Vorher stand im CSS eine geschaetzte
-                        Zahl fuer stroke-dasharray — war sie kleiner
-                        als der Pfad, blieb das letzte Stueck
-                        ungezeichnet. Mit der Normierung stimmt es
-                        unabhaengig von der Geometrie. */}
+                    {/* KEIN pathLength und kein stroke-dasharray mehr.
+                        Beides zusammen mit vector-effect war der
+                        Grund, warum der Strich in der Mitte eine
+                        Luecke hatte: die Normierung rechnet in
+                        viewBox-Einheiten, non-scaling-stroke zeichnet
+                        das Muster aber in Bildschirmpixeln. Bei einem
+                        575 px breiten Wort wurde daraus Strich 194 px,
+                        Luecke 194 px, Strich 194 px. Gezeichnet wird
+                        jetzt per clip-path, siehe CSS. */}
                     <path
-                      d="M 3 7 C 50 3, 150 9, 197 4"
-                      pathLength="1"
+                      d="M 3 6.5 C 50 3.2, 150 8.8, 197 5.5"
                       vector-effect="non-scaling-stroke"
                     />
                   </svg>
@@ -702,24 +704,37 @@ const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
     filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.5));
   }
 
-  /* Der Strich zeichnet sich einmal beim Laden, von links nach rechts.
-     Die Laenge steht in Einheiten des viewBox (200 breit), nicht in
-     Pixeln — vector-effect wirkt nur auf die Strichstaerke.
+  /* Der Strich zeichnet sich einmal beim Laden, von links nach rechts
+     — als Wischblende ueber dem fertigen Strich, nicht als
+     Strichmuster auf dem Pfad.
+
+     WARUM NICHT MEHR MIT stroke-dasharray: der Pfad traegt
+     vector-effect="non-scaling-stroke", damit die Strichstaerke bei
+     jeder Wortbreite gleich bleibt. Damit rechnet der Browser das
+     Strichmuster aber in Bildschirmpixeln, waehrend pathLength es auf
+     die viewBox normiert. Ergebnis bei „Makler-Website." (575 px
+     breit): Strich 194 px, Luecke 194 px, Strich 194 px — eine
+     sichtbare Luecke mitten im Wort, auf jeder Branchenseite.
+     Nachgemessen am 04.11.2026, Bild im Scratchpad.
+
+     clip-path kennt diesen Konflikt nicht: es beschneidet das fertige
+     Bild, unabhaengig von Pfadlaenge, Skalierung und Strichstaerke.
+     Die negativen Werte oben, unten und links lassen den Schein und
+     die runden Enden heraus, die sonst an der Kante abgeschnitten
+     wuerden.
 
      Nur unter no-preference, und zwar so herum: ohne die Abfrage
-     stuende der Strich bei abgeschalteter Bewegung dauerhaft auf
-     stroke-dashoffset und waere unsichtbar. Der Grundzustand ist der
-     fertige Strich. */
+     stuende der Strich bei abgeschalteter Bewegung dauerhaft
+     beschnitten da. Der Grundzustand ist der fertige Strich. */
   @media (prefers-reduced-motion: no-preference) {
-    .hero-highlight-underline path {
-      stroke-dasharray: 1;
-      stroke-dashoffset: 1;
+    .hero-highlight-underline {
+      clip-path: inset(-60% 100% -60% -2%);
       animation: hero-strich 820ms cubic-bezier(0.22, 1, 0.36, 1) 380ms forwards;
     }
 
     @keyframes hero-strich {
       to {
-        stroke-dashoffset: 0;
+        clip-path: inset(-60% -2% -60% -2%);
       }
     }
   }
@@ -851,10 +866,24 @@ const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
     grid-template-columns: 1fr;
   }
 
+  /* EINE Referenz: Text links, Vorschau rechts — und zwar auf halber
+     Hoehe des Textes, nicht oben buendig.
+
+     Vorher stand align-items: start, und dazu kamen 40px Abstand oben
+     an der Vorschau. Bei „Er & Sie" (Gastro) hing die Karte dadurch
+     sichtbar unter der ersten Textzeile und ueber dem letzten Absatz
+     in der Luft; bei Gräfe Media (Medien) traf sie den unteren Rand
+     zufaellig genau. Mittig trifft es bei jeder Textlaenge. */
   @media (min-width: 720px) {
     .v-case-grid.is-single {
       grid-template-columns: 1.1fr 1fr;
-      align-items: start;
+      align-items: center;
+    }
+
+    /* Der Abstand oben gehoert zum Untereinander (is-multi). Neben
+       dem Text waere er genau der Versatz, um den es geht. */
+    .v-case-grid.is-single .v-case-images {
+      margin-top: 0;
     }
   }
 
