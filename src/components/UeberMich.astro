@@ -12,11 +12,11 @@
  * jeder Klick hierher kostet Geld. Ein Link, der wegführt, verliert
  * ihn. Wer mehr wissen will, findet /ueber in der Navigation.
  *
- * Die Zahl der Websites kommt aus references.ts und wird nicht
- * gepflegt: eine Zahl von Hand ist eine Zahl, die altert.
+ * KEINE ZAHL LIVE-SEITEN in der Faktenzeile. Stand dort bis zum
+ * 04.11.2026, abgeleitet aus references.ts — und machte genau an der
+ * Stelle klein, an der die Seite groß wirken muss.
  */
 import { SKIZZE } from '../lib/i18n/seiten/skizze';
-import { REFERENCES } from '../lib/references';
 import { localeOf } from '../lib/routes.mjs';
 import type { SkizzeBranche } from '../lib/skizze';
 
@@ -28,8 +28,6 @@ const { branche } = Astro.props;
 
 const locale = localeOf(Astro.url.pathname) as 'de' | 'en';
 const u = SKIZZE[locale].ueberMich;
-
-const fakten = u.fakten.map((f) => f.replace('{n}', String(REFERENCES.length)));
 ---
 
 <section class="um" aria-labelledby="um-titel">
@@ -49,7 +47,7 @@ const fakten = u.fakten.map((f) => f.replace('{n}', String(REFERENCES.length)));
       <h2 class="um-headline" id="um-titel" data-reveal>{u.headline}</h2>
       <p class="um-absatz" data-reveal>{u.text[branche]}</p>
       <ul class="um-fakten" data-reveal>
-        {fakten.map((f) => <li>{f}</li>)}
+        {u.fakten.map((f) => <li>{f}</li>)}
       </ul>
     </div>
   </div>

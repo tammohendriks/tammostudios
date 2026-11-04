@@ -47,9 +47,12 @@ export type Angebot = {
    * Ob das Abzeichen oben an der Karte erscheint.
    *
    * ACHTUNG, das ist eine Behauptung: „Von Praxen am häufigsten
-   * gebucht" setzt voraus, dass es stimmt. Auf einer Seite mit genau
-   * einem Paket hat das Abzeichen wenig Bedeutung und etwas Risiko —
-   * deshalb steht es als Schalter hier und nicht fest im Markup.
+   * gebucht" setzt voraus, dass es stimmt. Es steht deshalb als
+   * Schalter hier und nicht fest im Markup — wird eine Branche
+   * irgendwann anders verkauft, ist es eine Zeile.
+   *
+   * Steht seit dem 04.11.2026 auf allen sechs Branchen, auf Ansage
+   * des Betreibers.
    */
   abzeichen: boolean;
 };
@@ -77,22 +80,34 @@ export const ANGEBOTE: Record<SkizzeBranche, Angebot> = {
     // darunter, ohne billig zu wirken.
     preis: 2500,
     anwendungen: 2,
-    abzeichen: false,
+    abzeichen: true,
   },
   immobilien: {
     preis: 2000,
     anwendungen: 1,
-    abzeichen: false,
+    abzeichen: true,
   },
   medien: {
     preis: 2000,
     anwendungen: 1,
-    // KEIN Abzeichen: „Von Agenturen am häufigsten gebucht" wäre für
-    // eine Branche mit genau einer Referenz eine Behauptung ohne
-    // Grundlage. Lieber kein Abzeichen als ein unglaubwürdiges.
-    abzeichen: false,
+    abzeichen: true,
   },
 };
+
+/**
+ * Der niedrigste Betrag über alle Branchen — der Einstiegspreis.
+ *
+ * Steht unter jeder Angebotskarte („Websites baue ich ab 2.000 €"),
+ * damit eine Karte mit 2.500 € nicht als Untergrenze gelesen wird und
+ * niemand aus einer siebten Branche denkt, für ihn gäbe es nichts.
+ *
+ * ABGELEITET, nicht hingeschrieben: sinkt irgendwann ein Paket unter
+ * 2.000 €, stimmt die Zeile weiter.
+ */
+export const MINDESTPREIS = Math.min(...Object.values(ANGEBOTE).map((a) => a.preis));
+
+export const mindestpreisText = (locale: 'de' | 'en'): string =>
+  MINDESTPREIS.toLocaleString(locale === 'en' ? 'en-US' : 'de-DE');
 
 /**
  * Der Betrag in der Schreibweise der jeweiligen Sprache, ohne

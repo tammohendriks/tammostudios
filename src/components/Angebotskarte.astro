@@ -20,7 +20,7 @@
  * Klick. Er öffnet den Fragebogen wie alle anderen Knöpfe hier.
  */
 import { SKIZZE } from '../lib/i18n/seiten/skizze';
-import { ANGEBOTE, preisText } from '../lib/angebote';
+import { ANGEBOTE, preisText, mindestpreisText } from '../lib/angebote';
 import { t } from '../lib/i18n';
 import { localeOf } from '../lib/routes.mjs';
 import type { SkizzeBranche } from '../lib/skizze';
@@ -57,6 +57,11 @@ const anwendungenZeile =
   angebot.anwendungen === 1
     ? a.anwendungenEine
     : a.anwendungen.replace('{n}', String(angebot.anwendungen));
+
+// Der Einstiegspreis ueber alle Branchen. Steht unter jeder Karte,
+// damit 2.500 € nicht als Untergrenze gelesen wird — und damit wer
+// aus einer siebten Branche kommt sieht, dass es ihn auch gibt.
+const breiteZeile = a.breite.replace('{ab}', mindestpreisText(locale));
 ---
 
 <section class="ak" aria-labelledby="ak-titel">
@@ -82,6 +87,8 @@ const anwendungenZeile =
     </ul>
 
     <div class="ak-trenner"></div>
+
+    <p class="ak-breite">{breiteZeile}</p>
 
     <p class="ak-fuss">
       {a.zahlung}<br />
@@ -257,6 +264,19 @@ const anwendungenZeile =
     font-size: var(--lp-klein);
     line-height: 1.5;
     color: rgba(245, 245, 244, 0.5);
+  }
+
+  /* Die Reichweiten-Zeile steht zwischen Leistungen und Bedingungen
+     und ist etwas heller als beide: sie ist kein Kleingedrucktes,
+     sondern die Antwort auf „baut der auch fuer mich?". */
+  .ak-breite {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-klein);
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.82);
+    margin: 0 0 16px;
+    padding: 0 0 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   }
 
   .ak-fuss {

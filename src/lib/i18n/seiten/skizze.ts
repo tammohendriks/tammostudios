@@ -304,6 +304,15 @@ export const de = {
      * niemandem etwas weg.
      */
     branchenTitel: 'Websites für Branchen',
+    /**
+     * Der letzte Eintrag der Branchenzeile.
+     *
+     * Sechs Branchen in einer Reihe lesen sich wie eine Liste dessen,
+     * was geht — und damit wie eine Liste dessen, was nicht geht. Ein
+     * Betrieb aus einer siebten Branche klickt dann gar nicht erst.
+     * Der Verweis fuehrt deshalb auf den Kontakt, nicht ins Leere.
+     */
+    mehr: '… und viele mehr',
     kurz: {
       praxis: 'Praxen',
       handwerk: 'Handwerk',
@@ -346,23 +355,25 @@ export const de = {
     headline: 'Hi, ich bin Tammo.',
     text: {
       praxis:
-        'Ich baue Websites für Praxen, Handwerk und kleine Unternehmen, von Bremen aus für ganz Deutschland. Kein Team, keine Agentur dazwischen: Du sprichst von der ersten Skizze bis zum Launch mit mir. Und wenn danach was ist, auch.',
+        'Ich baue Websites für Praxen, Handwerk und Unternehmen jeder Größe, von Bremen aus für ganz Deutschland. Kein Team, keine Agentur dazwischen: Du sprichst von der ersten Skizze bis zum Launch mit mir. Und wenn danach was ist, auch.',
       handwerk:
-        'Ich baue Websites für Handwerksbetriebe, Praxen und kleine Unternehmen, von Bremen aus für ganz Deutschland. Kein Team, keine Agentur dazwischen: Du sprichst von der ersten Skizze bis zum Launch mit mir. Und wenn danach was ist, auch.',
+        'Ich baue Websites für Handwerksbetriebe, Praxen und Unternehmen jeder Größe, von Bremen aus für ganz Deutschland. Kein Team, keine Agentur dazwischen: Du sprichst von der ersten Skizze bis zum Launch mit mir. Und wenn danach was ist, auch.',
       gastronomie:
-        'Ich baue Websites für Gastronomie, Handwerk und kleine Unternehmen, von Bremen aus für ganz Deutschland. Kein Team, keine Agentur dazwischen: Du sprichst von der ersten Skizze bis zum Launch mit mir. Und wenn danach was ist, auch.',
+        'Ich baue Websites für Gastronomie, Handwerk und Unternehmen jeder Größe, von Bremen aus für ganz Deutschland. Kein Team, keine Agentur dazwischen: Du sprichst von der ersten Skizze bis zum Launch mit mir. Und wenn danach was ist, auch.',
       medien:
         'Ich baue Websites für Medienbetriebe, Praxen und Handwerk, von Bremen aus für ganz Deutschland. Kein Team, keine Agentur dazwischen: Du sprichst von der ersten Skizze bis zum Launch mit mir. Und wenn danach was ist, auch.',
       kanzlei:
-        'Ich baue Websites für Kanzleien, Praxen und kleine Unternehmen, von Bremen aus für ganz Deutschland. Kein Team, keine Agentur dazwischen: Du sprichst von der ersten Skizze bis zum Launch mit mir. Und wenn danach was ist, auch.',
+        'Ich baue Websites für Kanzleien, Praxen und Unternehmen jeder Größe, von Bremen aus für ganz Deutschland. Kein Team, keine Agentur dazwischen: Du sprichst von der ersten Skizze bis zum Launch mit mir. Und wenn danach was ist, auch.',
       immobilien:
-        'Ich baue Websites für Makler, Handwerk und kleine Unternehmen, von Bremen aus für ganz Deutschland. Kein Team, keine Agentur dazwischen: Du sprichst von der ersten Skizze bis zum Launch mit mir. Und wenn danach was ist, auch.',
+        'Ich baue Websites für Makler, Handwerk und Unternehmen jeder Größe, von Bremen aus für ganz Deutschland. Kein Team, keine Agentur dazwischen: Du sprichst von der ersten Skizze bis zum Launch mit mir. Und wenn danach was ist, auch.',
     },
-    // {n} ist die Zahl der Referenzen aus references.ts — abgeleitet
-    // statt hingeschrieben. Eine Zahl, die man pflegen muss, ist eine
-    // Zahl, die irgendwann falsch ist, und auf einer Seite, die mit
-    // Vertrauen wirbt, ist das teuer.
-    fakten: ['{n} Websites live', 'Antwort < 24 h', 'Bremen'],
+    // KEINE ZAHL VON LIVE-SEITEN. Stand hier bis zum 04.11.2026 als
+    // „{n} Websites live", abgeleitet aus references.ts. Technisch
+    // sauber, strategisch falsch: eine einstellige Zahl neben dem
+    // eigenen Gesicht liest sich als Anfaenger, nicht als Beleg. Die
+    // Referenzen stehen weiter unten auf der Seite und sprechen fuer
+    // sich.
+    fakten: ['Antwort < 24 h', 'Alles aus einer Hand', 'Bremen'],
     fotoAlt: 'Tammo Hendriks, Gründer von Tammo Studios',
   },
 
@@ -377,11 +388,9 @@ export const de = {
       praxis: 'Von Praxen am häufigsten gebucht',
       handwerk: 'Von Betrieben am häufigsten gebucht',
       gastronomie: 'Von Lokalen am häufigsten gebucht',
-      // Wird nicht gezeigt (abzeichen: false in angebote.ts), steht
-      // aber bereit, falls es einmal genug Belege dafür gibt.
-      medien: 'Für Portfolios gebaut',
-      kanzlei: 'Für Kanzleien gebaut',
-      immobilien: 'Für Makler gebaut',
+      medien: 'Von Agenturen am häufigsten gebucht',
+      kanzlei: 'Von Kanzleien am häufigsten gebucht',
+      immobilien: 'Von Maklern am häufigsten gebucht',
     },
     bezeichnung: {
       praxis: 'Eine Praxis-Website',
@@ -444,6 +453,20 @@ export const de = {
         'Mobil und am Rechner schnell, SEO-sauber',
       ],
     },
+    /**
+     * Die Zeile, die das Paket einordnet.
+     *
+     * Zwei Dinge auf einmal, und beide auf Ansage: der Betrag auf
+     * dieser Karte ist das Paket, das in DIESER Branche am häufigsten
+     * gebucht wird — und wer in keiner der sechs Branchen steckt,
+     * fängt trotzdem bei 2.000 € an. Ohne diesen Satz liest sich eine
+     * Seite mit 2.500 € so, als wäre das der Einstiegspreis, und sechs
+     * Branchenseiten lesen sich so, als gäbe es nur sechs Branchen.
+     *
+     * Der Betrag kommt aus angebote.ts (MINDESTPREIS), nicht von
+     * Hand: sonst läuft er beim nächsten Mal auseinander.
+     */
+    breite: 'Andere Branche, anderer Umfang? Websites baue ich ab {ab} € — für jede Art von Unternehmen, klein wie groß.',
     zahlung: 'Zahlung: 50 % bei Auftrag, 50 % bei Launch.',
     bugfix: 'Bug-Fixes nach Launch: kostenlos.',
     pflege: 'Optional: Wartung und Support für 30 € im Monat, monatlich kündbar.',
@@ -728,6 +751,7 @@ export const en: Shape<typeof de> = {
       immobilien: 'Estate agents and property managers',
     },
     branchenTitel: 'Websites by industry',
+    mehr: '… and many more',
     kurz: {
       praxis: 'Practices',
       handwerk: 'Trades',
@@ -769,19 +793,19 @@ export const en: Shape<typeof de> = {
     headline: "Hi, I'm Tammo.",
     text: {
       praxis:
-        'I build websites for medical practices, trades and small businesses, from Bremen for all of Germany. No team, no agency in between: you talk to me from the first sketch to launch. And afterwards too, if something comes up.',
+        'I build websites for medical practices, trades and companies of every size, from Bremen for all of Germany. No team, no agency in between: you talk to me from the first sketch to launch. And afterwards too, if something comes up.',
       handwerk:
-        'I build websites for trades, medical practices and small businesses, from Bremen for all of Germany. No team, no agency in between: you talk to me from the first sketch to launch. And afterwards too, if something comes up.',
+        'I build websites for trades, medical practices and companies of every size, from Bremen for all of Germany. No team, no agency in between: you talk to me from the first sketch to launch. And afterwards too, if something comes up.',
       gastronomie:
-        'I build websites for restaurants, trades and small businesses, from Bremen for all of Germany. No team, no agency in between: you talk to me from the first sketch to launch. And afterwards too, if something comes up.',
+        'I build websites for restaurants, trades and companies of every size, from Bremen for all of Germany. No team, no agency in between: you talk to me from the first sketch to launch. And afterwards too, if something comes up.',
       medien:
         'I build websites for media studios, medical practices and trades, from Bremen for all of Germany. No team, no agency in between: you talk to me from the first sketch to launch. And afterwards too, if something comes up.',
       kanzlei:
-        'I build websites for law and tax firms, medical practices and small businesses, from Bremen for all of Germany. No team, no agency in between: you talk to me from the first sketch to launch. And afterwards too, if something comes up.',
+        'I build websites for law and tax firms, medical practices and companies of every size, from Bremen for all of Germany. No team, no agency in between: you talk to me from the first sketch to launch. And afterwards too, if something comes up.',
       immobilien:
-        'I build websites for estate agents, trades and small businesses, from Bremen for all of Germany. No team, no agency in between: you talk to me from the first sketch to launch. And afterwards too, if something comes up.',
+        'I build websites for estate agents, trades and companies of every size, from Bremen for all of Germany. No team, no agency in between: you talk to me from the first sketch to launch. And afterwards too, if something comes up.',
     },
-    fakten: ['{n} websites live', 'Reply < 24 h', 'Bremen'],
+    fakten: ['Reply < 24 h', 'One person, start to finish', 'Bremen'],
     fotoAlt: 'Tammo Hendriks, founder of Tammo Studios',
   },
 
@@ -791,9 +815,9 @@ export const en: Shape<typeof de> = {
       praxis: 'Most booked by practices',
       handwerk: 'Most booked by trades',
       gastronomie: 'Most booked by restaurants',
-      medien: 'Built for portfolios',
-      kanzlei: 'Built for law firms',
-      immobilien: 'Built for estate agents',
+      medien: 'Most booked by agencies',
+      kanzlei: 'Most booked by law firms',
+      immobilien: 'Most booked by estate agents',
     },
     bezeichnung: {
       praxis: 'One practice website',
@@ -835,6 +859,7 @@ export const en: Shape<typeof de> = {
       kanzlei: ['GDPR compliant, encrypted forms', 'Fast on phone and desktop, clean SEO'],
       immobilien: ['GDPR compliant, encrypted forms', 'Fast on phone and desktop, clean SEO'],
     },
+    breite: 'Different industry, different scope? I build websites from €{ab} — for any kind of business, small or large.',
     zahlung: 'Payment: 50 % on order, 50 % at launch.',
     bugfix: 'Bug fixes after launch: free.',
     pflege: 'Optional: maintenance and support for €30 a month, month to month.',
