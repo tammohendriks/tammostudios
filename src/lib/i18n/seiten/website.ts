@@ -53,6 +53,9 @@ export const de = {
   },
 
   cms: {
+    // Der Verweis auf die eigene Studio-Seite. Dieser Abschnitt
+    // bleibt der Anreisser; alles Weitere steht dort.
+    studioCta: 'So funktioniert dein Studio',
     eyebrow: 'DU PFLEGST SELBST',
     headline: 'Kein Anruf beim Entwickler.',
     absatz1:
@@ -179,6 +182,7 @@ export const en: Shape<typeof de> = {
   },
 
   cms: {
+    studioCta: 'How your studio works',
     eyebrow: 'YOU KEEP IT CURRENT',
     headline: 'No call to the developer.',
     absatz1:

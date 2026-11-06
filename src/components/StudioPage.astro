@@ -1,0 +1,1527 @@
+---
+/**
+ * /studio — das Redaktionssystem, das jeder Kunde bekommt.
+ *
+ * Liegt als Komponente und nicht in src/pages, weil es zwei Routen
+ * darauf gibt: /studio und /en/studio. Markup und <style>-Block
+ * gehoeren dabei zusammen.
+ *
+ * ZUM VERWEIS AUF DEN JOURNAL-BEITRAG am Ende: der wird nur gesetzt,
+ * wenn es den Beitrag wirklich gibt. Er liegt zum Zeitpunkt dieser
+ * Seite noch unveroeffentlicht beim Betreiber, und ein fester Verweis
+ * waere zweierlei: eine 404 fuer Besucher und ein Abbruch im Build
+ * (journal-verweis-guard in astro.config.mjs). Sobald der Beitrag
+ * live geht, erscheint der Verweis von selbst.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SubPageBackground from './SubPageBackground.astro';
+import SiteFooter from './SiteFooter.astro';
+import Hochzaehlen from './Hochzaehlen.astro';
+import { localeOf, path, pathOr } from '../lib/routes.mjs';
+import { STUDIO } from '../lib/i18n/seiten/studio';
+import { SITE, PHONE_INTERNATIONAL } from '../lib/constants';
+import { getJournalPost } from '../lib/sanity';
+
+const locale = localeOf(Astro.url.pathname);
+const d = STUDIO[locale];
+
+const kontaktPfad = pathOr('kontakt', locale);
+const referenzenPfad = path('referenzen', locale);
+
+const JOURNAL_SLUG = 'website-selbst-pflegen-studio';
+const journalBeitrag = await getJournalPost(JOURNAL_SLUG);
+const journalPfad = journalBeitrag ? `/journal/${JOURNAL_SLUG}` : null;
+
+const faqSchema = {
+  '@type': 'FAQPage',
+  mainEntity: d.faq.eintraege.map((e) => ({
+    '@type': 'Question',
+    name: e.frage,
+    acceptedAnswer: { '@type': 'Answer', text: e.antwort },
+  })),
+};
+---
+
+<BaseLayout
+  pageTitle={d.meta.pageTitle}
+  title={d.meta.title}
+  description={d.meta.description}
+  additionalSchema={faqSchema}
+>
+  <main class="studio-page">
+    <SubPageBackground />
+
+    <!-- ===================== HERO =====================
+         Aufbau wie auf /software, /website und /preise: Ueberschrift,
+         Unterzeile, ein Textverweis, eine Notizzeile. Keine
+         Augenbraue, keine Pille, kein hervorgehobenes Wort — die
+         Unterseiten sollen denselben Kopf haben, auf Ansage des
+         Betreibers. -->
+    <header class="studio-hero">
+      <h1 class="subpage-hero-title">{d.hero.headline}</h1>
+      <p class="subpage-hero-subtitle text-lines studio-hero-sub">{d.hero.sub}</p>
+
+      <div class="studio-hero-cta">
+        <a class="cta-link" href={kontaktPfad}>
+          {d.hero.cta}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+        </a>
+        <p class="studio-hero-note">
+          {d.hero.telVor}{' '}
+          <a href={PHONE_INTERNATIONAL} class="st-tel-nummer">{SITE.phone}</a>
+        </p>
+      </div>
+    </header>
+
+    <!-- ============== DER NACHGEBAUTE EDITOR ==============
+         Kein Video und kein Screenshot: ein Video waere 2 MB fuer
+         sechs Sekunden, ein Screenshot zeigt einen Zustand statt
+         eines Vorgangs. Gebaut aus HTML und CSS, laeuft nur im Blick
+         und steht bei abgeschalteter Bewegung still auf dem
+         Endzustand. -->
+    <section class="st-editor-abschnitt" aria-label={d.editor.label}>
+      <div class="st-editor" data-editor aria-hidden="true">
+        <div class="st-editor-leiste">
+          <span class="st-punkte" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </span>
+          <span class="st-adresse">{d.editor.browser}</span>
+          <span class="st-publish">
+            {d.editor.knopf}
+            <span class="st-publish-zahl">1</span>
+          </span>
+          <span class="st-live">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M20 6 9 17l-5-5" />
+            </svg>
+            {d.editor.live}
+          </span>
+        </div>
+
+        <div class="st-editor-koerper">
+          <div class="st-vorschau">
+            <span class="st-vorschau-balken st-balken-lang"></span>
+            <span class="st-vorschau-balken st-balken-kurz"></span>
+            <div class="st-vorschau-zeile">
+              <span class="st-vorschau-posten">{d.editor.posten}</span>
+              <span class="st-vorschau-preis">
+                <span class="st-wert-alt">{d.editor.alt}</span>
+                <span class="st-wert-neu">{d.editor.neu}</span>
+              </span>
+            </div>
+            <span class="st-vorschau-balken st-balken-mittel"></span>
+          </div>
+
+          <div class="st-panel">
+            <p class="st-panel-titel">{d.editor.panel}</p>
+            <p class="st-panel-label">{d.editor.feld}</p>
+            <div class="st-feld">
+              <span class="st-feld-alt">{d.editor.alt}</span>
+              <span class="st-feld-neu">{d.editor.neu}</span>
+              <span class="st-caret"></span>
+            </div>
+          </div>
+        </div>
+
+        <span class="st-cursor" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M5 2l14 10-6.2 1.2 3.4 6.6-2.6 1.4-3.4-6.6L5 19z" />
+          </svg>
+        </span>
+      </div>
+      <p class="st-nurlesen">{d.editor.beschreibung}</p>
+    </section>
+
+    <!-- ===================== PROBLEM ===================== -->
+    <section class="st-problem" aria-label={d.problem.pointe}>
+      <p class="st-problem-text text-lines" data-reveal>{d.problem.headline}</p>
+      <p class="st-problem-pointe" data-reveal>{d.problem.pointe}</p>
+
+      <ul class="st-zahlen">
+        {d.problem.zahlen.map((z) => (
+          <li class="st-zahl" data-reveal>
+            <span class="st-zahl-wert" data-zaehlen>{z.wert}</span>
+            <span class="st-zahl-text">{z.text}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- ===================== DREI ARTEN ===================== -->
+    <section class="st-arten" aria-labelledby="st-arten-titel">
+      <p class="st-braue" data-reveal>{d.arten.braue}</p>
+      <h2 class="st-titel" id="st-arten-titel" data-reveal>{d.arten.headline}</h2>
+
+      <ul class="st-karten st-karten-drei">
+        {d.arten.punkte.map((p, i) => (
+          <li class="st-karte" data-reveal>
+            {/* Statt eines Symbols eine kleine Skizze der Oberflaeche:
+                sie zeigt den Unterschied zwischen den drei Arten,
+                was drei verschiedene Symbole nicht koennten. */}
+            <span class={`st-skizze st-skizze-${i}`} aria-hidden="true">
+              <span></span><span></span><span></span>
+            </span>
+            <h3 class="st-karte-titel">{p.titel}</h3>
+            <p class="st-karte-text">{p.text}</p>
+            <p class="st-karte-beispiel">{p.beispiel}</p>
+          </li>
+        ))}
+      </ul>
+      <p class="st-fuss" data-reveal>{d.arten.fuss}</p>
+    </section>
+
+    <!-- ===================== PDF-BEISPIEL ===================== -->
+    <section class="st-pdf" aria-labelledby="st-pdf-titel">
+      <p class="st-braue" data-reveal>{d.pdf.braue}</p>
+      <h2 class="st-titel" id="st-pdf-titel" data-reveal>{d.pdf.headline}</h2>
+
+      <div class="st-pdf-raster">
+        <p class="st-pdf-text" data-reveal>{d.pdf.absatz}</p>
+
+        <div class="st-pdf-mock" data-reveal aria-hidden="true">
+          <div class="st-pdf-kopf">
+            <span class="st-pdf-titel-mock">{d.pdf.mock.titel}</span>
+            <span class="st-pdf-sprachen">
+              {d.pdf.mock.sprachen.map((s) => <span>{s}</span>)}
+            </span>
+          </div>
+          <p class="st-pdf-abschnitt">{d.pdf.mock.abschnitt}</p>
+          <ul class="st-pdf-zeilen">
+            {d.pdf.mock.zeilen.map((z) => (
+              <li>
+                <span>{z.posten}</span>
+                <span class="st-pdf-preis">{z.preis}</span>
+              </li>
+            ))}
+          </ul>
+          <div class="st-pdf-aktion">
+            <span class="st-pdf-knopf">{d.pdf.mock.knopf}</span>
+            <span class="st-pdf-datei">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" />
+              </svg>
+              {d.pdf.mock.datei}
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== ROLLEN ===================== -->
+    <section class="st-rollen" aria-labelledby="st-rollen-titel">
+      <p class="st-braue" data-reveal>{d.rollen.braue}</p>
+      <h2 class="st-titel" id="st-rollen-titel" data-reveal>{d.rollen.headline}</h2>
+
+      <div class="st-rollen-raster">
+        {[d.rollen.du, d.rollen.ich].map((spalte, i) => (
+          <div class={`st-spalte ${i === 0 ? 'ist-du' : 'ist-ich'}`} data-reveal>
+            <h3 class="st-spalte-titel">{spalte.titel}</h3>
+            <ul class="st-spalte-liste">
+              {spalte.punkte.map((p) => <li>{p}</li>)}
+            </ul>
+          </div>
+        ))}
+      </div>
+      <p class="st-fuss" data-reveal>{d.rollen.fuss}</p>
+    </section>
+
+    <!-- ===================== SICHERHEIT ===================== -->
+    <section class="st-sicherheit" aria-labelledby="st-sicher-titel">
+      <p class="st-braue" data-reveal>{d.sicherheit.braue}</p>
+      <h2 class="st-titel" id="st-sicher-titel" data-reveal>{d.sicherheit.headline}</h2>
+
+      <ul class="st-karten st-karten-vier">
+        {d.sicherheit.punkte.map((p) => (
+          <li class="st-karte st-karte-klein" data-reveal>
+            <h3 class="st-karte-titel">{p.titel}</h3>
+            <p class="st-karte-text">{p.text}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- ===================== EINFÜHRUNG ===================== -->
+    <section class="st-einfuehrung" aria-labelledby="st-einf-titel">
+      <p class="st-braue" data-reveal>{d.einfuehrung.braue}</p>
+      <h2 class="st-titel" id="st-einf-titel" data-reveal>{d.einfuehrung.headline}</h2>
+
+      {/* <ol>, weil die Reihenfolge der Inhalt ist. */}
+      <ol class="st-schritte">
+        {d.einfuehrung.schritte.map((s, i) => (
+          <li class="st-schritt" data-reveal>
+            <span class="st-nr" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+            <div>
+              <h3 class="st-schritt-titel">{s.titel}</h3>
+              <p class="st-schritt-text">{s.text}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <!-- ===================== FAQ ===================== -->
+    <section class="st-faq" aria-labelledby="st-faq-titel">
+      <p class="st-braue" data-reveal>{d.faq.braue}</p>
+      <h2 class="st-titel" id="st-faq-titel" data-reveal>{d.faq.headline}</h2>
+
+      <div class="st-faq-liste">
+        {d.faq.eintraege.map((e) => (
+          <details class="st-faq-eintrag" data-reveal>
+            <summary>
+              <span class="st-faq-frage">{e.frage}</span>
+              <span class="st-faq-symbol" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </span>
+            </summary>
+            <p class="st-faq-antwort">{e.antwort}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <!-- ===================== ABSCHLUSS ===================== -->
+    <section class="st-abschluss" aria-labelledby="st-ab-titel">
+      <h2 class="st-ab-titel" id="st-ab-titel" data-reveal>
+        {d.abschluss.headlineVor}{' '}
+        <span class="st-hell-schlicht">{d.abschluss.headlineHell}</span>
+      </h2>
+      <p class="st-ab-sub" data-reveal>{d.abschluss.sub}</p>
+
+      <div class="st-cta" data-reveal>
+        <a class="cta-orbital st-knopf" href={kontaktPfad}>
+          <span>{d.abschluss.cta}</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </a>
+        <p class="st-tel">
+          {d.abschluss.telVor}{' '}
+          <a href={PHONE_INTERNATIONAL} class="st-tel-nummer">{SITE.phone}</a>
+        </p>
+      </div>
+
+      {journalPfad && (
+        <p class="st-journal" data-reveal>
+          {d.abschluss.journalVor}{' '}
+          <a href={journalPfad}>{d.abschluss.journalText}</a>
+        </p>
+      )}
+      {referenzenPfad && (
+        <p class="st-journal st-journal-zweit" data-reveal>
+          <a href={referenzenPfad}>Samedos · Maadkey Media</a>
+        </p>
+      )}
+    </section>
+
+  </main>
+
+  {/* AUSSERHALB von <main>, wie auf jeder anderen Unterseite. Innen
+      haette ihn der 40px-Innenabstand der Seite eingerueckt, und sein
+      schwarzer Grund stuende im hellen Thema als zu kurzer Riegel auf
+      Creme. */}
+  <SiteFooter />
+
+  <Hochzaehlen />
+</BaseLayout>
+
+<style>
+  /* Alles mittig, wie die Branchenseiten. Die gemeinsame Typo-Skala
+     (--lp-*) steht in global.css auf :root und gilt hier genauso. */
+  /* Masse wie .software-page und .website-page. overflow-x: clip
+     statt overflow: hidden — optisch dasselbe, aber ohne den
+     Nebeneffekt, dass jedes position: sticky darunter aufhoert zu
+     funktionieren. */
+  .studio-page {
+    position: relative;
+    z-index: 1;
+    padding: 140px 40px 80px;
+    min-height: calc(100vh - 200px);
+    overflow-x: clip;
+  }
+
+  .studio-page > section {
+    max-width: 880px;
+    margin: 0 auto 96px;
+    text-align: center;
+  }
+
+  /* 780px und 32px oben wie auf jeder anderen Unterseite. Der Abstand
+     oben ist nicht optional: der Theme-Umschalter haengt fix auf
+     top:90px und ueberdeckt die Ueberschrift sonst. */
+  .studio-hero {
+    max-width: 780px;
+    margin: 0 auto 60px;
+    padding-top: 32px;
+    text-align: center;
+  }
+
+  /* „Ändern statt anrufen." braucht die vollen 96px nicht — gedeckelt
+     wie auf /software, damit der Hero nicht nach unten rutscht. */
+  .studio-hero .subpage-hero-title {
+    font-size: clamp(36px, 5.6vw, 64px);
+  }
+
+  .studio-hero-sub {
+    max-width: 62ch;
+    margin-inline: auto;
+  }
+
+  .studio-hero-cta {
+    margin-top: clamp(32px, 5vh, 48px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .studio-hero-note {
+    margin: 0;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.9rem;
+    color: rgba(245, 245, 244, 0.5);
+  }
+
+  .st-braue {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: var(--lp-braue);
+    letter-spacing: var(--lp-braue-sperrung);
+    text-transform: uppercase;
+    color: rgba(245, 158, 11, 0.85);
+    margin: 0 0 18px;
+  }
+
+  .st-titel {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: var(--lp-titel);
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    color: #f5f5f4;
+    margin: 0 0 40px;
+  }
+
+  .st-fuss {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-text);
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.6);
+    max-width: 56ch;
+    margin: 32px auto 0;
+  }
+
+  .st-hell-schlicht {
+    color: #f59e0b;
+  }
+
+  .st-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  /* Ein <a> erbt die Schrift des Browsers nicht, ein <button> schon —
+     .cta-orbital allein reicht an beiden Stellen nicht. */
+  .st-knopf {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    text-decoration: none;
+  }
+
+  .st-tel {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-klein);
+    color: rgba(245, 245, 244, 0.55);
+    margin: 0;
+  }
+
+  .st-tel-nummer {
+    color: rgba(245, 245, 244, 0.85);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.45);
+    white-space: nowrap;
+  }
+
+  .st-tel-nummer:hover,
+  .st-tel-nummer:focus-visible {
+    color: #f59e0b;
+  }
+
+  /* ================= DER NACHGEBAUTE EDITOR ================= */
+  .st-editor-abschnitt {
+    max-width: 980px !important;
+  }
+
+  .st-editor {
+    position: relative;
+    max-width: 820px;
+    margin: 0 auto;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    background: rgba(12, 12, 15, 0.92);
+    box-shadow: 0 26px 70px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    text-align: left;
+    /* Die ganze Schaufensterpuppe haengt an einem Takt. Wer die
+       Geschwindigkeit aendern will, aendert ihn hier einmal. */
+    --takt: 6s;
+  }
+
+  .st-editor-leiste {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.045);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .st-punkte {
+    display: flex;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+
+  .st-punkte span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.16);
+  }
+
+  .st-adresse {
+    flex: 1;
+    min-width: 0;
+    padding: 3px 10px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.32);
+    font-family: var(--lp-mono);
+    font-size: 0.7rem;
+    color: rgba(245, 245, 244, 0.45);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .st-publish,
+  .st-live {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    padding: 5px 11px;
+    border-radius: 999px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .st-publish {
+    background: #f59e0b;
+    color: #15120a;
+  }
+
+  .st-publish-zahl {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 15px;
+    height: 15px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.3);
+    font-size: 0.62rem;
+  }
+
+  .st-live {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    border: 1px solid rgba(74, 222, 128, 0.45);
+    background: rgba(74, 222, 128, 0.12);
+    color: #4ade80;
+  }
+
+  .st-editor-koerper {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 680px) {
+    .st-editor-koerper {
+      grid-template-columns: 1.5fr 1fr;
+    }
+  }
+
+  .st-vorschau {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    padding: 22px 20px 26px;
+    min-height: 168px;
+  }
+
+  .st-vorschau-balken {
+    display: block;
+    height: 7px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .st-balken-lang { width: 72%; }
+  .st-balken-kurz { width: 42%; }
+  .st-balken-mittel { width: 58%; }
+
+  .st-vorschau-zeile {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 11px 13px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .st-vorschau-posten {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.78rem;
+    line-height: 1.3;
+    color: rgba(245, 245, 244, 0.72);
+  }
+
+  /* Alt und neu liegen uebereinander, damit die Zeile beim Wechsel
+     nicht springt. */
+  .st-vorschau-preis {
+    position: relative;
+    flex-shrink: 0;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.86rem;
+    font-weight: 700;
+    white-space: nowrap;
+    color: #f5f5f4;
+  }
+
+  .st-wert-neu {
+    position: absolute;
+    top: 0;
+    right: 0;
+    opacity: 0;
+    color: #f59e0b;
+  }
+
+  .st-panel {
+    padding: 20px 20px 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    background: rgba(255, 255, 255, 0.025);
+  }
+
+  @media (min-width: 680px) {
+    .st-panel {
+      border-top: none;
+      border-left: 1px solid rgba(255, 255, 255, 0.07);
+    }
+  }
+
+  .st-panel-titel {
+    margin: 0 0 16px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: rgba(245, 245, 244, 0.85);
+  }
+
+  .st-panel-label {
+    margin: 0 0 6px;
+    font-family: var(--lp-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(245, 245, 244, 0.4);
+  }
+
+  .st-feld {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 34px;
+    padding: 0 11px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.82rem;
+    color: #f5f5f4;
+    overflow: hidden;
+  }
+
+  .st-feld-alt,
+  .st-feld-neu {
+    white-space: nowrap;
+  }
+
+  /* Der getippte Wert waechst in Schritten von null auf volle Breite:
+     das ist die Schreibmaschine, ohne ein Zeichen pro Element. */
+  .st-feld-neu {
+    position: absolute;
+    left: 11px;
+    max-width: 0;
+    overflow: hidden;
+  }
+
+  .st-caret {
+    position: absolute;
+    left: 11px;
+    width: 1.5px;
+    height: 17px;
+    background: #f59e0b;
+    opacity: 0;
+  }
+
+  .st-cursor {
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: #f5f5f4;
+    filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.6));
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .st-nurlesen {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* --- Der Ablauf. Laeuft nur, wenn der Kasten im Blick ist: eine
+         Schleife, die hinter dem Bildschirmrand weiterlaeuft, kostet
+         Rechenzeit und zeigt niemandem etwas. --- */
+  @media (prefers-reduced-motion: no-preference) {
+    .st-editor[data-laeuft] .st-cursor,
+    .st-editor[data-laeuft] .st-feld-alt,
+    .st-editor[data-laeuft] .st-feld-neu,
+    .st-editor[data-laeuft] .st-caret,
+    .st-editor[data-laeuft] .st-publish,
+    .st-editor[data-laeuft] .st-live,
+    .st-editor[data-laeuft] .st-wert-alt,
+    .st-editor[data-laeuft] .st-wert-neu,
+    .st-editor[data-laeuft] .st-vorschau-zeile {
+      animation-duration: var(--takt);
+      animation-iteration-count: infinite;
+      animation-timing-function: linear;
+    }
+
+    /* Ohne Blickkontakt: Grundzustand, nichts rechnet. */
+    .st-editor:not([data-laeuft]) .st-publish,
+    .st-editor:not([data-laeuft]) .st-live {
+      opacity: 0;
+    }
+
+    .st-editor[data-laeuft] .st-cursor { animation-name: st-cursor; }
+    .st-editor[data-laeuft] .st-feld-alt { animation-name: st-alt-weg; }
+    .st-editor[data-laeuft] .st-feld-neu { animation-name: st-tippen; }
+    .st-editor[data-laeuft] .st-caret { animation-name: st-caret; }
+    .st-editor[data-laeuft] .st-publish { animation-name: st-publish; }
+    .st-editor[data-laeuft] .st-live { animation-name: st-live; }
+    .st-editor[data-laeuft] .st-wert-alt { animation-name: st-wert-alt; }
+    .st-editor[data-laeuft] .st-wert-neu { animation-name: st-wert-neu; }
+    .st-editor[data-laeuft] .st-vorschau-zeile { animation-name: st-blitz; }
+
+    /* Der Zeiger wandert zum Feld (0–13 %), bleibt beim Tippen liegen,
+       zieht zum Knopf (47–58 %) und klickt dort. */
+    @keyframes st-cursor {
+      0%   { opacity: 0; transform: translate(58%, 210%) scale(1); }
+      6%   { opacity: 1; }
+      13%  { opacity: 1; transform: translate(620%, 300%) scale(1); }
+      15%  { transform: translate(620%, 300%) scale(0.82); }
+      18%  { transform: translate(620%, 300%) scale(1); }
+      46%  { opacity: 1; transform: translate(620%, 300%) scale(1); }
+      58%  { opacity: 1; transform: translate(1480%, 44%) scale(1); }
+      61%  { transform: translate(1480%, 44%) scale(0.82); }
+      64%  { opacity: 1; transform: translate(1480%, 44%) scale(1); }
+      76%  { opacity: 0; transform: translate(1480%, 44%) scale(1); }
+      100% { opacity: 0; transform: translate(58%, 210%) scale(1); }
+    }
+
+    /* Der alte Betrag verschwindet beim Klick ins Feld. */
+    @keyframes st-alt-weg {
+      0%, 17%   { opacity: 1; }
+      19%, 95%  { opacity: 0; }
+      100%      { opacity: 1; }
+    }
+
+    @keyframes st-tippen {
+      0%, 19%   { max-width: 0; }
+      40%       { max-width: 7em; }
+      95%       { max-width: 7em; }
+      100%      { max-width: 0; }
+    }
+
+    @keyframes st-caret {
+      0%, 17%   { opacity: 0; }
+      19%, 44%  { opacity: 1; }
+      46%, 100% { opacity: 0; }
+    }
+
+    /* „Veröffentlichen (1)" springt auf, sobald getippt ist, und
+       verschwindet nach dem Klick. */
+    @keyframes st-publish {
+      0%, 42%   { opacity: 0; transform: translateY(-5px) scale(0.9); }
+      47%       { opacity: 1; transform: translateY(0) scale(1); }
+      62%       { opacity: 1; transform: translateY(0) scale(1); }
+      64%, 100% { opacity: 0; transform: translateY(0) scale(0.9); }
+    }
+
+    @keyframes st-live {
+      0%, 63%   { opacity: 0; transform: scale(0.9); }
+      68%       { opacity: 1; transform: scale(1); }
+      92%       { opacity: 1; transform: scale(1); }
+      96%, 100% { opacity: 0; transform: scale(0.9); }
+    }
+
+    @keyframes st-wert-alt {
+      0%, 63%   { opacity: 1; }
+      66%, 95%  { opacity: 0; }
+      100%      { opacity: 1; }
+    }
+
+    @keyframes st-wert-neu {
+      0%, 63%   { opacity: 0; }
+      66%, 95%  { opacity: 1; }
+      100%      { opacity: 0; }
+    }
+
+    /* Der kurze Blitz in Amber, wenn die Vorschau nachzieht. */
+    @keyframes st-blitz {
+      0%, 63% {
+        border-color: rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.02);
+      }
+      66% {
+        border-color: rgba(245, 158, 11, 0.85);
+        background: rgba(245, 158, 11, 0.14);
+      }
+      74%, 100% {
+        border-color: rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.02);
+      }
+    }
+  }
+
+  /* Bei abgeschalteter Bewegung der Endzustand: neuer Wert im Feld
+     und in der Vorschau, „Live" oben. Kein Zeiger, kein Knopf. */
+  @media (prefers-reduced-motion: reduce) {
+    .st-cursor,
+    .st-feld-alt,
+    .st-wert-alt,
+    .st-publish,
+    .st-caret {
+      display: none;
+    }
+
+    .st-feld-neu {
+      position: static;
+      max-width: none;
+    }
+
+    .st-wert-neu,
+    .st-live {
+      opacity: 1;
+    }
+
+    .st-wert-neu {
+      position: static;
+    }
+
+    .st-vorschau-preis .st-wert-neu {
+      color: #f59e0b;
+    }
+  }
+
+  /* ===================== PROBLEM ===================== */
+  /* Eine Stufe unter der Pointe, aber klar lesbar. Stand auf 0.55
+     und las sich dadurch wie ausgegrauter Platzhaltertext statt wie
+     eine Aussage — gemeldet am 06.11.2026. Den Kontrast zur Pointe
+     traegt die FARBE (Amber), nicht die Helligkeit. */
+  .st-problem-text {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: var(--lp-titel);
+    line-height: 1.3;
+    letter-spacing: -0.015em;
+    color: rgba(245, 245, 244, 0.86);
+    max-width: 24ch;
+    margin: 0 auto 12px;
+  }
+
+  .st-problem-pointe {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: var(--lp-titel);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: #f59e0b;
+    margin: 0 0 48px;
+  }
+
+  .st-zahlen {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin: 0;
+    padding: 0;
+  }
+
+  @media (max-width: 620px) {
+    .st-zahlen {
+      grid-template-columns: 1fr;
+      gap: 28px;
+    }
+  }
+
+  .st-zahl {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .st-zahl-wert {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: var(--lp-mittel);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    white-space: nowrap;
+    color: #f5f5f4;
+  }
+
+  .st-zahl-text {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-klein);
+    line-height: 1.45;
+    color: rgba(245, 245, 244, 0.55);
+  }
+
+  /* ===================== KARTEN ===================== */
+  .st-karten {
+    list-style: none;
+    display: grid;
+    gap: 18px;
+    margin: 0;
+    padding: 0;
+  }
+
+  .st-karten-drei {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .st-karten-vier {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 760px) {
+    .st-karten-drei {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .st-karten-vier {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .st-karte {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    padding: 24px 22px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 16px;
+    background: rgba(15, 15, 18, 0.55);
+    text-align: left;
+    transition:
+      transform 280ms ease,
+      border-color 280ms ease;
+  }
+
+  .st-karte:hover {
+    transform: translateY(-3px);
+    border-color: rgba(245, 158, 11, 0.32);
+  }
+
+  /* Drei Skizzen statt drei Symbole: klassische Felder, eine Seite mit
+     markiertem Text, zwei Felder. */
+  .st-skizze {
+    display: flex;
+    gap: 4px;
+    height: 26px;
+    margin-bottom: 7px;
+  }
+
+  .st-skizze span {
+    display: block;
+    border-radius: 3px;
+    background: rgba(245, 158, 11, 0.3);
+  }
+
+  .st-skizze-0 span { width: 15px; height: 100%; }
+  .st-skizze-0 span:nth-child(2) { background: rgba(245, 158, 11, 0.55); }
+
+  .st-skizze-1 span:first-child { width: 34px; height: 100%; background: rgba(245, 158, 11, 0.18); }
+  .st-skizze-1 span:nth-child(2) { width: 13px; height: 100%; background: rgba(245, 158, 11, 0.75); }
+  .st-skizze-1 span:last-child { display: none; }
+
+  .st-skizze-2 span { width: 22px; height: 11px; align-self: center; }
+  .st-skizze-2 span:last-child { display: none; }
+
+  .st-karte-titel {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: var(--lp-text);
+    line-height: 1.3;
+    color: #f5f5f4;
+    margin: 0;
+  }
+
+  .st-karte-text {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-klein);
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.78);
+    margin: 0;
+  }
+
+  .st-karte-beispiel {
+    font-family: var(--lp-mono);
+    font-size: var(--lp-mono-groesse);
+    line-height: 1.5;
+    color: rgba(245, 158, 11, 0.8);
+    margin: 4px 0 0;
+  }
+
+  .st-karte-klein {
+    gap: 7px;
+    padding: 20px 20px;
+  }
+
+  /* ===================== PDF-BEISPIEL ===================== */
+  .st-pdf-raster {
+    display: grid;
+    gap: 28px;
+    align-items: center;
+  }
+
+  @media (min-width: 760px) {
+    .st-pdf-raster {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .st-pdf-text {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-lead);
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.85);
+    margin: 0;
+  }
+
+  .st-pdf-mock {
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 13px;
+    background: rgba(12, 12, 15, 0.9);
+    box-shadow: 0 18px 46px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    text-align: left;
+  }
+
+  .st-pdf-kopf {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 11px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .st-pdf-titel-mock {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: rgba(245, 245, 244, 0.88);
+  }
+
+  .st-pdf-sprachen {
+    display: flex;
+    gap: 5px;
+  }
+
+  .st-pdf-sprachen span {
+    padding: 2px 7px;
+    border-radius: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-family: var(--lp-mono);
+    font-size: 0.6rem;
+    color: rgba(245, 245, 244, 0.5);
+  }
+
+  .st-pdf-sprachen span:first-child {
+    border-color: rgba(245, 158, 11, 0.5);
+    color: rgba(245, 158, 11, 0.95);
+  }
+
+  .st-pdf-abschnitt {
+    margin: 16px 14px 9px;
+    font-family: var(--lp-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(245, 245, 244, 0.4);
+  }
+
+  .st-pdf-zeilen {
+    list-style: none;
+    margin: 0;
+    padding: 0 14px;
+  }
+
+  .st-pdf-zeilen li {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.75rem;
+    line-height: 1.3;
+    color: rgba(245, 245, 244, 0.7);
+  }
+
+  .st-pdf-preis {
+    flex-shrink: 0;
+    font-weight: 700;
+    white-space: nowrap;
+    color: #f5f5f4;
+  }
+
+  .st-pdf-aktion {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .st-pdf-knopf {
+    padding: 6px 13px;
+    border-radius: 999px;
+    background: #f59e0b;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    white-space: nowrap;
+    color: #15120a;
+  }
+
+  .st-pdf-datei {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--lp-mono);
+    font-size: 0.64rem;
+    color: rgba(245, 245, 244, 0.45);
+  }
+
+  /* ===================== ROLLEN ===================== */
+  .st-rollen-raster {
+    display: grid;
+    gap: 18px;
+  }
+
+  @media (min-width: 680px) {
+    .st-rollen-raster {
+      grid-template-columns: 1fr 1fr;
+      align-items: start;
+    }
+  }
+
+  .st-spalte {
+    padding: 26px 24px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 16px;
+    background: rgba(15, 15, 18, 0.55);
+    text-align: left;
+  }
+
+  .st-spalte.ist-du {
+    border-color: rgba(245, 158, 11, 0.28);
+    background: rgba(245, 158, 11, 0.045);
+  }
+
+  .st-spalte-titel {
+    margin: 0 0 16px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: var(--lp-text);
+    color: #f5f5f4;
+  }
+
+  .st-spalte-liste {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+  }
+
+  .st-spalte-liste li {
+    position: relative;
+    padding-left: 22px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-klein);
+    line-height: 1.5;
+    color: rgba(245, 245, 244, 0.82);
+  }
+
+  .st-spalte-liste li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: rgba(245, 158, 11, 0.85);
+  }
+
+  .st-spalte.ist-ich .st-spalte-liste li::before {
+    color: rgba(245, 245, 244, 0.35);
+  }
+
+  /* ===================== EINFÜHRUNG ===================== */
+  .st-schritte {
+    list-style: none;
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .st-schritt {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    padding-bottom: 28px;
+    text-align: left;
+  }
+
+  /* Eine Linie verbindet die drei Schritte zu einem Weg. */
+  .st-schritt::before {
+    content: '';
+    position: absolute;
+    top: 30px;
+    bottom: 0;
+    left: 16px;
+    width: 1px;
+    background: linear-gradient(to bottom, rgba(245, 158, 11, 0.4), rgba(255, 255, 255, 0.07));
+  }
+
+  .st-schritt:last-child {
+    padding-bottom: 0;
+  }
+
+  .st-schritt:last-child::before {
+    display: none;
+  }
+
+  .st-nr {
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 33px;
+    height: 33px;
+    border-radius: 50%;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    background: #0a0a0c;
+    font-family: var(--lp-mono);
+    font-size: var(--lp-mono-groesse);
+    color: rgba(245, 158, 11, 0.95);
+  }
+
+  .st-schritt-titel {
+    margin: 2px 0 5px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: var(--lp-text);
+    line-height: 1.3;
+    color: #f5f5f4;
+  }
+
+  .st-schritt-text {
+    margin: 0;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-text);
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.78);
+  }
+
+  /* ===================== FAQ ===================== */
+  .st-faq-liste {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 720px;
+    margin: 0 auto;
+    text-align: left;
+  }
+
+  .st-faq-eintrag {
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 13px;
+    background: rgba(15, 15, 18, 0.5);
+    overflow: hidden;
+  }
+
+  .st-faq-eintrag[open] {
+    border-color: rgba(245, 158, 11, 0.3);
+  }
+
+  .st-faq-eintrag summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 17px 20px;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .st-faq-eintrag summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .st-faq-eintrag summary:focus-visible {
+    outline: 2px solid rgba(245, 158, 11, 0.95);
+    outline-offset: -2px;
+  }
+
+  .st-faq-frage {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: var(--lp-text);
+    line-height: 1.35;
+    color: #f5f5f4;
+  }
+
+  .st-faq-symbol {
+    flex-shrink: 0;
+    display: inline-flex;
+    color: rgba(245, 158, 11, 0.85);
+    transition: transform 240ms ease;
+  }
+
+  .st-faq-eintrag[open] .st-faq-symbol {
+    transform: rotate(180deg);
+  }
+
+  .st-faq-antwort {
+    margin: 0;
+    padding: 0 20px 19px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-text);
+    line-height: 1.65;
+    color: rgba(245, 245, 244, 0.78);
+  }
+
+  /* ===================== ABSCHLUSS ===================== */
+  .st-abschluss {
+    margin-bottom: 72px !important;
+  }
+
+  .st-ab-titel {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: var(--lp-gross);
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    color: #f5f5f4;
+    margin: 0 0 16px;
+  }
+
+  .st-ab-sub {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-lead);
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.78);
+    max-width: 52ch;
+    margin: 0 auto 30px;
+  }
+
+  .st-journal {
+    margin: 26px 0 0;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-klein);
+    color: rgba(245, 245, 244, 0.5);
+  }
+
+  .st-journal-zweit {
+    margin-top: 8px;
+  }
+
+  .st-journal a {
+    color: rgba(245, 245, 244, 0.8);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.45);
+  }
+
+  .st-journal a:hover,
+  .st-journal a:focus-visible {
+    color: #f59e0b;
+  }
+
+  /* ===================== SCHMALE SCHIRME ===================== */
+  @media (max-width: 768px) {
+    .studio-page {
+      padding: 100px 20px 60px;
+    }
+
+    .studio-page > section {
+      margin-bottom: 64px;
+    }
+
+    .st-editor {
+      --takt: 7s;
+    }
+
+    .st-vorschau {
+      min-height: 0;
+      padding: 18px 16px 20px;
+    }
+
+    .st-panel {
+      padding: 16px 16px 20px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .st-karte {
+      transition: none;
+    }
+
+    .st-karte:hover {
+      transform: none;
+    }
+
+    .st-faq-symbol {
+      transition: none;
+    }
+  }
+
+  /* ===================== HELLES THEMA =====================
+     Die Seite hat den Umschalter wie jede Unterseite. Die Regeln
+     stehen hier und nicht in global.css, weil beide Seiten desselben
+     Paares dadurch dieselbe Astro-Kennung tragen und die hellen
+     Regeln ohne !important gewinnen — anders als bei den
+     Branchenseiten, deren Theme-Block von aussen eingreifen muss. */
+  :global(html[data-site-theme='light']) .st-titel,
+    :global(html[data-site-theme='light']) .st-ab-titel,
+  :global(html[data-site-theme='light']) .st-karte-titel,
+  :global(html[data-site-theme='light']) .st-spalte-titel,
+  :global(html[data-site-theme='light']) .st-schritt-titel,
+  :global(html[data-site-theme='light']) .st-faq-frage,
+  :global(html[data-site-theme='light']) .st-zahl-wert {
+    color: #1a1a1c;
+  }
+
+    :global(html[data-site-theme='light']) .st-ab-sub,
+  :global(html[data-site-theme='light']) .st-pdf-text,
+  :global(html[data-site-theme='light']) .st-karte-text,
+  :global(html[data-site-theme='light']) .st-schritt-text,
+  :global(html[data-site-theme='light']) .st-faq-antwort,
+  :global(html[data-site-theme='light']) .st-spalte-liste li {
+    color: rgba(26, 26, 28, 0.78);
+  }
+
+  :global(html[data-site-theme='light']) .st-problem-text {
+    color: rgba(26, 26, 28, 0.8);
+  }
+
+  :global(html[data-site-theme='light']) .st-fuss,
+  :global(html[data-site-theme='light']) .st-zahl-text,
+  :global(html[data-site-theme='light']) .studio-hero-note,
+  :global(html[data-site-theme='light']) .st-tel,
+  :global(html[data-site-theme='light']) .st-journal {
+    color: rgba(26, 26, 28, 0.6);
+  }
+
+  :global(html[data-site-theme='light']) .st-tel-nummer,
+  :global(html[data-site-theme='light']) .st-journal a {
+    color: rgba(26, 26, 28, 0.85);
+  }
+
+  :global(html[data-site-theme='light']) .st-karte,
+  :global(html[data-site-theme='light']) .st-spalte,
+  :global(html[data-site-theme='light']) .st-faq-eintrag {
+    background: rgba(255, 255, 255, 0.6);
+    border-color: rgba(0, 0, 0, 0.1);
+  }
+
+  :global(html[data-site-theme='light']) .st-spalte.ist-du {
+    background: rgba(245, 158, 11, 0.09);
+    border-color: rgba(245, 158, 11, 0.35);
+  }
+
+  :global(html[data-site-theme='light']) .st-spalte.ist-ich .st-spalte-liste li::before {
+    color: rgba(26, 26, 28, 0.35);
+  }
+
+  :global(html[data-site-theme='light']) .st-nr {
+    background: #fefdf9;
+  }
+
+  /* Editor und PDF-Mock bleiben dunkel: beide stellen eine
+     Programmoberflaeche dar, und die ist in Wirklichkeit auch
+     dunkel. Ein heller Nachbau waere eine Oberflaeche, die es nicht
+     gibt. */
+</style>
+
+<script>
+  /* Die Schleife laeuft nur, solange der Kasten im Blick ist.
+     Dieselbe Bremse wie beim Scroll-Moment auf den Branchenseiten:
+     eine Animation hinter dem Bildschirmrand kostet Rechenzeit und
+     zeigt niemandem etwas — auf einem Laptop im Akkubetrieb ist das
+     der Unterschied zwischen lautlos und Luefter. */
+  (() => {
+    const editor = document.querySelector<HTMLElement>('[data-editor]');
+    if (!editor) return;
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const beobachter = new IntersectionObserver(
+      (eintraege) => {
+        for (const e of eintraege) {
+          if (e.isIntersecting) editor.dataset.laeuft = '';
+          else delete editor.dataset.laeuft;
+        }
+      },
+      // Erst wenn ein gutes Stueck davon zu sehen ist: sonst startet
+      // der Durchlauf, waehrend nur die obere Kante im Bild haengt,
+      // und das Beste ist vorbei, bevor jemand hinsieht.
+      { threshold: 0.35 }
+    );
+
+    beobachter.observe(editor);
+  })();
+</script>

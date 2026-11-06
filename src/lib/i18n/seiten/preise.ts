@@ -64,6 +64,18 @@ export const de = {
   // Der Verweis auf den Preisrechner. Steht nur auf der deutschen
   // Seite, weil es den Rechner nur auf Deutsch gibt — die Uebersetzung
   // liegt trotzdem bereit, damit sie da ist, sobald er englisch wird.
+  /**
+   * Die Zeile unter den beiden Paketen.
+   *
+   * Die Seite zeigt sonst nur Websites und Shops. Wer wegen Flyern,
+   * Anzeigen oder Visitenkarten hier landet, findet keinen Preis und
+   * geht wieder — dabei gibt es einen.
+   */
+  sichtbarkeit: {
+    text: 'Flyer, Ads, Visitenkarten und mehr: 50\u00a0€ pro Stunde',
+    cta: 'Sichtbarkeit',
+  },
+
   rechner: {
     label: 'Preisrechner',
     eyebrow: 'UNSICHER?',
@@ -182,6 +194,11 @@ export const en: Shape<typeof de> = {
         'Products and orders in the CMS',
       ],
     },
+  },
+
+  sichtbarkeit: {
+    text: 'Flyers, ads, business cards and more: €50 an hour',
+    cta: 'Visibility',
   },
 
   rechner: {

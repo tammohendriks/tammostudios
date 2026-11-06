@@ -1,0 +1,1619 @@
+---
+/**
+ * /sichtbarkeit — ein Ansprechpartner fuer alles, was man von einem
+ * Betrieb sieht.
+ *
+ * Liegt als Komponente und nicht in src/pages, weil es zwei Routen
+ * darauf gibt: /sichtbarkeit und /en/visibility.
+ *
+ * DIE GEFAHR DIESER SEITE ist der Bauchladen. „Ich mache auch Flyer"
+ * ist kein Angebot, sondern eine Aufzaehlung. Dagegen steht der rote
+ * Faden: alles fuehrt zurueck auf die Website. Die Nabe sagt das als
+ * Bild, jeder Knoten sagt einzeln, wie er es tut, und die Knoten sind
+ * Verweise auf die passende Leistung weiter unten — so wird aus der
+ * Grafik Navigation statt Dekoration.
+ *
+ * ZUM QR-CODE-MOTIV: er steht nicht nur im Text. Auf drei der sechs
+ * Arbeiten ist einer wirklich drauf (Bauzaun, Banner, Getraenkekarte).
+ * Das Bild beweist den Satz.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SubPageBackground from './SubPageBackground.astro';
+import SiteFooter from './SiteFooter.astro';
+import { localeOf, pathOr } from '../lib/routes.mjs';
+import { SICHTBARKEIT } from '../lib/i18n/seiten/sichtbarkeit';
+import { SITE, PHONE_INTERNATIONAL } from '../lib/constants';
+
+const locale = localeOf(Astro.url.pathname);
+const d = SICHTBARKEIT[locale];
+
+// Das Anliegen ist im Kontaktformular vorbelegt. Ohne den Parameter
+// kaeme jede Anfrage von hier als „Anderes" an.
+const kontaktPfad = `${pathOr('kontakt', locale)}?thema=sichtbarkeit`;
+
+/**
+ * Die Bilder: Dateiname, echte Pixelmasse und Platz im Raster.
+ * Beschriftung und Alternativtext stehen im Woerterbuch und werden
+ * ueber den DATEINAMEN geholt, nicht ueber die Position.
+ *
+ * WARUM NICHT UEBER DIE POSITION: genau so stand es hier, und am
+ * 06.11.2026 waren zwei Eintraege vertauscht — die Visitenkarten von
+ * Samedos trugen die Beschriftung „A5-Flyer · Er & Sie". Der alte Typ
+ * (Gleichlang) band nur die Laenge beider Listen, nicht ihre
+ * Reihenfolge; eine Vertauschung war typkorrekt.
+ *
+ * Mit `satisfies` unten preuft der Typchecker jetzt, dass jeder
+ * Dateiname einen Eintrag im Woerterbuch hat. Ein Bild ohne
+ * Beschriftung bricht den Build.
+ *
+ * Die Masse stehen als width/height am <img> und als Seitenverhaeltnis
+ * an der Kachel, damit beim Laden nichts springt.
+ */
+type BildSchluessel = keyof typeof SICHTBARKEIT.de.galerie.stuecke;
+
+const BILDER = [
+  { datei: 'kirsch-bauzaun-foto', w: 900, h: 1600, platz: 'gross' },
+  { datei: 'kirsch-bauzaun-banner', w: 340, h: 173, platz: 'einschub' },
+  { datei: 'kirsch-anzeige', w: 898, h: 1134, platz: 'hoch' },
+  { datei: 'er-und-sie-bundesliga-flyer', w: 1269, h: 1800, platz: 'hoch' },
+  { datei: 'er-und-sie-getraenkekarte', w: 2000, h: 1414, platz: 'breit' },
+  { datei: 'samedos-visitenkarten', w: 1462, h: 1090, platz: 'quer' },
+] as const satisfies ReadonlyArray<{
+  datei: BildSchluessel;
+  w: number;
+  h: number;
+  platz: string;
+}>;
+
+const stuecke = BILDER.map((b) => ({
+  ...b,
+  ...d.galerie.stuecke[b.datei],
+  src: `/sichtbarkeit/${b.datei}.webp`,
+}));
+
+// Das Bauzaun-Foto und der Banner-Entwurf gehoeren zusammen: das Foto
+// zeigt das Banner am Geruest, der Entwurf zeigt, was darauf steht.
+// Der Entwurf ist nur 340px breit und darf deshalb nicht gross
+// skaliert werden — er sitzt als kleiner Einschub in der Ecke des
+// Fotos statt als eigene Kachel.
+const [foto, einschub, ...weitere] = stuecke;
+
+const faqSchema = {
+  '@type': 'FAQPage',
+  mainEntity: d.faq.eintraege.map((e) => ({
+    '@type': 'Question',
+    name: e.frage,
+    acceptedAnswer: { '@type': 'Answer', text: e.antwort },
+  })),
+};
+---
+
+<BaseLayout
+  pageTitle={d.meta.pageTitle}
+  title={d.meta.title}
+  description={d.meta.description}
+  additionalSchema={faqSchema}
+>
+  <main class="sichtbarkeit-page">
+    <SubPageBackground />
+
+    <!-- ===================== HERO =====================
+         Gleicher Aufbau wie /studio und die uebrigen Unterseiten.
+         Der Stundensatz stand hier als Pille; jetzt ist er die
+         Notizzeile unter dem Verweis, an derselben Stelle wie
+         „Eine Anwendung inklusive" auf /software. -->
+    <header class="sichtbarkeit-hero">
+      <h1 class="subpage-hero-title">{d.hero.headline}</h1>
+      <p class="subpage-hero-subtitle text-lines sichtbarkeit-hero-sub">{d.hero.sub}</p>
+
+      <div class="sichtbarkeit-hero-cta">
+        <a class="cta-link" href={kontaktPfad}>
+          {d.hero.cta}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+        </a>
+        <p class="sichtbarkeit-hero-note sichtbarkeit-hero-preis">{d.hero.preisNotiz}</p>
+        <p class="sichtbarkeit-hero-note">
+          {d.hero.telVor}{' '}
+          <a href={PHONE_INTERNATIONAL} class="sb-tel-nummer">{SITE.phone}</a>
+        </p>
+      </div>
+    </header>
+
+    <!-- ============ FÜNF DIENSTLEISTER WERDEN EINER ============ -->
+    <section class="sb-problem" aria-labelledby="sb-problem-titel">
+      <p class="sb-braue" data-reveal>{d.problem.braue}</p>
+      <h2 class="sb-titel" id="sb-problem-titel" data-reveal>{d.problem.headline}</h2>
+
+      <div class="sb-stapel" data-stapel aria-hidden="true">
+        <ul class="sb-fuenf">
+          {d.problem.karten.map((k, i) => (
+            <li
+              class={`sb-zettel sb-zettel-${i}`}
+              style={`--i: ${i}; --reihe: ${(i - 2) * 44}px`}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" /><path d="M8 13h8M8 17h5" />
+              </svg>
+              {k}
+            </li>
+          ))}
+        </ul>
+        <p class="sb-einer">{d.problem.einer}</p>
+      </div>
+      <p class="sb-nurlesen">{d.problem.beschreibung}</p>
+
+      <p class="sb-problem-text" data-reveal>{d.problem.text}</p>
+      <p class="sb-problem-pointe" data-reveal>{d.problem.pointe}</p>
+    </section>
+
+    <!-- ===================== DIE NABE =====================
+         Die Knoten sind Verweise auf die passende Leistung weiter
+         unten. Ein Knoten, der nur eine Beschriftung einblendet,
+         waere eine Sackgasse mit Schwebetext; als Sprungziel ist er
+         Navigation und funktioniert mit Tastatur und Finger gleich
+         gut. -->
+    <section class="sb-nabe" aria-labelledby="sb-nabe-titel">
+      <p class="sb-braue" data-reveal>{d.nabe.braue}</p>
+      <h2 class="sb-titel" id="sb-nabe-titel" data-reveal>{d.nabe.headline}</h2>
+
+      <div class="sb-nabe-feld" data-reveal>
+        {/* Die Linien liegen als eigene Ebene hinter den Knoten. Der
+            fliessende Strich laeuft nach innen: zur Mitte hin, nicht
+            von ihr weg. */}
+        <svg class="sb-linien" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <line x1="16" y1="14" x2="50" y2="50" />
+          <line x1="84" y1="14" x2="50" y2="50" />
+          <line x1="6" y1="50" x2="50" y2="50" />
+          <line x1="94" y1="50" x2="50" y2="50" />
+          <line x1="16" y1="86" x2="50" y2="50" />
+          <line x1="84" y1="86" x2="50" y2="50" />
+        </svg>
+
+        <div class="sb-mitte">
+          <span class="sb-mitte-leiste" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </span>
+          <span class="sb-mitte-adresse">{d.nabe.mitte}</span>
+        </div>
+
+        <ul class="sb-knoten">
+          {d.nabe.knoten.map((k, i) => (
+            <li class={`sb-knoten-platz sb-knoten-${i}`}>
+              <a class="sb-knoten-link" href={`#sb-leistung-${i}`}>
+                <span class="sb-knoten-titel">{k.titel}</span>
+                <span class="sb-knoten-wirkung">{k.wirkung}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================== GALERIE ===================== -->
+    <section class="sb-galerie-abschnitt" aria-labelledby="sb-galerie-titel">
+      <p class="sb-braue" data-reveal>{d.galerie.braue}</p>
+      <h2 class="sb-titel" id="sb-galerie-titel" data-reveal>{d.galerie.headline}</h2>
+
+      <ul class="sb-galerie">
+        <li class="sb-stueck sb-platz-gross" style={`aspect-ratio: ${foto.w} / ${foto.h}`} data-reveal>
+          <button
+            type="button"
+            class="sb-oeffnen"
+            data-gross={foto.src}
+            data-bu={foto.label}
+            aria-label={`${foto.label} — ${d.galerie.oeffnen}`}
+          >
+            <img src={foto.src} alt={foto.alt} width={foto.w} height={foto.h} loading="lazy" decoding="async" />
+          </button>
+          <span class="sb-label">{foto.label}</span>
+
+          {/* Der Banner-Entwurf als Einschub: 340px breit, gross
+              skaliert waere er Matsch. Klein daneben erklaert er das
+              Foto. */}
+          <button
+            type="button"
+            class="sb-einschub sb-oeffnen"
+            data-gross={einschub.src}
+            data-bu={einschub.label}
+            aria-label={`${einschub.label} — ${d.galerie.oeffnen}`}
+          >
+            <img src={einschub.src} alt={einschub.alt} width={einschub.w} height={einschub.h} loading="lazy" decoding="async" />
+          </button>
+        </li>
+
+        {weitere.map((s) => (
+          <li
+            class={`sb-stueck sb-platz-${s.platz}`}
+            style={`aspect-ratio: ${s.w} / ${s.h}`}
+            data-reveal
+          >
+            <button
+              type="button"
+              class="sb-oeffnen"
+              data-gross={s.src}
+              data-bu={s.label}
+              aria-label={`${s.label} — ${d.galerie.oeffnen}`}
+            >
+              <img src={s.src} alt={s.alt} width={s.w} height={s.h} loading="lazy" decoding="async" />
+            </button>
+            <span class="sb-label">{s.label}</span>
+          </li>
+        ))}
+      </ul>
+      <p class="sb-fuss" data-reveal>{d.galerie.fuss}</p>
+    </section>
+
+    <!-- ===================== LEISTUNGEN ===================== -->
+    <section class="sb-leistungen" aria-labelledby="sb-leistungen-titel">
+      <p class="sb-braue" data-reveal>{d.leistungen.braue}</p>
+      <h2 class="sb-titel" id="sb-leistungen-titel" data-reveal>{d.leistungen.headline}</h2>
+
+      <ul class="sb-karten">
+        {d.leistungen.punkte.map((p, i) => (
+          <li class="sb-karte" id={`sb-leistung-${i}`} data-reveal>
+            <span class="sb-karte-nr" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+            <h3 class="sb-karte-titel">{p.titel}</h3>
+            <p class="sb-karte-text">{p.text}</p>
+            <p class="sb-karte-beispiel">
+              <span class="sb-karte-beispiel-vor">{d.leistungen.beispielVor}</span>{' '}
+              {p.beispiel}
+            </p>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- ===================== SPARRINGSPARTNER ===================== -->
+    <section class="sb-sparring" aria-labelledby="sb-sparring-titel">
+      <div class="sb-sparring-raster">
+        <div class="sb-foto" data-reveal>
+          <img src="/tammo-foto.webp" alt={d.sparring.fotoAlt} width="440" height="440" loading="lazy" decoding="async" />
+        </div>
+        <div class="sb-sparring-text">
+          <h2 class="sb-titel sb-titel-links" id="sb-sparring-titel" data-reveal>{d.sparring.headline}</h2>
+          <p class="sb-sparring-absatz" data-reveal>{d.sparring.text}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== PREIS ===================== -->
+    <section class="sb-preis" aria-labelledby="sb-preis-titel">
+      <p class="sb-braue" data-reveal>{d.preis.braue}</p>
+      <h2 class="sb-titel" id="sb-preis-titel" data-reveal>{d.preis.headline}</h2>
+
+      <article class="sb-preis-karte" data-reveal>
+        <p class="sb-preis-bezeichnung">{d.preis.bezeichnung}</p>
+        <p class="sb-preis-betrag">{d.preis.betrag}</p>
+        <p class="sb-preis-einheit">{d.preis.einheit}</p>
+
+        <div class="sb-trenner"></div>
+
+        <ul class="sb-preis-liste">
+          {d.preis.merkmale.map((m) => <li>{m}</li>)}
+        </ul>
+
+        <div class="sb-trenner"></div>
+
+        <p class="sb-preis-hinweis">{d.preis.hinweis}</p>
+
+        <a class="cta-orbital sb-knopf" href={kontaktPfad}>
+          <span>{d.preis.cta}</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </a>
+      </article>
+    </section>
+
+    <!-- ===================== FAQ ===================== -->
+    <section class="sb-faq" aria-labelledby="sb-faq-titel">
+      <p class="sb-braue" data-reveal>{d.faq.braue}</p>
+      <h2 class="sb-titel" id="sb-faq-titel" data-reveal>{d.faq.headline}</h2>
+
+      <div class="sb-faq-liste">
+        {d.faq.eintraege.map((e) => (
+          <details class="sb-faq-eintrag" data-reveal>
+            <summary>
+              <span class="sb-faq-frage">{e.frage}</span>
+              <span class="sb-faq-symbol" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </span>
+            </summary>
+            <p class="sb-faq-antwort">{e.antwort}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <!-- ===================== ABSCHLUSS ===================== -->
+    <section class="sb-abschluss" aria-labelledby="sb-ab-titel">
+      <h2 class="sb-ab-titel" id="sb-ab-titel" data-reveal>
+        {d.abschluss.headlineVor}{' '}
+        <span class="sb-hell-schlicht">{d.abschluss.headlineHell}</span>
+      </h2>
+      <p class="sb-ab-sub" data-reveal>{d.abschluss.sub}</p>
+
+      <div class="sb-cta" data-reveal>
+        <a class="cta-orbital sb-knopf" href={kontaktPfad}>
+          <span>{d.abschluss.cta}</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </a>
+        <p class="sb-tel">
+          {d.abschluss.telVor}{' '}
+          <a href={PHONE_INTERNATIONAL} class="sb-tel-nummer">{SITE.phone}</a>
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  {/* AUSSERHALB von <main>, wie auf jeder anderen Unterseite. Innen
+      haette ihn der 40px-Innenabstand der Seite eingerueckt, und sein
+      schwarzer Grund stuende im hellen Thema als zu kurzer Riegel auf
+      Creme. */}
+  <SiteFooter />
+
+  {/* Die Lichtbox. <dialog> statt eines eigenen Overlays, aus
+      demselben Grund wie beim Fragebogen: Fokusfalle, ESC und das
+      Stilllegen des Hintergrunds bringt der Browser mit. */}
+  <dialog class="sb-licht" data-licht aria-label={d.galerie.oeffnen}>
+    <form method="dialog" class="sb-licht-schliessen-form">
+      <button class="sb-licht-schliessen" aria-label={d.galerie.schliessen}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <path d="M18 6 6 18M6 6l12 12" />
+        </svg>
+      </button>
+    </form>
+    <figure class="sb-licht-figur">
+      <img data-licht-bild src="" alt="" />
+      <figcaption data-licht-bu></figcaption>
+    </figure>
+  </dialog>
+</BaseLayout>
+
+<style>
+  /* Masse wie .software-page und .website-page; overflow-x: clip
+     statt overflow: hidden, siehe StudioPage. */
+  .sichtbarkeit-page {
+    position: relative;
+    z-index: 1;
+    padding: 140px 40px 80px;
+    min-height: calc(100vh - 200px);
+    overflow-x: clip;
+  }
+
+  .sichtbarkeit-page > section {
+    max-width: 880px;
+    margin: 0 auto 96px;
+    text-align: center;
+  }
+
+  .sichtbarkeit-hero {
+    max-width: 780px;
+    margin: 0 auto 96px;
+    padding-top: 32px;
+    text-align: center;
+  }
+
+  /* Der Satz ist lang; bei den globalen 96px lief er auf fuenf
+     Zeilen. Gedeckelt wie auf /software. */
+  .sichtbarkeit-hero .subpage-hero-title {
+    font-size: clamp(34px, 5.2vw, 60px);
+  }
+
+  .sichtbarkeit-hero-sub {
+    max-width: 62ch;
+    margin-inline: auto;
+  }
+
+  .sichtbarkeit-hero-cta {
+    margin-top: clamp(32px, 5vh, 48px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .sichtbarkeit-hero-note {
+    margin: 0;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.9rem;
+    color: rgba(245, 245, 244, 0.5);
+  }
+
+  /* Der Betrag bricht nie: geschuetztes Leerzeichen im Text, nowrap
+     auf der Zeile. */
+  .sichtbarkeit-hero-preis {
+    white-space: nowrap;
+    color: rgba(245, 245, 244, 0.72);
+  }
+
+  .sb-braue {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: var(--lp-braue);
+    letter-spacing: var(--lp-braue-sperrung);
+    text-transform: uppercase;
+    color: rgba(245, 158, 11, 0.85);
+    margin: 0 0 18px;
+  }
+
+  .sb-titel {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: var(--lp-titel);
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    color: #f5f5f4;
+    margin: 0 0 40px;
+  }
+
+  .sb-fuss {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-text);
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.6);
+    max-width: 54ch;
+    margin: 30px auto 0;
+  }
+
+  .sb-nurlesen {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .sb-hell-schlicht {
+    color: #f59e0b;
+  }
+
+  .sb-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .sb-knopf {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    text-decoration: none;
+  }
+
+  .sb-tel {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-klein);
+    color: rgba(245, 245, 244, 0.55);
+    margin: 0;
+  }
+
+  .sb-tel-nummer {
+    color: rgba(245, 245, 244, 0.85);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.45);
+    white-space: nowrap;
+  }
+
+  .sb-tel-nummer:hover,
+  .sb-tel-nummer:focus-visible {
+    color: #f59e0b;
+  }
+
+  /* ============ FÜNF WERDEN EINER ============ */
+  /* Hoch genug fuer die mittlere Stufe: fuenf Zettel in einer
+     gestapelten Spalte brauchen rund 230px. */
+  .sb-stapel {
+    position: relative;
+    height: 250px;
+    margin-bottom: 30px;
+    /* Die Schleife blendet am Ende kurz ab, setzt darunter zurueck
+       und blendet wieder auf. Ohne das waere der Neuanfang ein
+       Sprung, bei dem fuenf Zettel aus der Mitte nach aussen
+       fliegen — die Geschichte rueckwaerts. */
+    transition: opacity 420ms ease;
+  }
+
+  .sb-stapel[data-aus] {
+    opacity: 0;
+  }
+
+  /* Der eine Frame, in dem zurueckgesetzt wird: nichts animiert. */
+  .sb-stapel[data-sprung] .sb-zettel,
+  .sb-stapel[data-sprung] .sb-einer {
+    transition: none;
+  }
+
+  .sb-fuenf {
+    list-style: none;
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  .sb-zettel {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 9px;
+    background: rgba(22, 22, 26, 0.96);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.78rem;
+    white-space: nowrap;
+    color: rgba(245, 245, 244, 0.8);
+    /* Der Versatz je Zettel macht aus einem gleichzeitigen Sprung
+       eine Bewegung, der man folgen kann. */
+    transition:
+      transform 760ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--i) * 70ms),
+      opacity 420ms ease calc(var(--i) * 70ms);
+  }
+
+  .sb-zettel svg {
+    color: rgba(245, 158, 11, 0.7);
+    flex-shrink: 0;
+  }
+
+  /* Stufe 1 — durcheinander: schraeg, versetzt, ueberlappend. Dieser
+     Zustand IST die Aussage und wird deshalb erst einmal gehalten,
+     bevor sich etwas bewegt. Dass er zu schnell verschwand, war die
+     Beschwerde am 06.11.2026: man sah kurz etwas und dann nur noch
+     „Tammo". */
+  .sb-zettel-0 { transform: translate(-128%, -150%) rotate(-7deg); }
+  .sb-zettel-1 { transform: translate(-4%, -176%) rotate(5deg); }
+  .sb-zettel-2 { transform: translate(-96%, -52%) rotate(2deg); }
+  .sb-zettel-3 { transform: translate(-30%, 22%) rotate(-4deg); }
+  .sb-zettel-4 { transform: translate(-84%, 94%) rotate(8deg); }
+
+  /* Stufe 2 — Ordnung: gerade, mittig, untereinander. Eine SPALTE und
+     keine Reihe, weil eine Reihe aus fuenf Zetteln auf einem Handy
+     nicht nebeneinander passt und --reihe sonst je Breite anders
+     gerechnet werden muesste. */
+  .sb-stapel[data-ordnung] .sb-zettel {
+    transform: translate(-50%, calc(-50% + var(--reihe))) rotate(0deg);
+  }
+
+  .sb-einer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.85);
+    margin: 0;
+    padding: 11px 26px;
+    border: 1px solid rgba(245, 158, 11, 0.55);
+    border-radius: 999px;
+    background: rgba(245, 158, 11, 0.12);
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    white-space: nowrap;
+    color: #f59e0b;
+    opacity: 0;
+    /* Erscheint erst, wenn der letzte Zettel angekommen ist:
+       4 x 70ms Versatz + 760ms Weg. */
+    transition:
+      transform 620ms cubic-bezier(0.22, 1, 0.36, 1) 900ms,
+      opacity 440ms ease 900ms;
+  }
+
+  /* Stufe 3 — zusammen: alle fahren in die Mitte und verschwinden
+     dort. Einer bleibt. */
+  .sb-stapel[data-zusammen] .sb-zettel {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(0deg) scale(0.86);
+  }
+
+  .sb-stapel[data-zusammen] .sb-einer {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  .sb-problem-text {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-lead);
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.78);
+    max-width: 48ch;
+    margin: 0 auto 10px;
+  }
+
+  .sb-problem-pointe {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: var(--lp-titel);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: #f59e0b;
+    margin: 0;
+  }
+
+  /* Ohne Bewegung: beide Zustaende nebeneinander, statt eines
+     Durcheinanders, das nie aufgeloest wird. */
+  @media (prefers-reduced-motion: reduce) {
+    .sb-stapel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      height: auto;
+      margin-bottom: 34px;
+    }
+
+    .sb-fuenf {
+      position: static;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      max-width: 420px;
+    }
+
+    .sb-zettel,
+    .sb-stapel[data-ordnung] .sb-zettel,
+    .sb-stapel[data-zusammen] .sb-zettel {
+      position: static;
+      transform: none !important;
+      opacity: 1 !important;
+      transition: none;
+    }
+
+    .sb-einer {
+      position: static;
+      transform: none !important;
+      opacity: 1 !important;
+      transition: none;
+    }
+  }
+
+  /* ===================== DIE NABE ===================== */
+  .sb-nabe-feld {
+    position: relative;
+  }
+
+  .sb-linien {
+    display: none;
+  }
+
+  .sb-mitte {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 7px;
+    padding: 13px 16px 15px;
+    border: 1px solid rgba(245, 158, 11, 0.45);
+    border-radius: 12px;
+    background: rgba(12, 12, 15, 0.95);
+    box-shadow: 0 0 36px rgba(245, 158, 11, 0.16);
+  }
+
+  .sb-mitte-leiste {
+    display: flex;
+    gap: 4px;
+  }
+
+  .sb-mitte-leiste span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .sb-mitte-adresse {
+    font-family: var(--lp-mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.02em;
+    color: rgba(245, 158, 11, 0.95);
+    white-space: nowrap;
+  }
+
+  .sb-knoten {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .sb-knoten-link {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 13px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    background: rgba(15, 15, 18, 0.72);
+    text-align: left;
+    text-decoration: none;
+    transition:
+      border-color 240ms ease,
+      transform 240ms ease;
+  }
+
+  .sb-knoten-link:hover,
+  .sb-knoten-link:focus-visible {
+    border-color: rgba(245, 158, 11, 0.45);
+    transform: translateY(-2px);
+    outline: none;
+  }
+
+  .sb-knoten-link:focus-visible {
+    outline: 2px solid rgba(245, 158, 11, 0.95);
+    outline-offset: 2px;
+  }
+
+  .sb-knoten-titel {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 0.86rem;
+    line-height: 1.3;
+    color: #f5f5f4;
+  }
+
+  .sb-knoten-wirkung {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: rgba(245, 245, 244, 0.6);
+  }
+
+  /* Bis Tablet: eine senkrechte Liste mit durchgehender Linie nach
+     unten zur Website. Ein Radialbild auf 390px waere Kleingedrucktes
+     in sechs Richtungen. */
+  @media (max-width: 859px) {
+    .sb-nabe-feld {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .sb-knoten {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      max-width: 420px;
+      padding-left: 26px;
+    }
+
+    .sb-knoten::before {
+      content: '';
+      position: absolute;
+      top: 18px;
+      bottom: -26px;
+      left: 7px;
+      width: 1px;
+      background: linear-gradient(to bottom, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.75));
+    }
+
+    .sb-knoten-platz::before {
+      content: '';
+      position: absolute;
+      left: 4px;
+      width: 7px;
+      height: 7px;
+      margin-top: 17px;
+      border-radius: 50%;
+      background: rgba(245, 158, 11, 0.7);
+    }
+
+    .sb-mitte {
+      order: 2;
+      margin-top: 30px;
+    }
+  }
+
+  /* Ab Tablet: die Nabe. Mitte absolut in der Mitte, sechs Knoten
+     drumherum, Linien als eigene Ebene dahinter. */
+  @media (min-width: 860px) {
+    .sb-nabe-feld {
+      position: relative;
+      height: 460px;
+    }
+
+    .sb-linien {
+      display: block;
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      pointer-events: none;
+    }
+
+    /* Die Strichstaerke steht in BILDSCHIRMPIXELN, nicht in
+       viewBox-Einheiten: vector-effect: non-scaling-stroke rechnet
+       sie dorthin um. Hier stand 0.35 — gemessen 0,35 px, also
+       praktisch unsichtbar. Dieselbe Falle wie beim Hero-Strich. */
+    .sb-linien line {
+      stroke: rgba(245, 158, 11, 0.42);
+      stroke-width: 1.4;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .sb-mitte {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+    }
+
+    .sb-knoten-platz {
+      position: absolute;
+      width: 210px;
+      z-index: 1;
+    }
+
+    .sb-knoten-0 { top: 0; left: 0; }
+    .sb-knoten-1 { top: 0; right: 0; }
+    .sb-knoten-2 { top: 50%; left: 0; transform: translateY(-50%); }
+    .sb-knoten-3 { top: 50%; right: 0; transform: translateY(-50%); }
+    .sb-knoten-4 { bottom: 0; left: 0; }
+    .sb-knoten-5 { bottom: 0; right: 0; }
+
+    .sb-knoten-1 .sb-knoten-link,
+    .sb-knoten-3 .sb-knoten-link,
+    .sb-knoten-5 .sb-knoten-link {
+      text-align: right;
+    }
+  }
+
+  /* Der Strich fliesst nach innen. Nur mit Bewegung; ohne sie ist die
+     Linie einfach da. */
+  @media (prefers-reduced-motion: no-preference) and (min-width: 860px) {
+    .sb-linien line {
+      stroke-dasharray: 4 7;
+      animation: sb-fliessen 1.6s linear infinite;
+    }
+
+    @keyframes sb-fliessen {
+      to {
+        stroke-dashoffset: -11;
+      }
+    }
+  }
+
+  /* ===================== GALERIE ===================== */
+  .sb-galerie-abschnitt {
+    max-width: 1100px !important;
+  }
+
+  .sb-galerie {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    align-items: start;
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+  }
+
+  .sb-stueck {
+    position: relative;
+  }
+
+  /* Gleiche Spaltenbreite, unterschiedliche Hoehe. Das
+     Seitenverhaeltnis steht als Stil am Element und kommt aus den
+     echten Massen der Datei — hier stehen nur die Spalten.
+
+     Vorher gab es dafuer eine :nth-child-Regel fuer den Flyer. Die
+     haengt an der Reihenfolge im Markup und war beim naechsten
+     Umsortieren falsch. */
+  .sb-platz-gross { grid-column: span 2; }
+  .sb-platz-hoch { grid-column: span 2; }
+  .sb-platz-breit { grid-column: span 4; }
+  .sb-platz-quer { grid-column: span 2; }
+
+  @media (max-width: 760px) {
+    .sb-galerie {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .sb-platz-gross,
+    .sb-platz-hoch,
+    .sb-platz-quer {
+      grid-column: span 1;
+    }
+
+    .sb-platz-breit {
+      grid-column: span 2;
+    }
+  }
+
+  .sb-oeffnen {
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 13px;
+    background: #0a0a0c;
+    overflow: hidden;
+    cursor: pointer;
+    transition:
+      transform 320ms ease,
+      border-color 320ms ease,
+      box-shadow 320ms ease;
+  }
+
+  .sb-oeffnen img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 420ms ease;
+  }
+
+  .sb-oeffnen:hover,
+  .sb-oeffnen:focus-visible {
+    border-color: rgba(245, 158, 11, 0.45);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+    outline: none;
+  }
+
+  .sb-oeffnen:focus-visible {
+    outline: 2px solid rgba(245, 158, 11, 0.95);
+    outline-offset: 2px;
+  }
+
+  .sb-oeffnen:hover img {
+    transform: scale(1.04);
+  }
+
+  /* Das Etikett faehrt von unten ein. Es steht ueber dem Bild, nicht
+     darunter: darunter waere es eine Bildunterschrift und wuerde das
+     Raster auseinanderziehen. */
+  .sb-label {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 26px 13px 11px;
+    border-radius: 0 0 13px 13px;
+    background: linear-gradient(to top, rgba(5, 5, 7, 0.92), rgba(5, 5, 7, 0));
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.72rem;
+    line-height: 1.35;
+    text-align: left;
+    color: rgba(245, 245, 244, 0.92);
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(6px);
+    transition:
+      opacity 280ms ease,
+      transform 280ms ease;
+  }
+
+  .sb-stueck:hover .sb-label,
+  .sb-stueck:focus-within .sb-label {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Auf Touch gibt es kein Hover — dort steht das Etikett dauerhaft. */
+  @media (hover: none) {
+    .sb-label {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .sb-einschub {
+    position: absolute;
+    right: 9px;
+    bottom: 9px;
+    width: 42%;
+    max-width: 150px;
+    aspect-ratio: 340 / 173;
+    height: auto;
+    border-radius: 7px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.6);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sb-oeffnen,
+    .sb-oeffnen img,
+    .sb-label {
+      transition: none;
+    }
+
+    .sb-oeffnen:hover {
+      transform: none;
+    }
+
+    .sb-oeffnen:hover img {
+      transform: none;
+    }
+  }
+
+  /* ===================== LICHTBOX ===================== */
+  .sb-licht {
+    width: min(94vw, 1100px);
+    max-width: none;
+    max-height: 92vh;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 15px;
+    background: #0a0a0c;
+    color: #f5f5f4;
+    overflow: visible;
+  }
+
+  .sb-licht::backdrop {
+    background: rgba(5, 5, 7, 0.88);
+    backdrop-filter: blur(5px);
+  }
+
+  .sb-licht-schliessen-form {
+    margin: 0;
+  }
+
+  .sb-licht-schliessen {
+    position: absolute;
+    top: -14px;
+    right: -14px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 50%;
+    background: #15151a;
+    color: #f5f5f4;
+    cursor: pointer;
+  }
+
+  .sb-licht-schliessen:hover,
+  .sb-licht-schliessen:focus-visible {
+    border-color: rgba(245, 158, 11, 0.6);
+    color: #f59e0b;
+  }
+
+  .sb-licht-figur {
+    margin: 0;
+    padding: 14px;
+  }
+
+  .sb-licht-figur img {
+    display: block;
+    width: 100%;
+    max-height: calc(92vh - 86px);
+    object-fit: contain;
+    border-radius: 9px;
+    background: #050507;
+  }
+
+  .sb-licht-figur figcaption {
+    padding: 12px 4px 2px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-klein);
+    text-align: center;
+    color: rgba(245, 245, 244, 0.7);
+  }
+
+  /* ===================== LEISTUNGEN ===================== */
+  .sb-karten {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+  }
+
+  @media (max-width: 860px) {
+    .sb-karten {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 560px) {
+    .sb-karten {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .sb-karte {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 22px 20px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 16px;
+    background: rgba(15, 15, 18, 0.55);
+    text-align: left;
+    /* Sprungziel der Nabe: ohne das sitzt die Karte unter der
+       Kopfleiste, wenn man von oben springt. */
+    scroll-margin-top: 110px;
+    transition:
+      transform 280ms ease,
+      border-color 280ms ease;
+  }
+
+  .sb-karte:hover,
+  .sb-karte:target {
+    transform: translateY(-3px);
+    border-color: rgba(245, 158, 11, 0.4);
+  }
+
+  .sb-karte-nr {
+    font-family: var(--lp-mono);
+    font-size: var(--lp-mono-groesse);
+    letter-spacing: 0.08em;
+    color: rgba(245, 158, 11, 0.7);
+  }
+
+  .sb-karte-titel {
+    margin: 0;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: var(--lp-text);
+    line-height: 1.3;
+    color: #f5f5f4;
+  }
+
+  .sb-karte-text {
+    margin: 0;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-klein);
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.78);
+  }
+
+  .sb-karte-beispiel {
+    margin: 3px 0 0;
+    font-family: var(--lp-mono);
+    font-size: var(--lp-mono-groesse);
+    line-height: 1.5;
+    color: rgba(245, 158, 11, 0.8);
+  }
+
+  .sb-karte-beispiel-vor {
+    color: rgba(245, 245, 244, 0.45);
+  }
+
+  /* ===================== SPARRINGSPARTNER ===================== */
+  .sb-sparring-raster {
+    display: grid;
+    gap: 30px;
+    justify-items: center;
+    text-align: center;
+  }
+
+  @media (min-width: 720px) {
+    .sb-sparring-raster {
+      grid-template-columns: 220px 1fr;
+      gap: 40px;
+      align-items: center;
+      justify-items: start;
+      text-align: left;
+    }
+  }
+
+  .sb-foto {
+    position: relative;
+    width: 180px;
+    flex-shrink: 0;
+  }
+
+  @media (min-width: 720px) {
+    .sb-foto {
+      width: 220px;
+    }
+  }
+
+  .sb-foto img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid rgba(245, 158, 11, 0.45);
+  }
+
+  .sb-titel-links {
+    margin-bottom: 14px;
+  }
+
+  @media (min-width: 720px) {
+    .sb-titel-links {
+      text-align: left;
+    }
+  }
+
+  .sb-sparring-absatz {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-text);
+    line-height: 1.65;
+    color: rgba(245, 245, 244, 0.82);
+    max-width: 52ch;
+    margin: 0;
+  }
+
+  /* ===================== PREIS ===================== */
+  .sb-preis-karte {
+    position: relative;
+    max-width: 580px;
+    margin: 0 auto;
+    padding: 42px 42px 38px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    background: rgba(15, 15, 18, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    text-align: center;
+  }
+
+  .sb-preis-bezeichnung {
+    margin: 0 0 18px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-braue);
+    font-weight: 600;
+    letter-spacing: var(--lp-braue-sperrung);
+    text-transform: uppercase;
+    color: rgba(245, 158, 11, 0.95);
+  }
+
+  .sb-preis-betrag {
+    margin: 0 0 8px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: var(--lp-zahl);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    white-space: nowrap;
+    color: #f5f5f4;
+  }
+
+  .sb-preis-einheit {
+    margin: 0;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-text);
+    color: rgba(245, 245, 244, 0.55);
+  }
+
+  .sb-trenner {
+    height: 1px;
+    margin: 26px 0;
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .sb-preis-liste {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+  }
+
+  .sb-preis-liste li {
+    position: relative;
+    padding-left: 24px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-text);
+    line-height: 1.55;
+    color: rgba(245, 245, 244, 0.85);
+  }
+
+  .sb-preis-liste li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: rgba(245, 158, 11, 0.85);
+  }
+
+  .sb-preis-hinweis {
+    margin: 0 0 28px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-klein);
+    line-height: 1.65;
+    color: rgba(245, 245, 244, 0.6);
+  }
+
+  /* ===================== FAQ ===================== */
+  .sb-faq-liste {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 720px;
+    margin: 0 auto;
+    text-align: left;
+  }
+
+  .sb-faq-eintrag {
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 13px;
+    background: rgba(15, 15, 18, 0.5);
+    overflow: hidden;
+  }
+
+  .sb-faq-eintrag[open] {
+    border-color: rgba(245, 158, 11, 0.3);
+  }
+
+  .sb-faq-eintrag summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 17px 20px;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .sb-faq-eintrag summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .sb-faq-eintrag summary:focus-visible {
+    outline: 2px solid rgba(245, 158, 11, 0.95);
+    outline-offset: -2px;
+  }
+
+  .sb-faq-frage {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: var(--lp-text);
+    line-height: 1.35;
+    color: #f5f5f4;
+  }
+
+  .sb-faq-symbol {
+    flex-shrink: 0;
+    display: inline-flex;
+    color: rgba(245, 158, 11, 0.85);
+    transition: transform 240ms ease;
+  }
+
+  .sb-faq-eintrag[open] .sb-faq-symbol {
+    transform: rotate(180deg);
+  }
+
+  .sb-faq-antwort {
+    margin: 0;
+    padding: 0 20px 19px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-text);
+    line-height: 1.65;
+    color: rgba(245, 245, 244, 0.78);
+  }
+
+  /* ===================== ABSCHLUSS ===================== */
+  .sb-abschluss {
+    margin-bottom: 72px !important;
+  }
+
+  .sb-ab-titel {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: var(--lp-gross);
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    color: #f5f5f4;
+    margin: 0 0 16px;
+  }
+
+  .sb-ab-sub {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-lead);
+    line-height: 1.6;
+    color: rgba(245, 245, 244, 0.78);
+    max-width: 50ch;
+    margin: 0 auto 30px;
+  }
+
+  /* ===================== SCHMALE SCHIRME ===================== */
+  @media (max-width: 768px) {
+    .sichtbarkeit-page {
+      padding: 100px 20px 60px;
+    }
+
+    .sichtbarkeit-page > section {
+      margin-bottom: 64px;
+    }
+
+    .sb-preis-karte {
+      padding: 34px 22px 30px;
+      border-radius: 16px;
+    }
+
+    .sb-stapel {
+      height: 170px;
+    }
+
+    .sb-zettel {
+      font-size: 0.72rem;
+      padding: 7px 11px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sb-karte,
+    .sb-knoten-link,
+    .sb-faq-symbol {
+      transition: none;
+    }
+
+    .sb-karte:hover,
+    .sb-knoten-link:hover {
+      transform: none;
+    }
+  }
+
+  /* ===================== HELLES THEMA ===================== */
+  :global(html[data-site-theme='light']) .sb-titel,
+    :global(html[data-site-theme='light']) .sb-ab-titel,
+  :global(html[data-site-theme='light']) .sb-karte-titel,
+  :global(html[data-site-theme='light']) .sb-knoten-titel,
+  :global(html[data-site-theme='light']) .sb-faq-frage,
+  :global(html[data-site-theme='light']) .sb-preis-betrag {
+    color: #1a1a1c;
+  }
+
+    :global(html[data-site-theme='light']) .sb-ab-sub,
+  :global(html[data-site-theme='light']) .sb-problem-text,
+  :global(html[data-site-theme='light']) .sb-karte-text,
+  :global(html[data-site-theme='light']) .sb-sparring-absatz,
+  :global(html[data-site-theme='light']) .sb-faq-antwort,
+  :global(html[data-site-theme='light']) .sb-preis-liste li {
+    color: rgba(26, 26, 28, 0.78);
+  }
+
+  :global(html[data-site-theme='light']) .sb-fuss,
+  :global(html[data-site-theme='light']) .sichtbarkeit-hero-note,
+  :global(html[data-site-theme='light']) .sichtbarkeit-hero-preis,
+  :global(html[data-site-theme='light']) .sb-knoten-wirkung,
+  :global(html[data-site-theme='light']) .sb-preis-einheit,
+  :global(html[data-site-theme='light']) .sb-preis-hinweis,
+  :global(html[data-site-theme='light']) .sb-karte-beispiel-vor {
+    color: rgba(26, 26, 28, 0.6);
+  }
+
+  :global(html[data-site-theme='light']) .sb-tel-nummer {
+    color: rgba(26, 26, 28, 0.85);
+  }
+
+  :global(html[data-site-theme='light']) .sb-karte,
+  :global(html[data-site-theme='light']) .sb-knoten-link,
+  :global(html[data-site-theme='light']) .sb-faq-eintrag,
+  :global(html[data-site-theme='light']) .sb-preis-karte {
+    background: rgba(255, 255, 255, 0.6);
+    border-color: rgba(0, 0, 0, 0.1);
+  }
+
+  :global(html[data-site-theme='light']) .sb-zettel {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.12);
+    color: rgba(26, 26, 28, 0.8);
+  }
+
+  :global(html[data-site-theme='light']) .sb-mitte {
+    background: #ffffff;
+  }
+</style>
+
+<script>
+  /* Zwei Dinge: der Stapel, der beim Scrollen zu einem wird, und die
+     Lichtbox. */
+  (() => {
+    const ruhig = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // --- Fünf werden einer ---------------------------------------
+    const stapel = document.querySelector<HTMLElement>('[data-stapel]');
+    if (stapel && !ruhig) {
+      /* DREI STUFEN ALS DAUERSCHLEIFE.
+       *
+       * Erst lief das einmal und sofort: man sah das Durcheinander
+       * eine Zehntelsekunde und danach nur noch „Tammo" — der Witz
+       * war vorbei, bevor man ihn gelesen hatte. Jetzt steht jede
+       * Stufe lange genug, und die Schleife faengt von vorn an, damit
+       * man sie auch sieht, wenn man zu spaet hinschaut.
+       *
+       * Sie laeuft NUR im Blick. Eine Schleife hinter dem
+       * Bildschirmrand kostet Rechenzeit und zeigt niemandem etwas.
+       */
+      const PLAN: ReadonlyArray<readonly [number, (el: HTMLElement) => void]> = [
+        // Durcheinander steht und wird gelesen.
+        [1600, (el) => { el.dataset.ordnung = ''; }],
+        // In eine Spalte geordnet.
+        [1150, (el) => { el.dataset.zusammen = ''; }],
+        // Zusammengefuehrt, „Tammo" erscheint — dann abblenden.
+        [2250, (el) => { el.dataset.aus = ''; }],
+        // Unsichtbar zuruecksetzen und wieder aufblenden.
+        [430, (el) => {
+          el.dataset.sprung = '';
+          delete el.dataset.ordnung;
+          delete el.dataset.zusammen;
+          // Zwei Frames: einer, damit der Grundzustand steht, der
+          // zweite, damit der Browser ihn uebernommen hat, bevor die
+          // Uebergaenge wieder scharf sind.
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              delete el.dataset.sprung;
+              delete el.dataset.aus;
+            });
+          });
+        }],
+      ];
+
+      let uhr: number | undefined;
+
+      const schritt = (i: number) => {
+        const [wartezeit, tun] = PLAN[i % PLAN.length];
+        uhr = window.setTimeout(() => {
+          tun(stapel);
+          schritt(i + 1);
+        }, wartezeit);
+      };
+
+      const anhalten = () => {
+        if (uhr !== undefined) window.clearTimeout(uhr);
+        uhr = undefined;
+      };
+
+      const beobachter = new IntersectionObserver(
+        (eintraege) => {
+          for (const e of eintraege) {
+            if (e.isIntersecting) {
+              if (uhr === undefined) schritt(0);
+            } else {
+              anhalten();
+            }
+          }
+        },
+        // Erst wenn der Block wirklich steht. Bei 0.6 fing es an,
+        // waehrend die Unterkante noch unter dem Rand hing.
+        { threshold: 0.85 }
+      );
+      beobachter.observe(stapel);
+    }
+
+    // --- Lichtbox --------------------------------------------------
+    const licht = document.querySelector<HTMLDialogElement>('[data-licht]');
+    const bild = licht?.querySelector<HTMLImageElement>('[data-licht-bild]');
+    const bu = licht?.querySelector<HTMLElement>('[data-licht-bu]');
+    if (!licht || !bild || !bu) return;
+
+    document.querySelectorAll<HTMLButtonElement>('.sb-oeffnen').forEach((knopf) => {
+      knopf.addEventListener('click', () => {
+        const quelle = knopf.dataset.gross;
+        const text = knopf.dataset.bu ?? '';
+        if (!quelle) return;
+        bild.src = quelle;
+        // Der Alternativtext der Kachel beschreibt dasselbe Bild.
+        bild.alt = knopf.querySelector('img')?.alt ?? text;
+        bu.textContent = text;
+        licht.showModal();
+      });
+    });
+
+    // Klick auf den Grund schliesst. Das <dialog> selbst ist das
+    // Ziel nur dann, wenn daneben geklickt wurde — innerhalb trifft
+    // es immer ein Kind.
+    licht.addEventListener('click', (e) => {
+      if (e.target === licht) licht.close();
+    });
+
+    // Das Bild erst freigeben, wenn zu ist: sonst haengt die grosse
+    // Datei bis zum naechsten Oeffnen im Speicher.
+    licht.addEventListener('close', () => {
+      bild.removeAttribute('src');
+      bild.alt = '';
+    });
+  })();
+</script>

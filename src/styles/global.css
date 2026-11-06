@@ -133,10 +133,25 @@ html[data-site-theme='light'] .journal-page,
    Seite umschaltete. */
 html[data-site-theme='light'] .vertical-page,
 html[data-site-theme='light'] .post-page,
+html[data-site-theme='light'] .studio-page,
+html[data-site-theme='light'] .sichtbarkeit-page,
 html[data-site-theme='light'] .error-page {
   background: var(--theme-bg);
   color: var(--theme-text);
 }
+
+/* ACHTUNG, STOLPERSTELLE: diese Liste ist von Hand gepflegt, und sie
+   ist der Grund, warum eine neue Seite im hellen Thema unlesbar
+   aussieht.
+
+   Steht eine Seite NICHT drin, bleibt ihre Flaeche schwarz — die
+   Textfarben weiter unten schalten aber trotzdem auf Dunkel um.
+   Ergebnis: dunkler Text auf dunklem Grund, gemessen 1,17:1. Genau
+   das ist am 06.11.2026 mit /studio und /sichtbarkeit passiert, und
+   vorher schon mit der Branchenzeile in der Fussleiste.
+
+   WER EINE NEUE SEITE ANLEGT, traegt ihre .*-page-Klasse hier ein,
+   bevor er die ersten Textfarben schreibt. */
 
 /* === LIGHT THEME OVERRIDES — SUBPAGES ================================
    Generated from full DOM/CSS audit of all sub-pages (Workflow #ba382).

@@ -20,6 +20,8 @@ export const en: Shape<typeof de> = {
     angebot: 'Services',
     website: 'Website',
     software: 'Software',
+    studio: 'Studio',
+    sichtbarkeit: 'Visibility',
     werkstatt: 'Lab',
     preise: 'Pricing',
     referenzen: 'Work',

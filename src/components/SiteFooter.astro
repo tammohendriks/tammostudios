@@ -33,8 +33,8 @@ const locale = localeOf(Astro.url.pathname);
 // damit indiziert werden kann. Ohne das ist key einfach string, und
 // der Typchecker laesst den Zugriff zu Recht nicht durch.
 const FOOTER_KEYS = [
-  'home', 'ueber', 'website', 'software', 'preise', 'werkstatt',
-  'referenzen', 'journal',
+  'home', 'ueber', 'website', 'software', 'studio', 'sichtbarkeit',
+  'preise', 'werkstatt', 'referenzen', 'journal',
 ] as const;
 /**
  * Die Branchenseiten als eigene Zeile.
@@ -209,12 +209,28 @@ const legalLinks = [
      position:relative + z-index:1 wird auf /preise gebraucht (Layer
      hinter dem Footer via SubPageBackground). Auf anderen Pages
      harmlos — kein stacking-Kontext-Konflikt. */
+  /* Der Grund geht ueber die VOLLE Breite, der Inhalt bleibt bei
+     1120px zentriert (1200 minus 2x40 Innenabstand — dieselbe
+     Textbreite wie vorher, nichts verschiebt sich).
+
+     Vorher hing die Hoechstbreite am Element selbst, und damit auch
+     sein schwarzer Grund: ein 1200px breiter schwarzer Balken mitten
+     auf der Seite. Im dunklen Thema faellt das nicht auf, weil die
+     Seite darunter dieselbe Farbe hat. Im hellen Thema steht er als
+     eingerueckter Riegel auf Creme — gemeldet am 06.11.2026. */
   .site-footer.is-default {
     background: #050507;
     padding: 32px 40px 24px;
     margin: 0 auto;
+    max-width: none;
     position: relative;
     z-index: 1;
+  }
+
+  .site-footer.is-default > * {
+    width: 100%;
+    max-width: 1120px;
+    margin-inline: auto;
   }
 
   /* Embedded: Section-6 Kontext. Kein eigener Background (Section
