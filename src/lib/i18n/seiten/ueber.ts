@@ -52,6 +52,41 @@ export const de = {
       'Im Mai 2026 habe ich Tammo Studios gegründet — erst nebenbei. Inzwischen habe ich meinen Job aufgegeben und arbeite vollständig selbständig. Der Sprung ins Kalte, mich vollständig durchzusetzen. Ab August reise ich für längere Zeit durch Asien. Videos kann man schlecht aus 9.000 Kilometern Entfernung drehen. Websites schon.',
   },
 
+  /**
+   * Der Werdegang als Zeitstrahl.
+   *
+   * ALLE ANGABEN STAMMEN AUS DEM ABSATZ DARUEBER — Ausbildung, das
+   * Jahr als Online Marketing Manager, Mai 2026, die Reise. Nichts
+   * ist dazuerfunden, insbesondere keine Jahreszahlen, die dort nicht
+   * stehen. Wer eine ergaenzt, muss sie vom Betreiber haben.
+   */
+  werdegang: {
+    braue: 'DER WEG HIERHER',
+    headline: 'Vier Stationen',
+    stationen: [
+      {
+        zeit: 'Ausbildung',
+        titel: 'Kaufmann für Digitalisierungsmanagement',
+        text: 'Bei einer Sparkassen-Tochter. Da hat mich das Programmieren das erste Mal gepackt.',
+      },
+      {
+        zeit: 'Danach',
+        titel: 'Ein Jahr Online Marketing',
+        text: 'Im selben Haus geblieben, als Online Marketing Manager. Nebenbei gemerkt, dass mir das Bauen fehlt.',
+      },
+      {
+        zeit: 'Mai 2026',
+        titel: 'Tammo Studios gegründet',
+        text: 'Erst nebenbei, neben dem Job. Die ersten Websites entstehen abends und am Wochenende.',
+      },
+      {
+        zeit: 'Heute',
+        titel: 'Vollständig selbstständig',
+        text: 'Job gekündigt, der Sprung ins Kalte. Aus Bremen, zurzeit aus Asien.',
+      },
+    ],
+  },
+
   wieIchArbeite: {
     braue: 'KEINE AGENTUR DAZWISCHEN',
     headline: 'Wie ich arbeite',
@@ -136,6 +171,33 @@ export const en: Shape<typeof de> = {
       'It all started with a vocational apprenticeship in digitalization management at a savings bank subsidiary. After that I stayed on there for a year as an online marketing manager. On the side I noticed that something was missing: programming. Exactly the thing that had gripped me most at the beginning.',
     absatz2:
       'In May 2026 I founded Tammo Studios, at first on the side. By now I have given up the job and work fully self-employed. Jumping in at the deep end, all in on my own. From August I am traveling through Asia for a longer stretch. Videos are hard to shoot from 9,000 kilometers away. Websites are not.',
+  },
+
+  werdegang: {
+    braue: 'HOW I GOT HERE',
+    headline: 'Four stops',
+    stationen: [
+      {
+        zeit: 'Apprenticeship',
+        titel: 'Digital management, commercial track',
+        text: 'At a subsidiary of a German savings bank. That is where coding first got hold of me.',
+      },
+      {
+        zeit: 'After that',
+        titel: 'A year in online marketing',
+        text: 'I stayed in the same house as an online marketing manager. And noticed that I missed building things.',
+      },
+      {
+        zeit: 'May 2026',
+        titel: 'Tammo Studios founded',
+        text: 'On the side at first, next to the job. The first websites were built in the evenings and at weekends.',
+      },
+      {
+        zeit: 'Today',
+        titel: 'Fully self-employed',
+        text: 'I quit the job and jumped. From Bremen, currently from Asia.',
+      },
+    ],
   },
 
   wieIchArbeite: {
