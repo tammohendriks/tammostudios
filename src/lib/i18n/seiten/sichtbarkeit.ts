@@ -25,7 +25,10 @@ export const de = {
   hero: {
     // Siehe studio.ts: ein String, keine Augenbraue, keine
     // Hervorhebung — Hero wie auf den uebrigen Unterseiten.
-    headline: 'Ein Ansprechpartner. Für alles, was man von dir sieht.',
+    // Der Umbruch ist gesetzt, nicht dem Zufall der Zeilenbreite
+    // ueberlassen: „Ein Ansprechpartner." ist die Behauptung, der
+    // Rest ihre Reichweite. Gerendert ueber .text-lines (pre-line).
+    headline: 'Ein Ansprechpartner.\nFür alles, was man von dir sieht.',
     sub:
       'Google Ads, Flyer, Visitenkarten, Bauzaun, Social Media, Getränkekarte.\n' +
       'Ich mach das alles, im gleichen Look wie deine Website. Und alles führt zurück auf deine Seite.',
@@ -242,7 +245,7 @@ export const en: Shape<typeof de> = {
   },
 
   hero: {
-    headline: 'One person. For everything people see of you.',
+    headline: 'One person.\nFor everything people see of you.',
     sub:
       'Google Ads, flyers, business cards, hoardings, social media, drinks menus.\n' +
       'I do all of it, in the same look as your website. And all of it leads back to your site.',
