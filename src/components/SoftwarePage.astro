@@ -25,13 +25,24 @@ const werkstattPfad = path('werkstatt', locale);
 // Sprachen dieselben, die Beschreibungen stehen im Woerterbuch. Die
 // Reihenfolge muss zu faelle.eintraege passen.
 const FALL_KOEPFE = [
-  { name: 'IBI', href: 'https://ibi-doc.de/anfrage' },
-  { name: 'Samedos', href: 'https://www.samedos.de/rundgang' },
-  { name: 'WärmePower', href: 'https://waermepower.de/heizungsrechner' },
-  { name: 'Kirsch', href: 'https://kirsch-dach-fassade.de/investition' },
+  { name: 'IBI', href: 'https://ibi-doc.de/anfrage', bild: 'ibi-anfrage' },
+  { name: 'Samedos', href: 'https://www.samedos.de/rundgang', bild: 'samedos-rundgang' },
+  { name: 'WärmePower', href: 'https://waermepower.de/heizungsrechner', bild: 'waermepower-rechner' },
+  { name: 'Kirsch', href: 'https://kirsch-dach-fassade.de/investition', bild: 'kirsch-investition' },
 ] as const;
 
-const faelle = d.faelle.eintraege.map((eintrag, i) => ({ ...eintrag, ...FALL_KOEPFE[i] }));
+/**
+ * Die Adresse ohne Schema und ohne www, fuer die Leiste des
+ * Browser-Rahmens. Dasselbe Vorgehen wie auf den Branchenseiten.
+ */
+const hostVon = (url: string) => new URL(url).host.replace(/^www\./, '') + new URL(url).pathname;
+
+const faelle = d.faelle.eintraege.map((eintrag, i) => ({
+  ...eintrag,
+  ...FALL_KOEPFE[i],
+  quelle: `/software/${FALL_KOEPFE[i].bild}.webp`,
+  adresse: hostVon(FALL_KOEPFE[i].href),
+}));
 ---
 
 <BaseLayout
@@ -88,6 +99,33 @@ const faelle = d.faelle.eintraege.map((eintrag, i) => ({ ...eintrag, ...FALL_KOE
       <div class="case-grid">
         {faelle.map((item) => (
           <article class="case-card" data-reveal>
+            {/* DER ECHTE SCREENSHOT DER ANWENDUNG, nicht der
+                Startseite. Unter public/referenzen liegen Bilder der
+                Websites — die zeigen aber nicht den Rechner, das
+                Formular oder den Rundgang, um die es hier geht. Diese
+                vier sind von den Anwendungs-Adressen selbst
+                aufgenommen. */}
+            <a
+              class="case-rahmen"
+              href={item.href}
+              target="_blank"
+              rel="noopener"
+              aria-label={`${item.name} — ${d.faelle.ansehen}`}
+              tabindex="-1"
+            >
+              <span class="case-leiste" aria-hidden="true">
+                <span class="case-punkte"><span></span><span></span><span></span></span>
+                <span class="case-adresse">{item.adresse}</span>
+              </span>
+              <img
+                src={item.quelle}
+                alt={item.bildAlt}
+                width="1440"
+                height="900"
+                loading="lazy"
+                decoding="async"
+              />
+            </a>
             <h3 class="case-name">{item.name}</h3>
             <p class="case-full">{item.full}</p>
             <p class="case-branch">{item.branch}</p>
@@ -375,6 +413,83 @@ const faelle = d.faelle.eintraege.map((eintrag, i) => ({ ...eintrag, ...FALL_KOE
   .case-card:hover {
     border-color: rgba(245, 158, 11, 0.35);
     transform: translateY(-2px);
+  }
+
+  /* Browser-Rahmen um den Screenshot: Leiste oben, Bild darunter.
+     Das Seitenverhaeltnis sitzt am Bild, nicht am Rahmen — sonst
+     fraesse die Leiste oben vom Bild ab. */
+  .case-rahmen {
+    display: block;
+    margin: 0 0 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    background: #0a0a0c;
+    overflow: hidden;
+    box-shadow: 0 16px 42px rgba(0, 0, 0, 0.4);
+    transition:
+      transform 300ms ease,
+      border-color 300ms ease;
+  }
+
+  .case-card:hover .case-rahmen {
+    transform: translateY(-3px);
+    border-color: rgba(245, 158, 11, 0.4);
+  }
+
+  .case-leiste {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 11px;
+    background: rgba(255, 255, 255, 0.045);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .case-punkte {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .case-punkte span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.16);
+  }
+
+  .case-adresse {
+    flex: 1;
+    min-width: 0;
+    padding: 3px 9px;
+    border-radius: 5px;
+    background: rgba(0, 0, 0, 0.32);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.01em;
+    color: rgba(245, 245, 244, 0.45);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .case-rahmen img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1440 / 900;
+    object-fit: cover;
+    object-position: top center;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .case-rahmen {
+      transition: none;
+    }
+
+    .case-card:hover .case-rahmen {
+      transform: none;
+    }
   }
 
   .case-name {

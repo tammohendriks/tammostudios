@@ -77,24 +77,32 @@ export const de = {
         full: 'Institut für Betriebsmedizin',
         branch: 'Betriebsmedizin, Isernhagen',
         body: 'Anfrage-System für Vorsorgen mit drei Wegen durchs Formular. Unternehmen tragen Mitarbeitende ein, wählen die Untersuchungen aus, daraus entsteht automatisch ein PDF, das direkt in der Praxis landet. Der Absender bekommt eine Bestätigung. Die ganze Seite schaltet außerdem auf Englisch um, für internationale Belegschaften.',
+        bildAlt:
+          'Das Anfrage-System von IBI: „Welcher Pfad passt zu Ihnen?" mit drei Karten für Unternehmen, Privatpersonen und Auftraggeber.',
         tags: ['Formular mit drei Wegen', 'PDF automatisch', 'Deutsch / Englisch'],
       },
       {
         full: 'Arbeitsmedizinische Praxis',
         branch: 'Betriebsmedizin, Bremen',
         body: 'Ein 360°-Rundgang durch die Praxis, direkt auf der Seite begehbar. Wer zur Vorsorge kommt, weiß vorher, wo er landet. Dazu eine vollständige englische Fassung der Seite auf Knopfdruck, ohne zweite Website und ohne doppelte Pflege.',
+        bildAlt:
+          'Der 360°-Rundgang von Samedos: Einleitung und der interaktive Betrachter für sechs Ansichten der Praxisräume.',
         tags: ['360°-Rundgang', 'Deutsch / Englisch', 'Eigenes Redaktionssystem'],
       },
       {
         full: 'Heizung, Wärmepumpe, Sanitär',
         branch: 'Handwerk, Bremen',
         body: 'Sechs Fragen zu Wohnfläche, Baujahr, Personen und Warmwasser. Daraus eine Empfehlung: Wärmepumpe, Hybrid oder Gas-Brennwert. Mit Investitionsrahmen, möglicher BEG-Förderung und Eigenanteil. WärmePower bekommt das ausgefüllte Formular als Mail und PDF, der Kunde eine Bestätigung. Zweimal im Monat kommen echte Anfragen darüber rein.',
+        bildAlt:
+          'Der Heizungsrechner von Wärmepower: sechs Fragen links, rechts die Empfehlung „Hybrid: Wärmepumpe + Gas-Brennwert" samt Kostenschätzung.',
         tags: ['Empfehlungs-Logik', 'PDF automatisch', 'Förder-Berechnung'],
       },
       {
         full: 'Dach & Fassade',
         branch: 'Dachdecker, Bremen',
         body: 'Investitionsrechner, der zeigt wie viel teurer dasselbe Bauprojekt in fünf und zehn Jahren wird, auf Basis realer Baupreis-Entwicklungen. Dazu: wie viel Wertsteigerung eine neue Dachhülle der Immobilie zurückgibt. Beratung wird damit nachvollziehbar statt gefühlt.',
+        bildAlt:
+          'Der Investitionsrechner von Kirsch: „Dein Dach. Deine Investition." mit Knopf zum Rechner.',
         tags: ['Kosten-Prognose', 'Baupreis-Entwicklung', 'Wertsteigerung'],
       },
     ],
@@ -236,24 +244,32 @@ export const en: Shape<typeof de> = {
         full: 'Institut für Betriebsmedizin',
         branch: 'Occupational health, Isernhagen',
         body: 'An inquiry system for checkups with three paths through the form. Companies enter their staff, pick the examinations, and out of that a PDF is produced automatically that lands directly at the practice. The sender gets a confirmation. The whole site also switches to English, for international workforces.',
+        bildAlt:
+          'The IBI enquiry system: "Which path fits you?" with three cards for companies, private individuals and clients.',
         tags: ['A form with three paths', 'PDF automatically', 'German / English'],
       },
       {
         full: 'Occupational health practice',
         branch: 'Occupational health, Bremen',
         body: 'A 360° tour through the practice, walkable right on the page. Anyone coming in for a checkup knows what the place looks like before they arrive. Plus a complete English version of the site at the push of a button, without a second website and without maintaining everything twice.',
+        bildAlt:
+          'The Samedos 360° tour: an introduction and the interactive viewer for six views of the practice rooms.',
         tags: ['360° tour', 'German / English', 'A CMS of its own'],
       },
       {
         full: 'Heating, heat pumps, plumbing',
         branch: 'Contractors, Bremen',
         body: 'Six questions about floor space, year of construction, number of people, and hot water. Out of that comes a recommendation: heat pump, hybrid, or a gas condensing boiler. With an investment range, the government subsidy it may qualify for (the German BEG program), and the share left to pay. WärmePower gets the completed form as an email with a PDF, the customer gets a confirmation. Twice a month real inquiries come in through it.',
+        bildAlt:
+          'The Wärmepower heating calculator: six questions on the left, the recommendation "Hybrid: heat pump + gas condensing" with a cost estimate on the right.',
         tags: ['Recommendation logic', 'PDF automatically', 'Subsidy calculation'],
       },
       {
         full: 'Roofing and facades',
         branch: 'Roofing, Bremen',
         body: 'An investment calculator that shows how much more expensive the same building project will be in five and ten years, based on real construction price trends. Plus: how much value a new roof envelope gives back to the property. It makes the advice verifiable instead of a gut feeling.',
+        bildAlt:
+          'The Kirsch investment calculator: "Your roof. Your investment." with a button to the calculator.',
         tags: ['Cost projection', 'Construction price trends', 'Added value'],
       },
     ],
