@@ -37,13 +37,16 @@ function eintrag(key: RouteKey, label: string): NavChild | null {
 
 // Reihenfolge wie das Angebot gelesen werden soll: erst die Website,
 // dann was darin steckt (Software, Studio), dann was darum herum
-// sichtbar wird, dann Preise und Werkstatt.
+// sichtbar wird, dann die Werkstatt.
+//
+// PREISE STEHT NICHT DARIN, sondern daneben. Es ist keine Leistung,
+// sondern die Frage, die man zu allen vieren hat — unter „Angebot"
+// gelistet las es sich wie ein weiteres Angebot.
 const angebotKinder = [
   eintrag('website', d.nav.website),
   eintrag('software', d.nav.software),
   eintrag('studio', d.nav.studio),
   eintrag('sichtbarkeit', d.nav.sichtbarkeit),
-  eintrag('preise', d.nav.preise),
   eintrag('werkstatt', d.nav.werkstatt),
 ].filter((e): e is NavChild => e !== null);
 
@@ -59,6 +62,7 @@ const navItems: NavItem[] = [
   ...(angebotKinder.length
     ? [{ label: d.nav.angebot, href: pathOr('website', locale), children: angebotKinder }]
     : []),
+  ...(eintrag('preise', d.nav.preise) ? [{ label: d.nav.preise, href: pathOr('preise', locale) }] : []),
   ...(eintrag('referenzen', d.nav.referenzen) ? [{ label: d.nav.referenzen, href: pathOr('referenzen', locale) }] : []),
   ...(eintrag('journal', d.nav.journal) ? [{ label: d.nav.journal, href: pathOr('journal', locale) }] : []),
 ];
@@ -720,16 +724,31 @@ function itemIsActive(item: NavItem): boolean {
     font-weight: 500;
   }
 
-  /* === Mobile Accordion (Nav-Items mit Kindern) === */
+  /* === Mobile Accordion (Nav-Items mit Kindern) ===
+     DREI SPALTEN, nicht flex-center. Mit justify-content: center
+     wurde das PAAR aus Wort und Pfeil mittig gesetzt — das Wort
+     selbst sass dadurch um die halbe Knopfbreite plus halben Abstand
+     links von der Mitte und stand sichtbar versetzt unter den
+     anderen Eintraegen des Menues.
+
+     Mit 1fr auto 1fr steht das Wort exakt in der Mitte wie jeder
+     andere Eintrag, und der Pfeil haengt rechts daneben, ohne die
+     Mitte zu verschieben. */
   .mobile-item-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    justify-content: center;
-    gap: 12px;
   }
 
   .mobile-item-row .mobile-link {
+    grid-column: 2;
     padding-right: 0;
+  }
+
+  .mobile-item-row .mobile-expand {
+    grid-column: 3;
+    justify-self: start;
+    margin-left: 10px;
   }
 
   .mobile-expand {
