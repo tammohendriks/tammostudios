@@ -103,7 +103,7 @@ const faqSchema = {
          Notizzeile unter dem Verweis, an derselben Stelle wie
          „Eine Anwendung inklusive" auf /software. -->
     <header class="sichtbarkeit-hero">
-      <h1 class="subpage-hero-title">{d.hero.headline}</h1>
+      <h1 class="subpage-hero-title text-lines">{d.hero.headline}</h1>
       <p class="subpage-hero-subtitle text-lines sichtbarkeit-hero-sub">{d.hero.sub}</p>
 
       <div class="sichtbarkeit-hero-cta">
@@ -1477,6 +1477,10 @@ const faqSchema = {
   :global(html[data-site-theme='light']) .sb-fuss,
   :global(html[data-site-theme='light']) .sichtbarkeit-hero-note,
   :global(html[data-site-theme='light']) .sichtbarkeit-hero-preis,
+  /* Die Telefonzeile im Abschluss. Stand beim Umbau des Heros kurz
+     ohne helle Regel da und war dort weiss auf Creme — der Hero
+     bekam neue Klassen, der Abschluss behielt die alte. */
+  :global(html[data-site-theme='light']) .sb-tel,
   :global(html[data-site-theme='light']) .sb-knoten-wirkung,
   :global(html[data-site-theme='light']) .sb-preis-einheit,
   :global(html[data-site-theme='light']) .sb-preis-hinweis,

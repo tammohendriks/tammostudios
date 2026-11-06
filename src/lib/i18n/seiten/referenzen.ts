@@ -19,7 +19,7 @@ export const de = {
 
   hero: {
     headline: 'Referenzen.',
-    sub: 'Eine kleine Auswahl der Sites, die ich zuletzt für Unternehmen gebaut habe.\nVon der Praxis bis zum Mediengestalter.',
+    sub: 'Websites, die ich zuletzt für Unternehmen gebaut habe.\nVon der Praxis bis zum Mediengestalter.',
   },
 
   filter: {
@@ -69,7 +69,7 @@ export const en: Shape<typeof de> = {
 
   hero: {
     headline: 'Work.',
-    sub: 'A small selection of the sites I built for businesses recently.\nFrom a medical practice to a media designer.',
+    sub: 'Websites I have built for businesses recently.\nFrom a medical practice to a media designer.',
   },
 
   filter: {

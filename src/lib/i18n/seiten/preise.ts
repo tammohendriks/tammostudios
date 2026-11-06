@@ -130,7 +130,7 @@ export const de = {
       'Performance- & Uptime-Monitoring (du wirst informiert, bevor was klemmt)',
       'Priorisierter Support, meist innerhalb weniger Stunden',
       'Kleinere technische Fixes ohne Extra-Rechnung',
-      'Halbjährlicher Site-Check + Strategiegespräch',
+      'Halbjährlicher Website-Check + Strategiegespräch',
     ],
   },
 

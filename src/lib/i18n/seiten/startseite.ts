@@ -43,7 +43,7 @@ export const de = {
   projekte: {
     eyebrow: 'AUSGEWÄHLTE PROJEKTE',
     headline: 'Zuletzt gebaut.',
-    sub: 'Vier Sites, drei Branchen. Alle handgemacht, alle online.',
+    sub: 'Aus drei Branchen. Alle handgemacht, alle online.',
     vorschauVon: 'Vorschau von',
     modalOeffnen: 'im Modal öffnen',
     cta: 'Alle Referenzen ansehen',
@@ -227,7 +227,7 @@ export const en: Shape<typeof de> = {
   projekte: {
     eyebrow: 'SELECTED PROJECTS',
     headline: 'Built recently.',
-    sub: 'Four sites, three industries. All handcrafted, all online.',
+    sub: 'From three industries. All handcrafted, all online.',
     vorschauVon: 'Preview of',
     modalOeffnen: 'open in the preview',
     cta: 'See all work',
