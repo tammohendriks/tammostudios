@@ -403,6 +403,12 @@ html[data-site-theme='light'] .ref-preview-image {
 html[data-site-theme='light'] .kontakt-form-section .form-field label {
   color: var(--theme-text-strong) !important;
 }
+/* Das „(optional)" hinter der Beschriftung erbt die Farbe NICHT: es
+   steht in einem eigenen <span> mit eigener Regel und blieb dadurch
+   hell auf Creme. Gemessen 1,03:1. */
+html[data-site-theme='light'] .kontakt-form-section .form-field label .opt {
+  color: var(--theme-text-muted) !important;
+}
 html[data-site-theme='light'] .kontakt-form-section .form-checkbox label {
   color: var(--theme-text) !important;
 }
@@ -659,6 +665,26 @@ html[data-site-theme='light'] .ueber-content strong {
 html[data-site-theme='light'] .ueber-content p,
 html[data-site-theme='light'] .close-line {
   color: var(--theme-text-dim) !important;
+}
+
+/* Der Zeitstrahl. Gemessen 1,00:1 und 1,01:1 — weisse Schrift auf
+   Creme, also unsichtbar. Dieselbe Stolperstelle wie schon bei der
+   Branchenzeile in der Fussleiste und bei /studio und /sichtbarkeit:
+   neues Bauteil, Textfarben gesetzt, helles Thema vergessen.
+
+   Der Ring um den Punkt gehoert dazu: er maskiert die Linie, die
+   hinter ihm durchlaeuft, und muss deshalb die Farbe der FLAECHE
+   haben — auf Creme ein dunkler Ring waere ein Loch. */
+html[data-site-theme='light'] .wg-titel {
+  color: var(--theme-text-strong) !important;
+}
+
+html[data-site-theme='light'] .wg-text {
+  color: var(--theme-text-dim) !important;
+}
+
+html[data-site-theme='light'] .wg-punkt {
+  box-shadow: 0 0 0 4px var(--theme-bg) !important;
 }
 
 /* ---------- /referenzen ---------- */
