@@ -41,6 +41,7 @@ const d = WEBSITE[locale];
 const softwarePfad = path('software', locale);
 const referenzenPfad = path('referenzen', locale);
 const preisePfad = path('preise', locale);
+const studioPfad = path('studio', locale);
 const problemZiele = [null, softwarePfad, '#cms'];
 
 // Website-Referenzen fuer die "Aus der Praxis" Section — nur die 3
@@ -113,6 +114,12 @@ const websiteRefs = REFERENCES.filter((r) =>
         <p class="cms-examples">
           <strong>{d.cms.beispieleLabel}</strong>{d.cms.beispiele}
         </p>
+        {studioPfad && (
+          <a class="cta-link cms-mehr" href={studioPfad}>
+            {d.cms.studioCta}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+          </a>
+        )}
       </div>
     </section>
 
@@ -357,6 +364,11 @@ const websiteRefs = REFERENCES.filter((r) =>
     color: rgba(245, 158, 11, 0.85);
     font-weight: 600;
   }
+  .cms-mehr {
+    display: inline-flex;
+    margin-top: 18px;
+  }
+
   .cms-examples {
     padding: 20px;
     background: rgba(245, 158, 11, 0.06);

@@ -19,6 +19,7 @@ const d = PREISE[locale];
 // fallen deshalb beide Verweise darauf weg — ein englischer Linktext,
 // der auf eine deutsche Seite fuehrt, ist schlechter als kein Link.
 const rechnerPfad = path('preisrechner', locale);
+const sichtbarkeitPfad = path('sichtbarkeit', locale);
 
 // Inline-SVG für Häkchen — kleiner amber-umrandeter Kreis mit
 // amber Häkchen innen. Wird in der "Immer dabei"-Liste pro Item
@@ -69,6 +70,15 @@ const checkIcon = `
           </p>
         </article>
       ))}
+          {sichtbarkeitPfad && (
+        <p class="preise-sichtbarkeit">
+          {d.sichtbarkeit.text}
+          <a class="cta-link" href={sichtbarkeitPfad}>
+            {d.sichtbarkeit.cta}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+          </a>
+        </p>
+      )}
     </section>
 
     <!-- Preisrechner-Anker: dezenter CTA-Block zwischen Preis-Karten
@@ -224,6 +234,27 @@ const checkIcon = `
   .preise-intro strong {
     color: rgba(245, 158, 11, 1);
     font-weight: 700;
+  }
+
+  /* Die Zeile unter den beiden Paketen: leiser als sie, aber nicht
+     Kleingedrucktes. Sie beantwortet die Frage, die diese Seite sonst
+     offen laesst — was kostet alles, was keine Website ist. */
+  .preise-sichtbarkeit {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px 14px;
+    max-width: 760px;
+    margin: 26px auto 0;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.92rem;
+    text-align: center;
+    color: rgba(245, 245, 244, 0.6);
+  }
+
+  :global(html[data-site-theme='light']) .preise-sichtbarkeit {
+    color: rgba(26, 26, 28, 0.65);
   }
 
   /* === Zwei Hauptkarten === */
