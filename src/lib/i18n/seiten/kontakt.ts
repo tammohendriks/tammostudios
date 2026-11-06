@@ -72,7 +72,7 @@ export const de = {
   // Vorbelegung des Nachrichtenfeldes, passend zum gewählten Anliegen.
   // Reihenfolge wie bei anliegen.
   vorlagen: [
-    'Hallo Tammo, ich brauche eine neue Website für meinen Betrieb [Betriebsart]. Aktuell habe ich [keine Site / eine veraltete Site unter www.beispiel.de]. Wichtig für mich wäre: [z.B. Referenzen, Kontaktformular, mobile Optimierung]. Wann könnten wir sprechen?',
+    'Hallo Tammo, ich brauche eine neue Website für meinen Betrieb [Betriebsart]. Aktuell habe ich [keine Website / eine veraltete Website unter www.beispiel.de]. Wichtig für mich wäre: [z.B. Referenzen, Kontaktformular, mobile Optimierung]. Wann könnten wir sprechen?',
     'Hallo Tammo, ich plane einen Online-Shop für [Produktkategorie]. Aktuell verkaufe ich [im Ladengeschäft / gar nicht online]. Wichtige Features wären: [z.B. Zahlungsanbieter, Lagerverwaltung, Versand-Abwicklung]. Können wir das kurz besprechen?',
     'Hallo Tammo, ich brauche [Flyer / Visitenkarten / ein Bauzaun-Banner / Google Ads / Social-Media-Anzeigen] für meinen Betrieb [Betriebsart]. Geplant ist: [kurze Beschreibung]. Meine Website ist [www.beispiel.de / noch keine]. Was würde das ungefähr kosten?',
     'Hallo Tammo, meine bestehende Website unter [www.beispiel.de] braucht [Aktualisierung / Erweiterung / Bug-Fix]. Konkret geht es um: [kurze Beschreibung]. Wann hast du Zeit?',

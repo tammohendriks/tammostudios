@@ -97,7 +97,7 @@ export const de = {
     preisHeadline: 'Klar, fix, ohne Sternchen.',
     preislisteAnsehen: 'Volle Preisliste ansehen',
     // Wird dem Namen der Referenz nachgestellt: "Wärmepower — …".
-    liveSeiteOeffnen: 'Live-Site öffnen (neuer Tab)',
+    liveSeiteOeffnen: 'Live-Website öffnen (neuer Tab)',
     faqTitel: 'Häufige Fragen',
     empfehlung: {
       text: 'Die Branche ist nie das Problem. Was zählt, ist was die Seite können soll:',

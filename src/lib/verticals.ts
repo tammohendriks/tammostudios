@@ -152,7 +152,7 @@ export const VERTICALS = [
       paragraphs: [
         'Wärmepower ist ein Meisterbetrieb aus Lemwerder für Heizung, Wärmepumpe und Sanitär.\nNotdienst 24/7 direkt in der Navigation, klare Positionierung als lokaler Meister-Betrieb — kein anonymes Konzern-Look.',
         'Kirsch Dach & Fassade aus Bremen bedient Dach- und Fassadenprojekte in ganz Norddeutschland (bis 250 km Umkreis).\nProminente Sturmschaden-Hotline in der Navigation, "Schnelle Anfrage"-Formular direkt im Hero.',
-        'Beide Sites setzen auf klares Handwerk-Vokabular ohne Konzern-Optik, mobile-first, mit Google-Business-Anbindung.',
+        'Beide Websites setzen auf klares Handwerk-Vokabular ohne Konzern-Optik, mobile-first, mit Google-Business-Anbindung.',
       ],
       references: [
         {
@@ -190,7 +190,7 @@ export const VERTICALS = [
       },
       {
         q: 'Was passiert bei einem Ausfall?',
-        a: 'Deine Site läuft auf Vercel, einer der zuverlässigsten Hosting-Plattformen mit 99.99% Uptime. Im Pflege-Paket bin ich bei Störungen priorisiert erreichbar.',
+        a: 'Deine Website läuft auf Vercel, einer der zuverlässigsten Hosting-Plattformen mit 99.99% Uptime. Im Pflege-Paket bin ich bei Störungen priorisiert erreichbar.',
       },
     ],
   },
@@ -258,7 +258,7 @@ export const VERTICALS = [
       eyebrow: 'AUS DER PRAXIS — SAMEDOS + IBI',
       paragraphs: [
         'Samedos ist eine arbeitsmedizinische Praxis aus Bremen mit klarem Fokus auf DGUV-Vorschrift 2.\nDas Institut für Betriebsmedizin Isernhagen (IBI) bietet betriebsmedizinische Betreuung und Offshore-Eignung.',
-        'Beide Sites zeigen Team, Leistungen und Kontaktwege ohne medizinisches Marketing-Sprech.',
+        'Beide Websites zeigen Team, Leistungen und Kontaktwege ohne medizinisches Marketing-Sprech.',
       ],
       references: [
         {
@@ -339,7 +339,7 @@ export const VERTICALS = [
       },
     },
     intro:
-      'Eine Kneipe ist keine SaaS-Startup-Site. Ein feines Restaurant kein Baumarkt. Deine Website muss die Atmosphäre deines Ladens einfangen — dunkel und rau, warm und einladend, elegant und ruhig. Was auch immer du bist.',
+      'Eine Kneipe ist keine SaaS-Startup-Website. Ein feines Restaurant kein Baumarkt. Deine Website muss die Atmosphäre deines Ladens einfangen — dunkel und rau, warm und einladend, elegant und ruhig. Was auch immer du bist.',
     checklistTitle: 'Was auf eine Gastro-Website gehört',
     checklist: [
       'Aktuelle Speisekarte (im CMS selbst pflegen)',
@@ -386,7 +386,7 @@ export const VERTICALS = [
       },
       {
         q: 'Wie kriege ich neue Gäste über die Website?',
-        a: 'Kombination aus Local SEO (Google findet dich bei "kneipe bremen walle"), gutem Instagram-Feed auf der Site, und ehrlichen Bewertungen. Der Traffic-Aufbau dauert 3–6 Monate.',
+        a: 'Kombination aus Local SEO (Google findet dich bei "kneipe bremen walle"), gutem Instagram-Feed auf der Website, und ehrlichen Bewertungen. Der Traffic-Aufbau dauert 3–6 Monate.',
       },
       {
         q: 'Was ist mit Google Maps und Bewertungen?',
