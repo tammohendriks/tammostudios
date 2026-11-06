@@ -33,6 +33,7 @@ export const de = {
   },
 
   technik: {
+    braue: 'UNTER DER HAUBE',
     headline: 'Was drinsteckt',
     punkte: [
       {
@@ -86,6 +87,7 @@ export const en: Shape<typeof de> = {
   },
 
   technik: {
+    braue: 'UNDER THE HOOD',
     headline: 'What is in it',
     punkte: [
       {

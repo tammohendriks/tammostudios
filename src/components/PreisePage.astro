@@ -8,6 +8,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SubPageBackground from './SubPageBackground.astro';
 import SiteFooter from './SiteFooter.astro';
+import Hochzaehlen from './Hochzaehlen.astro';
 import ClosingCta from './ClosingCta.astro';
 import { localeOf, path } from '../lib/routes.mjs';
 import { PREISE } from '../lib/i18n/seiten/preise';
@@ -57,7 +58,11 @@ const checkIcon = `
       {[d.karten.website, d.karten.shop].map((karte) => (
         <article class="price-card" data-reveal>
           <p class="price-eyebrow">{karte.eyebrow}</p>
-          <p class="price-amount">{karte.preis}</p>
+          {/* data-zaehlen: die Zahl laeuft hoch, sobald sie im Bild
+              steht — dieselbe Behandlung wie auf den Branchenseiten.
+              Der Endzustand steht im HTML, das Skript schreibt nur
+              unterwegs etwas anderes hinein. */}
+          <p class="price-amount" data-zaehlen>{karte.preis}</p>
           <p class="price-sublabel">{d.karten.einmalig}</p>
           <div class="price-divider"></div>
           <ul class="dash-list">
@@ -172,6 +177,8 @@ const checkIcon = `
   </main>
 
   <SiteFooter />
+
+  <Hochzaehlen />
 </BaseLayout>
 
 <style>

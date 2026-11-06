@@ -37,13 +37,17 @@ export const de = {
   hero: {
     headline: 'Hi, ich bin Tammo.',
     sub:
-      '25 Jahre alt, aus Bremen — aktuell auf Reise durch Asien.\n' +
+      // {alter} wird beim Bauen ersetzt, siehe alterJetzt() in
+      // lib/constants.ts. Keine feste Zahl mehr: die war jedes Jahr
+      // ab dem 28. Oktober falsch.
+      '{alter} Jahre alt, aus Bremen — aktuell auf Reise durch Asien.\n' +
       'Freelance-Webdeveloper mit Marketing-Background.\n' +
       'Ich baue handgemachte Websites und die Anwendungen darin. Eine nach der anderen.',
     fotoAlt: 'Tammo Hendriks, Gründer von Tammo Studios',
   },
 
   werIchBin: {
+    braue: 'DIE KURZFASSUNG',
     headline: 'Wer ich bin',
     absatz1:
       'Angefangen hat alles mit einer Ausbildung zum Kaufmann für Digitalisierungsmanagement bei einer Sparkassen-Tochter. Danach bin ich dort ein Jahr lang als Online Marketing Manager geblieben. Nebenbei habe ich aber gemerkt, dass mir etwas fehlt: das Programmieren. Genau das, was mich am Anfang am meisten gepackt hat.',
@@ -51,7 +55,43 @@ export const de = {
       'Im Mai 2026 habe ich Tammo Studios gegründet — erst nebenbei. Inzwischen habe ich meinen Job aufgegeben und arbeite vollständig selbständig. Der Sprung ins Kalte, mich vollständig durchzusetzen. Ab August reise ich für längere Zeit durch Asien. Videos kann man schlecht aus 9.000 Kilometern Entfernung drehen. Websites schon.',
   },
 
+  /**
+   * Der Werdegang als Zeitstrahl.
+   *
+   * ALLE ANGABEN STAMMEN AUS DEM ABSATZ DARUEBER — Ausbildung, das
+   * Jahr als Online Marketing Manager, Mai 2026, die Reise. Nichts
+   * ist dazuerfunden, insbesondere keine Jahreszahlen, die dort nicht
+   * stehen. Wer eine ergaenzt, muss sie vom Betreiber haben.
+   */
+  werdegang: {
+    braue: 'DER WEG HIERHER',
+    headline: 'Vier Stationen',
+    stationen: [
+      {
+        zeit: 'Ausbildung',
+        titel: 'Kaufmann für Digitalisierungsmanagement',
+        text: 'Bei einer Sparkassen-Tochter. Da hat mich das Programmieren das erste Mal gepackt.',
+      },
+      {
+        zeit: 'Danach',
+        titel: 'Ein Jahr Online Marketing',
+        text: 'Im selben Haus geblieben, als Online Marketing Manager. Nebenbei gemerkt, dass mir das Bauen fehlt.',
+      },
+      {
+        zeit: 'Mai 2026',
+        titel: 'Tammo Studios gegründet',
+        text: 'Erst nebenbei, neben dem Job. Die ersten Websites entstehen abends und am Wochenende.',
+      },
+      {
+        zeit: 'Heute',
+        titel: 'Vollständig selbstständig',
+        text: 'Job gekündigt, der Sprung ins Kalte. Aus Bremen, zurzeit aus Asien.',
+      },
+    ],
+  },
+
   wieIchArbeite: {
+    braue: 'KEINE AGENTUR DAZWISCHEN',
     headline: 'Wie ich arbeite',
     absatz1:
       'Ein Projekt zur Zeit. Du sprichst direkt mit der Person, die deine Seite baut. Keine Agentur-Hierarchie dazwischen.',
@@ -67,6 +107,7 @@ export const de = {
   },
 
   kosten: {
+    braue: 'FESTPREIS',
     headline: 'Was es kostet',
     websiteVor: 'Eine Website kostet',
     websitePreis: '2.000 €',
@@ -78,6 +119,7 @@ export const de = {
   },
 
   ausserhalb: {
+    braue: 'DER REST',
     headline: 'Außerhalb vom Code',
     absatz1:
       "Wenn ich nicht arbeite, bin ich meistens beim Sport oder unterwegs. Reisen ist das, was mir Energie gibt. Und der Grund, warum ich das hier so aufgebaut habe, wie ich's aufgebaut habe.",
@@ -119,13 +161,14 @@ export const en: Shape<typeof de> = {
   hero: {
     headline: "Hi, I'm Tammo.",
     sub:
-      '25 years old, from Bremen, currently traveling through Asia.\n' +
+      '{alter} years old, from Bremen, currently traveling through Asia.\n' +
       'A freelance web developer with a marketing background.\n' +
       'I build handcrafted websites and the applications inside them. One at a time.',
     fotoAlt: 'Tammo Hendriks, founder of Tammo Studios',
   },
 
   werIchBin: {
+    braue: 'THE SHORT VERSION',
     headline: 'Who I am',
     absatz1:
       'It all started with a vocational apprenticeship in digitalization management at a savings bank subsidiary. After that I stayed on there for a year as an online marketing manager. On the side I noticed that something was missing: programming. Exactly the thing that had gripped me most at the beginning.',
@@ -133,7 +176,35 @@ export const en: Shape<typeof de> = {
       'In May 2026 I founded Tammo Studios, at first on the side. By now I have given up the job and work fully self-employed. Jumping in at the deep end, all in on my own. From August I am traveling through Asia for a longer stretch. Videos are hard to shoot from 9,000 kilometers away. Websites are not.',
   },
 
+  werdegang: {
+    braue: 'HOW I GOT HERE',
+    headline: 'Four stops',
+    stationen: [
+      {
+        zeit: 'Apprenticeship',
+        titel: 'Digital management, commercial track',
+        text: 'At a subsidiary of a German savings bank. That is where coding first got hold of me.',
+      },
+      {
+        zeit: 'After that',
+        titel: 'A year in online marketing',
+        text: 'I stayed in the same house as an online marketing manager. And noticed that I missed building things.',
+      },
+      {
+        zeit: 'May 2026',
+        titel: 'Tammo Studios founded',
+        text: 'On the side at first, next to the job. The first websites were built in the evenings and at weekends.',
+      },
+      {
+        zeit: 'Today',
+        titel: 'Fully self-employed',
+        text: 'I quit the job and jumped. From Bremen, currently from Asia.',
+      },
+    ],
+  },
+
   wieIchArbeite: {
+    braue: 'NO AGENCY IN BETWEEN',
     headline: 'How I work',
     absatz1:
       'One project at a time. You talk directly to the person who builds your site. No agency hierarchy in between.',
@@ -149,6 +220,7 @@ export const en: Shape<typeof de> = {
   },
 
   kosten: {
+    braue: 'FIXED PRICE',
     headline: 'What it costs',
     websiteVor: 'A website costs',
     websitePreis: '€2,000',
@@ -160,6 +232,7 @@ export const en: Shape<typeof de> = {
   },
 
   ausserhalb: {
+    braue: 'THE REST',
     headline: 'Outside the code',
     absatz1:
       'When I am not working I am usually at the gym or out somewhere. Traveling is what gives me energy. And the reason I set all this up the way I set it up.',

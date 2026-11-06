@@ -8,12 +8,18 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import SubPageBackground from './SubPageBackground.astro';
 import SiteFooter from './SiteFooter.astro';
 import ClosingCta from './ClosingCta.astro';
-import { SITE } from '../lib/constants';
+import { SITE, alterJetzt } from '../lib/constants';
 import { absUrl, localeOf, path, pathOr } from '../lib/routes.mjs';
 import { UEBER } from '../lib/i18n/seiten/ueber';
 
 const locale = localeOf(Astro.url.pathname);
 const d = UEBER[locale];
+
+// Das Alter steht nicht im Text, es wird beim Bauen eingesetzt. Eine
+// Zahl, die man von Hand pflegen muss, ist eine Zahl, die irgendwann
+// falsch ist — und diese hier wird es zuverlaessig jedes Jahr am
+// 28. Oktober.
+const heroSub = d.hero.sub.replace('{alter}', String(alterJetzt()));
 
 const preisePfad = path('preise', locale);
 const werkstattPfad = path('werkstatt', locale);
@@ -62,7 +68,7 @@ const personSchema = {
     <header class="ueber-hero">
       <div class="hero-text">
         <h1 class="subpage-hero-title">{d.hero.headline}</h1>
-        <p class="subpage-hero-subtitle text-lines">{d.hero.sub}</p>
+        <p class="subpage-hero-subtitle text-lines">{heroSub}</p>
       </div>
       <div class="hero-mark">
         <img
@@ -79,12 +85,36 @@ const personSchema = {
 
     <article class="ueber-content">
       <section class="ueber-section" data-reveal>
+        <p class="ueber-braue">{d.werIchBin.braue}</p>
         <h2>{d.werIchBin.headline}</h2>
         <p>{d.werIchBin.absatz1}</p>
         <p>{d.werIchBin.absatz2}</p>
       </section>
 
+      {/* DER WERDEGANG ALS ZEITSTRAHL.
+          Die vier Stationen standen bisher als Fliesstext im Absatz
+          darueber. Als Zeitstrahl liest man sie in drei Sekunden
+          statt in drei Saetzen — und sieht, dass aus einer Ausbildung
+          ein eigener Betrieb geworden ist. Am Rechner waagerecht mit
+          durchgehender Linie, auf dem Handy senkrecht. */}
+      <section class="ueber-section ueber-werdegang" aria-labelledby="wg-titel">
+        <p class="ueber-braue" data-reveal>{d.werdegang.braue}</p>
+        <h2 id="wg-titel" data-reveal>{d.werdegang.headline}</h2>
+
+        <ol class="wg-bahn">
+          {d.werdegang.stationen.map((st) => (
+            <li class="wg-station" data-reveal>
+              <span class="wg-punkt" aria-hidden="true"></span>
+              <span class="wg-zeit">{st.zeit}</span>
+              <span class="wg-titel">{st.titel}</span>
+              <span class="wg-text">{st.text}</span>
+            </li>
+          ))}
+        </ol>
+      </section>
+
       <section class="ueber-section" data-reveal>
+        <p class="ueber-braue">{d.wieIchArbeite.braue}</p>
         <h2>{d.wieIchArbeite.headline}</h2>
         <p>{d.wieIchArbeite.absatz1}</p>
         <p>{d.wieIchArbeite.absatz2}</p>
@@ -97,6 +127,7 @@ const personSchema = {
       </section>
 
       <section class="ueber-section" data-reveal>
+        <p class="ueber-braue">{d.kosten.braue}</p>
         <h2>{d.kosten.headline}</h2>
         <p>
           {d.kosten.websiteVor} <strong>{d.kosten.websitePreis}</strong>{d.kosten.shopVor}
@@ -123,6 +154,7 @@ const personSchema = {
       </section>
 
       <section class="ueber-section" data-reveal>
+        <p class="ueber-braue">{d.ausserhalb.braue}</p>
         <h2>{d.ausserhalb.headline}</h2>
         <p>{d.ausserhalb.absatz1}</p>
         <p>{d.ausserhalb.absatz2}</p>
@@ -301,6 +333,128 @@ const personSchema = {
 
   .ueber-section:last-of-type {
     margin-bottom: 32px;
+  }
+
+  /* Die Augenbraue ueber der Abschnitts-Ueberschrift. Dieselbe
+     Machart wie auf /website, /preise und den Branchenseiten: kleine
+     Grossbuchstaben in Amber, weit gesperrt.
+
+     Eingerueckt auf dieselben 18px wie die Ueberschrift darunter,
+     damit beide auf einer Kante stehen — sonst haengt sie links
+     neben dem Amber-Balken in der Luft. */
+  /* .ueber-content davor, nicht nur .ueber-braue: die Regel fuer die
+     Absaetze (.ueber-content p) ist spezifischer und hat die
+     Augenbraue sonst grau eingefaerbt. Gemessen am 06.11.2026. */
+  .ueber-content .ueber-braue {
+    padding-left: 18px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.75rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: rgba(245, 158, 11, 0.85);
+    margin: 0 0 12px;
+  }
+
+  /* === Zeitstrahl ===
+     Am Rechner vier Spalten mit einer durchgehenden Linie auf Hoehe
+     der Punkte; auf dem Handy eine senkrechte Liste mit derselben
+     Linie links. Die Linie liegt HINTER den Punkten (z-index), damit
+     sie nicht durch sie hindurchlaeuft. */
+  .ueber-werdegang {
+    margin-bottom: 64px;
+  }
+
+  .wg-bahn {
+    position: relative;
+    list-style: none;
+    display: grid;
+    gap: 26px;
+    margin: 4px 0 0;
+    padding: 0 0 0 26px;
+  }
+
+  /* Die Linie. Senkrecht bis Tablet, waagerecht darueber. */
+  .wg-bahn::before {
+    content: '';
+    position: absolute;
+    top: 7px;
+    bottom: 7px;
+    left: 4px;
+    width: 1px;
+    background: linear-gradient(
+      to bottom,
+      rgba(245, 158, 11, 0.7),
+      rgba(245, 158, 11, 0.15)
+    );
+  }
+
+  .wg-station {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .wg-punkt {
+    position: absolute;
+    top: 6px;
+    left: -26px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #f59e0b;
+    box-shadow: 0 0 0 4px #050507;
+  }
+
+  .wg-zeit {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(245, 158, 11, 0.9);
+  }
+
+  .wg-titel {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.02rem;
+    line-height: 1.3;
+    color: #f5f5f4;
+  }
+
+  .wg-text {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: rgba(245, 245, 244, 0.68);
+  }
+
+  @media (min-width: 860px) {
+    .wg-bahn {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 22px;
+      padding: 22px 0 0;
+    }
+
+    .wg-bahn::before {
+      top: 4px;
+      bottom: auto;
+      left: 0;
+      right: 0;
+      width: auto;
+      height: 1px;
+      background: linear-gradient(
+        to right,
+        rgba(245, 158, 11, 0.7),
+        rgba(245, 158, 11, 0.15)
+      );
+    }
+
+    .wg-punkt {
+      top: -22px;
+      left: 0;
+    }
   }
 
   /* Section-Headline mit vertikaler Amber-Bar links — 3px breit,

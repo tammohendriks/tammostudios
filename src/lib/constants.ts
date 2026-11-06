@@ -95,3 +95,43 @@ export const SLOT_KNAPPHEIT: {
 // die Prüfung auf frei === 0 — gälte dem Typchecker als unerreichbar.
 // Er meldet dann einen Vergleich, der nie zutreffen kann. Die Zahlen
 // sollen sich aber ändern lassen, genau dafür stehen sie hier.
+
+/**
+ * Tammos Geburtsdatum, einziger Zweck: das Alter auf /ueber.
+ *
+ * GERECHNET WIRD BEIM BAUEN, nicht im Browser. Damit steht im
+ * ausgelieferten HTML nur die Zahl, nicht das Datum — das Alter war
+ * vorher schon oeffentlich, der Geburtstag soll es nicht werden.
+ *
+ * Preis dafuer: zwischen dem 28. Oktober und dem naechsten Deploy
+ * zeigt die Seite noch die alte Zahl. Ein Deploy genuegt, um es
+ * geradezuziehen.
+ *
+ * Stand vorher als feste Zahl im Text („25 Jahre alt") und war
+ * dadurch jedes Jahr einmal falsch.
+ */
+export const GEBURTSTAG = '2000-10-28';
+
+/**
+ * Das heutige Alter in vollen Jahren.
+ *
+ * Gerechnet in Bremer Zeit, nicht in UTC: der Bauserver steht auf
+ * UTC, und am Geburtstag selbst waeren das zwischen Mitternacht und
+ * zwei Uhr morgens ein Jahr zu wenig. Zwei Zeilen gegen einen Fehler,
+ * der genau an dem Tag auftritt, an dem es auffaellt.
+ *
+ * Der Vergleich laeuft ueber die Zeichenketten „MM-TT". Beide sind
+ * mit fuehrender Null geschrieben, damit stimmt die alphabetische
+ * Reihenfolge mit der zeitlichen ueberein.
+ */
+export const alterJetzt = (): number => {
+  const heute = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/Berlin',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date());
+
+  const jahre = Number(heute.slice(0, 4)) - Number(GEBURTSTAG.slice(0, 4));
+  return heute.slice(5) >= GEBURTSTAG.slice(5) ? jahre : jahre - 1;
+};
