@@ -90,6 +90,7 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
          Was drinsteckt
          ============================================================== -->
     <section class="werkstatt-tech" aria-labelledby="tech-heading" data-reveal>
+      <p class="werkstatt-eyebrow">{d.technik.braue}</p>
       <h2 id="tech-heading" class="werkstatt-section-title">{d.technik.headline}</h2>
       <div class="tech-grid">
         {d.technik.punkte.map((t) => (
@@ -181,6 +182,16 @@ const GAME_URL = 'https://asteroid.tammostudios.de';
     text-transform: uppercase;
     margin: 0 0 14px;
   }
+  .werkstatt-eyebrow {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.75rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: rgba(245, 158, 11, 0.85);
+    margin: 0 0 14px;
+  }
+
   .werkstatt-section-title {
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-weight: 700;

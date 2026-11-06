@@ -44,6 +44,7 @@ export const de = {
   },
 
   arten: {
+    braue: 'VIER ARTEN',
     headline: 'Was damit gemeint ist',
     punkte: [
       {
@@ -66,6 +67,7 @@ export const de = {
   },
 
   faelle: {
+    braue: 'AUS DER PRAXIS',
     headline: 'Vier, die live sind',
     ansehen: 'Ansehen',
     // name und href stehen in der Komponente: Eigenname und Adresse
@@ -99,6 +101,7 @@ export const de = {
   },
 
   groesser: {
+    braue: 'WENN ES MEHR WIRD',
     headline: 'Größer als eine Website',
     absatz1:
       'Manches passt nicht mehr in eine Website. Eine Anwendung, die deine Mitarbeiter täglich benutzen. Ein System mit mehreren Rollen. Eine App. Oder ein Spiel.',
@@ -112,6 +115,7 @@ export const de = {
   },
 
   ablauf: {
+    braue: 'DER ABLAUF',
     headline: 'So läuft das ab',
     schritte: [
       {
@@ -136,6 +140,7 @@ export const de = {
   },
 
   kosten: {
+    braue: 'WAS ES KOSTET',
     headline: 'Was das kostet',
     websitePreis: '2.000 €',
     websiteNach: ' für eine Website, ',
@@ -200,6 +205,7 @@ export const en: Shape<typeof de> = {
   },
 
   arten: {
+    braue: 'FOUR KINDS',
     headline: 'What that means',
     punkte: [
       {
@@ -222,6 +228,7 @@ export const en: Shape<typeof de> = {
   },
 
   faelle: {
+    braue: 'REAL PROJECTS',
     headline: 'Four that are live',
     ansehen: 'Take a look',
     eintraege: [
@@ -253,6 +260,7 @@ export const en: Shape<typeof de> = {
   },
 
   groesser: {
+    braue: 'WHEN IT GROWS',
     headline: 'Bigger than a website',
     absatz1:
       'Some things no longer fit into a website. An application your staff use every day. A system with several roles. An app. Or a game.',
@@ -266,6 +274,7 @@ export const en: Shape<typeof de> = {
   },
 
   ablauf: {
+    braue: 'THE PROCESS',
     headline: 'How it goes',
     schritte: [
       {
@@ -287,6 +296,7 @@ export const en: Shape<typeof de> = {
   },
 
   kosten: {
+    braue: 'WHAT IT COSTS',
     headline: 'What it costs',
     websitePreis: '€2,000',
     websiteNach: ' for a website, ',

@@ -44,6 +44,7 @@ export const de = {
   },
 
   werIchBin: {
+    braue: 'DIE KURZFASSUNG',
     headline: 'Wer ich bin',
     absatz1:
       'Angefangen hat alles mit einer Ausbildung zum Kaufmann für Digitalisierungsmanagement bei einer Sparkassen-Tochter. Danach bin ich dort ein Jahr lang als Online Marketing Manager geblieben. Nebenbei habe ich aber gemerkt, dass mir etwas fehlt: das Programmieren. Genau das, was mich am Anfang am meisten gepackt hat.',
@@ -52,6 +53,7 @@ export const de = {
   },
 
   wieIchArbeite: {
+    braue: 'KEINE AGENTUR DAZWISCHEN',
     headline: 'Wie ich arbeite',
     absatz1:
       'Ein Projekt zur Zeit. Du sprichst direkt mit der Person, die deine Seite baut. Keine Agentur-Hierarchie dazwischen.',
@@ -67,6 +69,7 @@ export const de = {
   },
 
   kosten: {
+    braue: 'FESTPREIS',
     headline: 'Was es kostet',
     websiteVor: 'Eine Website kostet',
     websitePreis: '2.000 €',
@@ -78,6 +81,7 @@ export const de = {
   },
 
   ausserhalb: {
+    braue: 'DER REST',
     headline: 'Außerhalb vom Code',
     absatz1:
       "Wenn ich nicht arbeite, bin ich meistens beim Sport oder unterwegs. Reisen ist das, was mir Energie gibt. Und der Grund, warum ich das hier so aufgebaut habe, wie ich's aufgebaut habe.",
@@ -126,6 +130,7 @@ export const en: Shape<typeof de> = {
   },
 
   werIchBin: {
+    braue: 'THE SHORT VERSION',
     headline: 'Who I am',
     absatz1:
       'It all started with a vocational apprenticeship in digitalization management at a savings bank subsidiary. After that I stayed on there for a year as an online marketing manager. On the side I noticed that something was missing: programming. Exactly the thing that had gripped me most at the beginning.',
@@ -134,6 +139,7 @@ export const en: Shape<typeof de> = {
   },
 
   wieIchArbeite: {
+    braue: 'NO AGENCY IN BETWEEN',
     headline: 'How I work',
     absatz1:
       'One project at a time. You talk directly to the person who builds your site. No agency hierarchy in between.',
@@ -149,6 +155,7 @@ export const en: Shape<typeof de> = {
   },
 
   kosten: {
+    braue: 'FIXED PRICE',
     headline: 'What it costs',
     websiteVor: 'A website costs',
     websitePreis: '€2,000',
@@ -160,6 +167,7 @@ export const en: Shape<typeof de> = {
   },
 
   ausserhalb: {
+    braue: 'THE REST',
     headline: 'Outside the code',
     absatz1:
       'When I am not working I am usually at the gym or out somewhere. Traveling is what gives me energy. And the reason I set all this up the way I set it up.',

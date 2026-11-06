@@ -69,6 +69,7 @@ const faelle = d.faelle.eintraege.map((eintrag, i) => ({ ...eintrag, ...FALL_KOE
          Was eine "Anwendung" ueberhaupt ist — Kategorie vor Beispielen
          ============================================================== -->
     <section class="software-kinds" aria-labelledby="kinds-heading" data-reveal>
+      <p class="software-eyebrow">{d.arten.braue}</p>
       <h2 id="kinds-heading" class="software-section-title">{d.arten.headline}</h2>
       <div class="kinds-grid">
         {d.arten.punkte.map((k) => (
@@ -81,6 +82,7 @@ const faelle = d.faelle.eintraege.map((eintrag, i) => ({ ...eintrag, ...FALL_KOE
     </section>
 
     <section class="software-cases" aria-labelledby="cases-heading">
+      <p class="software-eyebrow" data-reveal>{d.faelle.braue}</p>
       <h2 id="cases-heading" class="software-section-title" data-reveal>{d.faelle.headline}</h2>
 
       <div class="case-grid">
@@ -115,6 +117,7 @@ const faelle = d.faelle.eintraege.map((eintrag, i) => ({ ...eintrag, ...FALL_KOE
          Weiterleitung — wer beauftragen will, bleibt hier.
          ============================================================== -->
     <section class="software-bigger" aria-labelledby="bigger-heading" data-reveal>
+      <p class="software-eyebrow">{d.groesser.braue}</p>
       <h2 id="bigger-heading" class="software-section-title">{d.groesser.headline}</h2>
       <div class="bigger-body">
         <p>{d.groesser.absatz1}</p>
@@ -132,6 +135,7 @@ const faelle = d.faelle.eintraege.map((eintrag, i) => ({ ...eintrag, ...FALL_KOE
     </section>
 
     <section class="software-process" aria-labelledby="process-heading">
+      <p class="software-eyebrow" data-reveal>{d.ablauf.braue}</p>
       <h2 id="process-heading" class="software-section-title" data-reveal>{d.ablauf.headline}</h2>
 
       <div class="process-grid">
@@ -147,6 +151,7 @@ const faelle = d.faelle.eintraege.map((eintrag, i) => ({ ...eintrag, ...FALL_KOE
     </section>
 
     <section class="software-pricing" aria-labelledby="pricing-heading" data-reveal>
+      <p class="software-eyebrow">{d.kosten.braue}</p>
       <h2 id="pricing-heading" class="software-section-title">{d.kosten.headline}</h2>
 
       <div class="pricing-body">
@@ -274,6 +279,18 @@ const faelle = d.faelle.eintraege.map((eintrag, i) => ({ ...eintrag, ...FALL_KOE
   }
 
   /* ------------------------------------------------- section headings */
+
+  /* Augenbraue ueber jeder Abschnitts-Ueberschrift, wie auf
+     /website und /preise. */
+  .software-eyebrow {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.75rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: rgba(245, 158, 11, 0.85);
+    margin: 0 0 14px;
+  }
 
   .software-section-title {
     margin: 0 0 clamp(24px, 4vh, 40px);

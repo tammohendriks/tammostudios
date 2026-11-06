@@ -79,12 +79,14 @@ const personSchema = {
 
     <article class="ueber-content">
       <section class="ueber-section" data-reveal>
+        <p class="ueber-braue">{d.werIchBin.braue}</p>
         <h2>{d.werIchBin.headline}</h2>
         <p>{d.werIchBin.absatz1}</p>
         <p>{d.werIchBin.absatz2}</p>
       </section>
 
       <section class="ueber-section" data-reveal>
+        <p class="ueber-braue">{d.wieIchArbeite.braue}</p>
         <h2>{d.wieIchArbeite.headline}</h2>
         <p>{d.wieIchArbeite.absatz1}</p>
         <p>{d.wieIchArbeite.absatz2}</p>
@@ -97,6 +99,7 @@ const personSchema = {
       </section>
 
       <section class="ueber-section" data-reveal>
+        <p class="ueber-braue">{d.kosten.braue}</p>
         <h2>{d.kosten.headline}</h2>
         <p>
           {d.kosten.websiteVor} <strong>{d.kosten.websitePreis}</strong>{d.kosten.shopVor}
@@ -123,6 +126,7 @@ const personSchema = {
       </section>
 
       <section class="ueber-section" data-reveal>
+        <p class="ueber-braue">{d.ausserhalb.braue}</p>
         <h2>{d.ausserhalb.headline}</h2>
         <p>{d.ausserhalb.absatz1}</p>
         <p>{d.ausserhalb.absatz2}</p>
@@ -301,6 +305,27 @@ const personSchema = {
 
   .ueber-section:last-of-type {
     margin-bottom: 32px;
+  }
+
+  /* Die Augenbraue ueber der Abschnitts-Ueberschrift. Dieselbe
+     Machart wie auf /website, /preise und den Branchenseiten: kleine
+     Grossbuchstaben in Amber, weit gesperrt.
+
+     Eingerueckt auf dieselben 18px wie die Ueberschrift darunter,
+     damit beide auf einer Kante stehen — sonst haengt sie links
+     neben dem Amber-Balken in der Luft. */
+  /* .ueber-content davor, nicht nur .ueber-braue: die Regel fuer die
+     Absaetze (.ueber-content p) ist spezifischer und hat die
+     Augenbraue sonst grau eingefaerbt. Gemessen am 06.11.2026. */
+  .ueber-content .ueber-braue {
+    padding-left: 18px;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.75rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: rgba(245, 158, 11, 0.85);
+    margin: 0 0 12px;
   }
 
   /* Section-Headline mit vertikaler Amber-Bar links — 3px breit,
