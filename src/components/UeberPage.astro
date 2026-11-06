@@ -8,12 +8,18 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import SubPageBackground from './SubPageBackground.astro';
 import SiteFooter from './SiteFooter.astro';
 import ClosingCta from './ClosingCta.astro';
-import { SITE } from '../lib/constants';
+import { SITE, alterJetzt } from '../lib/constants';
 import { absUrl, localeOf, path, pathOr } from '../lib/routes.mjs';
 import { UEBER } from '../lib/i18n/seiten/ueber';
 
 const locale = localeOf(Astro.url.pathname);
 const d = UEBER[locale];
+
+// Das Alter steht nicht im Text, es wird beim Bauen eingesetzt. Eine
+// Zahl, die man von Hand pflegen muss, ist eine Zahl, die irgendwann
+// falsch ist — und diese hier wird es zuverlaessig jedes Jahr am
+// 28. Oktober.
+const heroSub = d.hero.sub.replace('{alter}', String(alterJetzt()));
 
 const preisePfad = path('preise', locale);
 const werkstattPfad = path('werkstatt', locale);
@@ -62,7 +68,7 @@ const personSchema = {
     <header class="ueber-hero">
       <div class="hero-text">
         <h1 class="subpage-hero-title">{d.hero.headline}</h1>
-        <p class="subpage-hero-subtitle text-lines">{d.hero.sub}</p>
+        <p class="subpage-hero-subtitle text-lines">{heroSub}</p>
       </div>
       <div class="hero-mark">
         <img

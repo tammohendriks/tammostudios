@@ -37,7 +37,10 @@ export const de = {
   hero: {
     headline: 'Hi, ich bin Tammo.',
     sub:
-      '25 Jahre alt, aus Bremen — aktuell auf Reise durch Asien.\n' +
+      // {alter} wird beim Bauen ersetzt, siehe alterJetzt() in
+      // lib/constants.ts. Keine feste Zahl mehr: die war jedes Jahr
+      // ab dem 28. Oktober falsch.
+      '{alter} Jahre alt, aus Bremen — aktuell auf Reise durch Asien.\n' +
       'Freelance-Webdeveloper mit Marketing-Background.\n' +
       'Ich baue handgemachte Websites und die Anwendungen darin. Eine nach der anderen.',
     fotoAlt: 'Tammo Hendriks, Gründer von Tammo Studios',
@@ -158,7 +161,7 @@ export const en: Shape<typeof de> = {
   hero: {
     headline: "Hi, I'm Tammo.",
     sub:
-      '25 years old, from Bremen, currently traveling through Asia.\n' +
+      '{alter} years old, from Bremen, currently traveling through Asia.\n' +
       'A freelance web developer with a marketing background.\n' +
       'I build handcrafted websites and the applications inside them. One at a time.',
     fotoAlt: 'Tammo Hendriks, founder of Tammo Studios',
