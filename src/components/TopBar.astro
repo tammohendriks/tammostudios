@@ -35,9 +35,14 @@ function eintrag(key: RouteKey, label: string): NavChild | null {
   return href ? { label, href } : null;
 }
 
+// Reihenfolge wie das Angebot gelesen werden soll: erst die Website,
+// dann was darin steckt (Software, Studio), dann was darum herum
+// sichtbar wird, dann Preise und Werkstatt.
 const angebotKinder = [
   eintrag('website', d.nav.website),
   eintrag('software', d.nav.software),
+  eintrag('studio', d.nav.studio),
+  eintrag('sichtbarkeit', d.nav.sichtbarkeit),
   eintrag('preise', d.nav.preise),
   eintrag('werkstatt', d.nav.werkstatt),
 ].filter((e): e is NavChild => e !== null);

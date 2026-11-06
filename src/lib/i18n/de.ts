@@ -21,6 +21,8 @@ export const de = {
     angebot: 'Angebot',
     website: 'Website',
     software: 'Software',
+    studio: 'Studio',
+    sichtbarkeit: 'Sichtbarkeit',
     preise: 'Preise',
     werkstatt: 'Werkstatt',
     referenzen: 'Referenzen',
