@@ -78,6 +78,8 @@ const totalCount = REFERENCES.length;
       <p class="subpage-hero-subtitle ref-description text-lines">{d.hero.sub}</p>
     </header>
 
+    <p class="ref-braue" data-reveal>{d.filter.braue}</p>
+
     <div
       class="ref-filter"
       role="group"
@@ -211,6 +213,17 @@ const totalCount = REFERENCES.length;
      Pill-Row zwischen Hero und Grid. Visuell verwandt mit den
      .ref-tag-Badges auf den Cards (Amber-Sprache), aber groesser
      und interaktiv. Wraps auf schmalen Viewports. */
+  .ref-braue {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.75rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: rgba(245, 158, 11, 0.85);
+    text-align: center;
+    margin: 0 0 16px;
+  }
+
   .ref-filter {
     display: flex;
     flex-wrap: wrap;

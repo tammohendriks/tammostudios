@@ -23,6 +23,9 @@ export const de = {
   },
 
   filter: {
+    // Beschriftet die Chip-Reihe und gibt der Seite denselben
+    // Rhythmus wie die uebrigen Unterseiten.
+    braue: 'NACH BRANCHE',
     label: 'Referenzen nach Kategorie filtern',
     alle: 'Alle',
     // Wird der Zahl nachgestellt und ist nur fuer Screenreader da:
@@ -73,6 +76,7 @@ export const en: Shape<typeof de> = {
   },
 
   filter: {
+    braue: 'BY INDUSTRY',
     label: 'Filter the work by category',
     alle: 'All',
     einheit: 'projects',
