@@ -59,11 +59,6 @@
       "statusCode": 301
     },
     {
-      "source": "/studio",
-      "destination": "/website#cms",
-      "statusCode": 301
-    },
-    {
       "source": "/websites",
       "destination": "/website",
       "statusCode": 301

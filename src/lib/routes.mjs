@@ -47,6 +47,8 @@ export const ROUTES = {
   ueber:        { de: '/ueber',                 en: '/en/about' },
   website:      { de: '/website',               en: '/en/website' },
   software:     { de: '/software',              en: '/en/software' },
+  studio:       { de: '/studio',                en: '/en/studio' },
+  sichtbarkeit: { de: '/sichtbarkeit',          en: '/en/visibility' },
   preise:       { de: '/preise',                en: '/en/pricing' },
   referenzen:   { de: '/referenzen',            en: '/en/work' },
   werkstatt:    { de: '/werkstatt',             en: '/en/lab' },
