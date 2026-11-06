@@ -47,12 +47,23 @@ import type { Gleichlang } from '../../lib/i18n/shape';
 const SUBJECT_LABELS = {
   'website-projekt': 'Website-Projekt',
   'online-shop': 'Online-Shop-Projekt',
+  'sichtbarkeit': 'Sichtbarkeit (Ads, Print, Social, Design)',
   'wartung-support': 'Wartung/Support',
   'allgemein': 'Allgemeine Projektanfrage',
   'anderes': 'Anderes',
 } as const;
 
 type SubjectKey = keyof typeof SUBJECT_LABELS;
+
+/**
+ * Die erlaubten Werte, ABGELEITET aus den Beschriftungen.
+ *
+ * Stand vorher als zweite, handgeschriebene Liste in der Pruefung
+ * weiter unten. Ein neues Anliegen haette dort vergessen werden
+ * koennen, und die Anfrage waere mit 400 abgewiesen worden — ohne
+ * dass im Formular etwas falsch ausgesehen haette.
+ */
+const SUBJECT_SCHLUESSEL = Object.keys(SUBJECT_LABELS) as [SubjectKey, ...SubjectKey[]];
 
 type Locale = 'de' | 'en';
 
@@ -105,7 +116,7 @@ const contactSchema = (m: typeof meldungenDe) =>
     email: z.string().trim().email(m.emailUngueltig),
     phone: z.string().trim().min(6, m.telefonUngueltig),
     company: z.string().trim().optional(),
-    subject: z.enum(['website-projekt', 'online-shop', 'wartung-support', 'allgemein', 'anderes']),
+    subject: z.enum(SUBJECT_SCHLUESSEL),
     message: z.string().trim().min(20, m.nachrichtZuKurz),
     datenschutz: z
       .union([z.boolean(), z.literal('true'), z.literal('on'), z.literal('1')])

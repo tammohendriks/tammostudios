@@ -46,6 +46,11 @@ const k = KONTAKT[locale];
 const ANLIEGEN_WERTE = [
   'website-projekt',
   'online-shop',
+  // Das Anliegen der Sichtbarkeits-Seite. Deren Knoepfe verweisen mit
+  // ?thema=sichtbarkeit hierher und waehlen es vor — ohne den Eintrag
+  // kaeme jede Anfrage von dort als „Anderes" an, mit der falschen
+  // Vorlage im Nachrichtenfeld.
+  'sichtbarkeit',
   'wartung-support',
   'allgemein',
   'anderes',
@@ -342,6 +347,16 @@ const skriptTexteJson = JSON.stringify(skriptTexte).replace(/</g, '\\u003c');
   // [Klammer]-Platzhaltern bei Tammo an, der dann rueckfragen kann.
   let lastTemplate = '';
   if (subjectSelect && messageArea) {
+    // Vorbelegung aus der Adresse: /kontakt?thema=sichtbarkeit waehlt
+    // das passende Anliegen und damit auch die passende Vorlage im
+    // Nachrichtenfeld. Nur Werte, die es in der Auswahl wirklich gibt
+    // — ein erfundener Parameter darf das Formular nicht in einen
+    // Zustand bringen, den das Absenden spaeter ablehnt.
+    const thema = new URLSearchParams(window.location.search).get('thema');
+    if (thema && [...subjectSelect.options].some((o) => o.value === thema)) {
+      subjectSelect.value = thema;
+    }
+
     lastTemplate = PLACEHOLDERS[subjectSelect.value] ?? '';
     messageArea.value = lastTemplate;
 

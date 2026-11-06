@@ -63,6 +63,7 @@ export const de = {
   anliegen: [
     'Website-Projekt',
     'Online-Shop-Projekt',
+    'Sichtbarkeit (Ads, Print, Social, Design)',
     'Wartung / Support',
     'Allgemeine Projektanfrage',
     'Anderes',
@@ -73,6 +74,7 @@ export const de = {
   vorlagen: [
     'Hallo Tammo, ich brauche eine neue Website für meinen Betrieb [Betriebsart]. Aktuell habe ich [keine Site / eine veraltete Site unter www.beispiel.de]. Wichtig für mich wäre: [z.B. Referenzen, Kontaktformular, mobile Optimierung]. Wann könnten wir sprechen?',
     'Hallo Tammo, ich plane einen Online-Shop für [Produktkategorie]. Aktuell verkaufe ich [im Ladengeschäft / gar nicht online]. Wichtige Features wären: [z.B. Zahlungsanbieter, Lagerverwaltung, Versand-Abwicklung]. Können wir das kurz besprechen?',
+    'Hallo Tammo, ich brauche [Flyer / Visitenkarten / ein Bauzaun-Banner / Google Ads / Social-Media-Anzeigen] für meinen Betrieb [Betriebsart]. Geplant ist: [kurze Beschreibung]. Meine Website ist [www.beispiel.de / noch keine]. Was würde das ungefähr kosten?',
     'Hallo Tammo, meine bestehende Website unter [www.beispiel.de] braucht [Aktualisierung / Erweiterung / Bug-Fix]. Konkret geht es um: [kurze Beschreibung]. Wann hast du Zeit?',
     'Hallo Tammo, ich habe eine Projektanfrage: [kurze Beschreibung deines Vorhabens]. Ich bin mir noch nicht sicher was ich genau brauche, aber [Kontext / Ziel]. Können wir das kurz besprechen?',
     'Hallo Tammo, [dein Anliegen hier]...',
@@ -140,6 +142,7 @@ export const en: Shape<typeof de> = {
   anliegen: [
     'Website project',
     'Online store project',
+    'Visibility (ads, print, social, design)',
     'Maintenance and support',
     'General project inquiry',
     'Something else',
@@ -148,6 +151,7 @@ export const en: Shape<typeof de> = {
   vorlagen: [
     'Hi Tammo, I need a new website for my business [type of business]. Right now I have [no site / an outdated site at www.example.com]. What matters to me: [e.g. past work, a contact form, mobile]. When could we talk?',
     "Hi Tammo, I'm planning an online store for [product category]. Right now I sell [in the shop / not online at all]. Important features would be: [e.g. payment provider, inventory, shipping]. Can we talk this through?",
+    'Hi Tammo, I need [flyers / business cards / a hoarding banner / Google Ads / social media ads] for my business [type of business]. The plan is: [short description]. My website is [www.example.com / none yet]. Roughly what would that cost?',
     'Hi Tammo, my existing website at [www.example.com] needs [an update / an addition / a bug fix]. Specifically: [short description]. When do you have time?',
     "Hi Tammo, I have a project inquiry: [a short description of what you have in mind]. I'm not sure yet what exactly I need, but [context / goal]. Can we talk this through?",
     'Hi Tammo, [your inquiry here]...',
