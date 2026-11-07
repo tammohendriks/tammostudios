@@ -1,11 +1,16 @@
 ---
-import { REFERENCES } from '../../lib/references';
+import { REFERENCES, fallstudienPfade } from '../../lib/references';
 import { categoryLabel } from '../../lib/references.en';
 import ReferenzModal from '../ReferenzModal.astro';
 import { localeOf, path } from '../../lib/routes.mjs';
 import { STARTSEITE } from '../../lib/i18n/seiten/startseite';
 
 const locale = localeOf(Astro.url.pathname);
+
+/* Welche Referenz einen Journal-Beitrag hat, der WIRKLICH schon
+   veroeffentlicht ist. Leeres Objekt auf Englisch — das Journal gibt
+   es nur auf Deutsch. */
+const fallstudien = await fallstudienPfade(locale as 'de' | 'en');
 const d = STARTSEITE[locale];
 
 const referenzenPfad = path('referenzen', locale);
@@ -65,6 +70,7 @@ const dots = [
           type="button"
           data-slug={ref.slug}
           data-url={ref.url}
+          data-fallstudie={fallstudien[(ref as { fallstudie?: string }).fallstudie ?? '']}
           data-title={ref.title}
           tabindex="-1"
           aria-hidden="true"

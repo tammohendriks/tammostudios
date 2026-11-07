@@ -9,13 +9,18 @@ import SubPageBackground from './SubPageBackground.astro';
 import ReferenzModal from './ReferenzModal.astro';
 import SiteFooter from './SiteFooter.astro';
 import ClosingCta from './ClosingCta.astro';
-import { REFERENCES } from '../lib/references';
+import { REFERENCES, fallstudienPfade } from '../lib/references';
 import { categoryLabel, subtitleFor } from '../lib/references.en';
 import { VERTICAL_KEY_BY_CATEGORY } from '../lib/verticals';
 import { localeOf, path } from '../lib/routes.mjs';
 import { REFERENZEN } from '../lib/i18n/seiten/referenzen';
 
 const locale = localeOf(Astro.url.pathname);
+
+/* Welche Referenz einen Journal-Beitrag hat, der WIRKLICH schon
+   veroeffentlicht ist. Leeres Objekt auf Englisch — das Journal gibt
+   es nur auf Deutsch. */
+const fallstudien = await fallstudienPfade(locale as 'de' | 'en');
 const d = REFERENZEN[locale];
 
 const softwarePfad = path('software', locale);
@@ -163,6 +168,7 @@ const totalCount = REFERENCES.length;
           <button
             class="ref-card-trigger"
             data-url={ref.url}
+            data-fallstudie={fallstudien[(ref as { fallstudie?: string }).fallstudie ?? '']}
             data-title={ref.title}
             type="button"
             aria-label={`${ref.title} ${d.karte.modalOeffnenNach}`}

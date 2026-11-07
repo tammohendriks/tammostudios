@@ -32,6 +32,7 @@ import { localeOf, path, pathOr } from '../lib/routes.mjs';
 import { getVertical, type VerticalSlug } from '../lib/verticals.i18n';
 import QuizModal from './QuizModal.astro';
 import Kundenstimmen from './Kundenstimmen.astro';
+import { getJournalPost } from '../lib/sanity';
 import { SKIZZE } from '../lib/i18n/seiten/skizze';
 import { SITE, PHONE_INTERNATIONAL } from '../lib/constants';
 import { REFERENCES } from '../lib/references';
@@ -185,6 +186,21 @@ const seo = SKIZZE[locale as 'de' | 'en'].seo;
 const seoWort = seo.wort[slug as SkizzeBranche];
 const seoFuerWen = seo.fuerWen[slug as SkizzeBranche];
 const faqTitel = seo.faqTitel.replace('{wort}', seoWort);
+
+/* Fallstudie zu dieser Branche, wenn es einen Beitrag dazu gibt.
+   Geprueft wird beim Bauen gegen die veroeffentlichten Beitraege —
+   ein fester Verweis waere eine 404, solange der Text noch beim
+   Betreiber liegt. Nur auf Deutsch: das Journal gibt es nicht auf
+   Englisch, und ein Knopf, der unangekuendigt in eine andere Sprache
+   fuehrt, ist eine Falle. */
+const FALLSTUDIEN: Partial<Record<string, string>> = {
+  praxis: 'praxis-websites-samedos-ibi',
+};
+const fallstudieSlug = FALLSTUDIEN[slug];
+const fallstudiePfad =
+  locale === 'de' && fallstudieSlug && (await getJournalPost(fallstudieSlug))
+    ? `/journal/${fallstudieSlug}`
+    : null;
 
 const fallstudieBraue = (() => {
   const roh = vertical.caseStudy?.eyebrow ?? '';
@@ -455,6 +471,17 @@ const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
         ))}
       </div>
     </section>
+
+    {fallstudiePfad && (
+      <aside class="v-fallstudie" data-reveal>
+        <a href={fallstudiePfad}>
+          <span class="v-fallstudie-text">{d.referenzModal.fallstudie}</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </a>
+      </aside>
+    )}
 
     {umgebaut && <Kundenstimmen branche={slug as SkizzeBranche} />}
 
@@ -1055,6 +1082,44 @@ const telefonLink = `tel:${PHONE_INTERNATIONAL.replace(/\s/g, '')}`;
   }
 
   /* === FAQ === */
+  /* Ein ruhiger Verweis zwischen FAQ und Stimmen: ein Angebot, kein
+     zweiter Handlungsaufruf. */
+  .v-fallstudie {
+    max-width: 880px;
+    margin: 0 auto 96px;
+    padding: 0 40px;
+    text-align: center;
+  }
+
+  .v-fallstudie a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.04);
+    color: rgba(245, 245, 244, 0.86);
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: var(--lp-text);
+    text-decoration: none;
+    transition: background 200ms ease, border-color 200ms ease;
+  }
+
+  .v-fallstudie a:hover,
+  .v-fallstudie a:focus-visible {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.4);
+    color: #f59e0b;
+  }
+
+  @media (max-width: 768px) {
+    .v-fallstudie {
+      padding: 0 20px;
+      margin-bottom: 72px;
+    }
+  }
+
   .v-faq {
     margin-bottom: 96px;
   }

@@ -139,6 +139,7 @@ export const en: Shape<typeof de> = {
     rahmenTitel: 'Work preview',
     nichtEinbettbar: 'This site cannot be embedded directly.',
     neuerTabOeffnen: 'Open in a new tab',
+    fallstudie: 'Read the case study',
   },
 
   journal: {
