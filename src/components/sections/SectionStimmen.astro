@@ -35,17 +35,17 @@
  * Sticky, keine Wort-Animation, sondern ein ruhiges Layout
  * untereinander — derselbe DOM, andere Regeln.
  */
-import { localeOf, path } from '../../lib/routes.mjs';
+import { localeOf } from '../../lib/routes.mjs';
 import { STARTSEITE } from '../../lib/i18n/seiten/startseite';
 import { TESTIMONIALS, zerlegenFuer, type Testimonial } from '../../lib/testimonials';
 import { REFERENCES } from '../../lib/references';
-import { GOOGLE_BEWERTUNG, bewertungsNote } from '../../lib/constants';
+import { bewertungsNote } from '../../lib/constants';
+import Sterne from '../Sterne.astro';
 
 const locale = localeOf(Astro.url.pathname) as 'de' | 'en';
 const d = STARTSEITE[locale].stimmen;
 const note = bewertungsNote(locale);
 
-const referenzenPfad = path('referenzen', locale);
 
 /**
  * Die Reihenfolge der drei Akte und die Website, die dahinter laeuft.
@@ -133,16 +133,72 @@ const inTeile = (teile: [string, string, string]): Teil[] => {
   return raus;
 };
 
+/**
+ * Dasselbe Punktfeld wie in der Nachbarsection „Zuletzt gebaut.":
+ * statische Amber-Punkte, keine Animation. Andere Positionen, damit
+ * es nicht wie eine Kopie aussieht, aber dieselbe Familie.
+ */
+const PUNKTE = [
+  { x: 7, y: 18, s: 3, o: 0.5 }, { x: 92, y: 12, s: 2, o: 0.4 },
+  { x: 18, y: 72, s: 4, o: 0.35 }, { x: 80, y: 64, s: 3, o: 0.55 },
+  { x: 48, y: 8, s: 2, o: 0.45 }, { x: 62, y: 88, s: 3, o: 0.3 },
+  { x: 4, y: 52, s: 2, o: 0.6 }, { x: 96, y: 40, s: 4, o: 0.35 },
+  { x: 32, y: 34, s: 2, o: 0.4 }, { x: 70, y: 26, s: 2, o: 0.5 },
+  { x: 12, y: 92, s: 3, o: 0.4 }, { x: 88, y: 82, s: 2, o: 0.45 },
+  { x: 40, y: 58, s: 2, o: 0.3 }, { x: 56, y: 44, s: 3, o: 0.35 },
+] as const;
+
+/* === Stimmkurve ===
+   Eine Tonspur hinter jedem Zitat, die mitlaeuft, waehrend die Worte
+   aufgedeckt werden. Gespielt ist amber, ungespielt bleibt dunkel —
+   dieselbe Leserichtung wie der Text davor.
+
+   DIE HOEHEN KOMMEN AUS DEM ZITAT SELBST. Kein Math.random: der Build
+   muss wiederholbar sein, sonst zeigt jede Auslieferung eine andere
+   Kurve und kein Diff ist mehr lesbar. Gleiche Worte, gleiche Kurve.
+
+   Die Huellkurve macht die Mitte lauter als die Raender — sonst sieht
+   es aus wie ein Zaun und nicht wie ein gesprochener Satz. */
+const BALKEN = 56;
+
+const stimmkurve = (text: string): number[] => {
+  let h = 2166136261;
+  const raus: number[] = [];
+  for (let i = 0; i < BALKEN; i++) {
+    h ^= text.charCodeAt(i % text.length) + i * 131;
+    h = Math.imul(h, 16777619) >>> 0;
+    const zufall = (h % 1000) / 1000;
+    const t = i / (BALKEN - 1);
+    const huelle = 0.34 + 0.66 * Math.pow(Math.sin(Math.PI * t), 0.7);
+    raus.push(Math.max(0.07, zufall * huelle));
+  }
+  return raus;
+};
+
+// Die Note als Zahl — fuer die Sterne in der ruhigen Fassung, die
+// ohne laufendes Script keinen Wert von aussen bekommt.
+const noteZahl = Number(note.replace(',', '.'));
+
+/* Der Zaehler wird in drei Teile zerlegt, weil nur die ZIFFER
+   animiert werden soll: Trenner und „/ 03" stehen still, die
+   Aktnummer rollt. Vorlage ist '{n} / {gesamt}'. */
+const [zVor, zNach] = (d.zaehler ?? '{n} / {gesamt}').split('{n}');
+const zTrenner = '\u00a0\u00b7\u00a0' + (zVor ?? '').replace(/ /g, '\u00a0');
+// Geschuetzte Leerzeichen, damit „ / 03" seinen Abstand zur Ziffer
+// behaelt — ein normales Leerzeichen am Spananfang kann wegfallen.
+const zRest = (zNach ?? '').replace(/ /g, '\u00a0');
+
 const akte = AKTE.map((a) => {
   const stimme = hole(TESTIMONIALS, a.id, 'id') as Testimonial;
   const referenz = hole(REFERENCES, a.ref, 'slug');
-  const { teile, uebersetzt } = zerlegenFuer(stimme, locale);
+  const { teile, uebersetzt } = zerlegenFuer(stimme, locale, 'kurz');
   const stuecke = inTeile(teile);
   return {
     ...stimme,
     stuecke,
     wortzahl: stuecke.reduce((s, t) => s + (t.art === 'kern' ? t.woerter.length : 1), 0),
     uebersetzt,
+    kurve: stimmkurve(teile.join('')),
     bild: referenz.preview,
     bildAlt: `${STARTSEITE[locale].projekte.vorschauVon} ${referenz.title}`,
     // Der volle Text als eine Zeichenkette — fuer die kleinen Karten
@@ -152,10 +208,35 @@ const akte = AKTE.map((a) => {
 });
 ---
 
-<section class="sti" aria-labelledby="sti-titel">
+{/* sti-ruhig ist der STANDARD, nicht die Ausnahme. Ohne laufendes
+    Script bleibt die Klasse stehen und man bekommt das ruhige Layout
+    untereinander — vorher waren Siegel und alle drei Zitate auf
+    opacity 0 und man scrollte 400vh durch leeres Schwarz. Das
+    Inline-Script unter der Section nimmt sie synchron wieder weg,
+    bevor etwas gezeichnet wird. */}
+<section
+  class="sti sti-ruhig"
+  aria-labelledby="sti-titel"
+  style={`--note-voll:${noteZahl}`}
+>
+  {/* Hintergrund wie bei „Zuletzt gebaut." nebenan: dieselbe flache
+      Farbe, dasselbe Amber-Licht, dasselbe Punktfeld. Das Licht sitzt
+      hier aber OBEN statt unten — die Nachbarsection wird zu ihrer
+      Unterkante hin heller, diese zu ihrer Oberkante. An der Naht
+      treffen sich beide, und aus zwei Kanten wird ein Verlauf. */}
+  <div class="sti-ambient" aria-hidden="true"></div>
+  <div class="sti-punkte" aria-hidden="true">
+    {PUNKTE.map((pt) => (
+      <span style={`left:${pt.x}%; top:${pt.y}%; width:${pt.s}px; height:${pt.s}px; opacity:${pt.o}`}></span>
+    ))}
+  </div>
+
   <div class="sti-sticky">
-    {/* Die Screenshots laufen hinter allem. Abgedunkelt auf rund 18 %,
-        damit sie Kulisse bleiben und nicht mit dem Zitat konkurrieren. */}
+    {/* Die Screenshots der Websites, ueber die gesprochen wird. Stark
+        unscharf und sehr leise: sie sollen als Kulisse wirken, nicht
+        als zweiter Text. Vorher schimmerten „Betriebsmedizin mit
+        Augenmaß" und „Bremen" durch und standen in Konkurrenz zum
+        Zitat. */}
     <div class="sti-kulisse" aria-hidden="true">
       {akte.map((a, i) => (
         <div class="sti-bild" data-i={i}>
@@ -165,66 +246,119 @@ const akte = AKTE.map((a) => {
       <div class="sti-schleier"></div>
     </div>
 
-    <div class="sti-inhalt">
-      {/* === Das Siegel ===
-          Startet gross in der Mitte und wandert in die Ecke. Die Note
-          steht fertig im HTML; das Skript schreibt waehrend des
-          Hochzaehlens etwas anderes hinein und setzt am Ende exakt
-          den Ausgangstext zurueck. */}
-      <div class="sti-siegel" data-siegel>
-        <p class="sti-note" data-note>{note}</p>
-        <p class="sti-sterne" aria-hidden="true">
-          {[0, 1, 2, 3, 4].map((i) => (
-            <span class="sti-stern" style={`--i:${i}`}>★</span>
-          ))}
-        </p>
-        <span class="sti-nurlesen">{d.sterneLabel.replace('{note}', note)}</span>
-        <p class="sti-braue" id="sti-titel">{d.eyebrow}</p>
-        <p class="sti-mono">{d.mono.replace('{note}', note)}</p>
-      </div>
+    {/* Vier Zeilen wie im Fahrplan: Kopf, Buehne, Rail, Atem. Die
+        Rail hat eine eigene Zeile mit fester Hoehe — dadurch kann
+        kein Zitat und kein Autor-Chip je in sie hineinwachsen. Genau
+        das war der Fehler davor: die Rail lag absolut ueber allem und
+        schrieb „Dr. Kirsten W[KD]ak-Agah". */}
+    <div class="sti-raster">
+      <header class="sti-kopf">
+        {/* Die Augenbraue traegt den Zaehler und darf deshalb NICHT das
+            Label der Section sein: aria-labelledby nimmt den ganzen
+            Textinhalt mit, und der hiess waehrend der Akte
+            „WAS KUNDEN SAGEN · 02 / 03". Gelabelt wird mit der H2 —
+            genauso macht es Section5Timeline.
 
-      {/* === Die drei Akte === */}
+            Der Zaehler ist fuer Vorleseprogramme ausgeblendet: er ist
+            eine Fortschrittsanzeige fuers Auge, die Zitate selbst
+            werden ohnehin vorgelesen. */}
+        <p class="eyebrow sti-braue">
+          <span>{d.eyebrow}</span><span class="sti-zaehler" aria-hidden="true"
+            ><span class="sti-z-fest">{zTrenner}</span><span class="sti-z-rolle"
+              ><span class="sti-z-ab" data-n-ab>01</span><span
+                class="sti-z-auf" data-n-auf>02</span></span
+            ><span class="sti-z-fest">{zRest.replace('{gesamt}', String(akte.length).padStart(2, '0'))}</span></span
+          >
+        </p>
+        <div class="sti-kopf-text">
+          <h2 class="sti-headline" id="sti-titel">{d.headline}</h2>
+        </div>
+      </header>
+
       <div class="sti-buehne">
+        {/* Startbild: die Note, die Sterne, die Mono-Zeile. */}
+        <div class="sti-siegel" data-siegel>
+          {/* aria-hidden, weil der Wert hochzaehlt: angekuendigt wurde
+              „0,0". Fertig und vollstaendig steht die Note fuer
+              Vorleseprogramme gleich darunter in .sti-nurlesen. */}
+          <p class="sti-note" data-note aria-hidden="true">{note}</p>
+          <Sterne class="sti-sterne" groesse="clamp(1.5rem, 2.6vw, 2.2rem)" abstand="0.22em" />
+          <span class="sti-nurlesen">{d.sterneLabel.replace('{note}', note)}</span>
+          <p class="sti-mono">{d.mono.replace('{note}', note)}</p>
+        </div>
+
+        {/* Die drei Akte. */}
         {akte.map((a, i) => (
           <figure class="sti-akt" data-i={i} style={`--wortzahl:${a.wortzahl}`}>
+            {/* Die Tonspur liegt HINTER dem Zitat (z-index 0 gegen 1)
+                und ist fuer Vorleseprogramme nicht vorhanden. Zwei
+                Lagen desselben SVG: unten dunkel, darueber amber,
+                beschnitten auf den schon aufgedeckten Teil. Der
+                Schnitt sitzt auf einem HTML-Element, nicht auf SVG-
+                Kindern — dort ist die Bezugsbox je nach Browser eine
+                andere. */}
+            <span class="sti-stimme" aria-hidden="true">
+              <svg class="sti-stimme-svg" viewBox={`0 0 ${BALKEN * 10} 100`} preserveAspectRatio="none">
+                <g id={`stimmkurve-${i}`}>
+                  {a.kurve.map((v, b) => (
+                    <rect x={b * 10 + 2.6} y={50 - v * 50} width="4.8" height={v * 100} rx="2.4" />
+                  ))}
+                </g>
+              </svg>
+              <span class="sti-stimme-laut">
+                <svg class="sti-stimme-svg" viewBox={`0 0 ${BALKEN * 10} 100`} preserveAspectRatio="none">
+                  <use href={`#stimmkurve-${i}`} />
+                </svg>
+              </span>
+              <span class="sti-stimme-kopf"></span>
+            </span>
             {/* EINE Schleife ohne Umbrueche dazwischen: jeder Umbruch
                 im Markup waere ein Leerzeichen im HTML. */}
             <blockquote class="sti-zitat">{a.stuecke.map((t) => t.art === 'kern' ? (<>{t.raum ? ' ' : ''}<span class="sti-kern">{t.woerter.map((w) => (<span class="sti-wort" style={`--n:${w.n}`}>{w.raum ? ' ' : ''}{w.text}</span>))}</span></>) : (<span class="sti-wort" style={`--n:${t.wort.n}`}>{t.wort.raum ? ' ' : ''}{t.wort.text}</span>))}</blockquote>
 
-            <figcaption class="sti-chip">
-              <span class="sti-initialen" aria-hidden="true">{a.initialen}</span>
-              <span class="sti-wer">
-                <strong>{a.autor}</strong>
-                <span>{a.betrieb}</span>
+            {/* EINE figcaption, und zwar als letztes Kind. Vorher stand
+                der Uebersetzungshinweis als eigenes <p> DAHINTER —
+                damit war die figcaption mittleres Kind, die figure auf
+                /en ungueltig und der Hinweis gehoerte nicht mehr zur
+                Bildunterschrift. Er gehoert dort hin: er sagt, woher
+                die Worte kommen. */}
+            <figcaption class="sti-fuss">
+              <span class="sti-chip">
+                <span class="sti-initialen" aria-hidden="true">{a.initialen}</span>
+                <span class="sti-wer">
+                  <strong>{a.autor}</strong>
+                  <span>{a.betrieb}</span>
+                </span>
+                {a.abzeichen && <span class="sti-abzeichen" aria-hidden="true">{a.abzeichen}</span>}
               </span>
-              {a.abzeichen && <span class="sti-abzeichen" aria-hidden="true">{a.abzeichen}</span>}
+              {a.uebersetzt && d.uebersetzt && (
+                <span class="sti-uebersetzt">{d.uebersetzt}</span>
+              )}
             </figcaption>
-
-            {a.uebersetzt && d.uebersetzt && (
-              <p class="sti-uebersetzt">{d.uebersetzt}</p>
-            )}
           </figure>
         ))}
+
+        {/* Schlussbild: dieselben drei Stimmen, klein und
+            aufgefaechert, mit dem Siegel als Stempel darauf. Fuer
+            Vorleseprogramme ausgeblendet — der Text stand oben schon. */}
+        <div class="sti-stapel" aria-hidden="true">
+          {akte.map((a, i) => (
+            <article class="sti-karte" style={`--i:${i}`}>
+              <Sterne class="sti-karte-sterne" groesse="0.72rem" abstand="0.12em" />
+              <p class="sti-karte-text">{a.text}</p>
+              <p class="sti-karte-wer">{a.autor}</p>
+            </article>
+          ))}
+          <span class="sti-stempel">
+            <span class="sti-stempel-note">{note}</span>
+            <Sterne class="sti-stempel-sterne" groesse="0.58rem" abstand="0.08em" />
+          </span>
+        </div>
       </div>
 
-      {/* === Der Stapel am Ende ===
-          Dieselben drei Stimmen, klein und aufgefaechert. Fuer
-          Vorleseprogramme ausgeblendet: der Text steht oben schon. */}
-      <div class="sti-stapel" aria-hidden="true">
-        {akte.map((a, i) => (
-          <article class="sti-karte" style={`--i:${i}`}>
-            <p class="sti-karte-sterne">★★★★★</p>
-            <p class="sti-karte-text">{a.text}</p>
-            <p class="sti-karte-wer">{a.autor}</p>
-          </article>
-        ))}
-        <span class="sti-stempel">{note}</span>
-      </div>
-
-      {/* === Die Rail ===
-          Drei Punkte mit Initialen, verbunden durch eine Linie. Die
-          Orange-Fuellung trackt, welche Stimme gerade spricht —
-          dieselbe Mechanik wie die Fahrplan-Rail im Abschnitt davor. */}
+      {/* Drei Punkte mit Initialen, verbunden durch eine Linie. Die
+          Fuellung trackt den Schwerpunkt der Deckkraefte, nicht den
+          rohen Scroll — dieselbe Mechanik wie die Fahrplan-Rail. */}
       <div class="sti-rail" aria-hidden="true">
         <div class="sti-rail-spur"></div>
         <div class="sti-rail-fluss"></div>
@@ -235,42 +369,85 @@ const akte = AKTE.map((a) => {
         ))}
       </div>
 
-      {/* === Abschluss === */}
-      <div class="sti-abschluss">
-        {referenzenPfad && (
-          <a class="sti-cta" href={referenzenPfad}>
-            {d.cta}
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M5 12h14M13 6l6 6-6 6" />
-            </svg>
-          </a>
-        )}
-        {GOOGLE_BEWERTUNG.url && (
-          <a class="sti-google" href={GOOGLE_BEWERTUNG.url} target="_blank" rel="noopener noreferrer">
-            {d.google}
-          </a>
-        )}
-      </div>
     </div>
   </div>
 </section>
 
+{/* Nimmt die Klasse sti-ruhig SYNCHRON wieder ab, noch im selben
+    Parser-Durchlauf — zwischen dem Parsen der Section und diesem
+    Script wird nichts gezeichnet, es blitzt also kein ruhiges Layout
+    auf. Das Modul-Script weiter unten laeuft verzoegert und waere
+    dafuer zu spaet.
+
+    Wer Bewegung reduziert haben will, behaelt die Klasse: sonst
+    stuende fuer einen Moment die Choreografie da. */}
+<script is:inline>
+  (function () {
+    var s = document.currentScript.previousElementSibling;
+    while (s && !(s.classList && s.classList.contains('sti'))) s = s.previousElementSibling;
+    if (!s) return;
+    try {
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        s.classList.remove('sti-ruhig');
+      }
+    } catch (e) {
+      s.classList.remove('sti-ruhig');
+    }
+  })();
+</script>
+
 <style>
   /* === Wurzel ===
-     min-height treibt die Dauer der Choreografie: 400vh heisst 300vh
-     Verweildauer im Sticky, also rund 64vh je Akt. Genug Weg, damit
-     ein Zitat Wort fuer Wort gelesen werden kann, ohne dass es
-     zaeh wird. */
+     Hintergrund, Ambient und Punktfeld sind dieselben Mittel wie in
+     „Zuletzt gebaut." nebenan — #0a0a0a statt #050507, ein weiches
+     Amber-Licht und vierzehn statische Punkte. Vorher stand hier eine
+     flache, nackte Flaeche in einem anderen Schwarz; genau das hat
+     die Section wie einen Fremdkoerper wirken lassen. */
+  /* 450vh statt 400: die Standzeit des Autor-Chips haengt nicht am
+     Anteil, sondern am WEG. Bei 400vh standen „WaermePower, Bremen"
+     gemessen 149 px — ein Trackpad-Wisch. Die Nachbarsections sind
+     250 bis 300vh hoch, haben aber auch nur einen Kopf und keine drei
+     Akte. */
   .sti {
     position: relative;
-    min-height: 400vh;
-    background: #050507;
+    min-height: 450vh;
+    background: #0a0a0a;
   }
 
   @media (max-width: 768px) {
     .sti {
-      min-height: 300vh;
+      min-height: 340vh;
     }
+  }
+
+  /* Das Licht sitzt OBEN. Die Nachbarsection wird zu ihrer Unterkante
+     hin heller, diese zu ihrer Oberkante — an der Naht treffen sich
+     beide, und aus zwei harten Kanten wird ein Verlauf. */
+  .sti-ambient {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      ellipse 80% 45% at 50% 0%,
+      rgba(245, 158, 11, 0.07) 0%,
+      rgba(245, 158, 11, 0.03) 40%,
+      transparent 75%
+    );
+  }
+
+  .sti-punkte {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .sti-punkte span {
+    position: absolute;
+    background: rgba(245, 158, 11, 0.6);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
   }
 
   .sti-sticky {
@@ -279,15 +456,19 @@ const akte = AKTE.map((a) => {
     height: 100dvh;
     overflow: hidden;
 
+    --kopf-ein: 0;
+    --kopf: 1;
     --siegel: 0;
-    --klein: 0;
-    --sterne: 0;
+    --fuellung: 0;
     --rail: 0;
+    --rail-ink: 0;
     --settle: 0;
     --stempel: 0;
   }
 
-  /* === Kulisse: der Screenshot der jeweiligen Website === */
+  /* === Kulisse ===
+     Unscharf und sehr leise. Ohne die Unschaerfe stand hinter dem
+     Zitat lesbarer Fremdtext und hat mit ihm konkurriert. */
   .sti-kulisse {
     position: absolute;
     inset: 0;
@@ -298,8 +479,8 @@ const akte = AKTE.map((a) => {
   .sti-bild {
     position: absolute;
     inset: 0;
-    opacity: calc(var(--bild, 0) * 0.15);
-    will-change: opacity, transform;
+    opacity: calc(var(--bild, 0) * 0.1);
+    will-change: opacity;
   }
 
   .sti-bild img {
@@ -308,90 +489,303 @@ const akte = AKTE.map((a) => {
     object-fit: cover;
     object-position: top center;
     transform: scale(var(--zoom, 1));
+    filter: blur(7px) saturate(0.7);
     will-change: transform;
   }
 
-  /* Ein Schleier darueber: ohne ihn konkurriert der Screenshot mit
-     dem Zitat, und beides verliert. */
   .sti-schleier {
     position: absolute;
     inset: 0;
     background:
-      radial-gradient(ellipse 58% 50% at 50% 50%, rgba(5, 5, 7, 0.6) 0%, rgba(5, 5, 7, 0.97) 100%),
-      linear-gradient(to bottom, rgba(5, 5, 7, 0.78), rgba(5, 5, 7, 0.5) 40%, rgba(5, 5, 7, 0.94));
+      radial-gradient(ellipse 62% 54% at 50% 46%, rgba(10, 10, 10, 0.72) 0%, rgba(10, 10, 10, 0.97) 100%),
+      linear-gradient(to bottom, rgba(10, 10, 10, 0.8), rgba(10, 10, 10, 0.55) 42%, rgba(10, 10, 10, 0.95));
   }
 
-  .sti-inhalt {
+  /* === Vier Zeilen wie im Fahrplan ===
+     Kopf (auto) / Buehne (1fr) / Rail (auto) / Atem (0.6fr). Die
+     Masse sind die der Werkstatt-Section, damit beide Sticky-Stuecke
+     der Startseite denselben Rhythmus haben. */
+  .sti-raster {
     position: relative;
     z-index: 1;
+    display: grid;
+    /* DREI Zeilen, nicht vier: der Fahrplan hat unten noch eine
+       leere Atem-Zeile (0.6fr). Hier hat sie genau den Platz
+       gefressen, den das Zitat braucht — nachgerechnet blieben bei
+       900 px Fensterhoehe 245 px fuer ein Zitat, das mit Chip rund
+       300 px hoch ist. Ergebnis: oben abgeschnitten, Chip unter der
+       Rail. Der row-gap haelt die 32 px Mindestabstand zwischen Chip
+       und Rail, die der Auftrag verlangt. */
+    grid-template-rows: auto 1fr auto;
+    row-gap: clamp(32px, 5vh, 60px);
+    align-items: center;
+    justify-items: center;
     height: 100%;
+    width: 100%;
+    max-width: 1120px;
+    margin: 0 auto;
+    /* DIE KOPFHOEHE IST NACHGEBAUT, nicht geschaetzt.
+
+       Section 3 ist ein Flex-Spalte mit justify-content: center und
+       einem Inhaltsblock von rund 482 px — ihre Augenbraue sitzt
+       deshalb immer bei (100vh − 482) / 2. Gemessen: 259 px bei 1000,
+       209 bei 900, 159 bei 800, 119 bei 720, 79 bei 640. Section 4
+       liegt zwei Pixel daneben, also derselbe Aufbau.
+
+       Mein Raster fuellt dagegen die volle Hoehe, der Kopf klebte am
+       Innenabstand und sass bei 900 px auf 108 statt 209 — hundert
+       Pixel zu hoch. Dieselbe Formel bringt ihn auf dieselbe Linie.
+
+       Der Boden von 84 px verhindert, dass der Kopf auf sehr flachen
+       Fenstern unter die Kopfleiste rutscht; dort weicht er um
+       wenige Pixel von Section 3 ab, was niemand sieht. */
+    /* 241 ist nicht geraten, und die Zahl allein genuegt nicht als
+       Begruendung.
+
+       ERSTENS: die Augenbraue von Section 3 sitzt bei 50vh - 241px
+       PLUS 20 px Startversatz ihrer Einfahrt. Wer nur die sichtbare
+       Lage vergleicht, ohne den Einfahr-Fortschritt mitzudenken,
+       misst 20 px Unterschied, die es nicht gibt.
+
+       ZWEITENS, UND WICHTIGER: unterhalb 1280 px Breite ist mit den
+       Nachbarn gar keine Deckung zu haben, weil die sich selbst nicht
+       einig sind. Gemessen bei 900 px Fensterhoehe, Augenbraue im
+       Fenster, Kopf voll eingefahren:
+
+         Breite   Sec3     Sec4     hier
+          390     183,7     90      209
+          769      66,2     -8,6    209
+          886      56,7    -10,3    209
+         1024     233,2    -13,9    209
+         1280     210,0    213,7    209
+         1440     208,6    210,6    209
+         1920     208,6    206,8    209
+
+       Section 3 zentriert ihren Inhalt, und dessen Hoehe springt mit
+       dem Kartenumbruch (482 px bei 1440, 787 px bei 886). Section 4
+       scrollt ihre Augenbraue zwischen 769 und 1024 sogar oben aus
+       dem Bild. Erst ab 1280 laufen die drei zusammen, und dort liegt
+       diese Section mittendrin.
+
+       WER DAS HIER „REPARIERT", baut die Spruenge der Nachbarn nach.
+       Eine feste Lage ist hier die ruhigere Antwort. */
+    padding: max(84px, calc(50vh - 241px)) 40px clamp(56px, 8vh, 88px);
+    box-sizing: border-box;
   }
 
-  /* === Das Siegel === */
+  @media (max-width: 768px) {
+    .sti-raster {
+      padding: max(84px, calc(50vh - 241px)) 20px 56px;
+      row-gap: 32px;
+    }
+  }
+
+  @media (max-height: 780px) {
+    .sti-raster {
+      padding-bottom: 44px;
+      row-gap: 26px;
+    }
+  }
+
+  /* === Kopf ===
+     Augenbraue, Ueberschrift, Unterzeile — derselbe Aufbau und
+     dieselben Groessen wie in Section 3 und 4. Die Augenbraue bleibt
+     waehrend der Akte stehen und traegt dann den Zaehler; Ueberschrift
+     und Unterzeile faden weg, damit das Zitat Platz hat. */
+  /* Faehrt beim Runterscrollen EIN und beim Hochscrollen wieder aus —
+     genau wie .section-3-header und .section-4-header. Vorher stand der
+     Kopf dauerhaft da, sobald die Section ins Bild kam.
+
+     Dieselbe Anhebung wie Section 3 (20 px) und derselbe PHYSISCHE
+     Scrollweg: Section 3 ist 250vh hoch und blendet ueber 10 % ein, das
+     sind 15vh. Diese Section hat 350vh Scrollweg, 15vh davon sind 0.05
+     — der Anteil waere also der falsche Vergleich.
+
+     Startwert 0 steht in .sti-sticky, damit nichts aufblitzt, solange
+     das Script noch keinen Durchlauf hatte. Genauso macht es
+     .section-4-header. */
+  .sti-kopf {
+    max-width: 720px;
+    text-align: center;
+    opacity: var(--kopf-ein, 1);
+    transform: translateY(calc((1 - var(--kopf-ein, 1)) * 20px));
+    will-change: opacity, transform;
+  }
+
+  /* KEINE Farbe hier: die geteilte .eyebrow setzt genau dieselbe
+     (global.css:813). Zwei Orte, eine Wahrheit.
+
+     Flex statt text-align, damit der Zaehler ein eigenes Kaestchen ist,
+     dessen Breite sich animieren laesst, ohne die Grundlinie der Zeile
+     zu verschieben. */
+  .sti-braue {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    margin: 0 0 6px;
+  }
+
+  /* Der Zaehler blendet nicht nur ein, er macht sich auch schmal.
+     Sonst stuende auf dem Startbild unsichtbarer Text in der Zeile und
+     schoebe „WAS KUNDEN SAGEN" aus der Mitte.
+
+     WAS DARAN EIN FEHLER WAR: vorher loeschte das Script stattdessen
+     den Textinhalt. Weil die Deckkraftsumme der Akte an jedem
+     Aktwechsel durch Null faellt, passierte das MITTEN in der Section
+     — und die zentrierte Augenbraue sprang jedes Mal seitlich weg und
+     zurueck. Der Text steht jetzt immer, nur die Breite wandert. */
+  .sti-zaehler {
+    display: flex;
+    flex: none;
+    align-items: baseline;
+    max-width: calc(var(--zaehler-an, 0) * 8em);
+    overflow: hidden;
+    white-space: nowrap;
+    opacity: var(--zaehler-an, 0);
+    /* overflow: hidden braucht das Fach fuer die Breite. Ohne diesen
+       Luftraum wuerde es aber auch SENKRECHT schneiden und die
+       wandernden Ziffern koepfen. Negativer Rand haelt das Layout. */
+    padding-block: 0.6em;
+    margin-block: -0.6em;
+    /* Ohne tabellarische Ziffern ist „01" 1,02 px breiter als „02",
+       und die zentrierte Augenbraue ruckt beim Wechsel seitlich. */
+    font-variant-numeric: tabular-nums;
+  }
+
+  .sti-z-fest {
+    flex: none;
+  }
+
+  /* Nur die Ziffer rollt. Der Trenner und „/ 03" stehen still — ein
+     Wechsel des ganzen Textes wirkte abrupt und sprang.
+
+     Die abgehende Ziffer bleibt IM FLUSS; sie gibt dem Kaestchen Hoehe
+     und Grundlinie. Die ankommende liegt absolut darueber. 2ch ist in
+     einer Mono-Schrift exakt zwei Ziffern breit, die Breite steht also
+     still, waehrend die Ziffern wandern. */
+  /* KEINE feste Breite. 2ch war der Fehler: ch ist die Breite der
+     Null, die Augenbraue ist aber keine Mono-Schrift und hat zusaetzlich
+     Buchstabensperrung — „01" wurde dadurch breiter als sein Kaestchen
+     und ragte in den Schraegstrich. Die abgehende Ziffer steht im Fluss
+     und gibt die Breite vor; sie hat immer zwei Stellen, die Breite
+     steht also ohnehin still. */
+  .sti-z-rolle {
+    position: relative;
+    display: inline-block;
+    flex: none;
+    text-align: center;
+  }
+
+  .sti-z-ab,
+  .sti-z-auf {
+    display: inline-block;
+  }
+
+  /* --reise ist DIESELBE Bewegung, mit der der Punkt in der Rail zum
+     naechsten Punkt wandert. Ziffer und Punkt rollen damit im
+     Gleichschritt, und weil der Wert am Scrollstand haengt statt an
+     einem Timer, laeuft das Ganze rueckwaerts genauso. */
+  /* Die beiden Deckkraefte ergeben IMMER zusammen 1. Das ist kein
+     Schoenheitsdetail: eine geteilte Uebergabe (abgehende Ziffer bei
+     0.5 schon weg, ankommende faengt dort erst an) laesst das
+     Ziffernfach leer. Gemessen waren das fuenf erreichbare
+     Scrollpositionen je Wechsel, an denen „WAS KUNDEN SAGEN ·  / 03"
+     mit leerer Luecke dastand — derselbe Nulldurchgang, den die Rail
+     vorher hatte, nur eine Ebene tiefer.
+
+     Dass die beiden sich in der Mitte nicht ins Gehege kommen, macht
+     der ABSTAND: 0.42em auseinander, die eine ueber, die andere unter
+     der Zeile. */
+  .sti-z-ab {
+    opacity: calc(1 - var(--reise, 0));
+    transform: translateY(calc(var(--reise, 0) * -0.42em));
+  }
+
+  .sti-z-auf {
+    position: absolute;
+    left: 0;
+    right: 0;
+    opacity: var(--reise, 0);
+    transform: translateY(calc((1 - var(--reise, 0)) * 0.42em));
+  }
+
+  .sti-kopf-text {
+    opacity: var(--kopf);
+    transform: translateY(calc((1 - var(--kopf)) * -6px));
+  }
+
+  /* Exakt die Werte von .section-3-headline und .section-3-sub. */
+  .sti-headline {
+    margin: 0;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    letter-spacing: -0.02em;
+    color: #f5f5f4;
+  }
+
+  /* === Buehne ===
+     min-height: 0 und overflow: hidden sind nicht Kosmetik: ohne sie
+     sprengt ein langes Zitat die 1fr-Zeile und schiebt die Rail aus
+     dem Bild. */
+  .sti-buehne {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    /* Damit Kartenstapel und Stempel im Schlussbild in cqw und cqh
+       rechnen koennen, also in Prozent DIESER Buehne statt des
+       Fensters. Mit festen Pixelwerten war der Stapel zwischen 769 und
+       885 px Fensterbreite bis zu 64 px breiter als die Buehne, die
+       ihn beschneidet, und mobil 46 px; der Stempel ragte auf flachen
+       Fenstern oben heraus (1280x560 gemessen 39,6 px, also 35 % des
+       Kreises). size statt inline-size, weil der Stempel die HOEHE
+       braucht. Die Buehne hat height: 100 % in einer 1fr-Zeile, ihre
+       Groesse haengt also ohnehin nicht am Inhalt. */
+    container-type: size;
+  }
+
+  /* === Startbild === */
   .sti-siegel {
     position: absolute;
-    top: 50%;
-    left: 50%;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    opacity: calc(var(--siegel) * (1 - var(--settle)));
-    /* Erst mittig und gross, dann klein in der linken oberen Ecke.
-       Die zweite translate-Stufe faehrt sie dorthin, scale schrumpft
-       sie auf gut ein Viertel. */
-    transform:
-      translate(-50%, -50%)
-      translate(calc(var(--klein) * -33vw), calc(var(--klein) * -32vh))
-      scale(calc(1 - var(--klein) * 0.74));
-    will-change: transform, opacity;
+    opacity: var(--siegel);
+    transform: scale(calc(0.94 + var(--siegel) * 0.06));
+    will-change: opacity, transform;
   }
 
+  /* KEIN Fraunces: die Familie ist im Projekt nirgends deklariert —
+     kein @font-face, kein Paket, keine Datei. Der Browser ist bisher
+     stillschweigend auf Neue Montreal Bold zurueckgefallen. Jetzt
+     steht da, was tatsaechlich gerendert wird. */
   .sti-note {
     margin: 0;
-    font-family: 'Fraunces', 'Neue Montreal', serif;
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-weight: 700;
-    font-size: clamp(5.5rem, 14vw, 13.5rem);
-    line-height: 0.9;
-    letter-spacing: -0.04em;
+    font-size: clamp(4rem, min(11vw, 17vh), 9rem);
+    line-height: 0.92;
+    letter-spacing: -0.045em;
     color: #f5f5f4;
   }
 
   .sti-sterne {
-    display: flex;
-    gap: 0.1em;
-    margin: 0.1em 0 0;
-    font-size: clamp(1.6rem, 4vw, 3rem);
-    line-height: 1;
-    color: #f59e0b;
-  }
-
-  /* Jeder Stern fuellt sich, wenn --sterne seine Nummer ueberschreitet,
-     und macht dabei einen kurzen Satz nach oben. */
-  .sti-stern {
-    --an: clamp(0, calc((var(--sterne) - var(--i)) * 1.6), 1);
-    opacity: calc(0.14 + 0.86 * var(--an));
-    transform: scale(calc(1 + 0.15 * var(--an) * (1 - var(--an)) * 4));
-  }
-
-  .sti-braue {
-    margin: 1.1em 0 0;
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-weight: 500;
-    font-size: 0.75rem;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: rgba(245, 158, 11, 0.9);
-    opacity: calc(1 - var(--klein));
+    margin-top: 0.55em;
   }
 
   .sti-mono {
-    margin: 0.7em 0 0;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 0.7rem;
+    margin: 1.4em 0 0;
+    font-family: var(--lp-mono);
+    font-size: var(--lp-mono-groesse);
     letter-spacing: 0.14em;
-    color: rgba(245, 245, 244, 0.45);
-    opacity: calc(1 - var(--klein));
+    /* 0.45 ergab gemessen 4,22:1 und blieb damit unter 4,5:1. */
+    color: rgba(245, 245, 244, 0.52);
   }
 
   .sti-nurlesen {
@@ -404,14 +798,68 @@ const akte = AKTE.map((a) => {
   }
 
   /* === Die Akte === */
-  .sti-buehne {
+  /* === Stimmkurve ===
+     Liegt hinter dem Zitat. Gespielt ist amber, ungespielt dunkel —
+     dieselbe Leserichtung wie die Worte davor, nur eine Ebene tiefer.
+     Die Farbe kommt ueber currentColor: innerhalb von <use> greifen
+     Selektoren auf die Originalknoten nicht zuverlaessig, eine
+     geerbte Farbe schon. */
+  .sti-stimme {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 0;
+    width: 116%;
+    height: clamp(96px, 23vh, 190px);
+    transform: translate(-50%, -50%) scaleY(calc(0.45 + 0.55 * var(--akt, 0)));
+    color: rgba(245, 158, 11, 0.1);
+    pointer-events: none;
+  }
+
+  .sti-stimme-svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .sti-stimme-svg rect {
+    fill: currentColor;
+  }
+
+  /* Beschnitten auf den schon aufgedeckten Teil. inset() auf einem
+     HTML-Element, nicht auf SVG-Kindern: dort haengt die Bezugsbox am
+     Browser. Kein width-Wechsel, also kein Layout je Bild. */
+  .sti-stimme-laut {
     position: absolute;
     inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 40px;
-    pointer-events: none;
+    color: rgba(245, 158, 11, 0.44);
+    clip-path: inset(0 calc((1 - var(--spiel, 0)) * 100%) 0 0);
+  }
+
+  /* Der Kopf der Tonspur. Blendet an beiden Enden weg, damit er nur
+     waehrend des Sprechens zu sehen ist. */
+  .sti-stimme-kopf {
+    position: absolute;
+    top: 6%;
+    bottom: 6%;
+    left: calc(var(--spiel, 0) * 100%);
+    width: 1px;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      rgba(245, 158, 11, 0.5) 22%,
+      rgba(245, 158, 11, 0.5) 78%,
+      transparent
+    );
+    opacity: calc(var(--spiel, 0) * (1 - var(--spiel, 0)) * 4);
+  }
+
+  /* Text ueber die Tonspur. .sti-akt hat durch opacity ohnehin einen
+     eigenen Stapelzusammenhang, die Zahlen gelten also nur hier. */
+  .sti-zitat,
+  .sti-fuss {
+    position: relative;
+    z-index: 1;
   }
 
   .sti-akt {
@@ -424,30 +872,26 @@ const akte = AKTE.map((a) => {
     will-change: opacity, transform;
   }
 
+  /* An die HOEHE gekoppelt, nicht nur an die Breite: auf einem
+     flachen Fenster ist die Breite da, die Hoehe nicht, und genau
+     dort waechst ein Zitat sonst in die Rail. Obergrenze ist die
+     Headline-Groesse der Nachbarsections — groesser als die
+     Ueberschriften der Seite darf ein Zitat nicht werden. */
   .sti-zitat {
     margin: 0;
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-weight: 700;
-    font-size: clamp(1.5rem, 3.4vw, 3.25rem);
-    line-height: 1.3;
+    font-size: clamp(1.15rem, min(3.2vw, 4.6vh), 2.8rem);
+    line-height: 1.32;
     letter-spacing: -0.02em;
     color: #f5f5f4;
     text-wrap: pretty;
   }
 
-  /* DER TELEPROMPTER. Jedes Wort vergleicht seine Nummer mit --worte
-     und entscheidet daraus seine Deckkraft. Dadurch kostet ein Bild
-     der Animation EINE Zuweisung je Akt statt einer je Wort. */
   .sti-wort {
     opacity: calc(0.15 + 0.85 * clamp(0, calc((var(--worte, 0) - var(--n)) * 1.8), 1));
   }
 
-  /* Die Kernphrase: der Marker zieht sich darunter durch, sobald sie
-     vollstaendig dasteht, und faerbt sie dabei von Weiss nach Amber.
-     Als HINTERGRUND, nicht als abgesetztes Element — mit
-     box-decoration-break bekommt jede Zeile ihren eigenen Strich,
-     auch wenn die Phrase umbricht. Dieselbe Loesung wie im Hero der
-     Branchenseiten, und aus demselben Grund. */
   .sti-kern {
     --marker: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 20' preserveAspectRatio='none'%3E%3Cpath d='M 4 11 C 50 7, 150 14, 196 10' stroke='%23f59e0b' stroke-opacity='0.4' stroke-width='13' stroke-linecap='round' fill='none'/%3E%3Cpath d='M 4 11 C 50 7, 150 14, 196 10' stroke='%23f59e0b' stroke-width='5.5' stroke-linecap='round' fill='none'/%3E%3C/svg%3E");
 
@@ -461,18 +905,18 @@ const akte = AKTE.map((a) => {
     box-decoration-break: clone;
   }
 
-  /* === Autor-Chip === */
+  /* === Autor-Chip ===
+     Kartenstil der Referenz-Karten aus Section 3: dieselbe
+     Hintergrundfarbe, dieselbe Kante. Nur der Radius ist rund statt
+     12px, weil es eine Zeile ist und keine Kachel. */
   .sti-chip {
     display: inline-flex;
     align-items: center;
     gap: 13px;
-    margin-top: 34px;
     padding: 10px 18px 10px 10px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 999px;
-    background: rgba(12, 12, 15, 0.82);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    background: rgba(15, 15, 18, 0.6);
     text-align: left;
     opacity: var(--chip, 0);
     transform: translateY(calc((1 - var(--chip, 0)) * 22px));
@@ -487,8 +931,8 @@ const akte = AKTE.map((a) => {
     height: 38px;
     flex-shrink: 0;
     border-radius: 50%;
-    border: 1px solid rgba(245, 158, 11, 0.45);
-    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.32);
+    background: rgba(245, 158, 11, 0.09);
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-size: 0.8rem;
     font-weight: 600;
@@ -517,68 +961,76 @@ const akte = AKTE.map((a) => {
   .sti-abzeichen {
     margin-left: 6px;
     padding-left: 13px;
-    border-left: 1px solid rgba(255, 255, 255, 0.12);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
     font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     font-weight: 700;
     letter-spacing: -0.02em;
     color: rgba(245, 158, 11, 0.95);
   }
 
+  /* Sitzt jetzt IN der figcaption, darum display: block.
+     Groesse und Farbe waren 0.62rem bei 0.35 Deckkraft — gemessen
+     2,97:1 bei 9,9 px. Das ist ein Pflichthinweis zur Herkunft der
+     Worte, der muss lesbar sein. Jetzt die Mono-Groesse des Projekts
+     und 5,3:1. */
+  .sti-fuss {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: clamp(20px, 3.4vh, 34px);
+  }
+
   .sti-uebersetzt {
-    margin: 12px 0 0;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 0.62rem;
+    display: block;
+    margin: 10px 0 0;
+    font-family: var(--lp-mono);
+    font-size: var(--lp-mono-groesse);
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: rgba(245, 245, 244, 0.35);
+    color: rgba(245, 245, 244, 0.52);
     opacity: var(--chip, 0);
   }
 
-  /* === Der Stapel am Ende === */
+  /* === Schlussbild === */
   .sti-stapel {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    width: min(92vw, 820px);
-    height: 300px;
-    transform: translate(-50%, -50%);
+    width: 100%;
+    max-width: 880px;
+    height: 100%;
     opacity: var(--settle);
     pointer-events: none;
   }
 
+  /* Halbe Spannweite = Versatz + halbe Kartenbreite, und die muss
+     unter 50cqw bleiben, sonst schneidet die Buehne ab. 22 + 48/2 = 46
+     — mit Luft. */
   .sti-karte {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: min(74vw, 270px);
-    padding: 20px 20px 18px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 15px;
-    background: rgba(15, 15, 18, 0.94);
+    width: min(48cqw, 262px);
+    padding: 18px 18px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    background: rgba(15, 15, 18, 0.95);
     box-shadow: 0 20px 52px rgba(0, 0, 0, 0.5);
     text-align: left;
-    /* Aufgefaechert: −4° / 0° / +4°, und je weiter aussen, desto
-       weiter seitlich. Der Faecher baut sich mit --settle auf. */
     transform:
       translate(-50%, -50%)
-      translateX(calc((var(--i) - 1) * var(--settle) * 252px))
+      translateX(calc((var(--i) - 1) * var(--settle) * 22cqw))
       translateY(calc((1 - var(--settle)) * 40px))
       rotate(calc((var(--i) - 1) * var(--settle) * 4.5deg));
   }
 
   .sti-karte-sterne {
-    margin: 0 0 9px;
-    font-size: 0.8rem;
-    letter-spacing: 0.08em;
-    line-height: 1;
-    color: #f59e0b;
+    margin-bottom: 10px;
   }
 
   .sti-karte-text {
     margin: 0 0 12px;
     font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-size: 0.78rem;
+    font-size: 0.76rem;
     line-height: 1.5;
     color: rgba(245, 245, 244, 0.72);
     display: -webkit-box;
@@ -595,56 +1047,79 @@ const akte = AKTE.map((a) => {
     color: rgba(245, 245, 244, 0.9);
   }
 
-  /* Der Stempel: kommt aus der Ecke zurueck, faellt schraeg auf den
-     Stapel und setzt sich von 1.3 auf 1.0. */
   .sti-stempel {
     position: absolute;
     top: 50%;
     left: 50%;
     display: inline-flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 118px;
-    height: 118px;
-    border: 3px solid rgba(245, 158, 11, 0.9);
+    gap: 3px;
+    width: 112px;
+    height: 112px;
+    border: 2px solid rgba(245, 158, 11, 0.85);
     border-radius: 50%;
-    background: rgba(5, 5, 7, 0.62);
-    font-family: 'Fraunces', 'Neue Montreal', serif;
-    font-weight: 700;
-    font-size: 2.4rem;
-    letter-spacing: -0.03em;
-    color: #f59e0b;
+    background: rgba(10, 10, 10, 0.72);
     opacity: var(--stempel);
     transform:
       translate(-50%, -50%)
-      translate(324px, -126px)
+      /* Senkrecht nur so weit nach oben, wie der Stempel noch ganz in
+         die Buehne passt. In die 91 px gehen DREI Dinge ein, und zwei
+         davon habe ich erst nach dem Messen verstanden:
+           Radius                       56,0
+           x Maszstab beim Einblenden   x 1,3   = 72,8
+           x Drehung -13 Grad           x 1,199 = 87,3
+         Die Drehung macht aus dem Quadrat eine groessere
+         achsenparallele Huelle (cos13 + sin13 = 1,199) — mit 56
+         gerechnet ragten 3 px heraus, mit 72,8 immer noch 3, und
+         zwar genau bei --stempel ~0,36, wo Maszstab und Drehung
+         zusammenkommen. Plus 4 px Luft. Auf hohen Fenstern greift
+         weiter der Entwurfswert. */
+      translate(min(30cqw, 330px), max(-118px, calc(91px - 50cqh)))
       rotate(-13deg)
       scale(calc(1.3 - 0.3 * var(--stempel)));
     will-change: transform, opacity;
   }
 
-  /* === Die Rail === */
+  .sti-stempel-note {
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 2rem;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: #f59e0b;
+  }
+
+  /* === Rail === */
+  /* Die Punkte sitzen mit translate(-50%) auf 0 % und 100 % der Rail.
+     Bei voller Breite standen sie mobil gemessen 3 px links und 6 px
+     rechts vom Bildschirmrand — mit dem 5-px-Maskierring praktisch auf
+     der Kante. Die 44 px holen beide Aussenpunkte nach innen. */
   .sti-rail {
-    position: absolute;
-    left: 50%;
-    bottom: clamp(104px, 15vh, 150px);
-    width: min(76vw, 420px);
-    height: 1px;
-    transform: translateX(-50%);
+    position: relative;
+    display: block;
+    width: calc(100% - 44px);
+    max-width: 780px;
+    margin-inline: auto;
+    height: 20px;
     opacity: calc(var(--rail) * (1 - var(--settle)));
   }
 
-  .sti-rail-spur {
+  .sti-rail-spur,
+  .sti-rail-fluss {
     position: absolute;
-    inset: 0;
+    top: 50%;
+    left: 0;
+    height: 1px;
+  }
+
+  .sti-rail-spur {
+    right: 0;
     background: rgba(255, 255, 255, 0.12);
   }
 
   .sti-rail-fluss {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 1px;
     width: calc(var(--rail-ink, 0) * 100%);
     background: linear-gradient(to right, rgba(245, 158, 11, 0.45), #f59e0b);
   }
@@ -655,15 +1130,20 @@ const akte = AKTE.map((a) => {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     border: 1px solid rgba(255, 255, 255, 0.16);
-    background: #0a0a0c;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    background: #0a0a0a;
+    /* Der Ring in Hintergrundfarbe maskiert die Linie rundherum —
+       dadurch hat jeder Punkt eine saubere Luecke statt eines
+       Strichs, der in ihn hineinlaeuft. */
+    box-shadow: 0 0 0 5px #0a0a0a;
+    font-family: var(--lp-mono);
     font-size: 0.6rem;
     letter-spacing: 0.04em;
-    color: rgba(245, 245, 244, 0.4);
+    /* 0.4 ergab gemessen 3,55:1 bei 9,6 px. */
+    color: rgba(245, 245, 244, 0.52);
     transform: translate(-50%, -50%);
     transition:
       border-color 300ms ease,
@@ -673,196 +1153,206 @@ const akte = AKTE.map((a) => {
 
   .sti-rail-punkt.is-passed {
     border-color: rgba(245, 158, 11, 0.4);
-    color: rgba(245, 158, 11, 0.6);
+    /* 0.6 ergab gemessen 3,86:1. */
+    color: rgba(245, 158, 11, 0.8);
   }
 
   .sti-rail-punkt.is-active {
     border-color: #f59e0b;
-    background: rgba(245, 158, 11, 0.14);
+    /* DECKEND, nicht durchscheinend: mit rgba(245,158,11,0.14) lief
+       die Linie sichtbar durch den aktiven Punkt hindurch. Das hier
+       ist derselbe Ton, flach gerechnet auf #0a0a0a. */
+    background: #2b1f0a;
     color: #f59e0b;
-    transform: translate(-50%, -50%) scale(1.22);
-  }
-
-  /* === Abschluss === */
-  .sti-abschluss {
-    position: absolute;
-    left: 50%;
-    bottom: clamp(38px, 6vh, 62px);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    transform: translateX(-50%);
-    opacity: var(--settle);
-    pointer-events: auto;
-  }
-
-  .sti-cta {
-    display: inline-flex;
-    align-items: center;
-    gap: 9px;
-    padding: 12px 26px;
-    border-radius: 999px;
-    background: linear-gradient(to bottom, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-size: 0.95rem;
-    font-weight: 600;
-    text-decoration: none;
-    white-space: nowrap;
-    color: #1a1a1a;
-  }
-
-  .sti-google {
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-size: 0.8rem;
-    text-decoration: none;
-    color: rgba(245, 245, 244, 0.5);
-    border-bottom: 1px solid rgba(245, 158, 11, 0.4);
-  }
-
-  .sti-google:hover,
-  .sti-google:focus-visible {
-    color: #f59e0b;
+    transform: translate(-50%, -50%) scale(1.2);
   }
 
   /* === Schmale Schirme === */
   @media (max-width: 768px) {
-    .sti-buehne {
-      padding: 0 20px;
+    /* Breite und Versatz der Karten stehen nicht mehr hier: die
+       Grundregel rechnet in cqw und passt damit von 320 px bis
+       1440 px von sich aus. Die drei nth-child-Regeln mit ihren
+       festen +-115 px schnitten mobil gemessen 46 px je Aussenkarte
+       ab — mitten im Wort, im Schlussbild der ganzen Choreografie. */
+    .sti-karte {
+      padding: 14px 14px 12px;
     }
 
-    .sti-zitat {
-      font-size: clamp(1.25rem, 5.6vw, 1.9rem);
+    .sti-stempel {
+      width: 84px;
+      height: 84px;
+      transform:
+        translate(-50%, -50%)
+        translate(min(26cqw, 92px), max(-98px, calc(70px - 50cqh)))
+        rotate(-13deg)
+        scale(calc(1.3 - 0.3 * var(--stempel)));
+    }
+
+    .sti-stempel-note {
+      font-size: 1.5rem;
     }
 
     .sti-chip {
-      margin-top: 24px;
       padding: 8px 14px 8px 8px;
+      gap: 10px;
     }
 
     .sti-initialen {
       width: 32px;
       height: 32px;
     }
-
-    .sti-karte {
-      width: min(62vw, 190px);
-      padding: 15px 15px 13px;
-    }
-
-    .sti-stempel {
-      width: 88px;
-      height: 88px;
-      font-size: 1.8rem;
-      transform:
-        translate(-50%, -50%)
-        translate(96px, -104px)
-        rotate(-13deg)
-        scale(calc(1.3 - 0.3 * var(--stempel)));
-    }
-
-    .sti-siegel {
-      transform:
-        translate(-50%, -50%)
-        translate(calc(var(--klein) * -28vw), calc(var(--klein) * -33vh))
-        scale(calc(1 - var(--klein) * 0.78));
-    }
   }
 
   /* === Ohne Bewegung ===
-     Kein Sticky, keine Aufdeckung: ein ruhiges Layout untereinander.
-     DERSELBE DOM, nur andere Regeln — der Text steht sowieso schon
-     vollstaendig da. */
-  @media (prefers-reduced-motion: reduce) {
-    .sti {
-      min-height: 0;
-      padding: 96px 0;
-    }
+     Kein Sticky, kein Aufdecken: ein ruhiges Layout untereinander.
+     Derselbe DOM, nur andere Regeln. */
+  /* === Ruhige Fassung ===
+     Kein Sticky, kein Aufdecken: ein ruhiges Layout untereinander.
+     Derselbe DOM, nur andere Regeln.
 
-    .sti-sticky {
-      position: static;
-      height: auto;
-    }
+     WARUM EINE KLASSE UND KEINE MEDIENABFRAGE MEHR: als
+     @media (prefers-reduced-motion: reduce) deckte das hier genau
+     einen von drei Faellen ab.
 
-    .sti-kulisse,
-    .sti-stapel,
-    .sti-rail {
-      display: none;
-    }
+     1. OHNE SCRIPT stand jede Variable auf 0 — Siegel und alle drei
+        Zitate auf opacity 0, also 400vh leeres Schwarz. Die Klasse
+        steht jetzt im Markup und bleibt ohne Script stehen.
+     2. WIRD „Bewegung reduzieren" BEI OFFENER SEITE ABGESCHALTET,
+        wurde nie ein Scroll-Listener gehaengt und die Section blieb
+        fuer den Rest des Besuchs eingefroren. Jetzt haengen die
+        Listener immer, anwenden() setzt nur die Klasse.
+     3. will-change blieb bei abgeschalteter Bewegung auf vierzehn
+        Elementen stehen, sechs davon bildschirmfuellend. Steht jetzt
+        unten ausdruecklich auf auto.
 
-    .sti-inhalt {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 56px;
-      padding: 0 24px;
-    }
+     Die Variablen bekommen hier ihre LESBAREN Werte. Ohne Script
+     setzt sie niemand, also muessen sie aus dem Stylesheet kommen.
+     --note-voll traegt die Section als Inline-Stil, damit die Sterne
+     auch ohne Script gefuellt sind und die Note nicht ein zweites Mal
+     im Code steht. */
+  .sti.sti-ruhig {
+    min-height: 0;
+    padding: 96px 0;
+  }
 
-    .sti-siegel,
-    .sti-buehne,
-    .sti-akt,
-    .sti-abschluss {
-      position: static;
-      inset: auto;
-      opacity: 1;
-      transform: none;
-    }
+  /* Die Werte, die sonst das Script in jedem Bild schreibt. */
+  .sti-ruhig .sti-sticky {
+    position: static;
+    height: auto;
 
-    .sti-buehne {
-      display: flex;
-      flex-direction: column;
-      gap: 56px;
-      padding: 0;
-    }
+    --kopf-ein: 1;
+    --kopf: 1;
+    --siegel: 1;
+    --fuellung: var(--note-voll, 5);
+    --akt: 1;
+    --worte: 999;
+    --spiel: 1;
+    --kern: 1;
+    --chip: 1;
+    --rail: 0;
+    --rail-ink: 0;
+    --zaehler-an: 0;
+    --reise: 0;
+    --settle: 0;
+    --stempel: 0;
+  }
 
-    .sti-note {
-      font-size: clamp(3.5rem, 9vw, 5.5rem);
-    }
+  .sti-ruhig .sti-kulisse,
+  .sti-ruhig .sti-stapel,
+  .sti-ruhig .sti-rail,
+  .sti-ruhig .sti-zaehler {
+    display: none;
+  }
 
-    .sti-zitat {
-      font-size: clamp(1.15rem, 2.4vw, 1.6rem);
-    }
+  .sti-ruhig .sti-raster {
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+    height: auto;
+    padding: 0 24px;
+  }
 
-    .sti-wort,
-    .sti-stern {
-      opacity: 1;
-      transform: none;
-    }
+  .sti-ruhig .sti-buehne {
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+    height: auto;
+    overflow: visible;
+    /* Nichts rechnet hier in cqw, also auch keine Eingrenzung. */
+    container-type: normal;
+  }
 
-    .sti-kern {
-      color: #f59e0b;
-      background-size: 100% 0.3em;
-    }
+  .sti-ruhig .sti-siegel,
+  .sti-ruhig .sti-akt {
+    position: static;
+    opacity: 1;
+    transform: none;
+  }
 
-    .sti-chip,
-    .sti-uebersetzt {
-      opacity: 1;
-      transform: none;
-    }
+  .sti-ruhig .sti-kopf-text {
+    opacity: 1;
+    transform: none;
+  }
 
-    .sti-rail-punkt {
-      transition: none;
-    }
+  .sti-ruhig .sti-zitat {
+    font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+  }
+
+  .sti-ruhig .sti-wort {
+    opacity: 1;
+  }
+
+  .sti-ruhig .sti-kern {
+    color: #f59e0b;
+    background-size: 100% 0.3em;
+  }
+
+  .sti-ruhig .sti-chip,
+  .sti-ruhig .sti-uebersetzt {
+    opacity: 1;
+    transform: none;
+  }
+
+  .sti-ruhig .sti-rail-punkt {
+    transition: none;
+  }
+
+  /* Nichts bewegt sich, also braucht nichts eine eigene Ebene. */
+  /* Ohne Bewegung ist eine Tonspur sinnlos — sie zeigt ja gerade den
+     Verlauf des Sprechens. */
+  .sti-ruhig .sti-stimme {
+    display: none;
+  }
+
+  .sti-ruhig .sti-kopf,
+  .sti-ruhig .sti-siegel,
+  .sti-ruhig .sti-akt,
+  .sti-ruhig .sti-chip,
+  .sti-ruhig .sti-bild,
+  .sti-ruhig .sti-bild img,
+  .sti-ruhig .sti-stempel,
+  .sti-ruhig .sti-kern {
+    will-change: auto;
   }
 
   /* === Helles Thema ===
-     ACHTUNG: die Startseite traegt heute data-no-theme und zeigt den
-     Umschalter nicht — hell kann dort gar nicht vorkommen. Diese
-     Regeln stehen trotzdem hier, weil genau das die Stelle ist, an
-     der ein neues Bauteil sonst unsichtbar wird, sobald jemand den
-     Umschalter freischaltet. Vier Mal ist das in diesem Projekt schon
-     passiert. */
+     Die Startseite traegt heute data-no-theme und zeigt den
+     Umschalter nicht — hell kann dort gar nicht vorkommen. Die Regeln
+     stehen trotzdem hier: genau das ist die Stelle, an der ein neues
+     Bauteil unsichtbar wird, sobald jemand den Umschalter
+     freischaltet. Vier Mal ist das in diesem Projekt schon passiert. */
   :global(html[data-site-theme='light']) .sti {
     background: var(--theme-bg);
   }
 
   :global(html[data-site-theme='light']) .sti-schleier {
     background:
-      radial-gradient(ellipse 70% 60% at 50% 50%, rgba(248, 244, 234, 0.6) 0%, rgba(248, 244, 234, 0.9) 100%),
-      linear-gradient(to bottom, rgba(248, 244, 234, 0.75), rgba(248, 244, 234, 0.45) 40%, rgba(248, 244, 234, 0.92));
+      radial-gradient(ellipse 62% 54% at 50% 46%, rgba(248, 244, 234, 0.72) 0%, rgba(248, 244, 234, 0.97) 100%),
+      linear-gradient(to bottom, rgba(248, 244, 234, 0.8), rgba(248, 244, 234, 0.55) 42%, rgba(248, 244, 234, 0.95));
   }
 
   :global(html[data-site-theme='light']) .sti-note,
+  :global(html[data-site-theme='light']) .sti-headline,
   :global(html[data-site-theme='light']) .sti-zitat,
   :global(html[data-site-theme='light']) .sti-wer strong,
   :global(html[data-site-theme='light']) .sti-karte-wer {
@@ -877,13 +1367,13 @@ const akte = AKTE.map((a) => {
   :global(html[data-site-theme='light']) .sti-wer span,
   :global(html[data-site-theme='light']) .sti-karte-text,
   :global(html[data-site-theme='light']) .sti-uebersetzt,
-  :global(html[data-site-theme='light']) .sti-google {
+  :global(html[data-site-theme='light']) .sti-rail-punkt {
     color: rgba(26, 26, 28, 0.62);
   }
 
   :global(html[data-site-theme='light']) .sti-chip,
   :global(html[data-site-theme='light']) .sti-karte {
-    background: rgba(255, 255, 255, 0.88);
+    background: rgba(255, 255, 255, 0.9);
     border-color: rgba(0, 0, 0, 0.1);
   }
 
@@ -891,30 +1381,56 @@ const akte = AKTE.map((a) => {
   :global(html[data-site-theme='light']) .sti-stempel {
     background: var(--theme-bg);
   }
+
+  :global(html[data-site-theme='light']) .sti-rail-punkt {
+    box-shadow: 0 0 0 5px var(--theme-bg);
+  }
+
+  :global(html[data-site-theme='light']) .sti-rail-punkt.is-active {
+    background: rgba(245, 158, 11, 0.16);
+  }
 </style>
 
 <script>
   /* Die Choreografie. Schreibt ausschliesslich CSS-Variablen; was
      daraus wird, entscheidet das Stylesheet. Gebuendelt ueber
-     requestAnimationFrame und mit fruehem Ausstieg, wenn die Section
-     gar nicht im Bild ist — dasselbe Vorgehen wie im Fahrplan. */
+     requestAnimationFrame, mit fruehem Ausstieg ausserhalb des
+     Bildes — dieselbe Mechanik wie im Fahrplan. */
   const sektion = document.querySelector<HTMLElement>('.sti');
   const sticky = document.querySelector<HTMLElement>('.sti-sticky');
   const siegel = document.querySelector<HTMLElement>('[data-siegel]');
   const note = document.querySelector<HTMLElement>('[data-note]');
+  const nAb = document.querySelector<HTMLElement>('[data-n-ab]');
+  const nAuf = document.querySelector<HTMLElement>('[data-n-auf]');
   const akte = Array.from(document.querySelectorAll<HTMLElement>('.sti-akt'));
   const bilder = Array.from(document.querySelectorAll<HTMLElement>('.sti-bild'));
   const punkte = Array.from(document.querySelectorAll<HTMLElement>('.sti-rail-punkt'));
 
   if (sektion && sticky && siegel && note && akte.length) {
     const SIEGEL_ENDE = 0.14;
-    const KLEIN = [0.14, 0.22];
-    const RAIL = [0.16, 0.24];
+    const UEBERGANG = [0.14, 0.22];
     const AKTE_START = 0.22;
     const AKTE_ENDE = 0.86;
     const AKT_DAUER = (AKTE_ENDE - AKTE_START) / akte.length;
     const SETTLE = [0.86, 0.95];
     const STEMPEL = [0.9, 1.0];
+    /* Zwei Fenster um eine Aktgrenze, beide in Akt-Anteilen.
+       FUELL_WEG laeuft VOR der Grenze aus: die Rail-Fuellung erreicht
+       den naechsten Punkt genau dann, wenn er aufleuchtet.
+       ROLL_WEG liegt MITTIG auf der Grenze: die Ziffer wechselt mit
+       dem Zitat, nicht davor. 0.24 bzw. 2x0.12 von 0.2133 sind bei
+       450vh und 900 px Fensterhoehe 161 px — derselbe Weg, den der
+       Schnitt zwischen zwei Zitaten braucht. */
+    const FUELL_WEG = 0.24;
+    const ROLL_WEG = 0.12;
+    /* Einfahrt des Kopfes, als WEG gedacht statt als Anteil: 0.05 von
+       350vh Scrollweg sind 17,5vh. Section 3 braucht fuer ihren Kopf
+       15vh (250vh hoch, 10 % davon), Section 4 braucht 24vh (300vh,
+       12 %). 17,5 liegt dazwischen. */
+    const KOPF_EIN = 0.05;
+
+    // Frueh deklariert, weil aktualisieren() darauf prueft.
+    const ruhig = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     // Die Note steht fertig im HTML. Hier nur gemerkt, um sie am Ende
     // exakt zurueckzusetzen — samt Komma oder Punkt, je nach Sprache.
@@ -925,7 +1441,9 @@ const akte = AKTE.map((a) => {
     const klemm = (v: number, min = 0, max = 1) => Math.max(min, Math.min(max, v));
     const bereich = (v: number, a: number, b: number) => klemm((v - a) / (b - a));
     const sanft = (t: number) => 1 - Math.pow(1 - t, 2);
-    /** Ein-, Halten-, Ausblenden ueber vier Marken. */
+    // Symmetrisch, anders als sanft: bei 0.5 kommt 0.5 heraus. Fuer
+    // alles, was MITTIG auf einem Punkt sitzen muss.
+    const glatt = (t: number) => t * t * (3 - 2 * t);
     const kurve = (v: number, einA: number, einB: number, ausA: number, ausB: number) => {
       if (v < einA) return 0;
       if (v < einB) return sanft(bereich(v, einA, einB));
@@ -940,87 +1458,157 @@ const akte = AKTE.map((a) => {
     };
     messen();
 
-    let letzterAktiver = -1;
+    let letztAb = '';
+    let letztAuf = '';
     let geplant = false;
 
     const aktualisieren = () => {
       geplant = false;
+      // In der ruhigen Fassung kommt alles aus dem Stylesheet.
+      if (ruhig.matches) return;
       const r = sektion.getBoundingClientRect();
       if (r.bottom < 0 || r.top > window.innerHeight) return;
       const p = klemm(-r.top / Math.max(1, hoehe));
 
-      // --- Siegel: Note zaehlt hoch, Sterne fuellen sich ---
+      // --- Startbild: Note zaehlt hoch, Sterne fuellen sich ---
       const aufbau = bereich(p, 0, SIEGEL_ENDE);
-      sticky.style.setProperty('--siegel', klemm(aufbau * 3).toFixed(4));
-      sticky.style.setProperty('--sterne', (sanft(aufbau) * 5).toFixed(3));
+      sticky.style.setProperty(
+        '--siegel',
+        kurve(p, 0, SIEGEL_ENDE * 0.45, UEBERGANG[0], UEBERGANG[1]).toFixed(4)
+      );
+      // Die Sterne fuellen sich ANTEILIG mit der Note: bei 3,4 ist der
+      // vierte Stern zu 40 % gefuellt, nicht einfach blasser.
+      sticky.style.setProperty('--fuellung', (sanft(aufbau) * noteZahl).toFixed(3));
 
-      // Waehrend des Aufbaus eine Zwischenzahl, danach exakt der
-      // Ausgangstext. Nicht neu formatieren: der koennte sich je nach
-      // Sprache vom HTML unterscheiden.
       if (aufbau < 1) {
         note.textContent = (noteZahl * sanft(aufbau)).toFixed(1).replace('.', trenner);
       } else if (note.textContent !== noteFertig) {
         note.textContent = noteFertig;
       }
 
-      sticky.style.setProperty('--klein', sanft(bereich(p, KLEIN[0], KLEIN[1])).toFixed(4));
-      sticky.style.setProperty('--rail', bereich(p, RAIL[0], RAIL[1]).toFixed(4));
+      /* --- Kopf faehrt ein --- */
+      sticky.style.setProperty('--kopf-ein', klemm(p / KOPF_EIN).toFixed(4));
 
-      // --- Die drei Akte ---
-      let summe = 0;
-      let gewichtet = 0;
-      let aktiv = -1;
-      let staerkste = 0;
+      // --- Kopf: Ueberschrift und Unterzeile weichen fuer die Akte ---
+      const kopfWeg = bereich(p, UEBERGANG[0], UEBERGANG[1]);
+      const kopfZurueck = bereich(p, SETTLE[0], SETTLE[1]);
+      sticky.style.setProperty('--kopf', Math.max(1 - kopfWeg, kopfZurueck).toFixed(4));
+      sticky.style.setProperty('--rail', (kopfWeg * (1 - kopfZurueck)).toFixed(4));
+
+      /* --- Wo stehen wir zwischen den Akten? ---
+         Aus p SELBST, nicht aus der Summe der Aktdeckkraefte. Die
+         faellt an jedem Aktwechsel durch Null, weil das Aus-Fenster
+         eines Akts genau dort endet, wo das Ein-Fenster des naechsten
+         beginnt. Fuers Bild ist das Absicht — ein Schnitt, kein
+         Ueberblenden; zwei halbdurchsichtige Zitate uebereinander
+         waeren Matsch. Abgeleitete Werte durften nur nicht daran
+         haengen: vorher klappte die Rail-Fuellung zweimal mitten in
+         der Section auf leer zusammen.
+
+         BEZUGSPUNKT IST DIE AKTGRENZE, nicht der laufende Akt. Ein
+         erster Versuch leitete alles aus dem Fortschritt INNERHALB
+         des Akts ab — dann schaltete der Rail-Punkt 76 px vor dem
+         Zitatwechsel um, die Augenbraue zaehlte 44 px zu frueh hoch,
+         und beides geschah, waehrend das alte Zitat noch bei voller
+         Deckkraft dastand. */
+      const roh = klemm((p - AKTE_START) / AKT_DAUER, 0, akte.length);
+      // Die Grenze, um die es gerade geht — nur die inneren.
+      const grenze = Math.min(akte.length - 1, Math.max(1, Math.round(roh)));
+      const iAb = grenze - 1;
+
+      /* ZWEI Bewegungen, nicht eine. Vorher trieb ein Wert beides,
+         und dadurch leuchtete der naechste Punkt auf, waehrend die
+         Fuellinie erst auf halber Strecke stand — gemessen 187 px
+         Luecke zwischen Linienende und leuchtendem Punkt.
+
+         Die FUELLUNG erreicht den naechsten Punkt genau am Schnitt.
+         Die ZIFFER rollt mittig ueber den Schnitt, wie das Zitat
+         selbst: bei 0.5 steht sie auf der Grenze. */
+      const fuellung = glatt(bereich(roh, grenze - FUELL_WEG, grenze));
+      const reise = glatt(bereich(roh, grenze - ROLL_WEG, grenze + ROLL_WEG));
+      sticky.style.setProperty('--reise', reise.toFixed(4));
 
       akte.forEach((akt, i) => {
         const a = AKTE_START + i * AKT_DAUER;
-        const deckkraft = kurve(p, a, a + 0.035, a + AKT_DAUER - 0.03, a + AKT_DAUER);
+        /* Das Aus-Fenster ist kurz: es verlaengert die Ruhephase, in
+           der Zitat, Marker und Autor-Chip zusammen stehen, und macht
+           die dunkle Zaesur zum naechsten Akt knapper. */
+        const deckkraft = kurve(p, a, a + 0.03, a + AKT_DAUER - 0.022, a + AKT_DAUER);
         akt.style.setProperty('--akt', deckkraft.toFixed(4));
 
-        // Woerter decken sich im ersten Drittel des Akts auf.
         const wortzahl = Number(akt.style.getPropertyValue('--wortzahl')) || 1;
-        const woerter = bereich(p, a + 0.03, a + AKT_DAUER * 0.62) * (wortzahl + 1);
-        akt.style.setProperty('--worte', woerter.toFixed(2));
-
-        // Der Marker zieht erst, wenn die Phrase vollstaendig dasteht.
+        // EIN Fortschritt treibt beides: die aufgedeckten Worte und
+        // den gespielten Teil der Tonspur dahinter. Dadurch koennen
+        // sie gar nicht auseinanderlaufen.
+        const spiel = bereich(p, a + 0.03, a + AKT_DAUER * 0.48);
+        akt.style.setProperty('--worte', (spiel * (wortzahl + 1)).toFixed(2));
+        akt.style.setProperty('--spiel', spiel.toFixed(4));
         akt.style.setProperty(
           '--kern',
-          sanft(bereich(p, a + AKT_DAUER * 0.64, a + AKT_DAUER * 0.78)).toFixed(4)
+          sanft(bereich(p, a + AKT_DAUER * 0.52, a + AKT_DAUER * 0.66)).toFixed(4)
         );
+        /* Der Chip kommt, sobald das Zitat fertig aufgedeckt ist
+           (0.62 der Aktdauer), und BLEIBT dann stehen. Vorher hatte
+           er ein eigenes Aus-Fenster ab 0.97 und stand dadurch nur
+           17 % eines Akts — gut 98 px Scrollweg, zu kurz um
+           „WaermePower, Bremen" zu lesen. Den Abgang macht jetzt die
+           Ueberblendung des Akts selbst; damit steht er 34 %. */
         akt.style.setProperty(
           '--chip',
-          kurve(p, a + AKT_DAUER * 0.66, a + AKT_DAUER * 0.8, a + AKT_DAUER - 0.03, a + AKT_DAUER).toFixed(4)
+          sanft(bereich(p, a + AKT_DAUER * 0.5, a + AKT_DAUER * 0.6)).toFixed(4)
         );
 
         const bild = bilder[i];
         if (bild) {
-          bild.style.setProperty('--bild', kurve(p, a - 0.02, a + 0.05, a + AKT_DAUER - 0.04, a + AKT_DAUER).toFixed(4));
+          bild.style.setProperty(
+            '--bild',
+            kurve(p, a - 0.02, a + 0.05, a + AKT_DAUER - 0.04, a + AKT_DAUER).toFixed(4)
+          );
           bild.style.setProperty('--zoom', (1 + 0.06 * bereich(p, a - 0.02, a + AKT_DAUER)).toFixed(4));
         }
 
-        summe += deckkraft;
-        gewichtet += i * deckkraft;
-        if (deckkraft > staerkste) {
-          staerkste = deckkraft;
-          aktiv = i;
-        }
       });
 
-      // Die Rail trackt den Schwerpunkt der Deckkraefte, nicht den
-      // rohen Scroll — so landet sie bei einem allein stehenden Akt
-      // exakt auf dessen Punkt.
-      const ink = summe > 0.01 ? gewichtet / summe / (akte.length - 1) : p > AKTE_ENDE ? 1 : 0;
-      sticky.style.setProperty('--rail-ink', klemm(ink).toFixed(4));
+      // Haelt am Punkt und wandert nur rund um eine Aktgrenze zum
+      // naechsten. Stetig, monoton, nie Null mitten in der Section.
+      sticky.style.setProperty(
+        '--rail-ink',
+        (p < AKTE_START ? 0 : klemm((iAb + fuellung) / (akte.length - 1))).toFixed(4)
+      );
 
-      if (aktiv !== -1) letzterAktiver = aktiv;
-      else if (letzterAktiver !== -1) aktiv = letzterAktiver;
+      // Der Punkt wechselt GENAU am Schnitt — reise ist dort 0.5.
+      const aktiv = reise < 0.5 ? iAb : grenze;
       punkte.forEach((punkt, i) => {
         punkt.classList.toggle('is-active', i === aktiv);
         punkt.classList.toggle('is-passed', i < aktiv);
       });
 
-      // --- Settle ---
-      sticky.style.setProperty('--settle', sanft(bereich(p, SETTLE[0], SETTLE[1])).toFixed(4));
+      /* --- Zaehler an der Augenbraue ---
+         Stetig aus p, damit er sich zu Beginn der Akte einschiebt
+         statt zu erscheinen. Der Text wird NIE geleert: vorher tat
+         das Script genau das, sobald die Deckkraftsumme durch Null
+         fiel — also bei jedem Aktwechsel. Weil die Augenbraue
+         zentriert ist, sprang „WAS KUNDEN SAGEN" dabei seitlich weg
+         und zurueck. */
+      sticky.style.setProperty(
+        '--zaehler-an',
+        (bereich(p, AKTE_START - 0.035, AKTE_START) * (1 - kopfZurueck)).toFixed(4)
+      );
+
+      /* Nur die ZIFFER wechselt, und zwar rollend: unten steht der
+         laufende Akt, darueber der naechste, --reise blendet. Der
+         Trenner und „/ 03" stehen still — den ganzen Text zu
+         tauschen wirkte abrupt. Geschrieben wird nur bei Aenderung,
+         jede Zuweisung an textContent kostet eine Neuberechnung. */
+      if (nAb && nAuf) {
+        const ab = String(grenze).padStart(2, '0');
+        const auf = String(grenze + 1).padStart(2, '0');
+        if (ab !== letztAb) { nAb.textContent = ab; letztAb = ab; }
+        if (auf !== letztAuf) { nAuf.textContent = auf; letztAuf = auf; }
+      }
+
+      // --- Schlussbild ---
+      sticky.style.setProperty('--settle', sanft(kopfZurueck).toFixed(4));
       sticky.style.setProperty('--stempel', sanft(bereich(p, STEMPEL[0], STEMPEL[1])).toFixed(4));
     };
 
@@ -1039,32 +1627,43 @@ const akte = AKTE.map((a) => {
       }, 120);
     };
 
-    const ruhig = window.matchMedia('(prefers-reduced-motion: reduce)');
+    /* Die ruhige Fassung ist eine KLASSE, kein zweiter Satz
+       Inline-Stile. Beim Umschalten werden die Variablen, die das
+       Script gesetzt hat, wieder entfernt — Inline-Stile schlagen
+       sonst jede Regel aus dem Stylesheet und die ruhige Fassung kaeme
+       nicht durch. --wortzahl bleibt stehen: das ist Markup, keine
+       Choreografie. */
+    const AUFRAEUMEN = [
+      '--siegel', '--fuellung', '--kopf', '--kopf-ein', '--rail',
+      '--rail-ink', '--settle', '--stempel', '--zaehler-an', '--reise',
+    ];
     const anwenden = () => {
       if (ruhig.matches) {
-        // Alles auf den Endzustand des jeweiligen Teils: der Text
-        // steht offen da, der Marker ist gezogen, nichts bewegt sich.
+        sektion.classList.add('sti-ruhig');
+        for (const name of AUFRAEUMEN) sticky.style.removeProperty(name);
+        for (const akt of akte) {
+          for (const name of ['--akt', '--worte', '--spiel', '--kern', '--chip']) akt.style.removeProperty(name);
+        }
+        for (const bild of bilder) {
+          bild.style.removeProperty('--bild');
+          bild.style.removeProperty('--zoom');
+        }
         note.textContent = noteFertig;
-        sticky.style.setProperty('--siegel', '1');
-        sticky.style.setProperty('--sterne', '5');
-        sticky.style.setProperty('--klein', '0');
-        sticky.style.setProperty('--settle', '0');
-        akte.forEach((akt) => {
-          akt.style.setProperty('--akt', '1');
-          akt.style.setProperty('--worte', '999');
-          akt.style.setProperty('--kern', '1');
-          akt.style.setProperty('--chip', '1');
-        });
       } else {
+        sektion.classList.remove('sti-ruhig');
+        messen();
         aktualisieren();
       }
     };
+
+    /* Die Listener haengen IMMER. Vorher haengte sie das Script nur,
+       wenn beim Laden keine Bewegungsreduktion aktiv war — wer sie bei
+       offener Seite abschaltete, hatte die 400vh hohe Section fuer den
+       Rest des Besuchs im eingefrorenen Bild stehen. aktualisieren()
+       steigt in der ruhigen Fassung gleich wieder aus. */
+    window.addEventListener('scroll', anstossen, { passive: true });
+    window.addEventListener('resize', beiGroesse);
     ruhig.addEventListener('change', anwenden);
     anwenden();
-
-    if (!ruhig.matches) {
-      window.addEventListener('scroll', anstossen, { passive: true });
-      window.addEventListener('resize', beiGroesse);
-    }
   }
 </script>

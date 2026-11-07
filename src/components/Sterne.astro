@@ -1,0 +1,142 @@
+---
+/**
+ * Fünf Sterne — die EINE Stern-Darstellung des Projekts.
+ *
+ * Vorher standen an vier Stellen literale ★-Zeichen im Markup
+ * (Kundenstimmen gross und klein, das Siegel der Startseite, die
+ * Karten im Abschluss), jede mit eigener Groesse, eigenem
+ * Buchstabenabstand und eigenem Ausgleich dafuer. Vier Stellen, vier
+ * leicht verschiedene Sterne.
+ *
+ * WARUM NICHT WEITER DAS UNICODE-ZEICHEN: ★ ist eine Glyphe aus der
+ * Systemschrift. Sie sieht auf jedem Betriebssystem anders aus, laesst
+ * sich nicht teilweise fuellen, und sie passt nicht zu den uebrigen
+ * Symbolen der Seite — die sind alle duenn gezeichnet, 24er-viewBox,
+ * Strichstaerke 1.8, runde Enden. Dieser Stern ist genauso gebaut.
+ *
+ * TEILFUELLUNG: der Stern besteht aus zwei Lagen. Unten die Kontur,
+ * immer sichtbar; darueber derselbe Stern gefuellt, in einem Kasten
+ * mit begrenzter Breite. Bei 3,3 Sternen ist der vierte zu 30 %
+ * gefuellt — und zwar von links, wie ein Balken, nicht als Deckkraft.
+ *
+ * Das Beschneiden macht ein HTML-Element, kein clip-path auf dem SVG:
+ * clip-path mit Grundformen bezieht sich bei SVG-Kindern auf eine
+ * Bezugsbox, die SVG-Elemente gar nicht haben, und das Ergebnis ist
+ * je nach Browser verschieden.
+ */
+export interface Props {
+  /**
+   * Wie viele Sterne gefuellt sind, 0 bis 5. Nachkommastellen sind
+   * erlaubt und fuellen den naechsten Stern anteilig.
+   *
+   * Wird NICHT gesetzt, wenn die Fuellung von aussen per
+   * CSS-Variable --fuellung kommt (so macht es die Choreografie auf
+   * der Startseite, die den Wert pro Bild neu schreibt).
+   */
+  fuellung?: number;
+  /** Kantenlaenge eines Sterns. Beliebige CSS-Laenge. */
+  groesse?: string;
+  /** Abstand zwischen den Sternen. */
+  abstand?: string;
+  /**
+   * Beschriftung fuer Vorleseprogramme. Ohne sie ist die Reihe
+   * ausgeblendet — dann muss die Note nebenan im Text stehen.
+   */
+  label?: string;
+  /** Zusaetzliche Klasse fuer die Huelle. */
+  class?: string;
+}
+
+const {
+  fuellung,
+  groesse = '1rem',
+  abstand = '0.16em',
+  label,
+  class: klasse = '',
+} = Astro.props;
+
+// Fuenfzackig, schlanker als der uebliche Stern: aeusserer Radius
+// 9.6, innerer 4.0 statt 4.6. Dadurch wirken die Zacken spitzer und
+// der Stern leichter — passend zu den duennen Symbolen der Seite.
+const PFAD =
+  'M12 2.4 L14.35 8.76 L21.13 9.03 L15.8 13.24 L17.64 19.77 L12 16 ' +
+  'L6.36 19.77 L8.2 13.24 L2.87 9.03 L9.65 8.76 Z';
+---
+
+<span
+  class:list={['sterne', klasse]}
+  style={`--groesse:${groesse}; --abstand:${abstand};${fuellung !== undefined ? ` --fuellung:${fuellung};` : ''}`}
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+>
+  {[0, 1, 2, 3, 4].map((i) => (
+    <span class="stern" style={`--i:${i}`}>
+      <svg class="stern-kontur" viewBox="0 0 24 24" aria-hidden="true">
+        <path d={PFAD} />
+      </svg>
+      <span class="stern-maske">
+        <svg class="stern-voll" viewBox="0 0 24 24" aria-hidden="true">
+          <path d={PFAD} />
+        </svg>
+      </span>
+    </span>
+  ))}
+</span>
+
+<style>
+  .sterne {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--abstand);
+    line-height: 1;
+    color: #f59e0b;
+  }
+
+  .stern {
+    position: relative;
+    display: block;
+    width: var(--groesse);
+    height: var(--groesse);
+    flex-shrink: 0;
+    /* Wie weit DIESER Stern gefuellt ist: 0 bis 1. Der dritte Stern
+       bei --fuellung 3.3 ist voll, der vierte zu 30 %. */
+    --an: clamp(0, calc(var(--fuellung, 5) - var(--i)), 1);
+  }
+
+  .stern-kontur,
+  .stern-voll {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .stern-kontur {
+    fill: none;
+    stroke: currentColor;
+    /* 1.8 wie jedes andere Symbol der Seite, runde Enden und Ecken —
+       dadurch sind die Zacken leicht abgerundet statt nadelspitz. */
+    stroke-width: 1.8;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    opacity: 0.4;
+  }
+
+  .stern-maske {
+    position: absolute;
+    inset: 0;
+    width: calc(var(--an) * 100%);
+    overflow: hidden;
+  }
+
+  /* Der gefuellte Stern behaelt INNERHALB der Maske seine volle
+     Breite — sonst wuerde er gestaucht statt beschnitten. */
+  .stern-voll {
+    width: var(--groesse);
+    height: var(--groesse);
+    fill: currentColor;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linejoin: round;
+  }
+</style>

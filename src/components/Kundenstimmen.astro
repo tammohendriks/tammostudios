@@ -29,6 +29,7 @@
 import { localeOf } from '../lib/routes.mjs';
 import { SKIZZE } from '../lib/i18n/seiten/skizze';
 import { testimonialsFuer, zerlegen, type TestimonialBranche } from '../lib/testimonials';
+import Sterne from './Sterne.astro';
 
 interface Props {
   branche: TestimonialBranche;
@@ -66,7 +67,7 @@ const stufe = gross.zitat.length > 200 ? 'lang' : gross.zitat.length > 140 ? 'mi
       Teile sind ausgeblendet. */}
   <div class="ks-kopf" data-reveal>
     <p class="ks-note" aria-hidden="true" data-zaehlen>{s.stimmen.note}</p>
-    <p class="ks-sterne" aria-hidden="true">★★★★★</p>
+    <Sterne class="ks-sterne" groesse="clamp(1.1rem, 2.6vw, 1.55rem)" abstand="0.2em" />
     <span class="ks-nurlesen">{s.stimmen.noteLabel}</span>
     <p class="ks-unterzeile">{s.stimmen.unterZeile}</p>
   </div>
@@ -96,7 +97,7 @@ const stufe = gross.zitat.length > 200 ? 'lang' : gross.zitat.length > 140 ? 'mi
             {stimme.abzeichen && (
               <span class="ks-abzeichen" aria-hidden="true">{stimme.abzeichen}</span>
             )}
-            <p class="ks-sterne-klein" aria-hidden="true">★★★★★</p>
+            <Sterne class="ks-sterne-klein" groesse="0.78rem" abstand="0.14em" />
             <span class="ks-nurlesen">{s.stimmen.sterne}</span>
             <blockquote class="ks-zitat">
               {vor}<strong>{phrase}</strong>{nach}
@@ -154,15 +155,12 @@ const stufe = gross.zitat.length > 200 ? 'lang' : gross.zitat.length > 140 ? 'mi
     margin: 0;
   }
 
+  /* Typografie und Form kommen aus Sterne.astro — hier bleibt nur
+     die Stellung im Satz. Vorher stand hier ein ★ aus der
+     Systemschrift samt text-indent-Ausgleich fuer den
+     Buchstabenabstand; beides entfaellt mit einem echten SVG. */
   .ks-sterne {
-    font-size: clamp(1.4rem, 3.4vw, 2rem);
-    letter-spacing: 0.18em;
-    line-height: 1;
-    color: #f59e0b;
-    margin: 4px 0 0;
-    /* Der Buchstabenabstand hängt rechts als Leerraum nach und
-       verschiebt die Reihe nach links. */
-    text-indent: 0.18em;
+    margin: 6px 0 0;
   }
 
   .ks-unterzeile {
@@ -293,10 +291,6 @@ const stufe = gross.zitat.length > 200 ? 'lang' : gross.zitat.length > 140 ? 'mi
 
   .ks-sterne-klein {
     margin: 0;
-    font-size: 0.92rem;
-    letter-spacing: 0.1em;
-    line-height: 1;
-    color: #f59e0b;
   }
 
   .ks-zitat {

@@ -57,6 +57,24 @@ export type Testimonial = {
    */
   abzeichen?: string;
   /**
+   * Die kurze Fassung — NUR fuer die Stimmen-Section der Startseite.
+   *
+   * Dort steht ein Zitat allein und gross auf dem Schirm und wird
+   * Wort fuer Wort aufgedeckt. Sieben Zeilen sind dafuer zu viel: man
+   * liest nicht mehr mit, man wartet. Auf den Branchenseiten bleiben
+   * die laengeren Fassungen, dort stehen sie in Karten und werden
+   * ueberflogen.
+   *
+   * GEKUERZT WIRD DURCH STREICHEN, nicht durch Umschreiben. Die
+   * Interpunktion der Verfasserin bleibt stehen, auch der
+   * Gedankenstrich. Einzige erlaubte Anpassung ist das Satzende dort,
+   * wo mitten im Satz gestrichen wurde — ein Komma, das nun einen
+   * Satz beendet, wird zum Punkt. Mehr nicht.
+   */
+  zitatKurz?: string;
+  /** Die kurze Fassung auf Englisch. */
+  zitatKurzEn?: string;
+  /**
    * Die englische Fassung — NUR fuer die Stimmen-Section der
    * Startseite.
    *
@@ -86,6 +104,10 @@ export const TESTIMONIALS: readonly Testimonial[] = [
       'Sehr zu empfehlen. Die Zusammenarbeit funktioniert klasse, wir sind mit der Arbeit und dem Miteinander sehr zufrieden und freuen uns auch in Zukunft weiterhin mit Tammo zusammen zu arbeiten. 10/10.',
     zitatEn:
       'Highly recommended. Working together runs brilliantly, we are very happy with the work and with the collaboration, and we look forward to carrying on with Tammo. 10/10.',
+    zitatKurz:
+      'Sehr zu empfehlen. Die Zusammenarbeit funktioniert klasse, wir sind mit der Arbeit und dem Miteinander sehr zufrieden. 10/10.',
+    zitatKurzEn:
+      'Highly recommended. Working together runs brilliantly, we are very happy with the work and with the collaboration. 10/10.',
     kernphrase: 'Die Zusammenarbeit funktioniert klasse',
     kernphraseEn: 'Working together runs brilliantly',
     abzeichen: '10/10',
@@ -109,6 +131,10 @@ export const TESTIMONIALS: readonly Testimonial[] = [
       'Ganz herzlichen Dank für die Neugestaltung unserer Website. Für alle Mitlesenden: Tammo Studios können wir als betriebsärztliche Praxis wirklich empfehlen — kurze Kommunikationswege, präzise Umsetzung, einfach eine gelungene Websitegestaltung mit gut funktionierendem Responsive-System. Tammo können wir von Herzen empfehlen. Ein wunderbarer Mensch ist er außerdem.',
     zitatEn:
       'As an occupational health practice we can genuinely recommend Tammo Studios — short lines of communication, precise execution, a well-made website design. We recommend Tammo wholeheartedly. And he is a wonderful person on top of that.',
+    zitatKurz:
+      'Tammo Studios können wir als betriebsärztliche Praxis wirklich empfehlen — kurze Kommunikationswege, präzise Umsetzung. Ein wunderbarer Mensch ist er außerdem.',
+    zitatKurzEn:
+      'As an occupational health practice we can genuinely recommend Tammo Studios — short lines of communication, precise execution. And he is a wonderful person on top of that.',
     kernphrase: 'kurze Kommunikationswege, präzise Umsetzung',
     kernphraseEn: 'short lines of communication, precise execution',
     autor: 'Dr. Kirsten Witzak-Agah',
@@ -199,12 +225,26 @@ export const testimonialsFuer = (branche: TestimonialBranche): Testimonial[] =>
  */
 export const zerlegenFuer = (
   t: Testimonial,
-  locale: 'de' | 'en'
+  locale: 'de' | 'en',
+  laenge: 'voll' | 'kurz' = 'voll'
 ): { teile: [string, string, string]; uebersetzt: boolean } => {
   const uebersetzt = locale === 'en' && !!t.zitatEn && !!t.kernphraseEn;
-  if (!uebersetzt) return { teile: zerlegen(t), uebersetzt: false };
 
-  const zitat = t.zitatEn!;
+  if (!uebersetzt) {
+    const zitat = (laenge === 'kurz' && t.zitatKurz) || t.zitat;
+    const i = zitat.indexOf(t.kernphrase);
+    if (i === -1) {
+      throw new Error(
+        `Kernphrase „${t.kernphrase}" steht nicht im Zitat von ${t.autor}.`
+      );
+    }
+    return {
+      teile: [zitat.slice(0, i), t.kernphrase, zitat.slice(i + t.kernphrase.length)],
+      uebersetzt: false,
+    };
+  }
+
+  const zitat = (laenge === 'kurz' && t.zitatKurzEn) || t.zitatEn!;
   const phrase = t.kernphraseEn!;
   const i = zitat.indexOf(phrase);
   if (i === -1) {

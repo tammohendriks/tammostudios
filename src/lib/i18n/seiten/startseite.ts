@@ -58,11 +58,13 @@ export const de = {
    */
   stimmen: {
     eyebrow: 'WAS KUNDEN SAGEN',
+    // Waehrend der drei Akte haengt der Zaehler hinten dran.
+    // {n} und {gesamt} werden ersetzt.
+    zaehler: '{n} / {gesamt}',
+    headline: 'Ihre Worte, nicht meine.',
     // {note} wird aus GOOGLE_BEWERTUNG ersetzt.
     mono: 'GOOGLE · {note} · ECHTE PROJEKTE',
     sterneLabel: '{note} von 5 Sternen',
-    cta: 'Alle Referenzen ansehen',
-    google: 'Bewertungen auf Google',
     // Steht unter uebersetzten Zitaten. Auf der deutschen Fassung
     // leer, weil dort nichts uebersetzt wurde.
     uebersetzt: '',
@@ -254,10 +256,10 @@ export const en: Shape<typeof de> = {
 
   stimmen: {
     eyebrow: 'WHAT CLIENTS SAY',
+    zaehler: '{n} / {gesamt}',
+    headline: 'Their words, not mine.',
     mono: 'GOOGLE · {note} · REAL PROJECTS',
     sterneLabel: '{note} out of 5 stars',
-    cta: 'See all work',
-    google: 'Reviews on Google',
     // Unter jedem Zitat auf der englischen Fassung: die Bewertungen
     // sind auf Deutsch geschrieben und hier uebersetzt. Ohne diesen
     // Hinweis waere es ein Zitat mit fremder Stimme.
