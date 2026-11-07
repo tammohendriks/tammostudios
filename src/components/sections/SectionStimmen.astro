@@ -290,13 +290,17 @@ const akte = AKTE.map((a) => {
         {/* Die drei Akte. */}
         {akte.map((a, i) => (
           <figure class="sti-akt" data-i={i} style={`--wortzahl:${a.wortzahl}`}>
-            {/* Die Tonspur liegt HINTER dem Zitat (z-index 0 gegen 1)
-                und ist fuer Vorleseprogramme nicht vorhanden. Zwei
-                Lagen desselben SVG: unten dunkel, darueber amber,
-                beschnitten auf den schon aufgedeckten Teil. Der
-                Schnitt sitzt auf einem HTML-Element, nicht auf SVG-
-                Kindern — dort ist die Bezugsbox je nach Browser eine
-                andere. */}
+            {/* EINE Schleife ohne Umbrueche dazwischen: jeder Umbruch
+                im Markup waere ein Leerzeichen im HTML. */}
+            <blockquote class="sti-zitat">{a.stuecke.map((t) => t.art === 'kern' ? (<>{t.raum ? ' ' : ''}<span class="sti-kern">{t.woerter.map((w) => (<span class="sti-wort" style={`--n:${w.n}`}>{w.raum ? ' ' : ''}{w.text}</span>))}</span></>) : (<span class="sti-wort" style={`--n:${t.wort.n}`}>{t.wort.raum ? ' ' : ''}{t.wort.text}</span>))}</blockquote>
+
+            {/* Die Tonspur steht UNTER dem Zitat, nicht dahinter.
+                Als Hintergrund lief sie mitten durch die zweite
+                Zeile — und die noch nicht aufgedeckten Woerter sind
+                dort ohnehin blass, Balken dahinter machten sie
+                unlesbar. Als schmales Band zwischen Zitat und
+                Autor-Chip sagt sie dasselbe, ohne dem Text in die
+                Quere zu kommen. Fuer Vorleseprogramme nicht da. */}
             <span class="sti-stimme" aria-hidden="true">
               <svg class="sti-stimme-svg" viewBox={`0 0 ${BALKEN * 10} 100`} preserveAspectRatio="none">
                 <g id={`stimmkurve-${i}`}>
@@ -312,9 +316,6 @@ const akte = AKTE.map((a) => {
               </span>
               <span class="sti-stimme-kopf"></span>
             </span>
-            {/* EINE Schleife ohne Umbrueche dazwischen: jeder Umbruch
-                im Markup waere ein Leerzeichen im HTML. */}
-            <blockquote class="sti-zitat">{a.stuecke.map((t) => t.art === 'kern' ? (<>{t.raum ? ' ' : ''}<span class="sti-kern">{t.woerter.map((w) => (<span class="sti-wort" style={`--n:${w.n}`}>{w.raum ? ' ' : ''}{w.text}</span>))}</span></>) : (<span class="sti-wort" style={`--n:${t.wort.n}`}>{t.wort.raum ? ' ' : ''}{t.wort.text}</span>))}</blockquote>
 
             {/* EINE figcaption, und zwar als letztes Kind. Vorher stand
                 der Uebersetzungshinweis als eigenes <p> DAHINTER —
@@ -804,16 +805,19 @@ const akte = AKTE.map((a) => {
      Die Farbe kommt ueber currentColor: innerhalb von <use> greifen
      Selektoren auf die Originalknoten nicht zuverlaessig, eine
      geerbte Farbe schon. */
+  /* Ein Band IM FLUSS zwischen Zitat und Autor-Chip, keine Lage
+     dahinter mehr. Schmal genug, dass die Zeile als Beiwerk liest,
+     und nur so breit wie ein Zitat — ueber die volle Buehne gezogen
+     wuerde sie zum zweiten Hauptdarsteller. */
   .sti-stimme {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    z-index: 0;
-    width: 116%;
-    height: clamp(96px, 23vh, 190px);
-    transform: translate(-50%, -50%) scaleY(calc(0.45 + 0.55 * var(--akt, 0)));
-    color: rgba(245, 158, 11, 0.1);
+    position: relative;
+    display: block;
+    width: min(100%, 520px);
+    height: clamp(30px, 4.4vh, 46px);
+    margin: clamp(14px, 2.2vh, 24px) auto 0;
+    color: rgba(245, 158, 11, 0.16);
     pointer-events: none;
+    transform: scaleY(calc(0.4 + 0.6 * var(--akt, 0)));
   }
 
   .sti-stimme-svg {
@@ -832,7 +836,7 @@ const akte = AKTE.map((a) => {
   .sti-stimme-laut {
     position: absolute;
     inset: 0;
-    color: rgba(245, 158, 11, 0.44);
+    color: rgba(245, 158, 11, 0.5);
     clip-path: inset(0 calc((1 - var(--spiel, 0)) * 100%) 0 0);
   }
 
@@ -852,14 +856,6 @@ const akte = AKTE.map((a) => {
       transparent
     );
     opacity: calc(var(--spiel, 0) * (1 - var(--spiel, 0)) * 4);
-  }
-
-  /* Text ueber die Tonspur. .sti-akt hat durch opacity ohnehin einen
-     eigenen Stapelzusammenhang, die Zahlen gelten also nur hier. */
-  .sti-zitat,
-  .sti-fuss {
-    position: relative;
-    z-index: 1;
   }
 
   .sti-akt {
@@ -1002,14 +998,20 @@ const akte = AKTE.map((a) => {
     pointer-events: none;
   }
 
-  /* Halbe Spannweite = Versatz + halbe Kartenbreite, und die muss
-     unter 50cqw bleiben, sonst schneidet die Buehne ab. 22 + 48/2 = 46
-     — mit Luft. */
+  /* GRUNDFALL: untereinander. Auf schmalen Buehnen ist kein Faecher
+     moeglich, bei dem sich die Karten nicht ueberdecken — und eine
+     Karte, die das Zitat der Nachbarin halb verdeckt („Zusammenarbe"),
+     ist schlimmer als eine Spalte. Der Faecher kommt weiter unten per
+     Container-Abfrage zurueck, sobald die Buehne breit genug ist. */
   .sti-karte {
     position: absolute;
+    z-index: 1;
     top: 50%;
     left: 50%;
-    width: min(48cqw, 262px);
+    /* 66 statt 78: in der Spalte deckten die Karten den Stempel sonst
+       fast vollstaendig zu (gemessen 2 % sichtbar bei 390 px). Mit dem
+       schmaleren Mass schaut er rechts daneben hervor. */
+    width: min(66cqw, 262px);
     padding: 18px 18px 16px;
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 12px;
@@ -1018,9 +1020,107 @@ const akte = AKTE.map((a) => {
     text-align: left;
     transform:
       translate(-50%, -50%)
-      translateX(calc((var(--i) - 1) * var(--settle) * 22cqw))
-      translateY(calc((1 - var(--settle)) * 40px))
-      rotate(calc((var(--i) - 1) * var(--settle) * 4.5deg));
+      translateY(calc((var(--i) - 1) * var(--settle) * 32cqh))
+      translateY(calc((1 - var(--settle)) * 40px));
+  }
+
+  /* FLACHE BUEHNEN: drei gestapelte Karten in voller Hoehe passen
+     nicht mehr. Zwei Stufen, beide ueber die Buehne abgefragt statt
+     ueber das Fenster — massgeblich ist der Platz, den der Stapel
+     wirklich hat.
+
+     Stufe 1 ab 420 px abwaerts (gemessen 373 px bei 360x640): drei
+     Zeilen Text statt vier, groesserer Versatz, leicht verkleinert.
+     Vorher ragte die Spalte dort 10 px aus der Buehne. */
+  @container (max-height: 420px) {
+    .sti-karte-text {
+      -webkit-line-clamp: 3;
+    }
+
+    .sti-stapel {
+      transform: scale(0.8);
+    }
+
+    .sti-karte {
+      transform:
+        translate(-50%, -50%)
+        translateY(calc((var(--i) - 1) * var(--settle) * 40cqh))
+        translateY(calc((1 - var(--settle)) * 40px));
+    }
+  }
+
+  /* Stufe 2 ab 340 px abwaerts (gemessen 258 px bei 320x568): zwei
+     Zeilen, noch groesserer Versatz, staerker verkleinert. */
+  @container (max-height: 340px) {
+    .sti-karte {
+      padding: 11px 12px 9px;
+    }
+
+    .sti-karte-text {
+      margin-bottom: 8px;
+      -webkit-line-clamp: 2;
+    }
+
+    .sti-karte-sterne {
+      margin-bottom: 6px;
+    }
+
+    .sti-stimme {
+      height: 14px;
+      margin-top: 6px;
+    }
+
+    /* Auf 258 px Buehnenhoehe blieben zwischen Autor-Chip und Rail
+       nur 20 px, und der Akt ragte 6 px heraus. */
+    .sti-fuss {
+      margin-top: 10px;
+    }
+
+    .sti-chip {
+      padding: 6px 12px 6px 6px;
+      gap: 8px;
+    }
+
+    .sti-initialen {
+      width: 28px;
+      height: 28px;
+    }
+
+    /* Auch mit zwei Zeilen passen drei Karten nicht in 258 px: bei
+       einem Versatz, der die Ueberdeckung vermeidet (45cqh), braucht
+       die Spalte 347 px. Also wird der ganze Stapel kleiner — samt
+       Stempel, der die Lage behaelt. */
+    .sti-stapel {
+      transform: scale(0.62);
+    }
+
+    .sti-karte {
+      transform:
+        translate(-50%, -50%)
+        translateY(calc((var(--i) - 1) * var(--settle) * 50cqh))
+        translateY(calc((1 - var(--settle)) * 40px));
+    }
+  }
+
+  /* FAECHER, aber nur mit echtem Abstand. Vorher war der Versatz
+     22cqw bei 48cqw Breite — benachbarte Karten ueberlappten damit
+     zwangslaeufig um 2 x (24 - 22) = 4cqw, bei 1440 px also 33 px.
+     Die rechte Karte steht im Markup spaeter und lag deshalb oben.
+
+     Jetzt sind Versatz und Breite entkoppelt: 32cqw Versatz bei
+     28cqw Breite laesst 4cqw Luft zwischen den Karten, und die halbe
+     Spannweite bleibt mit 32 + 14 = 46cqw unter der halben Buehne.
+     Die Drehung kostet nochmal rund 5 px je Seite — passt in die
+     Luft. */
+  @container (min-width: 600px) {
+    .sti-karte {
+      width: min(28cqw, 262px);
+      transform:
+        translate(-50%, -50%)
+        translateX(calc((var(--i) - 1) * var(--settle) * 32cqw))
+        translateY(calc((1 - var(--settle)) * 40px))
+        rotate(calc((var(--i) - 1) * var(--settle) * 4.5deg));
+    }
   }
 
   .sti-karte-sterne {
@@ -1047,8 +1147,17 @@ const akte = AKTE.map((a) => {
     color: rgba(245, 245, 244, 0.9);
   }
 
+  /* HINTER den Karten. Der Stempel ist als Siegel AUF dem Stapel
+     entworfen und lag deshalb ueber allem — gemessen auf bis zu
+     134 px Kartentext. Weiter aufgefaechert wurde das sichtbar.
+     Es gibt keine Lage, an der er auf jeder Buehnengroesse neben den
+     Karten Platz haette: bei 1280x720 sind oberhalb des Stapels nur
+     106 px frei, er braucht 134. Dahinter geschoben ist die Frage
+     erledigt statt verschoben — kein Text wird je verdeckt, die Lage
+     bleibt, und was ueber den Stapel hinausragt, sieht man weiter. */
   .sti-stempel {
     position: absolute;
+    z-index: 0;
     top: 50%;
     left: 50%;
     display: inline-flex;
@@ -1183,7 +1292,7 @@ const akte = AKTE.map((a) => {
       height: 84px;
       transform:
         translate(-50%, -50%)
-        translate(min(26cqw, 92px), max(-98px, calc(70px - 50cqh)))
+        translate(min(33cqw, 115px), max(-98px, calc(70px - 50cqh)))
         rotate(-13deg)
         scale(calc(1.3 - 0.3 * var(--stempel)));
     }
