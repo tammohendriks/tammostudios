@@ -21,6 +21,7 @@ import { localeOf, path, pathOr } from '../lib/routes.mjs';
 import { STUDIO } from '../lib/i18n/seiten/studio';
 import { SITE, PHONE_INTERNATIONAL } from '../lib/constants';
 import { getJournalPost } from '../lib/sanity';
+import { dienst } from '../lib/schema';
 
 const locale = localeOf(Astro.url.pathname);
 const d = STUDIO[locale];
@@ -40,13 +41,30 @@ const faqSchema = {
     acceptedAnswer: { '@type': 'Answer', text: e.antwort },
   })),
 };
+
+/* Was DIESE Seite anbietet, als eigener Knoten. Der Betriebsknoten
+   nennt zwar einen Angebotskatalog, aber keine Seite sagte bisher
+   selbst, welche Leistung sie beschreibt. Form und @id kommen aus
+   src/lib/schema.ts, damit nicht jede Seite ihre eigene Schreibweise
+   bekommt. */
+const seitenUrl = `${SITE.url}${Astro.url.pathname.replace(/\/$/, '')}`;
+const dienstSchema = dienst({
+  seitenUrl,
+  name: d.meta.title,
+  beschreibung: d.meta.description,
+  art: locale === 'en' ? 'Content management system' : 'Redaktionssystem',
+  land: locale === 'en' ? 'Germany' : 'Deutschland',
+  // „Kostenlos, fuer immer" steht so auf der Seite. 0 ist hier eine
+  // Aussage, kein fehlender Wert.
+  preis: '0',
+});
 ---
 
 <BaseLayout
   pageTitle={d.meta.pageTitle}
   title={d.meta.title}
   description={d.meta.description}
-  additionalSchema={faqSchema}
+  additionalSchema={[faqSchema, dienstSchema]}
 >
   <main class="studio-page">
     <SubPageBackground />
