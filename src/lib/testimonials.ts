@@ -56,6 +56,25 @@ export type Testimonial = {
    * dasselbe Problem wie oben.
    */
   abzeichen?: string;
+  /**
+   * Die englische Fassung — NUR fuer die Stimmen-Section der
+   * Startseite.
+   *
+   * ACHTUNG, DAS IST EINE AUSNAHME. Oben steht, warum Bewertungen
+   * normalerweise nicht uebersetzt werden, und auf den
+   * Branchenseiten gilt das weiter: dort stehen die Zitate auch auf
+   * der englischen Fassung auf Deutsch.
+   *
+   * Auf der Startseite werden sie Wort fuer Wort aufgedeckt und
+   * tragen die Aussage der ganzen Section. Ein deutscher Absatz, der
+   * sich einem englischen Leser Wort fuer Wort enthuellt, ist kein
+   * Vertrauensbeweis, sondern eine Huerde. Deshalb uebersetzt — und
+   * deshalb steht darunter sichtbar „Translated from German". Ohne
+   * diesen Hinweis waere es ein Zitat mit fremder Stimme.
+   */
+  zitatEn?: string;
+  /** Die Kernphrase in der englischen Fassung. */
+  kernphraseEn?: string;
   /** Nur zur Orientierung beim Pflegen, nicht sichtbar. */
   branche: string;
 };
@@ -65,7 +84,10 @@ export const TESTIMONIALS: readonly Testimonial[] = [
     id: 'kirsch',
     zitat:
       'Sehr zu empfehlen. Die Zusammenarbeit funktioniert klasse, wir sind mit der Arbeit und dem Miteinander sehr zufrieden und freuen uns auch in Zukunft weiterhin mit Tammo zusammen zu arbeiten. 10/10.',
+    zitatEn:
+      'Highly recommended. Working together runs brilliantly, we are very happy with the work and with the collaboration, and we look forward to carrying on with Tammo. 10/10.',
     kernphrase: 'Die Zusammenarbeit funktioniert klasse',
+    kernphraseEn: 'Working together runs brilliantly',
     abzeichen: '10/10',
     autor: 'Kirsch Dach & Fassade GmbH',
     betrieb: 'Bremen',
@@ -85,7 +107,10 @@ export const TESTIMONIALS: readonly Testimonial[] = [
       'Tammo Studios können wir als betriebsärztliche Praxis wirklich empfehlen — kurze Kommunikationswege, präzise Umsetzung, eine gelungene Websitegestaltung. Tammo können wir von Herzen empfehlen. Ein wunderbarer Mensch ist er außerdem.',
     zitatVoll:
       'Ganz herzlichen Dank für die Neugestaltung unserer Website. Für alle Mitlesenden: Tammo Studios können wir als betriebsärztliche Praxis wirklich empfehlen — kurze Kommunikationswege, präzise Umsetzung, einfach eine gelungene Websitegestaltung mit gut funktionierendem Responsive-System. Tammo können wir von Herzen empfehlen. Ein wunderbarer Mensch ist er außerdem.',
+    zitatEn:
+      'As an occupational health practice we can genuinely recommend Tammo Studios — short lines of communication, precise execution, a well-made website design. We recommend Tammo wholeheartedly. And he is a wonderful person on top of that.',
     kernphrase: 'kurze Kommunikationswege, präzise Umsetzung',
+    kernphraseEn: 'short lines of communication, precise execution',
     autor: 'Dr. Kirsten Witzak-Agah',
     betrieb: 'Institut für Betriebsmedizin Isernhagen',
     initialen: 'KW',
@@ -95,7 +120,10 @@ export const TESTIMONIALS: readonly Testimonial[] = [
     id: 'waermepower',
     zitat:
       'Sympathischer junger Kerl, der nahezu jede Idee umsetzen kann. Preis / Leistung der Hammer und schnelle Antwort!',
+    zitatEn:
+      'A likeable young guy who can build just about any idea. Value for money is outstanding and he replies fast!',
     kernphrase: 'Preis / Leistung der Hammer',
+    kernphraseEn: 'Value for money is outstanding',
     autor: 'WärmePower',
     betrieb: 'Bremen',
     initialen: 'WP',
@@ -159,3 +187,33 @@ export const testimonialsFuer = (branche: TestimonialBranche): Testimonial[] =>
     if (!gefunden) throw new Error(`Kundenstimme "${id}" gibt es nicht (Branche ${branche}).`);
     return gefunden;
   });
+
+/**
+ * Zitat und Kernphrase in der gewuenschten Sprache, zerlegt in
+ * [davor, Kernphrase, danach].
+ *
+ * Faellt auf Deutsch zurueck, wenn es keine Uebersetzung gibt — so
+ * bleibt eine neue Stimme ohne englische Fassung sichtbar statt leer.
+ * Ob uebersetzt wurde, sagt das zweite Feld: nur dann gehoert der
+ * Hinweis „Translated from German" darunter.
+ */
+export const zerlegenFuer = (
+  t: Testimonial,
+  locale: 'de' | 'en'
+): { teile: [string, string, string]; uebersetzt: boolean } => {
+  const uebersetzt = locale === 'en' && !!t.zitatEn && !!t.kernphraseEn;
+  if (!uebersetzt) return { teile: zerlegen(t), uebersetzt: false };
+
+  const zitat = t.zitatEn!;
+  const phrase = t.kernphraseEn!;
+  const i = zitat.indexOf(phrase);
+  if (i === -1) {
+    throw new Error(
+      `Kernphrase „${phrase}" steht nicht im englischen Zitat von ${t.autor}.`
+    );
+  }
+  return {
+    teile: [zitat.slice(0, i), phrase, zitat.slice(i + phrase.length)],
+    uebersetzt: true,
+  };
+};

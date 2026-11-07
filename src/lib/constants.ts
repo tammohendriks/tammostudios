@@ -135,3 +135,45 @@ export const alterJetzt = (): number => {
   const jahre = Number(heute.slice(0, 4)) - Number(GEBURTSTAG.slice(0, 4));
   return heute.slice(5) >= GEBURTSTAG.slice(5) ? jahre : jahre - 1;
 };
+
+/**
+ * Die Google-Bewertung, an EINER Stelle.
+ *
+ * Steht bisher dreimal als Text im Woerterbuch (Branchenseiten,
+ * Startseite), und drei Zahlen, die dasselbe meinen, laufen
+ * irgendwann auseinander.
+ *
+ * ACHTUNG, ZWEI DINGE:
+ *
+ * 1. `anzahl` pflegt der Betreiber von Hand. Sie wird NICHT
+ *    automatisch aus Google geholt — dafuer braeuchte es die Places
+ *    API und einen Schluessel, und eine Zahl, die von einer API
+ *    kommen koennte, aber aus einer Konstante kommt, waere die
+ *    gefaehrlichere Variante.
+ *
+ * 2. Die Zahl geht NICHT als aggregateRating ins JSON-LD. Selbst
+ *    ausgespielte Gesamtbewertungen wertet Google als
+ *    Richtlinienverstoss. Die drei Einzelbewertungen als `review`
+ *    sind erlaubt und fuer Suchmaschinen und KI-Crawler lesbar —
+ *    genau die stehen deshalb im Graph.
+ */
+export const GOOGLE_BEWERTUNG = {
+  /** Die Note in deutscher Schreibweise. */
+  note: '5,0',
+  /** Dieselbe Note auf Englisch. */
+  noteEn: '5.0',
+  /** Wie viele Bewertungen. Von Hand gepflegt. */
+  anzahl: 4,
+  /**
+   * Das Google-Unternehmensprofil.
+   *
+   * Leer, solange die Adresse nicht vorliegt: ein Verweis ins Leere
+   * ist schlechter als keiner. Die Komponenten blenden den Verweis
+   * aus, wenn hier nichts steht.
+   */
+  url: '',
+} as const;
+
+/** Die Note in der Schreibweise der jeweiligen Sprache. */
+export const bewertungsNote = (locale: 'de' | 'en'): string =>
+  locale === 'en' ? GOOGLE_BEWERTUNG.noteEn : GOOGLE_BEWERTUNG.note;

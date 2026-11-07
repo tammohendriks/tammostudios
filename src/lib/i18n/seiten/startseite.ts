@@ -49,6 +49,25 @@ export const de = {
     cta: 'Alle Referenzen ansehen',
   },
 
+  /**
+   * Die Stimmen-Section zwischen Referenzen und Kernbotschaften.
+   *
+   * Die ZITATE stehen nicht hier, sondern in lib/testimonials.ts —
+   * sie sind auf den Branchenseiten dieselben, und eine zweite Kopie
+   * waere eine zweite Wahrheit. Hier steht nur das Beiwerk.
+   */
+  stimmen: {
+    eyebrow: 'WAS KUNDEN SAGEN',
+    // {note} wird aus GOOGLE_BEWERTUNG ersetzt.
+    mono: 'GOOGLE · {note} · ECHTE PROJEKTE',
+    sterneLabel: '{note} von 5 Sternen',
+    cta: 'Alle Referenzen ansehen',
+    google: 'Bewertungen auf Google',
+    // Steht unter uebersetzten Zitaten. Auf der deutschen Fassung
+    // leer, weil dort nichts uebersetzt wurde.
+    uebersetzt: '',
+  },
+
   warum: {
     eyebrow: 'WARUM TAMMO STUDIOS',
     headline: 'Kein Zufall.',
@@ -231,6 +250,18 @@ export const en: Shape<typeof de> = {
     vorschauVon: 'Preview of',
     modalOeffnen: 'open in the preview',
     cta: 'See all work',
+  },
+
+  stimmen: {
+    eyebrow: 'WHAT CLIENTS SAY',
+    mono: 'GOOGLE · {note} · REAL PROJECTS',
+    sterneLabel: '{note} out of 5 stars',
+    cta: 'See all work',
+    google: 'Reviews on Google',
+    // Unter jedem Zitat auf der englischen Fassung: die Bewertungen
+    // sind auf Deutsch geschrieben und hier uebersetzt. Ohne diesen
+    // Hinweis waere es ein Zitat mit fremder Stimme.
+    uebersetzt: 'Translated from German',
   },
 
   warum: {
