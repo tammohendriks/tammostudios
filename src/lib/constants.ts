@@ -124,6 +124,19 @@ export const GEBURTSTAG = '2000-10-28';
  * mit fuehrender Null geschrieben, damit stimmt die alphabetische
  * Reihenfolge mit der zeitlichen ueberein.
  */
+/**
+ * Ersetzt {alter} in einem Text durch das heutige Alter.
+ *
+ * WARUM ALS HELFER: die Zahl stand an drei Stellen. Der sichtbare
+ * Untertitel auf /ueber wurde schon auf den Platzhalter umgestellt,
+ * die META-BESCHREIBUNG derselben Seite nicht — dort stand weiter
+ * fest „25", in beiden Sprachen. Eine SEO-Beschreibung ist genau der
+ * Ort, an dem eine veraltete Zahl niemandem auffaellt und trotzdem
+ * im Suchergebnis steht.
+ */
+export const mitAlter = (text: string): string =>
+  text.replace('{alter}', String(alterJetzt()));
+
 export const alterJetzt = (): number => {
   const heute = new Intl.DateTimeFormat('en-CA', {
     timeZone: 'Europe/Berlin',
@@ -151,11 +164,44 @@ export const alterJetzt = (): number => {
  *    kommen koennte, aber aus einer Konstante kommt, waere die
  *    gefaehrlichere Variante.
  *
- * 2. Die Zahl geht NICHT als aggregateRating ins JSON-LD. Selbst
- *    ausgespielte Gesamtbewertungen wertet Google als
- *    Richtlinienverstoss. Die drei Einzelbewertungen als `review`
- *    sind erlaubt und fuer Suchmaschinen und KI-Crawler lesbar —
- *    genau die stehen deshalb im Graph.
+ * 2. WEDER die Zahl als `aggregateRating` NOCH die drei Stimmen als
+ *    `review` stehen im JSON-LD, und der Grund ist ein anderer als
+ *    hier frueher stand.
+ *
+ *    Frueher stand da, aggregateRating sei ein Richtlinienverstoss
+ *    und Einzelbewertungen seien erlaubt. Beides stimmt nicht.
+ *    Googles FAQ zur Aenderung von 2019 beantwortet „Does this
+ *    update apply to AggregateRating too?" mit „Yes. It applies to
+ *    Review and AggregateRating" — beide werden gleich behandelt.
+ *    Und ein Verstoss ist es auch nicht: „No, you don't need to
+ *    remove them. Google Search just won't display review snippets
+ *    for those pages anymore" sowie „You won't get a manual action
+ *    just for this."
+ *
+ *    Der wirkliche Grund ist Wirkungslosigkeit. Die Doku zu Review
+ *    snippets sagt: „If the entity that's being reviewed controls
+ *    the reviews about itself, their pages that use LocalBusiness or
+ *    any other type of Organization structured data are ineligible
+ *    for star review feature." ProfessionalService ist ein Subtyp
+ *    von LocalBusiness, der Fall liegt also vor. Sterne gibt es
+ *    dafuer garantiert nie — die Auszeichnung waere Aufwand ohne
+ *    jeden Gegenwert.
+ *
+ *    Dazu kaeme ein zweiter Punkt: „Don't aggregate reviews or
+ *    ratings from other websites" und „Ratings must be sourced
+ *    directly from users". Diese Note kommt aus Google, nicht aus
+ *    einer eigenen Erhebung.
+ *
+ *    Was stattdessen wirkt: die Stimmen als sichtbarer Text mit
+ *    Namen und Quelle (steht so auf der Startseite und den
+ *    Landingpages, ist fuer Menschen und KI-Crawler lesbar), und
+ *    `url` unten als sameAs auf das Unternehmensprofil — Sterne
+ *    entstehen ueber das Profil, das von der Regel ausdruecklich
+ *    nicht betroffen ist.
+ *
+ *    Belege, Stand 08.09.2026:
+ *    https://developers.google.com/search/docs/appearance/structured-data/review-snippet
+ *    https://developers.google.com/search/blog/2019/09/making-review-rich-results-more-helpful
  */
 export const GOOGLE_BEWERTUNG = {
   /** Die Note in deutscher Schreibweise. */

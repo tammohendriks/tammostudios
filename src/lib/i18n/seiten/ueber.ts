@@ -15,7 +15,7 @@ export const de = {
     pageTitle: 'Über mich',
     title: 'Tammo Hendriks — Webentwickler aus Bremen | Tammo Studios',
     description:
-      'Tammo Hendriks, 25, aus Bremen. Webentwickler mit Marketing-Hintergrund. Baut Websites und die Anwendungen darin, ohne Agentur dazwischen.',
+      'Tammo Hendriks, {alter}, aus Bremen. Webentwickler mit Marketing-Hintergrund. Baut Websites und die Anwendungen darin, ohne Agentur dazwischen.',
   },
 
   schema: {
@@ -139,7 +139,7 @@ export const en: Shape<typeof de> = {
     pageTitle: 'About',
     title: 'Tammo Hendriks — web developer from Bremen | Tammo Studios',
     description:
-      'Tammo Hendriks, 25, from Bremen. A web developer with a marketing background. Builds websites and the applications inside them, with no agency in between.',
+      'Tammo Hendriks, {alter}, from Bremen. A web developer with a marketing background. Builds websites and the applications inside them, with no agency in between.',
   },
 
   schema: {
