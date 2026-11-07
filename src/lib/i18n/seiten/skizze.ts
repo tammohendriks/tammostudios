@@ -493,6 +493,10 @@ export const de = {
     // bedeutungslose Zeichen.
     sterne: 'Fünf von fünf Sternen',
     noteLabel: 'Durchschnitt: 5,0 von 5 Sternen',
+    // Auf der deutschen Fassung ist nichts übersetzt, der Hinweis
+    // bleibt leer. Der Schlüssel steht trotzdem da, damit beide
+    // Sprachen dieselbe Form haben.
+    uebersetzt: '',
   },
 
   /**
@@ -868,12 +872,19 @@ export const en: Shape<typeof de> = {
   stimmen: {
     titel: 'What clients say',
     note: '5.0',
-    // Die Zitate bleiben im Original — eine uebersetzte Bewertung ist
-    // keine Bewertung mehr. Die Zeile sagt das, statt es zu
-    // verschweigen.
-    unterZeile: 'FROM REAL PROJECTS · ORIGINAL GERMAN REVIEWS',
+    /* Spiegelt die deutsche Zeile. Vorher stand hier „ORIGINAL GERMAN
+       REVIEWS" — das stimmte, solange die Zitate im Original blieben.
+       Seit sie übersetzt sind, trägt der Hinweis an jedem einzelnen
+       Zitat diese Einschränkung, nicht mehr die Überschrift.
+
+       Dieselbe Vorsicht wie auf Deutsch: „100 % would recommend" ist
+       über die drei gezeigten Stimmen belegt, nicht über alle Kunden. */
+    unterZeile: 'FROM REAL PROJECTS · 100% WOULD RECOMMEND',
     sterne: 'Five out of five stars',
     noteLabel: 'Average: 5.0 out of 5 stars',
+    // Steht unter jedem übersetzten Zitat. Ohne ihn wäre es ein Zitat
+    // mit fremder Stimme.
+    uebersetzt: 'Translated from German',
   },
 
   schwebend: {

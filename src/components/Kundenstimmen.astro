@@ -28,7 +28,7 @@
  */
 import { localeOf } from '../lib/routes.mjs';
 import { SKIZZE } from '../lib/i18n/seiten/skizze';
-import { testimonialsFuer, zerlegen, type TestimonialBranche } from '../lib/testimonials';
+import { testimonialsFuer, zerlegenFuer, type TestimonialBranche } from '../lib/testimonials';
 import Sterne from './Sterne.astro';
 
 interface Props {
@@ -40,7 +40,18 @@ const locale = localeOf(Astro.url.pathname);
 const s = SKIZZE[locale as 'de' | 'en'];
 
 const [gross, ...klein] = testimonialsFuer(branche);
-const [vorG, phraseG, nachG] = zerlegen(gross);
+
+/* Auf /en stehen die Zitate UEBERSETZT, mit Hinweis darunter — so wie
+   in der Stimmen-Section der Startseite. Vorher blieben sie hier im
+   Original und die Unterzeile sagte „ORIGINAL GERMAN REVIEWS".
+
+   Beides ist vertretbar, aber nicht gleichzeitig: wer dieselben drei
+   Stimmen auf der Startseite uebersetzt liest und auf der Landingpage
+   deutsch, haelt eines von beidem fuer einen Fehler. Der Hinweis an
+   jedem Zitat traegt die Einschraenkung, die vorher in der Unterzeile
+   stand. */
+const { teile: [vorG, phraseG, nachG], uebersetzt: grossUebersetzt } =
+  zerlegenFuer(gross, locale as 'de' | 'en');
 
 /**
  * Die Schriftgroesse des grossen Zitats haengt an seiner LAENGE.
@@ -55,7 +66,10 @@ const [vorG, phraseG, nachG] = zerlegen(gross);
  * fuenf Zeilen kommt. Nebenwirkung: text-wrap: balance greift erst
  * bis etwa sechs Zeilen — in der alten Groesse lief es ins Leere.
  */
-const stufe = gross.zitat.length > 200 ? 'lang' : gross.zitat.length > 140 ? 'mittel' : 'kurz';
+// Gemessen wird der Text, der WIRKLICH dasteht — die englische
+// Fassung ist anders lang als die deutsche.
+const grossLaenge = (vorG + phraseG + nachG).length;
+const stufe = grossLaenge > 200 ? 'lang' : grossLaenge > 140 ? 'mittel' : 'kurz';
 ---
 
 <section class="ks" aria-labelledby="ks-titel">
@@ -79,6 +93,9 @@ const stufe = gross.zitat.length > 200 ? 'lang' : gross.zitat.length > 140 ? 'mi
     <blockquote class="ks-gross-zitat">
       {vorG}<strong>{phraseG}</strong>{nachG}
     </blockquote>
+    {grossUebersetzt && s.stimmen.uebersetzt && (
+      <p class="ks-uebersetzt">{s.stimmen.uebersetzt}</p>
+    )}
     <figcaption class="ks-autor">
       <span class="ks-initialen" aria-hidden="true">{gross.initialen}</span>
       <span class="ks-autor-text">
@@ -91,7 +108,8 @@ const stufe = gross.zitat.length > 200 ? 'lang' : gross.zitat.length > 140 ? 'mi
   <ul class="ks-raster">
     {
       klein.map((stimme) => {
-        const [vor, phrase, nach] = zerlegen(stimme);
+        const { teile: [vor, phrase, nach], uebersetzt } =
+          zerlegenFuer(stimme, locale as 'de' | 'en');
         return (
           <li class="ks-karte" data-reveal>
             {stimme.abzeichen && (
@@ -102,6 +120,9 @@ const stufe = gross.zitat.length > 200 ? 'lang' : gross.zitat.length > 140 ? 'mi
             <blockquote class="ks-zitat">
               {vor}<strong>{phrase}</strong>{nach}
             </blockquote>
+            {uebersetzt && s.stimmen.uebersetzt && (
+              <p class="ks-uebersetzt">{s.stimmen.uebersetzt}</p>
+            )}
             <figure class="ks-autor">
               <span class="ks-initialen" aria-hidden="true">{stimme.initialen}</span>
               <figcaption class="ks-autor-text">
@@ -299,6 +320,19 @@ const stufe = gross.zitat.length > 200 ? 'lang' : gross.zitat.length > 140 ? 'mi
     font-size: var(--lp-text);
     line-height: 1.55;
     color: rgba(245, 245, 244, 0.8);
+  }
+
+  /* Steht unter übersetzten Zitaten. Dieselben Werte wie der Hinweis
+     in der Stimmen-Section der Startseite: Mono-Größe des Projekts,
+     0.52 Deckkraft. Eine Pflichtangabe zur Herkunft der Worte muss
+     lesbar sein, nicht nur vorhanden. */
+  .ks-uebersetzt {
+    margin: 12px 0 0;
+    font-family: var(--lp-mono);
+    font-size: var(--lp-mono-groesse);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(245, 245, 244, 0.52);
   }
 
   /* === Namenszeile, in beiden Größen gleich === */
