@@ -3,7 +3,7 @@ import '../styles/global.css';
 import TopBar from '../components/TopBar.astro';
 import SiteThemeToggle from '../components/SiteThemeToggle.astro';
 import SiteLangToggle from '../components/SiteLangToggle.astro';
-import { SITE } from '../lib/constants';
+import { SITE, GOOGLE_BEWERTUNG } from '../lib/constants';
 import { webSite, BUSINESS_ID, TAMMO_ID } from '../lib/schema';
 import { absUrl, hreflangs, keyOf, localeOf, pathOr } from '../lib/routes.mjs';
 import { t } from '../lib/i18n';
@@ -203,7 +203,14 @@ const businessSchema: Record<string, unknown> = {
     jobTitle: d.schema.jobTitle,
     url: absUrl(pathOr('ueber', locale)),
   },
-  sameAs: ['https://www.instagram.com/tammostudios/'],
+  /* sameAs verbindet diese Seite mit denselben Betrieb anderswo.
+     Das Unternehmensprofil gehoert dazu: ueber IHN entstehen die
+     Sterne in der Suche, nicht ueber Bewertungs-Markup auf der
+     eigenen Seite (siehe GOOGLE_BEWERTUNG in constants.ts). */
+  sameAs: [
+    'https://www.instagram.com/tammostudios/',
+    ...(GOOGLE_BEWERTUNG.url ? [GOOGLE_BEWERTUNG.url] : []),
+  ],
   knowsAbout: d.schema.kannUeber,
   slogan: d.schema.slogan,
 };

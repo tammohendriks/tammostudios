@@ -213,11 +213,19 @@ export const GOOGLE_BEWERTUNG = {
   /**
    * Das Google-Unternehmensprofil.
    *
-   * Leer, solange die Adresse nicht vorliegt: ein Verweis ins Leere
-   * ist schlechter als keiner. Die Komponenten blenden den Verweis
-   * aus, wenn hier nichts steht.
+   * Leer lassen, wenn keine Adresse vorliegt: ein Verweis ins Leere
+   * ist schlechter als keiner. Die Komponenten blenden ihn dann aus.
+   *
+   * DIESE FORM, UND WARUM NICHT DIE AUFGELOESTE: der Kurzlink fuehrt
+   * ueber zwei Weiterleitungen auf eine Google-SUCHSEITE mit
+   * Sitzungsparametern (sca_esv, rlz, sxsrf, utm_source). Die taugt
+   * nicht als dauerhafte Adresse. Stabil waere allenfalls die
+   * Knowledge-Graph-Kennung kgmid=/g/11zgmt_dxz, aber die liefert
+   * einem Abruf ohne Browser nur eine Zustimmungsseite — ob sie das
+   * Profil zeigt, liess sich nicht pruefen. Der Kurzlink ist das,
+   * was der Betreiber selbst teilt, und Google haelt ihn.
    */
-  url: '',
+  url: 'https://share.google/jLisCetP5L4vl37dY',
 } as const;
 
 /** Die Note in der Schreibweise der jeweiligen Sprache. */
