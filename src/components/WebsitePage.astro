@@ -31,9 +31,27 @@ import { REFERENCES } from '../lib/references';
 import { subtitleFor } from '../lib/references.en';
 import { localeOf, path, pathOr } from '../lib/routes.mjs';
 import { WEBSITE } from '../lib/i18n/seiten/website';
+import { dienst } from '../lib/schema';
+import { SITE } from '../lib/constants';
 
 const locale = localeOf(Astro.url.pathname);
 const d = WEBSITE[locale];
+
+/* Was DIESE Seite anbietet, als eigener Knoten. Der Betriebsknoten
+   nennt zwar einen Angebotskatalog, aber keine Seite sagte bisher
+   selbst, welche Leistung sie beschreibt. Form und @id kommen aus
+   src/lib/schema.ts, damit nicht jede Seite ihre eigene Schreibweise
+   bekommt. */
+const seitenUrl = `${SITE.url}${Astro.url.pathname.replace(/\/$/, '')}`;
+const dienstSchema = dienst({
+  seitenUrl,
+  name: d.meta.title,
+  beschreibung: d.meta.description,
+  art: locale === 'en' ? 'Web design' : 'Webdesign',
+  land: locale === 'en' ? 'Germany' : 'Deutschland',
+  // Der Einstiegspreis, derselbe wie im Angebotskatalog des Betriebs.
+  preis: '2000',
+});
 
 // Ziele der drei Problem-Karten. Der Anker #cms zeigt auf diese Seite
 // selbst und gilt in jeder Sprache; /software gibt es nicht
@@ -55,6 +73,7 @@ const websiteRefs = REFERENCES.filter((r) =>
   pageTitle={d.meta.pageTitle}
   title={d.meta.title}
   description={d.meta.description}
+  additionalSchema={dienstSchema}
 >
   <main class="website-page">
     <SubPageBackground />

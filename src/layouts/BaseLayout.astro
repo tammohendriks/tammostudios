@@ -4,6 +4,7 @@ import TopBar from '../components/TopBar.astro';
 import SiteThemeToggle from '../components/SiteThemeToggle.astro';
 import SiteLangToggle from '../components/SiteLangToggle.astro';
 import { SITE } from '../lib/constants';
+import { webSite, BUSINESS_ID, TAMMO_ID } from '../lib/schema';
 import { absUrl, hreflangs, keyOf, localeOf, pathOr } from '../lib/routes.mjs';
 import { t } from '../lib/i18n';
 import { UMBAU_AKTIV } from '../lib/skizze';
@@ -130,8 +131,8 @@ const themaErstNachHero = (UMBAU_AKTIV as readonly string[]).includes(routeKey ?
 // vollstaendige Person-Definition steht separat auf /ueber (via
 // additionalSchema-Prop) — Google merged Entities mit gleicher
 // @id automatisch in ihren Knowledge-Graph.
-const TAMMO_ID = `${SITE.url}/#tammo`;
-const BUSINESS_ID = `${SITE.url}/#business`;
+// Die IDs und die Formen stehen in src/lib/schema.ts — sie werden
+// auch von den Seiten gebraucht, die eigene Knoten beisteuern.
 
 const businessSchema: Record<string, unknown> = {
   '@type': 'ProfessionalService',
@@ -244,10 +245,22 @@ const additionalSchemas = additionalSchema
     : [additionalSchema]
   : [];
 
+/* Der WebSite-Knoten. Fehlte bisher: im Graph stand zwar der Betrieb
+   und eine Brotkrume, aber nirgends, dass es diese Seite in zwei
+   Sprachen gibt. inLanguage sagt es fuer die jeweilige Fassung,
+   publisher verweist per @id auf denselben Betrieb. */
+const webSiteSchema = webSite({
+  locale,
+  url: absUrl(pathOr('home', locale)),
+  name: SITE.name,
+  beschreibung: d.schema.beschreibung,
+});
+
 const jsonLdGraph = {
   '@context': 'https://schema.org',
   '@graph': [
     businessSchema,
+    webSiteSchema,
     ...(breadcrumbSchema ? [breadcrumbSchema] : []),
     ...additionalSchemas,
   ],

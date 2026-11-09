@@ -28,7 +28,8 @@
  */
 import { localeOf } from '../lib/routes.mjs';
 import { SKIZZE } from '../lib/i18n/seiten/skizze';
-import { testimonialsFuer, zerlegen, type TestimonialBranche } from '../lib/testimonials';
+import { testimonialsFuer, zerlegenFuer, type TestimonialBranche } from '../lib/testimonials';
+import Sterne from './Sterne.astro';
 
 interface Props {
   branche: TestimonialBranche;
@@ -39,7 +40,18 @@ const locale = localeOf(Astro.url.pathname);
 const s = SKIZZE[locale as 'de' | 'en'];
 
 const [gross, ...klein] = testimonialsFuer(branche);
-const [vorG, phraseG, nachG] = zerlegen(gross);
+
+/* Auf /en stehen die Zitate UEBERSETZT, mit Hinweis darunter — so wie
+   in der Stimmen-Section der Startseite. Vorher blieben sie hier im
+   Original und die Unterzeile sagte „ORIGINAL GERMAN REVIEWS".
+
+   Beides ist vertretbar, aber nicht gleichzeitig: wer dieselben drei
+   Stimmen auf der Startseite uebersetzt liest und auf der Landingpage
+   deutsch, haelt eines von beidem fuer einen Fehler. Der Hinweis an
+   jedem Zitat traegt die Einschraenkung, die vorher in der Unterzeile
+   stand. */
+const { teile: [vorG, phraseG, nachG], uebersetzt: grossUebersetzt } =
+  zerlegenFuer(gross, locale as 'de' | 'en');
 
 /**
  * Die Schriftgroesse des grossen Zitats haengt an seiner LAENGE.
@@ -54,7 +66,10 @@ const [vorG, phraseG, nachG] = zerlegen(gross);
  * fuenf Zeilen kommt. Nebenwirkung: text-wrap: balance greift erst
  * bis etwa sechs Zeilen — in der alten Groesse lief es ins Leere.
  */
-const stufe = gross.zitat.length > 200 ? 'lang' : gross.zitat.length > 140 ? 'mittel' : 'kurz';
+// Gemessen wird der Text, der WIRKLICH dasteht — die englische
+// Fassung ist anders lang als die deutsche.
+const grossLaenge = (vorG + phraseG + nachG).length;
+const stufe = grossLaenge > 200 ? 'lang' : grossLaenge > 140 ? 'mittel' : 'kurz';
 ---
 
 <section class="ks" aria-labelledby="ks-titel">
@@ -66,7 +81,7 @@ const stufe = gross.zitat.length > 200 ? 'lang' : gross.zitat.length > 140 ? 'mi
       Teile sind ausgeblendet. */}
   <div class="ks-kopf" data-reveal>
     <p class="ks-note" aria-hidden="true" data-zaehlen>{s.stimmen.note}</p>
-    <p class="ks-sterne" aria-hidden="true">★★★★★</p>
+    <Sterne class="ks-sterne" groesse="clamp(1.1rem, 2.6vw, 1.55rem)" abstand="0.2em" />
     <span class="ks-nurlesen">{s.stimmen.noteLabel}</span>
     <p class="ks-unterzeile">{s.stimmen.unterZeile}</p>
   </div>
@@ -78,6 +93,9 @@ const stufe = gross.zitat.length > 200 ? 'lang' : gross.zitat.length > 140 ? 'mi
     <blockquote class="ks-gross-zitat">
       {vorG}<strong>{phraseG}</strong>{nachG}
     </blockquote>
+    {grossUebersetzt && s.stimmen.uebersetzt && (
+      <p class="ks-uebersetzt">{s.stimmen.uebersetzt}</p>
+    )}
     <figcaption class="ks-autor">
       <span class="ks-initialen" aria-hidden="true">{gross.initialen}</span>
       <span class="ks-autor-text">
@@ -90,17 +108,21 @@ const stufe = gross.zitat.length > 200 ? 'lang' : gross.zitat.length > 140 ? 'mi
   <ul class="ks-raster">
     {
       klein.map((stimme) => {
-        const [vor, phrase, nach] = zerlegen(stimme);
+        const { teile: [vor, phrase, nach], uebersetzt } =
+          zerlegenFuer(stimme, locale as 'de' | 'en');
         return (
           <li class="ks-karte" data-reveal>
             {stimme.abzeichen && (
               <span class="ks-abzeichen" aria-hidden="true">{stimme.abzeichen}</span>
             )}
-            <p class="ks-sterne-klein" aria-hidden="true">★★★★★</p>
+            <Sterne class="ks-sterne-klein" groesse="0.78rem" abstand="0.14em" />
             <span class="ks-nurlesen">{s.stimmen.sterne}</span>
             <blockquote class="ks-zitat">
               {vor}<strong>{phrase}</strong>{nach}
             </blockquote>
+            {uebersetzt && s.stimmen.uebersetzt && (
+              <p class="ks-uebersetzt">{s.stimmen.uebersetzt}</p>
+            )}
             <figure class="ks-autor">
               <span class="ks-initialen" aria-hidden="true">{stimme.initialen}</span>
               <figcaption class="ks-autor-text">
@@ -154,15 +176,12 @@ const stufe = gross.zitat.length > 200 ? 'lang' : gross.zitat.length > 140 ? 'mi
     margin: 0;
   }
 
+  /* Typografie und Form kommen aus Sterne.astro — hier bleibt nur
+     die Stellung im Satz. Vorher stand hier ein ★ aus der
+     Systemschrift samt text-indent-Ausgleich fuer den
+     Buchstabenabstand; beides entfaellt mit einem echten SVG. */
   .ks-sterne {
-    font-size: clamp(1.4rem, 3.4vw, 2rem);
-    letter-spacing: 0.18em;
-    line-height: 1;
-    color: #f59e0b;
-    margin: 4px 0 0;
-    /* Der Buchstabenabstand hängt rechts als Leerraum nach und
-       verschiebt die Reihe nach links. */
-    text-indent: 0.18em;
+    margin: 6px 0 0;
   }
 
   .ks-unterzeile {
@@ -293,10 +312,6 @@ const stufe = gross.zitat.length > 200 ? 'lang' : gross.zitat.length > 140 ? 'mi
 
   .ks-sterne-klein {
     margin: 0;
-    font-size: 0.92rem;
-    letter-spacing: 0.1em;
-    line-height: 1;
-    color: #f59e0b;
   }
 
   .ks-zitat {
@@ -305,6 +320,19 @@ const stufe = gross.zitat.length > 200 ? 'lang' : gross.zitat.length > 140 ? 'mi
     font-size: var(--lp-text);
     line-height: 1.55;
     color: rgba(245, 245, 244, 0.8);
+  }
+
+  /* Steht unter übersetzten Zitaten. Dieselben Werte wie der Hinweis
+     in der Stimmen-Section der Startseite: Mono-Größe des Projekts,
+     0.52 Deckkraft. Eine Pflichtangabe zur Herkunft der Worte muss
+     lesbar sein, nicht nur vorhanden. */
+  .ks-uebersetzt {
+    margin: 12px 0 0;
+    font-family: var(--lp-mono);
+    font-size: var(--lp-mono-groesse);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(245, 245, 244, 0.52);
   }
 
   /* === Namenszeile, in beiden Größen gleich === */

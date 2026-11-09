@@ -23,6 +23,27 @@ const d = t(Astro.url.pathname);
     <header class="ref-modal-header">
       <span class="ref-modal-url" id="ref-modal-url"></span>
       <div class="ref-modal-actions">
+        {/* Der Verweis auf die Fallstudie. Steht immer im Markup und
+            wird beim Oeffnen ein- oder ausgeblendet — welche Referenz
+            eine hat, entscheidet erst der Klick. Ohne Beitrag bleibt
+            er hidden, es gibt also nie einen toten Link. */}
+        <a class="ref-modal-fallstudie" id="ref-modal-fallstudie" href="#" hidden>
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M4 19.5V6a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 1.5Z" />
+            <path d="M8 8h7M8 12h7" />
+          </svg>
+          <span>{d.referenzModal.fallstudie}</span>
+        </a>
         <a
           class="ref-modal-external"
           id="ref-modal-external"
@@ -174,6 +195,33 @@ const d = t(Astro.url.pathname);
     gap: 12px;
     align-items: center;
     flex-shrink: 0;
+  }
+
+  /* Ruhiger als der Amber-Knopf daneben: die Fallstudie ist ein
+     Angebot, der Sprung zur echten Seite die Hauptsache. */
+  .ref-modal-fallstudie {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.04);
+    color: rgba(245, 245, 244, 0.82);
+    font-family: 'Neue Montreal', 'Inter', sans-serif;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: background 200ms ease, border-color 200ms ease;
+  }
+
+  .ref-modal-fallstudie:hover,
+  .ref-modal-fallstudie:focus-visible {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.24);
+  }
+
+  .ref-modal-fallstudie[hidden] {
+    display: none;
   }
 
   .ref-modal-external {
@@ -373,8 +421,26 @@ const d = t(Astro.url.pathname);
     triggers.forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.preventDefault();
-        const url = (btn as HTMLElement).dataset.url;
-        if (url) openModal(url);
+        const el = btn as HTMLElement;
+        const url = el.dataset.url;
+        if (!url) return;
+
+        // Fallstudie: nur zeigen, wenn die Karte einen Pfad mitbringt.
+        // Gesetzt wird der beim Bauen und nur fuer Beitraege, die es
+        // wirklich gibt.
+        const fs = document.getElementById('ref-modal-fallstudie') as HTMLAnchorElement | null;
+        if (fs) {
+          const pfad = el.dataset.fallstudie;
+          if (pfad) {
+            fs.href = pfad;
+            fs.hidden = false;
+          } else {
+            fs.removeAttribute('href');
+            fs.hidden = true;
+          }
+        }
+
+        openModal(url);
       });
     });
 

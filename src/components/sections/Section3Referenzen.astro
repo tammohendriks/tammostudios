@@ -1,11 +1,16 @@
 ---
-import { REFERENCES } from '../../lib/references';
+import { REFERENCES, fallstudienPfade } from '../../lib/references';
 import { categoryLabel } from '../../lib/references.en';
 import ReferenzModal from '../ReferenzModal.astro';
 import { localeOf, path } from '../../lib/routes.mjs';
 import { STARTSEITE } from '../../lib/i18n/seiten/startseite';
 
 const locale = localeOf(Astro.url.pathname);
+
+/* Welche Referenz einen Journal-Beitrag hat, der WIRKLICH schon
+   veroeffentlicht ist. Leeres Objekt auf Englisch — das Journal gibt
+   es nur auf Deutsch. */
+const fallstudien = await fallstudienPfade(locale as 'de' | 'en');
 const d = STARTSEITE[locale];
 
 const referenzenPfad = path('referenzen', locale);
@@ -53,7 +58,7 @@ const dots = [
 
   <div class="section-3-sticky">
     <header class="section-3-header reveal-slot">
-      <p class="section-3-eyebrow">{d.projekte.eyebrow}</p>
+      <p class="eyebrow section-3-eyebrow">{d.projekte.eyebrow}</p>
       <h2 class="section-3-headline">{d.projekte.headline}</h2>
       <p class="section-3-sub">{d.projekte.sub}</p>
     </header>
@@ -65,6 +70,7 @@ const dots = [
           type="button"
           data-slug={ref.slug}
           data-url={ref.url}
+          data-fallstudie={fallstudien[(ref as { fallstudie?: string }).fallstudie ?? '']}
           data-title={ref.title}
           tabindex="-1"
           aria-hidden="true"
@@ -232,13 +238,9 @@ const dots = [
     transform: translateY(calc((1 - var(--reveal-progress)) * 20px));
   }
 
+  /* Typografie kommt aus .eyebrow in global.css — hier bleibt nur
+     der Abstand, der zum Rhythmus DIESER Section gehoert. */
   .section-3-eyebrow {
-    font-family: 'Neue Montreal', 'Inter', sans-serif;
-    font-size: 0.75rem;
-    font-weight: 500;
-    letter-spacing: 0.3em;
-    color: rgba(245, 158, 11, 0.85);
-    text-transform: uppercase;
     margin: 0 0 6px;
   }
 

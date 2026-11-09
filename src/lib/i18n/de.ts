@@ -113,6 +113,7 @@ export const de = {
     rahmenTitel: 'Referenz-Vorschau',
     nichtEinbettbar: 'Diese Seite kann nicht direkt eingebettet werden.',
     neuerTabOeffnen: 'Im neuen Tab öffnen',
+    fallstudie: 'Fallstudie lesen',
   },
 
   // Texte der strukturierten Daten im Kopf jeder Seite (siehe

@@ -23,6 +23,7 @@ import SiteFooter from './SiteFooter.astro';
 import { localeOf, pathOr } from '../lib/routes.mjs';
 import { SICHTBARKEIT } from '../lib/i18n/seiten/sichtbarkeit';
 import { SITE, PHONE_INTERNATIONAL } from '../lib/constants';
+import { dienst } from '../lib/schema';
 
 const locale = localeOf(Astro.url.pathname);
 const d = SICHTBARKEIT[locale];
@@ -86,13 +87,30 @@ const faqSchema = {
     acceptedAnswer: { '@type': 'Answer', text: e.antwort },
   })),
 };
+
+/* Was DIESE Seite anbietet, als eigener Knoten. Der Betriebsknoten
+   nennt zwar einen Angebotskatalog, aber keine Seite sagte bisher
+   selbst, welche Leistung sie beschreibt. Form und @id kommen aus
+   src/lib/schema.ts, damit nicht jede Seite ihre eigene Schreibweise
+   bekommt. */
+const seitenUrl = `${SITE.url}${Astro.url.pathname.replace(/\/$/, '')}`;
+const dienstSchema = dienst({
+  seitenUrl,
+  name: d.meta.title,
+  beschreibung: d.meta.description,
+  art: locale === 'en' ? 'Marketing' : 'Marketing',
+  land: locale === 'en' ? 'Germany' : 'Deutschland',
+  // 50 EUR pro STUNDE. Ohne Einheit laese sich das als Gesamtpreis.
+  preis: '50',
+  einheit: 'HUR',
+});
 ---
 
 <BaseLayout
   pageTitle={d.meta.pageTitle}
   title={d.meta.title}
   description={d.meta.description}
-  additionalSchema={faqSchema}
+  additionalSchema={[faqSchema, dienstSchema]}
 >
   <main class="sichtbarkeit-page">
     <SubPageBackground />

@@ -787,6 +787,33 @@ p, li {
   white-space: pre-line;
 }
 
+/* === .eyebrow — die kleine Amber-Zeile ueber jeder Ueberschrift ===
+
+   Es gab sie siebenmal: .section-3-eyebrow, .section-4-eyebrow,
+   .werkstatt-eyebrow, .werkzeug__eyebrow, .spielplatz__eyebrow,
+   .closing-eyebrow, .sti-braue — sieben Klassen, sieben Namen,
+   siebenmal dieselben Zahlen von Hand hingeschrieben. Und die Zahlen
+   standen die ganze Zeit schon als Token da: --lp-braue ist 0.75rem,
+   --lp-braue-sperrung ist 0.3em. Auf den Pixel dieselben Werte.
+
+   Die Klasse definiert nur die TYPOGRAFIE. Abstand nach unten setzt
+   jede Section selbst, weil er dort verschieden ist (6px in Section 3,
+   14px im Fahrplan) und zum jeweiligen Rhythmus gehoert.
+
+   Keine Spezifitaets-Falle: eine Section, die zusaetzlich ihre eigene
+   gescopte Klasse traegt, gewinnt damit automatisch — Astro haengt
+   dort eine Kennung an, (0,2,0) schlaegt (0,1,0). Wer also etwas
+   abweichen will, kann das weiter tun. */
+.eyebrow {
+  font-family: 'Neue Montreal', 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: var(--lp-braue);
+  letter-spacing: var(--lp-braue-sperrung);
+  text-transform: uppercase;
+  color: rgba(245, 158, 11, 0.85);
+  margin: 0;
+}
+
 /* === Sub-Page Hero ===
    Wiederverwendbare Typografie für die H1 + Subtitle auf /ueber,
    /referenzen und /preise. Vorher hatte jede Seite ihre eigenen

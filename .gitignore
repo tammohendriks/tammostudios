@@ -33,3 +33,16 @@ design-reference/
 
 # macOS
 .DS_Store
+
+# Quellmaterial, kein Produktionscode. Beide Ordner sind Ablage fuer
+# den Menschen, nicht Eingabe fuer den Build:
+#   sichtbarkeit beispiele/  9,6 MB PNG-Vorlagen
+#   posts/images/            Titelbilder; gelesen NUR von
+#                            scripts/publish-post.mjs, das sie nach
+#                            Sanity hochlaedt. Die Journal-Seiten holen
+#                            ihre Bilder von dort, nicht aus dem Ordner.
+# ACHTUNG: 19 aeltere Titelbilder sind bereits versioniert (5,5 MB).
+# Dieser Eintrag haelt nur neue draussen; die alten bleiben im Repo,
+# bis jemand sie bewusst mit git rm --cached herausnimmt.
+sichtbarkeit beispiele/
+posts/images/
