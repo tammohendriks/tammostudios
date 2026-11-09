@@ -282,7 +282,7 @@ const akte = AKTE.map((a) => {
               „0,0". Fertig und vollstaendig steht die Note fuer
               Vorleseprogramme gleich darunter in .sti-nurlesen. */}
           <p class="sti-note" data-note aria-hidden="true">{note}</p>
-          <Sterne class="sti-sterne" groesse="clamp(1.5rem, 2.6vw, 2.2rem)" abstand="0.22em" />
+          <Sterne class="sti-sterne" groesse="clamp(1.8rem, 3.3vw, 2.9rem)" abstand="0.22em" />
           <span class="sti-nurlesen">{d.sterneLabel.replace('{note}', note)}</span>
           <p class="sti-mono">{d.mono.replace('{note}', note)}</p>
         </div>
@@ -770,14 +770,27 @@ const akte = AKTE.map((a) => {
     margin: 0;
     font-family: 'Neue Montreal', 'Inter', sans-serif;
     font-weight: 700;
-    font-size: clamp(4rem, min(11vw, 17vh), 9rem);
+    /* Groesser: das Siegel ist das erste Bild der Section und hatte
+       zu wenig Gewicht. */
+    font-size: clamp(4.6rem, min(13vw, 20vh), 11rem);
     line-height: 0.92;
     letter-spacing: -0.045em;
     color: #f5f5f4;
   }
 
-  .sti-sterne {
-    margin-top: 0.55em;
+  /* :global, und das ist kein Stilgeschmack: <Sterne class="..." />
+     rendert sein Element in Sterne.astro, es traegt also DEREN
+     Scope-Attribut. Eine gescopte Regel hier wuerde zu
+     .sti-sterne[data-astro-cid-SectionStimmen] und traefe nie.
+     Alle vier Regeln auf Stern-Klassen im Projekt waren dadurch
+     wirkungslos — auch der Abstand, der die Unterlaenge des Kommas
+     von „5,0" aus der Sternenreihe halten sollte. */
+  :global(.sti-sterne) {
+    /* NICHT in em: em bezoege sich auf die Schriftgroesse der STERNE,
+       nicht auf die der Note — 0.55em waren rund 9 px gegen eine
+       150 px hohe Zahl. Dieselbe Skala wie die Note, rund ein
+       Fuenftel davon. */
+    margin-top: clamp(10px, min(2.6vw, 4vh), 36px);
   }
 
   .sti-mono {
@@ -882,6 +895,35 @@ const akte = AKTE.map((a) => {
     .sti-stimme {
       height: clamp(32px, 4.8vh, 54px);
       margin-top: clamp(12px, 1.9vh, 20px);
+    }
+  }
+
+  /* Sehr flache Buehnen (gemessen 258 px bei 320x568): dort bleiben
+     zwischen Autor-Chip und Rail sonst nur 15 px, und der Akt ragt
+     11 px heraus.
+
+     NUR AN DER HOEHE, nicht an der Breite: es geht um den
+     senkrechten Platz eines AKTS, nicht um den Stapel im
+     Schlussbild. Diese Regeln standen frueher in den Stufen, die mit
+     dem Umbau der Spalte entfielen — sie gehoerten nie dorthin. */
+  @container (max-height: 300px) {
+    .sti-stimme {
+      height: 14px;
+      margin-top: 4px;
+    }
+
+    .sti-fuss {
+      margin-top: 6px;
+    }
+
+    .sti-chip {
+      padding: 6px 12px 6px 6px;
+      gap: 8px;
+    }
+
+    .sti-initialen {
+      width: 28px;
+      height: 28px;
     }
   }
 
@@ -1054,89 +1096,6 @@ const akte = AKTE.map((a) => {
       translateY(calc((1 - var(--settle)) * 40px));
   }
 
-  /* FLACHE UND SCHMALE BUEHNEN: drei UNTEREINANDER gestapelte Karten
-     passen in der Hoehe nicht mehr.
-
-     DIE BREITENBEDINGUNG IST WESENTLICH und fehlte zuerst. Ohne sie
-     griffen diese Regeln auch auf breiten Buehnen: bei 1470x750 ist
-     die Buehne 409 px hoch, also unter 420 — die Karten standen dort
-     auf 80 % skaliert und auf drei Zeilen gekuerzt, obwohl sie
-     nebeneinander liegen und Hoehe gar nicht der Engpass ist. Im
-     Faecher ist die Breite der Engpass, nicht die Hoehe.
-
-     Stufe 1 ab 420 px Hoehe abwaerts (gemessen 373 px bei 360x640):
-     drei Zeilen Text statt vier, groesserer Versatz, leicht
-     verkleinert. */
-  @container (max-width: 519px) and (max-height: 420px) {
-    .sti-karte-text {
-      -webkit-line-clamp: 3;
-    }
-
-    .sti-stapel {
-      transform: scale(0.8);
-    }
-
-    .sti-karte {
-      transform:
-        translate(-50%, -50%)
-        translateY(calc((var(--i) - 1) * var(--settle) * 40cqh))
-        translateY(calc((1 - var(--settle)) * 40px));
-    }
-  }
-
-  /* Stufe 2 ab 340 px Hoehe abwaerts (gemessen 258 px bei 320x568):
-     zwei Zeilen, noch groesserer Versatz, staerker verkleinert. */
-  @container (max-width: 519px) and (max-height: 340px) {
-    .sti-karte {
-      padding: 11px 12px 9px;
-    }
-
-    .sti-karte-text {
-      margin-bottom: 8px;
-      -webkit-line-clamp: 2;
-    }
-
-    .sti-karte-sterne {
-      margin-bottom: 6px;
-    }
-
-    .sti-stimme {
-      height: 14px;
-      margin-top: 6px;
-    }
-
-    /* Auf 258 px Buehnenhoehe blieben zwischen Autor-Chip und Rail
-       nur 20 px, und der Akt ragte 6 px heraus. */
-    .sti-fuss {
-      margin-top: 10px;
-    }
-
-    .sti-chip {
-      padding: 6px 12px 6px 6px;
-      gap: 8px;
-    }
-
-    .sti-initialen {
-      width: 28px;
-      height: 28px;
-    }
-
-    /* Auch mit zwei Zeilen passen drei Karten nicht in 258 px: bei
-       einem Versatz, der die Ueberdeckung vermeidet (45cqh), braucht
-       die Spalte 347 px. Also wird der ganze Stapel kleiner — samt
-       Stempel, der die Lage behaelt. */
-    .sti-stapel {
-      transform: scale(0.62);
-    }
-
-    .sti-karte {
-      transform:
-        translate(-50%, -50%)
-        translateY(calc((var(--i) - 1) * var(--settle) * 50cqh))
-        translateY(calc((1 - var(--settle)) * 40px));
-    }
-  }
-
   /* FAECHER, aber nur mit echtem Abstand. Vorher war der Versatz
      22cqw bei 48cqw Breite — benachbarte Karten ueberlappten damit
      zwangslaeufig um 2 x (24 - 22) = 4cqw, bei 1440 px also 33 px.
@@ -1147,51 +1106,26 @@ const akte = AKTE.map((a) => {
      Spannweite bleibt mit 32 + 14 = 46cqw unter der halben Buehne.
      Die Drehung kostet nochmal rund 5 px je Seite — passt in die
      Luft. */
-  /* Ab 520 statt 600: bei einem 600 px breiten Fenster ist die Buehne
-     560 px breit, und der Faecher passt dort rechnerisch (30cqw
-     Versatz bei 30cqw Breite ergibt 252 von 280 Halbbreite). Mit der
-     alten Schwelle landete diese Groesse in der Spalte, wo der
-     Stempel zu drei Vierteln hinter den Karten verschwand. */
-  @container (min-width: 520px) {
-    /* Breiter als vorher (30cqw statt 28, Deckel 320 statt 262) und
-       enger zusammen: Versatz = Breite, die Kanten stossen also
-       aneinander statt 4cqw Luft zu lassen. Der Text sitzt 18 px
-       innerhalb der Karte, bleibt also beidseitig 36 px frei — kein
-       Zitat wird verdeckt, der Stapel wirkt aber als Stapel und nicht
-       als drei verstreute Zettel.
 
-       Nach unten gerueckt, weil der Stempel jetzt DARUEBER sitzt und
-       nicht mehr dahinter. */
-    .sti-karte {
-      width: min(30cqw, 320px);
-      transform:
-        translate(-50%, -50%)
-        translateX(calc((var(--i) - 1) * var(--settle) * 30cqw))
-        translateY(calc(var(--settle) * 11cqh))
-        translateY(calc((1 - var(--settle)) * 40px))
-        rotate(calc((var(--i) - 1) * var(--settle) * 4.5deg));
-    }
+  /* SPALTE (schmale Buehnen): echter Fluss statt absoluter Positionen.
+     Hier wurde lange gerechnet — Versatz in cqh, Kartenhoehe
+     geschaetzt, Stempel dahinter — und jedes Mal blieb ein Fall
+     uebrig, in dem sich etwas ueberdeckte. Zuletzt lag der Stempel
+     mobil zu zwei Dritteln hinter den Karten und war unlesbar.
 
-    /* Der Stempel steht ueber der rechten Karte, nicht dahinter.
-       Dahinter war er bis zu 70 % verdeckt; hier ist er ganz zu
-       sehen und sitzt sichtbar auf dem Stapel wie ein Siegel.
+     Als Flexspalte kann das nicht mehr passieren: die Kinder liegen
+     untereinander im Fluss, der Stempel steht als erstes Element
+     oben. Keine Hoehe wird geschaetzt, keine Ueberdeckung ist
+     moeglich.
 
-       Die Hoehe haengt an der Buehne: -30cqh haelt ihn knapp ueber
-       der Kartenoberkante, und die obere Kante bleibt dabei auf
-       jeder gemessenen Buehnenhoehe innerhalb. */
-    .sti-stempel {
-      z-index: 2;
-      width: min(132px, 30cqh);
-      height: min(132px, 30cqh);
-      transform:
-        translate(-50%, -50%)
-        translate(min(30cqw, 320px), calc(-30cqh))
-        rotate(-11deg)
-        scale(calc(1.25 - 0.25 * var(--stempel)));
-    }
-  }
+     Als eigene Abfrage HINTER dem Faecher, nicht als Grundregel
+     davor: sonst schlaegt die spaeter stehende Grundregel
+     .sti-karte-text { -webkit-line-clamp: 4 } den kuerzeren
+     Ausschnitt wieder tot. */
 
-  .sti-karte-sterne {
+
+
+  :global(.sti-karte-sterne) {
     margin-bottom: 10px;
   }
 
@@ -1389,6 +1323,119 @@ const akte = AKTE.map((a) => {
   /* === Ohne Bewegung ===
      Kein Sticky, kein Aufdecken: ein ruhiges Layout untereinander.
      Derselbe DOM, nur andere Regeln. */
+  /* === Schlussbild: Faecher oder Spalte ===============================
+     DIESE BLOECKE STEHEN BEWUSST GANZ HIER UNTEN, hinter allen
+     Grundregeln. Weiter oben waren sie wirkungslos: .sti-stempel und
+     .sti-karte-text werden darunter noch einmal grundsaetzlich
+     gesetzt, und bei gleicher Spezifitaet gewinnt die spaetere
+     Regel. Der Stempel blieb dadurch auf 112 px, obwohl die
+     Spaltenfassung 88 verlangt. */
+
+  /* Ab 520 statt 600: bei einem 600 px breiten Fenster ist die Buehne
+     560 px breit, und der Faecher passt dort rechnerisch (30cqw
+     Versatz bei 30cqw Breite ergibt 252 von 280 Halbbreite). Mit der
+     alten Schwelle landete diese Groesse in der Spalte, wo der
+     Stempel zu drei Vierteln hinter den Karten verschwand. */
+  @container (min-width: 520px) {
+    /* Breiter als vorher (30cqw statt 28, Deckel 320 statt 262) und
+       enger zusammen: Versatz = Breite, die Kanten stossen also
+       aneinander statt 4cqw Luft zu lassen. Der Text sitzt 18 px
+       innerhalb der Karte, bleibt also beidseitig 36 px frei — kein
+       Zitat wird verdeckt, der Stapel wirkt aber als Stapel und nicht
+       als drei verstreute Zettel.
+
+       Nach unten gerueckt, weil der Stempel jetzt DARUEBER sitzt und
+       nicht mehr dahinter. */
+    .sti-karte {
+      width: min(30cqw, 320px);
+      transform:
+        translate(-50%, -50%)
+        translateX(calc((var(--i) - 1) * var(--settle) * 30cqw))
+        translateY(calc(var(--settle) * 11cqh))
+        translateY(calc((1 - var(--settle)) * 40px))
+        rotate(calc((var(--i) - 1) * var(--settle) * 4.5deg));
+    }
+
+    /* Der Stempel steht ueber der rechten Karte, nicht dahinter.
+       Dahinter war er bis zu 70 % verdeckt; hier ist er ganz zu
+       sehen und sitzt sichtbar auf dem Stapel wie ein Siegel.
+
+       Die Hoehe haengt an der Buehne: -30cqh haelt ihn knapp ueber
+       der Kartenoberkante, und die obere Kante bleibt dabei auf
+       jeder gemessenen Buehnenhoehe innerhalb. */
+    .sti-stempel {
+      z-index: 2;
+      width: min(132px, 30cqh);
+      height: min(132px, 30cqh);
+      transform:
+        translate(-50%, -50%)
+        translate(min(30cqw, 320px), calc(-30cqh))
+        rotate(-11deg)
+        scale(calc(1.25 - 0.25 * var(--stempel)));
+    }
+  }
+
+  @container (max-width: 519px) {
+    .sti-stapel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(6px, 1.4cqh, 10px);
+    }
+
+    .sti-karte {
+      position: static;
+      width: min(88cqw, 320px);
+      /* Knapper als im Faecher: hier zaehlt jeder Pixel Hoehe. */
+      padding: 10px 14px 7px;
+      transform: translateY(calc((1 - var(--settle)) * 26px));
+    }
+
+    /* Im Schlussbild ist die Karte ein Auszug, kein Zitat: die volle
+       Fassung stand eben noch bildschirmfuellend da. */
+    .sti-karte-text {
+      -webkit-line-clamp: 2;
+      margin-bottom: 7px;
+    }
+
+    :global(.sti-karte-sterne) {
+      margin-bottom: 5px;
+    }
+
+    .sti-stempel {
+      position: static;
+      /* Vor den Karten, unabhaengig von der Reihenfolge im Markup. */
+      order: -1;
+      flex: none;
+      width: min(88px, 20cqh);
+      height: min(88px, 20cqh);
+      transform: rotate(-8deg) scale(calc(1.15 - 0.15 * var(--stempel)));
+    }
+
+    .sti-stempel-note {
+      font-size: 1.45rem;
+    }
+  }
+
+  /* Auf kurzen Buehnen passt auch die knappe Spalte nicht mehr:
+     gemessen braucht sie rund 420 px, bei 360x640 sind 373 da und
+     bei 320x568 nur 258. Flex-Elemente schrumpfen nicht unter ihre
+     Inhaltshoehe, also wuerde sie ueberlaufen — und beim Zentrieren
+     den Stempel in die erste Karte schieben. Also wird die ganze
+     Spalte kleiner, samt Siegel, statt sie zu zerschneiden. */
+  @container (max-width: 519px) and (max-height: 415px) {
+    .sti-stapel {
+      transform: scale(0.85);
+    }
+  }
+
+  @container (max-width: 519px) and (max-height: 300px) {
+    .sti-stapel {
+      transform: scale(0.6);
+    }
+  }
+
   /* === Ruhige Fassung ===
      Kein Sticky, kein Aufdecken: ein ruhiges Layout untereinander.
      Derselbe DOM, nur andere Regeln.
@@ -1590,13 +1637,24 @@ const akte = AKTE.map((a) => {
   const punkte = Array.from(document.querySelectorAll<HTMLElement>('.sti-rail-punkt'));
 
   if (sektion && sticky && siegel && note && akte.length) {
-    const SIEGEL_ENDE = 0.14;
-    const UEBERGANG = [0.14, 0.22];
-    const AKTE_START = 0.22;
-    const AKTE_ENDE = 0.86;
+    /* SIEGEL_ENDE ist das Ende des HOCHZAEHLENS, UEBERGANG[0] der
+       Beginn des Ausblendens. Beide standen auf 0.14 — die Note
+       erreichte 5,0 also exakt in dem Bild, in dem sie zu
+       verschwinden begann. Der Moment, in dem das Siegel fertig
+       dasteht, war rechnerisch null lang.
+
+       Jetzt zaehlt sie frueher aus und das Bild STEHT dann: 0.105
+       von p sind bei 450vh und 900 px Fensterhoehe rund 330 px
+       Scrollweg, in denen „5,0" vollstaendig zu sehen ist. */
+    const SIEGEL_ENDE = 0.085;
+    const UEBERGANG = [0.19, 0.27];
+    const AKTE_START = 0.27;
+    // Nach hinten verlaengert, damit die Akte trotz des spaeteren
+    // Starts ihre Laenge behalten: (0.90 - 0.27) / 3 = 0.21.
+    const AKTE_ENDE = 0.9;
     const AKT_DAUER = (AKTE_ENDE - AKTE_START) / akte.length;
-    const SETTLE = [0.86, 0.95];
-    const STEMPEL = [0.9, 1.0];
+    const SETTLE = [0.9, 0.96];
+    const STEMPEL = [0.92, 1.0];
     /* Zwei Fenster um eine Aktgrenze, beide in Akt-Anteilen.
        FUELL_WEG laeuft VOR der Grenze aus: die Rail-Fuellung erreicht
        den naechsten Punkt genau dann, wenn er aufleuchtet.
@@ -1657,7 +1715,7 @@ const akte = AKTE.map((a) => {
       const aufbau = bereich(p, 0, SIEGEL_ENDE);
       sticky.style.setProperty(
         '--siegel',
-        kurve(p, 0, SIEGEL_ENDE * 0.45, UEBERGANG[0], UEBERGANG[1]).toFixed(4)
+        kurve(p, 0, 0.05, UEBERGANG[0], UEBERGANG[1]).toFixed(4)
       );
       // Die Sterne fuellen sich ANTEILIG mit der Note: bei 3,4 ist der
       // vierte Stern zu 40 % gefuellt, nicht einfach blasser.

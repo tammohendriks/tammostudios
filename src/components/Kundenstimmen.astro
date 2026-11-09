@@ -180,7 +180,10 @@ const stufe = grossLaenge > 200 ? 'lang' : grossLaenge > 140 ? 'mittel' : 'kurz'
      die Stellung im Satz. Vorher stand hier ein ★ aus der
      Systemschrift samt text-indent-Ausgleich fuer den
      Buchstabenabstand; beides entfaellt mit einem echten SVG. */
-  .ks-sterne {
+  /* :global, weil <Sterne class="..." /> sein Element in Sterne.astro
+     rendert und deshalb DEREN Scope-Attribut traegt. Gescopt traefe
+     die Regel nie. */
+  :global(.ks-sterne) {
     margin: 6px 0 0;
   }
 
@@ -310,7 +313,7 @@ const stufe = grossLaenge > 200 ? 'lang' : grossLaenge > 140 ? 'mittel' : 'kurz'
     color: rgba(245, 158, 11, 0.95);
   }
 
-  .ks-sterne-klein {
+  :global(.ks-sterne-klein) {
     margin: 0;
   }
 
