@@ -29,6 +29,13 @@ export const de = {
     journal: 'Journal',
     kontakt: 'Kontakt',
     hauptnavigation: 'Hauptnavigation',
+    // Eigener Name fuer die Navigation im Fuss. Zwei <nav> mit
+    // derselben Beschriftung sind fuer Screenreader nicht
+    // unterscheidbar — die Sprungliste zeigt dann zweimal dasselbe.
+    fussnavigation: 'Navigation im Seitenfuß',
+    // Der Sprachumschalter schwebt ausserhalb von Kopf und Fuss und
+    // braucht darum eine eigene Landmarke, sonst liegt er in keiner.
+    sprachbereich: 'Sprache',
     menueOeffnen: 'Menü öffnen',
     menueSchliessen: 'Menü schließen',
     bereichRechtliches: 'Rechtliches',

@@ -185,8 +185,14 @@ const priceFaq = [
         </fieldset>
       </div>
 
-      <!-- Live-Summary (sticky auf Desktop) -->
-      <aside class="pr-summary" aria-label="Live-Preiszusammenfassung">
+      <!-- Live-Summary (sticky auf Desktop).
+           <section>, nicht <aside>: ein <aside> ist immer eine
+           complementary-Landmarke, und die gehoert auf die oberste
+           Ebene — nicht in das <main> des Rechners. Die Zusammenfassung
+           ist aber kein Rand-Inhalt, sondern das Ergebnis des
+           Formulars. Mit aria-label wird das <section> zu einer
+           region-Landmarke und bleibt damit anspringbar. -->
+      <section class="pr-summary" aria-label="Live-Preiszusammenfassung">
         <div class="pr-summary-card">
           <p class="pr-summary-eyebrow">DEINE GESCHÄTZTEN KOSTEN</p>
 
@@ -222,7 +228,7 @@ const priceFaq = [
             Preise inklusive aller Standards. Was du hier siehst, ist was du zahlst.
           </p>
         </div>
-      </aside>
+      </section>
     </section>
 
     <!-- Was immer inklusive ist (matcht /preise "Immer dabei") -->

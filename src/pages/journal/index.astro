@@ -213,27 +213,35 @@ const TAG_FILTERS = ['Alle', ...TAG_REIHENFOLGE];
                 data-slug={post.slug}
                 data-tags={(post.tags || []).join(',')}
               >
-                <a class="post-card-link" href={`/journal/${post.slug}`} aria-label={`Beitrag lesen: ${post.title}`}>
-                  <div class="post-card-cover">
-                    <img
-                      src={urlFor(post.coverImage).width(720).height(480).fit('crop').auto('format').url()}
-                      alt={post.coverImage.alt || post.title}
-                      loading="lazy"
-                      width="720"
-                      height="480"
-                    />
-                  </div>
-                  <div class="post-card-body">
-                    {post.tags && post.tags[0] && (
-                      <span class="post-tag">{post.tags[0]}</span>
-                    )}
-                    <h3 class="post-card-title">{post.title}</h3>
-                    <p class="post-card-excerpt">{post.excerpt}</p>
-                    <time class="post-card-date" datetime={post.publishedAt}>
-                      {formatJournalDate(post.publishedAt)}
-                    </time>
-                  </div>
-                </a>
+                {/* Der Link sitzt AM TITEL, nicht um die ganze Karte.
+                    Vorher umhuellte ein <a aria-label="Beitrag lesen: …">
+                    Bild, Schlagwort, Titel, Anriss und Datum — damit stand
+                    sichtbarer Text in der Karte, der im zugaenglichen Namen
+                    fehlte. Wer per Sprachbefehl "klick <Titel>" sagt, traf
+                    nichts (WCAG 2.5.3). Jetzt ist der Name genau der
+                    sichtbare Titel; die ganze Karte bleibt ueber das
+                    ::after des Links klickbar. */}
+                <div class="post-card-cover">
+                  <img
+                    src={urlFor(post.coverImage).width(720).height(480).fit('crop').auto('format').url()}
+                    alt={post.coverImage.alt || post.title}
+                    loading="lazy"
+                    width="720"
+                    height="480"
+                  />
+                </div>
+                <div class="post-card-body">
+                  {post.tags && post.tags[0] && (
+                    <span class="post-tag">{post.tags[0]}</span>
+                  )}
+                  <h3 class="post-card-title">
+                    <a class="post-card-link" href={`/journal/${post.slug}`}>{post.title}</a>
+                  </h3>
+                  <p class="post-card-excerpt">{post.excerpt}</p>
+                  <time class="post-card-date" datetime={post.publishedAt}>
+                    {formatJournalDate(post.publishedAt)}
+                  </time>
+                </div>
               </article>
             ))}
           </section>
@@ -794,7 +802,13 @@ const TAG_FILTERS = ['Alle', ...TAG_REIHENFOLGE];
     }
   }
 
+  /* Die Karte traegt jetzt selbst die Spalte — vorher tat das das <a>,
+     das die ganze Karte umhuellte. position:relative ist die Verankerung
+     fuer die Klickflaeche des Titel-Links. */
   .post-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
     background: rgba(15, 15, 18, 0.55);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 12px;
@@ -805,12 +819,26 @@ const TAG_FILTERS = ['Alle', ...TAG_REIHENFOLGE];
     transform: translateY(-3px);
     border-color: rgba(245, 158, 11, 0.4);
   }
+  /* Tastatur: der Fokus sitzt am Titel-Link, sichtbar werden muss aber
+     die ganze Karte — sonst ist nicht zu erkennen, was gleich oeffnet. */
+  .post-card:focus-within {
+    border-color: rgba(245, 158, 11, 0.6);
+  }
   .post-card-link {
-    display: flex;
-    flex-direction: column;
     color: inherit;
     text-decoration: none;
-    height: 100%;
+  }
+  /* Die eigentliche Klickflaeche: deckt die Karte ab, ohne im
+     Zugaenglichkeitsbaum zu erscheinen. */
+  .post-card-link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+  .post-card-link:focus-visible {
+    outline: 2px solid rgba(245, 158, 11, 0.95);
+    outline-offset: 2px;
   }
   .post-card-cover {
     aspect-ratio: 3 / 2;

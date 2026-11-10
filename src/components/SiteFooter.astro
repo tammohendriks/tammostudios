@@ -90,7 +90,7 @@ const legalLinks = [
           Vergleich auf d.nav.bereichRechtliches === "Legal" — eine
           Aenderung dieser Beschriftung haette die Navigation
           stillschweigend wieder deutsch benannt. */}
-      <nav class="footer-nav" aria-label={d.nav.hauptnavigation}>
+      <nav class="footer-nav" aria-label={d.nav.fussnavigation}>
         {navLinks.map((link, i) => (
           <>
             {i > 0 && <span aria-hidden="true">·</span>}
@@ -332,8 +332,12 @@ const legalLinks = [
     font-weight: 500;
   }
 
+  /* 0.6 statt 0.5: die Zeile steht mobil auf 9.6px, und dort ist
+     Lesbarkeit wichtiger als Zurueckhaltung. Gemessen 6.8:1 gegen
+     #050507 — mit 0.5 waren es 4.95:1, was allein noch reichte, aber
+     zusammen mit der opacity der Zeile (siehe unten) auf 2.91:1 fiel. */
   .footer-copy {
-    color: rgba(245, 245, 244, 0.5);
+    color: rgba(245, 245, 244, 0.6);
   }
 
   .footer-privacy {
@@ -379,8 +383,11 @@ const legalLinks = [
     flex-basis: 100%;
   }
 
+  /* 0.55 statt 0.4: gemessen ergab 0.4 nur 3.49:1 gegen #050507. 0.55
+     bringt 5.8:1 und liegt damit auf derselben Stufe wie
+     .footer-privacy — leise, aber lesbar. */
   .footer-branchen-titel {
-    color: rgba(245, 245, 244, 0.4);
+    color: rgba(245, 245, 244, 0.55);
     white-space: nowrap;
   }
 
@@ -518,9 +525,12 @@ const legalLinks = [
       gap: 4px 12px;
       font-size: 0.65rem;
     }
+    /* KEINE opacity auf dieser Zeile. Sie multipliziert jede Farbe
+       darin — auch die der Pflichtlinks — und hat den Kontrast des
+       Copyrights von 4.95:1 auf 2.91:1 gedrueckt. Wer die Zeile
+       leiser will, setzt die Farben leiser, nicht die Deckkraft. */
     .footer-row-legal {
       font-size: 0.6rem;
-      opacity: 0.7;
     }
     /* Mobile: Nav + Socials in einer Zeile zentriert, kleiner Gap. */
     .footer-links {

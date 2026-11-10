@@ -31,6 +31,8 @@ export const en: Shape<typeof de> = {
     journal: 'Journal',
     kontakt: 'Contact',
     hauptnavigation: 'Main navigation',
+    fussnavigation: 'Footer navigation',
+    sprachbereich: 'Language',
     menueOeffnen: 'Open menu',
     menueSchliessen: 'Close menu',
     bereichRechtliches: 'Legal',
