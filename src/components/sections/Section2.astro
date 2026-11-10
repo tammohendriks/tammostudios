@@ -153,10 +153,27 @@ const d = STARTSEITE[localeOf(Astro.url.pathname)];
   .aurora-layer {
     position: absolute;
     border-radius: 50%;
-    /* 30px blur: weiter runter (war 35 / vorher 45 / ursprünglich 60).
-       Visuell minimal anders, GPU-Kosten weiter unten — hilft Mobile
-       deutlich. */
-    filter: blur(30px);
+    /* KEIN filter: blur() mehr. Die Ebene IST schon ein weicher
+       Radialverlauf — von voller Deckung bis durchsichtig ueber rund
+       400px. Ein 30px-Weichzeichner darauf aendert praktisch nichts
+       (gemessen: PSNR 45.2 dB gegenueber der Fassung mit Blur, groesste
+       Abweichung 39/255 und die lag am Theme-Schalter, nicht an der
+       Aurora), kostet aber real: zusammen mit mix-blend-mode muss die
+       Ebene in eine eigene Textur gerendert, weichgezeichnet und gegen
+       den Hintergrund zurueckgelesen werden.
+
+       Gemessen bei 1470x830, DPR 2, CPU 4x gebremst, echte
+       Scroll-Gesten:
+         blur 30/35 -> 10 FPS, 77-96 Bilder ueber 50ms
+         blur 12/14 -> 12 FPS, 77-86
+         blur  6/7  -> 13 FPS, 78-92
+         ohne       -> 17-21 FPS, 42-59
+       Der Radius ist fast egal, die Existenz des Filters ist teuer.
+       Darum ganz raus statt kleiner.
+
+       Banding war die Sorge und ist keine: auf einer Zeile von 1500px
+       durch den Glow ist die laengste gleichfarbige Strecke ohne Blur
+       15px, mit Blur 19px — Chrome dithert die Verlaeufe selbst. */
     mix-blend-mode: screen;
     transition: opacity 200ms linear;
     will-change: transform, opacity;
@@ -261,9 +278,9 @@ const d = STARTSEITE[localeOf(Astro.url.pathname)];
       rgba(120, 53,  15, 0.04) 70%,
       rgba(0,   0,   0,   0)   88%
     );
-    /* 35px blur — bleibt etwas höher als bei Aurora, weil das
-       Spotlight die fokussierte Lichtquelle ist. */
-    filter: blur(35px);
+    /* Ebenfalls ohne filter: blur(). Derselbe Grund wie bei
+       .aurora-layer — der Verlauf hat fuenf Stopps und ist bis 88%
+       ausgeblendet, da glaettet ein Weichzeichner nichts mehr. */
     /* KEINE transition auf transform — sonst lag durch Smoothing über
        jeden Scroll-Tick. Nur opacity bekommt den weichen On/Off. */
     transition: opacity 200ms linear;
