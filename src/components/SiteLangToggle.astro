@@ -44,6 +44,7 @@ const istEnglisch = locale === 'en';
 ---
 
 {ziel && (
+  <nav class="site-lang-nav" aria-label={d.nav.sprachbereich}>
   <a
     class="site-lang-toggle"
     href={ziel}
@@ -57,6 +58,7 @@ const istEnglisch = locale === 'en';
       <span class="site-lang-thumb"></span>
     </span>
   </a>
+  </nav>
 )}
 
 <script>
@@ -100,6 +102,13 @@ const istEnglisch = locale === 'en';
 <style>
   /* Spiegelbild des Theme-Umschalters: dort top:88 right:24, hier
      top:88 left:24. Gleiche Hoehe, damit beide auf einer Linie sitzen. */
+  /* Reine Zugaenglichkeits-Huelle: sie macht den Umschalter zu einer
+     Landmarke, damit er nicht ausserhalb jeder Region liegt. Ihr
+     einziges Kind ist fixiert, sie belegt im Fluss also nichts. */
+  .site-lang-nav {
+    height: 0;
+  }
+
   .site-lang-toggle {
     position: fixed;
     top: 88px;

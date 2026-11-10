@@ -147,7 +147,11 @@ const totalCount = REFERENCES.length;
             </div>
           </div>
           <div class="ref-info">
-            <h3 class="ref-card-title">{ref.title}</h3>
+            {/* h2, nicht h3: ueber den Karten steht nur die h1 der
+                Seite, und die ClosingCta darunter ist ebenfalls eine
+                h2. Mit h3 sprang die Gliederung von 1 auf 3 und fiel
+                danach auf 2 zurueck. */}
+            <h2 class="ref-card-title">{ref.title}</h2>
             <p class="ref-card-subtitle">{subtitleFor(ref, locale)}</p>
             <div class="ref-tags">
               {ref.tags.map((tag) => (
