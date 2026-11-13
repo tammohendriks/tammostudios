@@ -157,7 +157,7 @@ export const VERTICALS = [
       references: [
         {
           name: 'Wärmepower',
-          image: '/referenzen/waermepowerwebsite.webp',
+          image: '/referenzen/waermepowerwebsite-v2.webp',
           alt: 'Vorschau der Wärmepower-Website',
           url: 'https://waermepower.de',
           linkLabel: 'waermepower.de ansehen',
