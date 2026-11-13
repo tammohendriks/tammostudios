@@ -32,7 +32,7 @@ export const REFERENCES = [
     title: 'Wärmepower',
     subtitle: 'Heizung, Wärmepumpe, Sanitär',
     url: 'https://waermepower.de',
-    preview: '/referenzen/waermepowerwebsite.webp',
+    preview: '/referenzen/waermepowerwebsite-v2.webp',
     tags: ['Astro', 'Tailwind', 'Sanity', 'Vercel'],
     category: 'Handwerk',
   },
