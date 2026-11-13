@@ -150,7 +150,7 @@ export const VERTICALS = [
     caseStudy: {
       eyebrow: 'AUS DER PRAXIS — WÄRMEPOWER + KIRSCH',
       paragraphs: [
-        'Wärmepower ist ein Meisterbetrieb aus Lemwerder für Heizung, Wärmepumpe und Sanitär.\nNotdienst 24/7 direkt in der Navigation, klare Positionierung als lokaler Meister-Betrieb — kein anonymes Konzern-Look.',
+        'Wärmepower ist ein Meisterbetrieb aus Lemwerder für Heizung, Wärmepumpe und Sanitär.\nNotdienst 24/7 mit Telefonnummer direkt im Hero, dazu ein Heizungsrechner: in 60 Sekunden zur Einschätzung, welche Heizung zum Haus passt. Klar als lokaler Meisterbetrieb positioniert, kein anonymer Konzern-Look.',
         'Kirsch Dach & Fassade aus Bremen bedient Dach- und Fassadenprojekte in ganz Norddeutschland (bis 250 km Umkreis).\nProminente Sturmschaden-Hotline in der Navigation, "Schnelle Anfrage"-Formular direkt im Hero.',
         'Beide Websites setzen auf klares Handwerk-Vokabular ohne Konzern-Optik, mobile-first, mit Google-Business-Anbindung.',
       ],

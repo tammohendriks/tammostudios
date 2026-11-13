@@ -116,7 +116,7 @@ export const VERTICAL_TEXT_EN: VerticalTexte = {
     caseStudy: {
       eyebrow: 'REAL PROJECTS: WÄRMEPOWER + KIRSCH',
       paragraphs: [
-        'Wärmepower is a master-certified shop in Lemwerder for heating, heat pumps, and plumbing.\n24/7 emergency service right in the navigation, positioned clearly as the local master shop instead of an anonymous corporate look.',
+        'Wärmepower is a master-certified shop in Lemwerder for heating, heat pumps, and plumbing.\n24/7 emergency number right in the hero, plus a heating calculator that tells visitors in 60 seconds which system fits their house. Positioned clearly as the local master shop instead of an anonymous corporate look.',
         'Kirsch Dach & Fassade in Bremen takes on roofing and facade work across northern Germany, within a 250 km radius.\nA storm damage hotline up front in the navigation, a quick inquiry form right in the hero.',
         'Both sites speak plain trade language instead of corporate polish, mobile first, with Google Business connected.',
       ],
