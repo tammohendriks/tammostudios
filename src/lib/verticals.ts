@@ -270,7 +270,7 @@ export const VERTICALS = [
         },
         {
           name: 'IBI',
-          image: '/referenzen/ibi.webp',
+          image: '/referenzen/ibi-v2.webp',
           alt: 'Vorschau der IBI-Website',
           url: 'https://www.ibi-doc.de',
           linkLabel: 'ibi-doc.de ansehen',
