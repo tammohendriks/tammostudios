@@ -7,7 +7,7 @@ import sitemap from '@astrojs/sitemap';
 import react from '@astrojs/react';
 import vercel from '@astrojs/vercel';
 
-import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -184,6 +184,103 @@ export default defineConfig({
 
           logger.info(
             `${vorhanden.size - 1} Journal-Seiten, alle Verweise darauf zeigen ins Ziel`
+          );
+        },
+      },
+    },
+
+    /* Einzelne Woerter am Zeilenende festbinden.
+     *
+     * Beobachtet auf dem Desktop: ein Satz endet, der naechste faengt
+     * an, und nur sein erstes kurzes Wort passt noch in die Zeile.
+     *
+     *   …dass mir etwas fehlt: das Programmieren. Genau
+     *   das, was mich am Anfang am meisten gepackt hat.
+     *
+     * text-wrap: pretty (global.css) hilft hier NICHT: das raeumt
+     * Waisen in der LETZTEN Zeile eines Absatzes auf, nicht mitten
+     * drin. Gemessen ueber sieben Seiten bei 1440 und 1280px:
+     *
+     *   nur text-wrap: pretty        16 gestrandete Woerter
+     *   + hyphens: auto              15   (und 50 getrennte Woerter —
+     *                                     grosse optische Aenderung
+     *                                     fuer fast keinen Gewinn)
+     *   + geschuetztes Leerzeichen    2   ohne Nebenwirkung
+     *   beides                        5   (Trennung bricht die Bindung
+     *                                     wieder auf)
+     *
+     * Also nur das geschuetzte Leerzeichen, und zwar HIER im Build
+     * statt per Skript im Browser: eine Nachbesserung nach dem ersten
+     * Zeichnen waere als Umbruch sichtbar.
+     *
+     * Gebunden wird nach einem Satzzeichen das folgende Wort, wenn es
+     * hoechstens sechs Buchstaben hat. Laengere Woerter stranden
+     * optisch nicht. Abkuerzungen wie "z. B." treffen nicht zu: dort
+     * folgt auf den Buchstaben sofort ein Punkt, kein Leerzeichen.
+     */
+    {
+      name: 'kurze-satzanfaenge-binden',
+      hooks: {
+        'astro:build:done': ({ dir, logger }) => {
+          const wurzel = fileURLToPath(new URL('./', dir));
+          /** @type {string[]} */
+          const dateien = [];
+          /** @param {string} ordner */
+          const gehen = (ordner) => {
+            for (const name of readdirSync(ordner)) {
+              const pfad = join(ordner, name);
+              if (statSync(pfad).isDirectory()) gehen(pfad);
+              else if (pfad.endsWith('.html')) dateien.push(pfad);
+            }
+          };
+          gehen(wurzel);
+
+          // Worin NICHT ersetzt werden darf. script deckt auch das
+          // JSON-LD ab — ein geschuetztes Leerzeichen in strukturierten
+          // Daten waere eine stille Aenderung an dem, was Google liest.
+          const TABU = /^(script|style|pre|code|textarea|title)$/i;
+          const REGEL = /([.!?:]["\u00bb)]?[ \t\n\r]+)(\p{L}{1,6})[ \t\n\r]+/gu;
+
+          let dateienGeaendert = 0;
+          let bindungen = 0;
+          for (const pfad of dateien) {
+            const vor = readFileSync(pfad, 'utf8');
+            let tiefe = 0;
+            let aus = '';
+            let i = 0;
+            // Dokument in Tags und Textstuecke zerlegen. Ersetzt wird
+            // ausschliesslich in den Textstuecken — nie in einem Tag,
+            // nie in einem Attribut.
+            while (i < vor.length) {
+              const auf = vor.indexOf('<', i);
+              const text = auf === -1 ? vor.slice(i) : vor.slice(i, auf);
+              if (text) {
+                if (tiefe === 0) {
+                  aus += text.replace(REGEL, (_, satz, wort) => {
+                    bindungen++;
+                    return satz + wort + '\u00a0';
+                  });
+                } else aus += text;
+              }
+              if (auf === -1) break;
+              const zu = vor.indexOf('>', auf);
+              if (zu === -1) { aus += vor.slice(auf); break; }
+              const tag = vor.slice(auf, zu + 1);
+              aus += tag;
+              const m = /^<\/?([a-zA-Z0-9-]+)/.exec(tag);
+              if (m && TABU.test(m[1])) {
+                if (tag.startsWith('</')) tiefe = Math.max(0, tiefe - 1);
+                else if (!tag.endsWith('/>')) tiefe++;
+              }
+              i = zu + 1;
+            }
+            if (aus !== vor) {
+              writeFileSync(pfad, aus);
+              dateienGeaendert++;
+            }
+          }
+          logger.info(
+            `${bindungen} kurze Satzanfaenge in ${dateienGeaendert} Seiten festgebunden`
           );
         },
       },

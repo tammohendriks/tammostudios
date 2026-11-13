@@ -44,7 +44,7 @@ export const REFERENCES = [
     url: 'https://www.ibi-doc.de',
     // Derselbe Beitrag: er stellt beide Praxen gegenueber.
     fallstudie: 'praxis-websites-samedos-ibi',
-    preview: '/referenzen/ibi.webp',
+    preview: '/referenzen/ibi-v2.webp',
     tags: ['Astro', 'Tailwind', 'Sanity', 'Vercel'],
     category: 'Medizin',
   },
