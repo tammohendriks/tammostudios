@@ -409,15 +409,19 @@ const akte = AKTE.map((a) => {
      gemessen 149 px — ein Trackpad-Wisch. Die Nachbarsections sind
      250 bis 300vh hoch, haben aber auch nur einen Kopf und keine drei
      Akte. */
+  /* 475 statt 450: das Siegel startet jetzt erst, wenn der Kopf steht
+     (siehe SIEGEL_START weiter unten). Dieser eingeschobene Weg kommt
+     hinten dazu, statt die Standzeit der „5,0" oder die Akte zu
+     kuerzen — alle Phasen danach behalten ihre Laenge in Pixeln. */
   .sti {
     position: relative;
-    min-height: 450vh;
+    min-height: 475vh;
     background: #0a0a0a;
   }
 
   @media (max-width: 768px) {
     .sti {
-      min-height: 340vh;
+      min-height: 360vh;
     }
   }
 
@@ -1646,14 +1650,28 @@ const akte = AKTE.map((a) => {
        Jetzt zaehlt sie frueher aus und das Bild STEHT dann: 0.105
        von p sind bei 450vh und 900 px Fensterhoehe rund 330 px
        Scrollweg, in denen „5,0" vollstaendig zu sehen ist. */
-    const SIEGEL_ENDE = 0.085;
-    const UEBERGANG = [0.19, 0.27];
-    const AKTE_START = 0.27;
+    /* Reihenfolge statt Gleichzeitigkeit: vorher blendete das Siegel
+       ueber GENAU dasselbe Fenster ein wie der Kopf (beide 0..0.05)
+       und zaehlte dabei schon hoch. Man las Ueberschrift und Zahl
+       gleichzeitig und keines von beidem richtig.
+
+       Jetzt steht der Kopf zuerst, dann faengt das Siegel an.
+       SIEGEL_START liegt einen kurzen Atemzug hinter KOPF_EIN, damit
+       die Reihenfolge auch zu sehen ist und nicht wie ein
+       gemeinsamer Start wirkt.
+
+       Alle Werte sind auf den neuen Scrollweg umgerechnet (375vh statt
+       350vh, siehe min-height). In Pixeln bleibt damit alles wie
+       vorher — nur der Start des Siegels ist nach hinten gerueckt. */
+    const SIEGEL_START = 0.061;
+    const SIEGEL_ENDE = 0.141;
+    const UEBERGANG = [0.239, 0.313];
+    const AKTE_START = 0.313;
     // Nach hinten verlaengert, damit die Akte trotz des spaeteren
     // Starts ihre Laenge behalten: (0.90 - 0.27) / 3 = 0.21.
-    const AKTE_ENDE = 0.9;
+    const AKTE_ENDE = 0.901;
     const AKT_DAUER = (AKTE_ENDE - AKTE_START) / akte.length;
-    const SETTLE = [0.9, 0.96];
+    const SETTLE = [0.901, 0.957];
     const STEMPEL = [0.92, 1.0];
     /* Zwei Fenster um eine Aktgrenze, beide in Akt-Anteilen.
        FUELL_WEG laeuft VOR der Grenze aus: die Rail-Fuellung erreicht
@@ -1668,7 +1686,7 @@ const akte = AKTE.map((a) => {
        350vh Scrollweg sind 17,5vh. Section 3 braucht fuer ihren Kopf
        15vh (250vh hoch, 10 % davon), Section 4 braucht 24vh (300vh,
        12 %). 17,5 liegt dazwischen. */
-    const KOPF_EIN = 0.05;
+    const KOPF_EIN = 0.047;
 
     // Frueh deklariert, weil aktualisieren() darauf prueft.
     const ruhig = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -1712,10 +1730,10 @@ const akte = AKTE.map((a) => {
       const p = klemm(-r.top / Math.max(1, hoehe));
 
       // --- Startbild: Note zaehlt hoch, Sterne fuellen sich ---
-      const aufbau = bereich(p, 0, SIEGEL_ENDE);
+      const aufbau = bereich(p, SIEGEL_START, SIEGEL_ENDE);
       sticky.style.setProperty(
         '--siegel',
-        kurve(p, 0, 0.05, UEBERGANG[0], UEBERGANG[1]).toFixed(4)
+        kurve(p, SIEGEL_START, SIEGEL_START + 0.047, UEBERGANG[0], UEBERGANG[1]).toFixed(4)
       );
       // Die Sterne fuellen sich ANTEILIG mit der Note: bei 3,4 ist der
       // vierte Stern zu 40 % gefuellt, nicht einfach blasser.
@@ -1833,7 +1851,7 @@ const akte = AKTE.map((a) => {
          und zurueck. */
       sticky.style.setProperty(
         '--zaehler-an',
-        (bereich(p, AKTE_START - 0.035, AKTE_START) * (1 - kopfZurueck)).toFixed(4)
+        (bereich(p, AKTE_START - 0.033, AKTE_START) * (1 - kopfZurueck)).toFixed(4)
       );
 
       /* Nur die ZIFFER wechselt, und zwar rollend: unten steht der
